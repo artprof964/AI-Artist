@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Latest Local AI Agent Flow</title>
+<style>
+body{font-family:Arial;margin:0;background:#08111f;color:#e5e7eb}
+main{padding:18px}
+pre{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;white-space:pre-wrap}
+.box{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px;margin:10px 0}
+</style>
+</head>
+<body>
+<main>
+<h1>Latest Local AI Agent Flow</h1>
+<div class="box"><pre>External Request
+ -> FastAPI Gateway
+ -> OPA Policy Layer
+ -> Front Agent
+ -> Hermes Orchestrator
+    -> route / assign
+    -> delegate_task to restricted sub-agents
+    -> sub-agents push structured outputs
+    -> collect
+    -> validate
+    -> compare
+    -> retry / escalate
+    -> synthesize one result
+    -> emit orchestrated output
+ -> Final Validation
+ -> Final Response / Action
+ -> Output Tool Agent
+ -> Channels / Platforms
+</pre></div>
+<h2>Key Logic</h2>
+<div class="box">Front Agent delegates only.</div>
+<div class="box">Hermes Orchestrator owns route / assign / collect / validate / compare / retry / synthesize.</div>
+<div class="box">Sub-agents push structured outputs to Hermes.</div>
+<div class="box">OPA owns authority.</div>
+<div class="box">Output Tool Agent owns delivery.</div>
+</main>
+</body>
+</html>
