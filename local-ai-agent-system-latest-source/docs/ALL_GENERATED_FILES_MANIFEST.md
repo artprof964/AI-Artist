@@ -6,6 +6,7 @@
 - `docs/query_source_tracking_schema_latest_v1.md`
 - `docs/diagrams/latest_mermaid_flow_v2.md`
 - `docs/diagrams/latest_mermaid_flow_v3.md`
+- `docs/diagrams/latest_mermaid_flow_v3.mmd`
 - `docs/diagrams/latest_interactive_flow_v2.html`
 - `docs/diagrams/latest_interactive_flow_v3.html`
 - `docs/hardware/hardware_requirements_latest_v2.md`
