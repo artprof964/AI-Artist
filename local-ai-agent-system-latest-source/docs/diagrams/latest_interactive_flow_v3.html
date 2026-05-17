@@ -1,0 +1,901 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Local AI Agent System - Interactive Flow v3</title>
+<style>
+:root{
+  --bg:#f4efe4;
+  --panel:#fffaf1;
+  --ink:#1d2433;
+  --muted:#5c6473;
+  --line:#d8cdb8;
+  --accent:#b85042;
+  --accent-2:#1f6f78;
+  --accent-3:#d9a441;
+  --accent-4:#5f7c3b;
+  --shadow:0 18px 40px rgba(46,34,20,.12);
+  --radius:20px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:
+radial-gradient(circle at top left, rgba(217,164,65,.18), transparent 30%),
+linear-gradient(180deg, #f8f4ea 0%, var(--bg) 100%);
+color:var(--ink);
+font-family:Georgia, "Times New Roman", serif}
+body{min-height:100vh}
+.shell{max-width:1400px;margin:0 auto;padding:32px 20px 56px}
+.hero{
+  display:grid;
+  grid-template-columns:1.6fr .9fr;
+  gap:20px;
+  align-items:stretch;
+  margin-bottom:24px;
+}
+.card{
+  background:rgba(255,250,241,.88);
+  border:1px solid rgba(216,205,184,.9);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  backdrop-filter:blur(10px);
+}
+.intro{padding:28px}
+.eyebrow{
+  display:inline-block;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  font:600 12px/1.2 "Trebuchet MS", Arial, sans-serif;
+  color:var(--accent);
+  margin-bottom:14px;
+}
+h1{
+  margin:0 0 14px;
+  font-size:clamp(34px,5vw,64px);
+  line-height:.94;
+  font-weight:700;
+}
+.lede{
+  margin:0;
+  max-width:60ch;
+  font-size:18px;
+  line-height:1.6;
+  color:var(--muted);
+}
+.summary{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:12px;
+  padding:20px;
+}
+.stat{
+  border:1px solid var(--line);
+  border-radius:16px;
+  padding:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.72), rgba(255,250,241,.92));
+}
+.stat strong{
+  display:block;
+  margin-bottom:6px;
+  font:700 13px/1.2 "Trebuchet MS", Arial, sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--accent-2);
+}
+.stat span{font-size:15px;line-height:1.45;color:var(--muted)}
+.toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:0 0 18px;
+}
+.chip{
+  border:1px solid var(--line);
+  background:#fffdf8;
+  color:var(--ink);
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font:600 13px/1 "Trebuchet MS", Arial, sans-serif;
+  transition:.2s ease;
+}
+.chip:hover,.chip.active{
+  background:var(--ink);
+  color:#fff9f0;
+  border-color:var(--ink);
+}
+.layout{
+  display:grid;
+  grid-template-columns:minmax(0,1.2fr) 360px;
+  gap:20px;
+}
+.flow-area{padding:20px}
+.flow{
+  display:grid;
+  gap:14px;
+}
+.stage{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px 18px 18px;
+  background:linear-gradient(180deg, rgba(255,255,255,.8), rgba(251,246,237,.94));
+  transition:transform .18s ease, border-color .18s ease, box-shadow .18s ease, opacity .18s ease;
+  cursor:pointer;
+}
+.stage:hover,
+.stage.active{
+  transform:translateY(-2px);
+  border-color:var(--accent);
+  box-shadow:0 14px 28px rgba(184,80,66,.12);
+}
+.stage.dim{opacity:.42}
+.stage-head{
+  display:flex;
+  justify-content:space-between;
+  gap:12px;
+  align-items:flex-start;
+  margin-bottom:10px;
+}
+.stage-index{
+  font:700 12px/1 "Trebuchet MS", Arial, sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  color:var(--accent);
+}
+.stage-title{
+  margin:4px 0 6px;
+  font-size:23px;
+  line-height:1.05;
+}
+.stage-copy{
+  margin:0;
+  font-size:15px;
+  line-height:1.55;
+  color:var(--muted);
+}
+.tags{display:flex;flex-wrap:wrap;gap:8px}
+.tag{
+  padding:6px 10px;
+  border-radius:999px;
+  font:600 12px/1 "Trebuchet MS", Arial, sans-serif;
+  background:#f3ead8;
+  color:#594a2d;
+}
+.stage ul{
+  margin:14px 0 0;
+  padding-left:18px;
+  color:var(--ink);
+}
+.stage li{margin:6px 0;line-height:1.45}
+.arrow{
+  width:2px;
+  height:18px;
+  margin:0 auto;
+  background:linear-gradient(180deg, rgba(95,124,59,.18), rgba(31,111,120,.9));
+  border-radius:999px;
+}
+.panel{
+  padding:22px;
+  position:sticky;
+  top:18px;
+  align-self:start;
+}
+.panel h2{
+  margin:0 0 10px;
+  font-size:26px;
+  line-height:1.05;
+}
+.panel p{
+  margin:0 0 14px;
+  font-size:15px;
+  line-height:1.6;
+  color:var(--muted);
+}
+.detail-block{
+  border-top:1px solid var(--line);
+  padding-top:14px;
+  margin-top:14px;
+}
+.detail-block h3{
+  margin:0 0 10px;
+  font:700 13px/1.2 "Trebuchet MS", Arial, sans-serif;
+  text-transform:uppercase;
+  letter-spacing:.08em;
+  color:var(--accent-2);
+}
+.detail-list{
+  display:grid;
+  gap:8px;
+}
+.detail-item{
+  padding:10px 12px;
+  background:#fffdf8;
+  border:1px solid var(--line);
+  border-radius:14px;
+  font-size:14px;
+  line-height:1.45;
+}
+.lanes{
+  margin-top:24px;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.lane{padding:18px}
+.lane h3{margin:0 0 8px;font-size:18px}
+.lane p{margin:0;color:var(--muted);line-height:1.55;font-size:14px}
+.lane.runtime h3{color:var(--accent)}
+.lane.data h3{color:var(--accent-2)}
+.lane.security h3{color:var(--accent-4)}
+.dependency-shell{
+  margin-top:24px;
+  padding:20px;
+}
+.dependency-head{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:end;
+  margin-bottom:14px;
+}
+.dependency-head h3{
+  margin:0 0 6px;
+  font-size:28px;
+  line-height:1.02;
+}
+.dependency-head p{
+  margin:0;
+  max-width:66ch;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.6;
+}
+.dependency-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  margin:0 0 14px;
+}
+.dep-chip{
+  border:1px solid var(--line);
+  background:#fffdf8;
+  color:var(--ink);
+  padding:10px 14px;
+  border-radius:999px;
+  cursor:pointer;
+  font:600 13px/1 "Trebuchet MS", Arial, sans-serif;
+}
+.dep-chip.active{
+  background:var(--accent-2);
+  color:#fffaf1;
+  border-color:var(--accent-2);
+}
+.dependency-grid{
+  display:grid;
+  grid-template-columns:1.15fr .85fr;
+  gap:16px;
+}
+.dependency-list{
+  display:grid;
+  gap:12px;
+}
+.dep-card{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:16px;
+  background:linear-gradient(180deg, rgba(255,255,255,.76), rgba(251,246,237,.96));
+  cursor:pointer;
+  transition:.18s ease;
+}
+.dep-card:hover,.dep-card.active{
+  border-color:var(--accent-2);
+  box-shadow:0 12px 22px rgba(31,111,120,.10);
+  transform:translateY(-1px);
+}
+.dep-card h4{
+  margin:0 0 8px;
+  font-size:20px;
+  line-height:1.05;
+}
+.dep-card p{
+  margin:0;
+  color:var(--muted);
+  font-size:14px;
+  line-height:1.55;
+}
+.dep-meta{
+  margin-top:12px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+.dep-badge{
+  padding:6px 10px;
+  border-radius:999px;
+  background:#f3ead8;
+  color:#594a2d;
+  font:600 12px/1 "Trebuchet MS", Arial, sans-serif;
+}
+.dependency-detail{
+  border:1px solid var(--line);
+  border-radius:18px;
+  padding:18px;
+  background:#fffdf8;
+}
+.dependency-detail h4{
+  margin:0 0 8px;
+  font-size:24px;
+  line-height:1.05;
+}
+.dependency-detail p{
+  margin:0 0 14px;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.6;
+}
+.dependency-detail ul{
+  margin:0;
+  padding-left:18px;
+}
+.dependency-detail li{
+  margin:8px 0;
+  line-height:1.5;
+}
+.footer-note{
+  margin-top:22px;
+  padding:16px 18px;
+  border-radius:16px;
+  border:1px dashed rgba(184,80,66,.35);
+  background:rgba(184,80,66,.06);
+  color:#5b342e;
+  font-size:14px;
+  line-height:1.5;
+}
+@media (max-width:1120px){
+  .hero,.layout,.lanes,.dependency-grid{grid-template-columns:1fr}
+  .panel{position:static}
+}
+@media (max-width:720px){
+  .shell{padding:18px 14px 38px}
+  .intro,.summary,.flow-area,.panel,.lane{padding:18px}
+  .stage-title{font-size:21px}
+  .lede{font-size:16px}
+}
+</style>
+</head>
+<body>
+<div class="shell">
+  <section class="hero">
+    <article class="card intro">
+      <span class="eyebrow">Interactive System Map</span>
+      <h1>Local AI Agent System Full Flow</h1>
+      <p class="lede">
+        This view turns the architecture notes into a clickable operating model:
+        request intake, policy control, orchestration, specialist agents, validation,
+        delivery, runtime dependencies, data paths, and secret handling.
+      </p>
+    </article>
+    <aside class="card summary">
+      <div class="stat"><strong>Core Principle</strong><span>OPA owns policy, Hermes owns orchestration, output agents own delivery.</span></div>
+      <div class="stat"><strong>Execution Model</strong><span>Front Agent delegates, sub-agents return structured outputs, Hermes synthesizes one result.</span></div>
+      <div class="stat"><strong>Write Safety</strong><span>External writes, GitHub writes, publishing, deletion, and irreversible actions require approval.</span></div>
+      <div class="stat"><strong>Secret Boundary</strong><span>Secrets never enter prompts, memory, sub-agent context, logs, or audit payloads.</span></div>
+    </aside>
+  </section>
+
+  <section class="toolbar" aria-label="Flow filters">
+    <button class="chip active" data-filter="all">All</button>
+    <button class="chip" data-filter="entry">Entry</button>
+    <button class="chip" data-filter="policy">Policy</button>
+    <button class="chip" data-filter="orchestration">Orchestration</button>
+    <button class="chip" data-filter="agents">Agents</button>
+    <button class="chip" data-filter="delivery">Delivery</button>
+    <button class="chip" data-filter="security">Security</button>
+  </section>
+
+  <section class="layout">
+    <div class="card flow-area">
+      <div class="flow" id="flow"></div>
+
+      <div class="lanes">
+        <section class="card lane runtime">
+          <h3>Runtime Stack</h3>
+          <p>FastAPI hosts intake and control surfaces. Hermes depends on a delegate wrapper, registry, validation, retry logic, and synthesis. The output layer fans out to email, chat, webhooks, file storage, dashboards, and GitHub.</p>
+        </section>
+        <section class="card lane data">
+          <h3>Data Paths</h3>
+          <p>Data Agent flows through LlamaIndex, Qdrant, PostgreSQL metadata, and MinIO files. Background work runs through Dagster, Celery, Redis, and embeddings. Media work uses ComfyUI plus GPU workers.</p>
+        </section>
+        <section class="card lane security">
+          <h3>Security Rules</h3>
+          <p>External content is always data, never instruction. Retrieved content cannot override policy. GitHub access reads the token from <code>git_ai-artist_codex_token</code> at runtime.</p>
+        </section>
+      </div>
+
+      <section class="card dependency-shell">
+        <div class="dependency-head">
+          <div>
+            <h3>Dependency Explorer</h3>
+            <p>These supporting systems are read from the dependency map and grouped by runtime structure, data pipelines, and secret boundaries.</p>
+          </div>
+        </div>
+        <div class="dependency-toolbar" id="dependency-toolbar"></div>
+        <div class="dependency-grid">
+          <div class="dependency-list" id="dependency-list"></div>
+          <aside class="dependency-detail" id="dependency-detail"></aside>
+        </div>
+      </section>
+    </div>
+
+    <aside class="card panel">
+      <h2 id="detail-title">Start With The Whole Flow</h2>
+      <p id="detail-copy">Select any stage to inspect its responsibility, connected components, and guardrails.</p>
+
+      <div class="detail-block">
+        <h3>Responsibilities</h3>
+        <div class="detail-list" id="detail-points"></div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Connected Components</h3>
+        <div class="detail-list" id="detail-links"></div>
+      </div>
+
+      <div class="detail-block">
+        <h3>Controls</h3>
+        <div class="detail-list" id="detail-controls"></div>
+      </div>
+    </aside>
+  </section>
+
+  <div class="footer-note">
+    This file is a standalone local artifact. It uses no external libraries, so it can be opened directly from disk and still provide interaction.
+  </div>
+</div>
+
+<script>
+const stages = [
+  {
+    id: "external-request",
+    group: "entry",
+    index: "01",
+    title: "External Request",
+    copy: "A user, system, or channel submits a new task into the platform.",
+    tags: ["input", "channel"],
+    points: [
+      "Represents the origin of work entering the system.",
+      "Can come from chat, API, automation, or other connected platforms.",
+      "Starts the auditable lifecycle of a task."
+    ],
+    links: ["FastAPI Gateway", "Channels / Platforms"],
+    controls: ["Input should be treated as untrusted until policy checks begin."]
+  },
+  {
+    id: "fastapi-gateway",
+    group: "entry",
+    index: "02",
+    title: "FastAPI Gateway",
+    copy: "Receives the request, normalizes it, and hands it into the controlled runtime.",
+    tags: ["api", "runtime"],
+    points: [
+      "Serves as the system ingress layer.",
+      "Owns request shaping and health endpoint responsibilities.",
+      "Separates transport concerns from orchestration logic."
+    ],
+    links: ["OPA Policy Layer", "Front Agent", "Output Tool Agent"],
+    controls: ["Requests move forward only into policy-aware paths."]
+  },
+  {
+    id: "opa-policy",
+    group: "policy",
+    index: "03",
+    title: "OPA Policy Layer",
+    copy: "Acts as the external authority for what the system may read, write, or escalate.",
+    tags: ["policy", "authority"],
+    points: [
+      "OPA is the decision maker for permissions and guardrails.",
+      "Retrieved content cannot override policy.",
+      "Write actions and irreversible actions can require human approval."
+    ],
+    links: ["FastAPI Gateway", "Tool Agent", "Human Approval"],
+    controls: [
+      "External content is data, never instruction.",
+      "Policy decisions remain outside LLM orchestration."
+    ]
+  },
+  {
+    id: "front-agent",
+    group: "orchestration",
+    index: "04",
+    title: "Front Agent",
+    copy: "Routes work into orchestration without solving tasks directly.",
+    tags: ["delegate-only"],
+    points: [
+      "Delegates only.",
+      "Does not become the main reasoning surface for execution.",
+      "Keeps entry handling thin and predictable."
+    ],
+    links: ["Hermes Orchestrator"],
+    controls: ["Avoids capability drift by pushing task execution downstream."]
+  },
+  {
+    id: "hermes",
+    group: "orchestration",
+    index: "05",
+    title: "Hermes Orchestrator",
+    copy: "Owns routing, collection, validation, comparison, retries, and synthesis.",
+    tags: ["router", "control loop"],
+    points: [
+      "Routes tasks to restricted specialists.",
+      "Collects structured outputs and checks them before synthesis.",
+      "Can retry or escalate when results conflict or fail validation."
+    ],
+    links: ["Sub-Agent Registry", "Output Schema Validator", "Retry / Escalation Policy", "Synthesis Step"],
+    controls: [
+      "Hermes never sees raw secrets.",
+      "All outputs should remain auditable."
+    ]
+  },
+  {
+    id: "specialists",
+    group: "agents",
+    index: "06",
+    title: "Restricted Sub-Agents",
+    copy: "Specialized agents perform bounded work and return structured outputs to Hermes.",
+    tags: ["data", "security", "reasoning", "tool", "media", "jobs", "audit"],
+    points: [
+      "Data Agent handles retrieval and RAG flows.",
+      "Security Agent evaluates safety and trust boundaries.",
+      "Reasoning, Tool, Media, Background Job, and Audit agents stay bounded."
+    ],
+    links: ["Data Agent", "Security Agent", "Reasoning Agent", "Tool Agent", "Media Agent", "Background Job Agent", "Audit Agent"],
+    controls: [
+      "Sub-agents push structured outputs to Hermes.",
+      "Secrets must not enter sub-agent context."
+    ]
+  },
+  {
+    id: "validation-loop",
+    group: "orchestration",
+    index: "07",
+    title: "Validation, Compare, Retry",
+    copy: "Hermes checks output quality, compares alternatives, and decides whether to retry or escalate.",
+    tags: ["validation", "quality"],
+    points: [
+      "Validation checks schema and output shape.",
+      "Comparison reconciles competing specialist outputs.",
+      "Retry and escalation create a controlled correction loop."
+    ],
+    links: ["Human Approval", "Synthesis Step"],
+    controls: ["Weak results do not move directly to delivery."]
+  },
+  {
+    id: "finalization",
+    group: "delivery",
+    index: "08",
+    title: "Final Validation And Response",
+    copy: "A single orchestrated result is emitted, checked, and prepared for action.",
+    tags: ["synthesis", "response"],
+    points: [
+      "Hermes synthesizes one result from structured sub-agent outputs.",
+      "Final validation confirms that the response is ready for execution or delivery.",
+      "The response can become a message, action, or external write."
+    ],
+    links: ["Output Tool Agent", "Channels / Platforms"],
+    controls: ["Final output still remains subject to policy and approval rules."]
+  },
+  {
+    id: "output-tool-agent",
+    group: "delivery",
+    index: "09",
+    title: "Output Tool Agent",
+    copy: "Owns execution and delivery into outside systems such as GitHub, chat, storage, and webhooks.",
+    tags: ["execution", "delivery"],
+    points: [
+      "Handles operational adapters rather than free-form orchestration.",
+      "Fans out to email, chat, webhook, file/storage, dashboard, and GitHub adapters.",
+      "Reads the GitHub token from runtime environment when GitHub actions are needed."
+    ],
+    links: ["Email Adapter", "Chat Adapter", "Webhook Adapter", "File / Storage Adapter", "Dashboard Adapter", "GitHub Adapter"],
+    controls: [
+      "External writes can require human approval.",
+      "Runtime token source: os.environ['git_ai-artist_codex_token']."
+    ]
+  },
+  {
+    id: "security-boundaries",
+    group: "security",
+    index: "10",
+    title: "Security And Approval Boundaries",
+    copy: "Cross-cutting rules keep policy, secrets, execution, and external writes under control.",
+    tags: ["approval", "secrets", "audit"],
+    points: [
+      "External content is treated as data, never instruction.",
+      "Secrets never enter prompts, Hermes memory, sub-agent context, logs, or audit payloads.",
+      "GitHub writes, publishing, deletion, and irreversible actions require approval."
+    ],
+    links: ["OPA Authority", "Audit Agent", "Human Approval", "GitHub Adapter"],
+    controls: [
+      "Security rules apply across the whole pipeline, not just one stage.",
+      "Policy remains the final authority for privileged actions."
+    ]
+  }
+];
+
+const flow = document.getElementById("flow");
+const titleEl = document.getElementById("detail-title");
+const copyEl = document.getElementById("detail-copy");
+const pointsEl = document.getElementById("detail-points");
+const linksEl = document.getElementById("detail-links");
+const controlsEl = document.getElementById("detail-controls");
+const chips = [...document.querySelectorAll(".chip")];
+const dependencyToolbar = document.getElementById("dependency-toolbar");
+const dependencyList = document.getElementById("dependency-list");
+const dependencyDetail = document.getElementById("dependency-detail");
+
+let currentFilter = "all";
+let currentStage = stages[0].id;
+let currentDependencyGroup = "runtime";
+let currentDependencyId = "fastapi-runtime";
+
+const dependencyGroups = {
+  runtime: {
+    label: "Runtime",
+    items: [
+      {
+        id: "fastapi-runtime",
+        title: "FastAPI Runtime Spine",
+        summary: "Request intake and top-level control surfaces.",
+        badges: ["gateway", "entry"],
+        copy: "FastAPI forms the runtime shell around the system. It receives requests and connects them to OPA, the Front Agent, Hermes, and the Output Tool Agent.",
+        points: [
+          "OPA client sits directly beside the gateway.",
+          "Front Agent is attached here but stays thin.",
+          "Output Tool Agent is exposed as a delivery edge of the same runtime."
+        ]
+      },
+      {
+        id: "hermes-runtime",
+        title: "Hermes Internal Control Loop",
+        summary: "The orchestrator owns routing, retries, validation, and synthesis.",
+        badges: ["orchestrator", "control"],
+        copy: "Hermes relies on a compact set of internal helpers that keep the orchestration loop explicit instead of distributed across agents.",
+        points: [
+          "delegate_task wrapper",
+          "sub-agent registry",
+          "output schema validator",
+          "retry / escalation policy",
+          "synthesis step"
+        ]
+      },
+      {
+        id: "output-runtime",
+        title: "Output Delivery Adapters",
+        summary: "Execution fans out from one delivery layer into outside channels.",
+        badges: ["delivery", "adapters"],
+        copy: "The Output Tool Agent turns an approved final response into concrete actions across external systems.",
+        points: [
+          "email adapter",
+          "chat adapter",
+          "webhook adapter",
+          "file / storage adapter",
+          "dashboard adapter",
+          "GitHub adapter"
+        ]
+      }
+    ]
+  },
+  data: {
+    label: "Data",
+    items: [
+      {
+        id: "rag-pipeline",
+        title: "Retrieval And Metadata Path",
+        summary: "Data Agent moves through indexing, vector storage, metadata, and file storage.",
+        badges: ["RAG", "storage"],
+        copy: "The main retrieval chain is Data Agent -> LlamaIndex -> Qdrant -> PostgreSQL metadata -> MinIO files.",
+        points: [
+          "LlamaIndex orchestrates retrieval logic.",
+          "Qdrant stores vector state.",
+          "PostgreSQL keeps metadata.",
+          "MinIO stores files and hot artifacts."
+        ]
+      },
+      {
+        id: "background-pipeline",
+        title: "Background Job Pipeline",
+        summary: "Batch work feeds embeddings and vector refresh jobs.",
+        badges: ["jobs", "embeddings"],
+        copy: "Background work runs through Dagster, Celery, Redis, embeddings, and back into Qdrant.",
+        points: [
+          "Dagster coordinates scheduled work.",
+          "Celery executes async jobs.",
+          "Redis carries queue state.",
+          "Embeddings flow back into Qdrant."
+        ]
+      },
+      {
+        id: "media-pipeline",
+        title: "Media Generation Pipeline",
+        summary: "Media Agent uses GPU-backed generation and stores outputs with metadata.",
+        badges: ["media", "gpu"],
+        copy: "The media chain is Media Agent -> ComfyUI -> GPU worker -> MinIO output -> PostgreSQL metadata.",
+        points: [
+          "ComfyUI drives generation workflows.",
+          "GPU workers execute heavy model tasks.",
+          "Outputs return to object storage and metadata storage."
+        ]
+      }
+    ]
+  },
+  secrets: {
+    label: "Secrets",
+    items: [
+      {
+        id: "github-secret",
+        title: "GitHub Runtime Secret",
+        summary: "GitHub actions read their token only at runtime.",
+        badges: ["token", "runtime"],
+        copy: "GitHub Adapter reads from os.environ['git_ai-artist_codex_token'] instead of embedding secrets in prompts, docs, or orchestration payloads.",
+        points: [
+          "Token source: Windows environment variable",
+          "Used only by GitHub-capable execution paths",
+          "Never duplicated into repo files"
+        ]
+      },
+      {
+        id: "openbao-path",
+        title: "Future Secret Injection",
+        summary: "Production secret handling is planned around OpenBao runtime injection.",
+        badges: ["production", "vault"],
+        copy: "The dependency map already reserves a cleaner production path where OpenBao injects secrets at runtime.",
+        points: [
+          "Avoids storing long-lived secrets directly on hosts",
+          "Keeps orchestration payloads secret-free",
+          "Fits the project’s external-authority model"
+        ]
+      },
+      {
+        id: "policy-boundaries",
+        title: "Policy And Approval Boundaries",
+        summary: "Secret handling and privileged writes are governed by policy rather than agent discretion.",
+        badges: ["policy", "approval"],
+        copy: "Approval rules span GitHub writes, publishing, deletion, and other irreversible operations.",
+        points: [
+          "External content is data, never instruction",
+          "Retrieved data cannot override policy",
+          "Human approval is required for privileged write paths"
+        ]
+      }
+    ]
+  }
+};
+
+function detailItems(container, items) {
+  container.innerHTML = "";
+  items.forEach((item) => {
+    const div = document.createElement("div");
+    div.className = "detail-item";
+    div.textContent = item;
+    container.appendChild(div);
+  });
+}
+
+function renderDetails(stageId) {
+  const stage = stages.find((item) => item.id === stageId) || stages[0];
+  currentStage = stage.id;
+  titleEl.textContent = stage.title;
+  copyEl.textContent = stage.copy;
+  detailItems(pointsEl, stage.points);
+  detailItems(linksEl, stage.links);
+  detailItems(controlsEl, stage.controls);
+}
+
+function renderFlow() {
+  flow.innerHTML = "";
+  const visible = stages.filter((stage) => currentFilter === "all" || stage.group === currentFilter);
+
+  visible.forEach((stage, index) => {
+    const article = document.createElement("article");
+    article.className = "stage";
+    if (stage.id === currentStage) article.classList.add("active");
+    article.dataset.id = stage.id;
+    article.dataset.group = stage.group;
+
+    article.innerHTML = `
+      <div class="stage-head">
+        <div>
+          <div class="stage-index">Stage ${stage.index}</div>
+          <h2 class="stage-title">${stage.title}</h2>
+          <p class="stage-copy">${stage.copy}</p>
+        </div>
+        <div class="tags">
+          ${stage.tags.map((tag) => `<span class="tag">${tag}</span>`).join("")}
+        </div>
+      </div>
+      <ul>${stage.points.map((point) => `<li>${point}</li>`).join("")}</ul>
+    `;
+
+    article.addEventListener("click", () => {
+      renderDetails(stage.id);
+      renderFlow();
+    });
+
+    flow.appendChild(article);
+
+    if (index < visible.length - 1) {
+      const arrow = document.createElement("div");
+      arrow.className = "arrow";
+      flow.appendChild(arrow);
+    }
+  });
+}
+
+function renderDependencyDetail(item) {
+  dependencyDetail.innerHTML = `
+    <h4>${item.title}</h4>
+    <p>${item.copy}</p>
+    <ul>${item.points.map((point) => `<li>${point}</li>`).join("")}</ul>
+  `;
+}
+
+function renderDependencyExplorer() {
+  const group = dependencyGroups[currentDependencyGroup];
+  const activeItems = group.items;
+  const activeItem = activeItems.find((item) => item.id === currentDependencyId) || activeItems[0];
+  currentDependencyId = activeItem.id;
+
+  dependencyToolbar.innerHTML = Object.entries(dependencyGroups).map(([key, value]) => `
+    <button class="dep-chip ${key === currentDependencyGroup ? "active" : ""}" data-dep-group="${key}">
+      ${value.label}
+    </button>
+  `).join("");
+
+  dependencyList.innerHTML = activeItems.map((item) => `
+    <article class="dep-card ${item.id === currentDependencyId ? "active" : ""}" data-dep-id="${item.id}">
+      <h4>${item.title}</h4>
+      <p>${item.summary}</p>
+      <div class="dep-meta">
+        ${item.badges.map((badge) => `<span class="dep-badge">${badge}</span>`).join("")}
+      </div>
+    </article>
+  `).join("");
+
+  renderDependencyDetail(activeItem);
+
+  [...dependencyToolbar.querySelectorAll(".dep-chip")].forEach((button) => {
+    button.addEventListener("click", () => {
+      currentDependencyGroup = button.dataset.depGroup;
+      currentDependencyId = dependencyGroups[currentDependencyGroup].items[0].id;
+      renderDependencyExplorer();
+    });
+  });
+
+  [...dependencyList.querySelectorAll(".dep-card")].forEach((card) => {
+    card.addEventListener("click", () => {
+      currentDependencyId = card.dataset.depId;
+      renderDependencyExplorer();
+    });
+  });
+}
+
+chips.forEach((chip) => {
+  chip.addEventListener("click", () => {
+    currentFilter = chip.dataset.filter;
+  chips.forEach((item) => item.classList.toggle("active", item === chip));
+  const visible = stages.filter((stage) => currentFilter === "all" || stage.group === currentFilter);
+  if (visible.length && !visible.some((stage) => stage.id === currentStage)) {
+      currentStage = visible[0].id;
+      renderDetails(currentStage);
+  }
+  renderFlow();
+  });
+});
+
+renderDetails(currentStage);
+renderFlow();
+renderDependencyExplorer();
+</script>
+</body>
+</html>
