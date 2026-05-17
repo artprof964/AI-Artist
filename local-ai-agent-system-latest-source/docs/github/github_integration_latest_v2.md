@@ -21,15 +21,16 @@ gh auth status
 ## Architecture
 
 ```text
-Hermes
+Execution Policy Gate
  -> Tool Agent
- -> OPA check
+ -> OPA recheck
  -> GitHub Adapter
  -> git_ai-artist_codex_token
  -> GitHub API
 ```
 
 Hermes never sees or logs the token.
+GitHub writes remain behind the execution policy gate and approval rules.
 
 Compatibility note: if a shared adapter expects `GITHUB_API_TOKEN`, map it at
 runtime from `git_ai-artist_codex_token` instead of duplicating the secret in files.

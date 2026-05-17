@@ -72,8 +72,9 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 This project is a documentation-first blueprint for a local AI agent system.
 It describes an orchestrated multi-agent architecture centered on a FastAPI
-gateway, OPA policy enforcement, a Hermes orchestrator, restricted sub-agents,
-and an output tool agent.
+gateway, request canonicalization, OPA policy enforcement, a Hermes
+orchestrator, restricted sub-agents, a safe read-only reuse path, and an
+output tool agent.
 
 ## Short Overview
 
@@ -95,22 +96,31 @@ delivered.
 ```text
 External Request
  -> FastAPI Gateway
+ -> Request Canonicalizer
+ -> Policy Context Builder
  -> OPA Policy Layer
- -> Front Agent
- -> Hermes Orchestrator
-    -> route / assign
-    -> delegate_task to restricted sub-agents
-    -> sub-agents push structured outputs
-    -> collect
-    -> validate
-    -> compare
-    -> retry / escalate
-    -> synthesize one result
-    -> emit orchestrated output
- -> Final Validation
- -> Final Response / Action
- -> Output Tool Agent
- -> Channels / Platforms
+ -> Request Classifier
+    -> repeat read-only query
+       -> Reuse Gate
+       -> Source Freshness Check
+       -> Approved Response Cache
+       -> Final Validation
+       -> Final Response / Action
+    -> fresh query or action request
+       -> Front Agent
+       -> Hermes Orchestrator
+          -> route / assign
+          -> delegate_task to restricted sub-agents
+          -> sub-agents push structured outputs
+          -> collect
+          -> validate
+          -> compare
+          -> retry / escalate
+          -> synthesize one result
+       -> Final Validation
+       -> Execution Policy Gate
+       -> Output Tool Agent
+       -> Channels / Platforms
 ```
 
 ## Invariants
@@ -118,7 +128,8 @@ External Request
 - Front Agent delegates only.
 - Hermes owns routing, collection, validation, comparison, retries, and synthesis.
 - Sub-agents return structured outputs to Hermes.
-- OPA is the policy authority.
+- OPA is the policy authority before reuse and before privileged execution.
+- Cached reuse is limited to approved read-only responses.
 - Output Tool Agent owns delivery to external channels.
 - GitHub access uses `git_ai-artist_codex_token` from the environment.
 - Hermes must never receive raw secrets.

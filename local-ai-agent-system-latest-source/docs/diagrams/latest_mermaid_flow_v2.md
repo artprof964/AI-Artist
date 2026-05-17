@@ -1,46 +1,26 @@
-# Latest Mermaid Flow
+# Latest Mermaid Flow v2
 
 ```mermaid
 flowchart TD
-    A[External Request] --> B[FastAPI Gateway]
-    B --> C[OPA Policy Layer]
-    C --> D[Front Agent]
-    D --> E[Hermes Orchestrator]
-    E --> F[Route / Assign]
+    ER["External Request"] --> FG["FastAPI Gateway"]
+    FG --> RC["Request Canonicalizer"]
+    RC --> PCB["Policy Context Builder"]
+    PCB --> OPA["OPA Policy Layer"]
+    OPA --> RCL{"Request Classifier"}
 
-    F --> G[Data Agent]
-    F --> H[Security Agent]
-    F --> I[Reasoning Agent]
-    F --> J[Tool Agent]
-    F --> K[Media Agent]
-    F --> L[Background Job Agent]
-    F --> M[Audit Agent]
+    RCL -->|"repeat read query"| RG["Reuse Gate"]
+    RG --> SFC["Source Freshness Check"]
+    SFC -->|"approved + unchanged"| ARC["Approved Response Cache"]
+    SFC -->|"miss / changed"| FA["Front Agent"]
+    ARC --> FVAL["Final Validation"]
 
-    G --> N[Collect Structured Outputs]
-    H --> N
-    I --> N
-    J --> N
-    K --> N
-    L --> N
-    M --> N
-
-    N --> O[Validate]
-    O --> P[Compare]
-    P --> Q{Retry / Escalate?}
-    Q -->|Retry| F
-    Q -->|Escalate| R[Human Approval]
-    Q -->|OK| S[Synthesize One Result]
-    R --> S
-
-    S --> T[Emit Orchestrated Output]
-    T --> U[Final Validation]
-    U --> V[Final Response / Action]
-    V --> W[Output Tool Agent]
-
-    W --> X[Email]
-    W --> Y[Chat / Messaging]
-    W --> Z[Webhook / API]
-    W --> AA[File / Storage]
-    W --> AB[Dashboard / Internal Feed]
-    W --> AC[GitHub Adapter]
+    RCL -->|"fresh query or action"| FA
+    FA --> HO["Hermes Orchestrator"]
+    HO --> SUB["Restricted Sub-Agents"]
+    SUB --> SYN["Validation / Compare / Retry / Synthesis"]
+    SYN --> FVAL
+    FVAL --> FRA["Final Response / Action"]
+    FRA --> EPG["Execution Policy Gate"]
+    EPG --> OTA["Output Tool Agent"]
+    OTA --> CH["Channels / Platforms"]
 ```

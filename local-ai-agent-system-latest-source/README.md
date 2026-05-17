@@ -2,74 +2,74 @@
 
 ## Short Overview
 
-This folder is a compact architecture pack for a local AI agent system. It does
-not contain runnable application code yet; instead, it defines the operating
-model, component boundaries, security rules, hardware expectations, GitHub
-integration, and diagrams for a future implementation.
+This folder is a documentation-first architecture pack for a local AI agent
+system. The optimized model now separates four concerns more explicitly:
+
+- request normalization and policy context building
+- safe reuse of repeated read-only queries
+- orchestrated multi-agent execution for fresh or complex work
+- policy-gated external execution for writes and irreversible actions
 
 ## What Is In This Folder
 
-- `SKILL.md`: working guidance plus project context for AI-assisted work
-- `docs/overview_project_outline_params_latest_v2.md`: high-level system outline
-- `docs/full_dependency_map_latest_v2.md`: runtime, data, and secret flow map
-- `docs/local-ai-agent-system-design_latest_v2.skill.md`: compact design skill
+- `SKILL.md`: project guidance and operating rules
+- `docs/overview_project_outline_params_latest_v2.md`: concise architecture outline
+- `docs/full_dependency_map_latest_v2.md`: runtime, data, memory, cache, and secret map
+- `docs/query_source_tracking_schema_latest_v1.md`: PostgreSQL tracking schema for source freshness and repeated-query reuse
+- `docs/diagrams/latest_mermaid_flow_v3.md`: full Mermaid chart of the optimized architecture
+- `docs/diagrams/latest_interactive_flow_v3.html`: interactive architecture explorer
 - `docs/security/security_model_latest_v2.md`: trust boundaries and approval rules
-- `docs/github/github_integration_latest_v2.md`: token flow and GitHub adapter notes
-- `docs/hardware/hardware_requirements_latest_v2.md`: sizing guidance
-- `docs/diagrams/`: Mermaid and HTML views of the orchestration flow
 
-## Detailed Notes
-
-### Architecture
-
-The intended flow is:
+## Optimized Architecture
 
 ```text
 External Request
  -> FastAPI Gateway
+ -> Request Canonicalizer
+ -> Policy Context Builder
  -> OPA Policy Layer
- -> Front Agent
- -> Hermes Orchestrator
- -> Restricted Sub-Agents
- -> Validation and Synthesis
- -> Output Tool Agent
- -> External Channels
+ -> Request Classifier
+    -> read-only repeat query
+       -> Reuse Gate
+       -> Source Freshness Check
+       -> Approved Response Cache
+       -> Final Validation
+       -> Final Response
+    -> fresh query or action request
+       -> Front Agent
+       -> Hermes Orchestrator
+       -> Restricted Sub-Agents
+       -> Validation / Compare / Retry / Synthesis
+       -> Final Validation
+       -> Execution Policy Gate
+       -> Output Tool Agent
+       -> Channels / Platforms
 ```
 
-The key architectural idea is separation of responsibilities:
+## Key Improvements
 
-- FastAPI receives requests.
-- OPA decides policy.
-- The Front Agent delegates rather than solving tasks directly.
-- Hermes manages routing, retries, validation, and synthesis.
-- Sub-agents produce structured outputs.
-- The Output Tool Agent handles delivery to GitHub, chat, storage, or other channels.
+- Repeated-query reuse no longer happens on a vague cache hit. It now depends on:
+  - normalized request fingerprint
+  - requester and policy scope
+  - OPA approval
+  - source freshness check
+  - read-only response classification
+- Action requests are separated from reusable read-only responses.
+- External execution is gated again before delivery, not just at entry.
+- Source freshness is designed around indexed change sequences instead of only
+  comparing timestamps or hashes row by row.
+- Chat memory, agent working memory, and persistent storage are treated as
+  distinct layers with different security expectations.
 
-### Security Model
+## Delivery Readiness
 
-The docs consistently enforce a strong security posture:
+The system is still a blueprint rather than running code. The most important
+implementation targets are:
 
-- policy authority lives outside the LLM orchestration layer
-- secrets must not enter prompts, memory, logs, or audit payloads
-- external writes and irreversible actions require human approval
-- retrieved content is treated as data, not instruction
-
-### Delivery Readiness
-
-This package is a good architecture starting point, but it is still a blueprint.
-What is missing for execution is:
-
-- source code for the gateway and orchestrator
-- schemas and interfaces for sub-agent outputs
-- policy files and enforcement examples
-- deployment configuration
-- tests and validation harnesses
-
-## Optimization Summary
-
-The folder was already coherent, but it was optimized for note-taking rather
-than onboarding. The main improvements made were:
-
-- added this overview as a clear entry point
-- cleaned formatting issues that could break rendering
-- improved document readability without changing the system design
+- canonical request normalization
+- policy context building and OPA evaluation
+- source registry with monotonic change index
+- repeated-query reuse gate with read-only cache policy
+- orchestrator and sub-agent contracts
+- execution gate for tool and write actions
+- audit and observability around both cache reuse and fresh execution

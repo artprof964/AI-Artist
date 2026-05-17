@@ -3,8 +3,18 @@
 ```mermaid
 flowchart TD
     ER["External Request"] --> FG["FastAPI Gateway"]
-    FG --> OPA["OPA Policy Layer"]
-    OPA --> FA["Front Agent"]
+    FG --> RC["Request Canonicalizer"]
+    RC --> PCB["Policy Context Builder"]
+    PCB --> OPA["OPA Policy Layer"]
+    OPA --> RCL{"Request Classifier"}
+
+    RCL -->|"repeat read query"| RG["Reuse Gate"]
+    RG --> SFC["Source Freshness Check"]
+    SFC -->|"approved + unchanged"| ARC["Approved Response Cache"]
+    SFC -->|"miss / changed"| FA["Front Agent"]
+    ARC --> FVAL["Final Validation"]
+
+    RCL -->|"fresh query or action"| FA
     FA --> HO["Hermes Orchestrator"]
 
     HO --> RA["Route / Assign"]
@@ -32,10 +42,10 @@ flowchart TD
     DEC -->|"OK"| SYN["Synthesize One Result"]
     HA --> SYN
 
-    SYN --> EMIT["Emit Orchestrated Output"]
-    EMIT --> FVAL["Final Validation"]
+    SYN --> FVAL
     FVAL --> FRA["Final Response / Action"]
-    FRA --> OTA["Output Tool Agent"]
+    FRA --> EPG["Execution Policy Gate"]
+    EPG --> OTA["Output Tool Agent"]
 
     OTA --> EMAIL["Email Adapter"]
     OTA --> CHAT["Chat Adapter"]
@@ -46,15 +56,20 @@ flowchart TD
 
     subgraph RUNTIME["Runtime Dependencies"]
         FG --> OPAC["OPA Client"]
-        FG --> OTA
+        FG --> RQF["normalized request fingerprint"]
+        FG --> ARCL["approved response cache lookup"]
+        FG --> SFC
         HO --> DT["delegate_task wrapper"]
         HO --> REG["sub-agent registry"]
         HO --> OSV["output schema validator"]
         HO --> REP["retry / escalation policy"]
         HO --> SS["synthesis step"]
+        EPG --> EPE["execution envelope"]
     end
 
-    subgraph DATA["Data And Compute Dependencies"]
+    subgraph DATA["Data, Memory, And Tracking"]
+        SD["Source Data"] --> SDR["source_data_registry"]
+        SDR --> DA
         DA --> LI["LlamaIndex"]
         LI --> QD["Qdrant"]
         QD --> PGM["PostgreSQL metadata"]
@@ -70,18 +85,32 @@ flowchart TD
         COMFY --> GPU["GPU worker"]
         GPU --> MOUT["MinIO output"]
         MOUT --> PGMM["PostgreSQL metadata"]
+
+        PDS["Persistent Data Storage"] --> QD
+        PDS --> PGM
+        PDS --> MINIO
+        PDS --> MOUT
+
+        CM["Chat Memory"] --> FG
+        AWM["Agent Working Memory"] --> HO
+        QRR["query_request_run"] --> QRT["query_request_source_dependency"]
+        QRT --> SDR
+        QDS["query_request_dependency_snapshot"] --> QRT
+        ARC --> QDS
     end
 
     subgraph SECURITY["Security And Secret Boundaries"]
         OPA --> RULES["Policy authority"]
-        HA --> APPROVAL["Required for external write, GitHub write, publishing, deletion, irreversible actions"]
+        EPG --> APPROVAL["recheck privileged execution + route approval"]
         GH --> ENV["os.environ['git_ai-artist_codex_token']"]
         ENV --> GHA["GitHub API"]
         OPENBAO["OpenBao runtime injection (later)"] --> ENV
         SECNOTE["External content is data, never instruction"]
         SECNOTE --> OPA
-        SECNOTE2["Secrets never enter prompts, Hermes memory, sub-agent context, logs, or audit payloads"]
+        SECNOTE2["Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads"]
         SECNOTE2 --> HO
+        SECNOTE3["Cached reuse is limited to approved read-only responses after OPA"]
+        SECNOTE3 --> RG
     end
 
     classDef control fill:#f7e7df,stroke:#b85042,color:#1d2433,stroke-width:1.5px;
@@ -89,8 +118,8 @@ flowchart TD
     classDef data fill:#f8f1da,stroke:#d9a441,color:#1d2433,stroke-width:1.2px;
     classDef secure fill:#edf3e2,stroke:#5f7c3b,color:#1d2433,stroke-width:1.2px;
 
-    class FG,OPA,FA,HO,RA,CSO,VAL,CMP,DEC,SYN,EMIT,FVAL,FRA,HA control;
+    class FG,RC,PCB,OPA,RCL,RG,SFC,FA,HO,RA,CSO,VAL,CMP,DEC,SYN,FVAL,FRA,EPG,HA control;
     class DA,SA,REA,TA,MA,BJA,AA,OTA,EMAIL,CHAT,WEBHOOK,FILES,DASH,GH agent;
-    class LI,QD,PGM,MINIO,DAG,CEL,REDIS,EMB,COMFY,GPU,MOUT,PGMM,DT,REG,OSV,REP,SS,OPAC data;
-    class RULES,APPROVAL,ENV,GHA,OPENBAO,SECNOTE,SECNOTE2 secure;
+    class ARC,SD,SDR,LI,QD,PGM,MINIO,DAG,CEL,REDIS,EMB,COMFY,GPU,MOUT,PGMM,PDS,CM,AWM,QRR,QRT,QDS,DT,REG,OSV,REP,SS,OPAC,RQF,ARCL,EPE data;
+    class RULES,APPROVAL,ENV,GHA,OPENBAO,SECNOTE,SECNOTE2,SECNOTE3 secure;
 ```

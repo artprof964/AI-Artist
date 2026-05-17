@@ -3,42 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Latest Local AI Agent Flow</title>
+<title>Optimized Local AI Agent Flow</title>
 <style>
-body{font-family:Arial;margin:0;background:#08111f;color:#e5e7eb}
-main{padding:18px}
-pre{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:16px;white-space:pre-wrap}
-.box{background:#0f172a;border:1px solid #334155;border-radius:12px;padding:12px;margin:10px 0}
+body{font-family:Georgia,serif;margin:0;background:#f5f1e8;color:#202533}
+main{max-width:1100px;margin:0 auto;padding:24px}
+.hero,.box{background:#fffaf2;border:1px solid #d9cfbc;border-radius:18px;box-shadow:0 12px 28px rgba(46,34,20,.08)}
+.hero{padding:24px;margin-bottom:18px}
+.hero h1{margin:0 0 10px;font-size:42px;line-height:.98}
+.hero p{margin:0;color:#5c6473;line-height:1.6;font-size:17px}
+.grid{display:grid;grid-template-columns:1.1fr .9fr;gap:18px}
+.box{padding:18px}
+pre{margin:0;white-space:pre-wrap;font:500 14px/1.55 "Trebuchet MS",Arial,sans-serif;color:#243247}
+h2{margin:0 0 10px;font-size:24px}
+ul{margin:0;padding-left:18px}
+li{margin:8px 0;line-height:1.5}
+@media (max-width:900px){.grid{grid-template-columns:1fr}.hero h1{font-size:34px}}
 </style>
 </head>
 <body>
 <main>
-<h1>Latest Local AI Agent Flow</h1>
-<div class="box"><pre>External Request
+  <section class="hero">
+    <h1>Optimized Local AI Agent Flow</h1>
+    <p>The optimized architecture adds canonical request normalization, a safe repeat-query reuse path behind OPA, source-freshness checks, and a second policy gate before privileged execution.</p>
+  </section>
+  <section class="grid">
+    <article class="box">
+      <h2>Core Flow</h2>
+      <pre>External Request
  -> FastAPI Gateway
+ -> Request Canonicalizer
+ -> Policy Context Builder
  -> OPA Policy Layer
- -> Front Agent
- -> Hermes Orchestrator
-    -> route / assign
-    -> delegate_task to restricted sub-agents
-    -> sub-agents push structured outputs
-    -> collect
-    -> validate
-    -> compare
-    -> retry / escalate
-    -> synthesize one result
-    -> emit orchestrated output
- -> Final Validation
- -> Final Response / Action
- -> Output Tool Agent
- -> Channels / Platforms
-</pre></div>
-<h2>Key Logic</h2>
-<div class="box">Front Agent delegates only.</div>
-<div class="box">Hermes Orchestrator owns route / assign / collect / validate / compare / retry / synthesize.</div>
-<div class="box">Sub-agents push structured outputs to Hermes.</div>
-<div class="box">OPA owns authority.</div>
-<div class="box">Output Tool Agent owns delivery.</div>
+ -> Request Classifier
+    -> repeat read-only query
+       -> Reuse Gate
+       -> Source Freshness Check
+       -> Approved Response Cache
+       -> Final Validation
+       -> Final Response
+    -> fresh query or action request
+       -> Front Agent
+       -> Hermes Orchestrator
+       -> Restricted Sub-Agents
+       -> Validation / Compare / Retry / Synthesis
+       -> Final Validation
+       -> Execution Policy Gate
+       -> Output Tool Agent
+       -> Channels / Platforms</pre>
+    </article>
+    <article class="box">
+      <h2>Control Rules</h2>
+      <ul>
+        <li>OPA is checked before reuse and before privileged execution.</li>
+        <li>Only approved read-only responses are eligible for replay.</li>
+        <li>Source freshness must be checked before cache reuse.</li>
+        <li>Secrets stay out of chat memory, agent memory, prompts, logs, and audit payloads.</li>
+        <li>Output Tool Agent owns external delivery and action execution.</li>
+      </ul>
+    </article>
+  </section>
 </main>
 </body>
 </html>

@@ -5,31 +5,36 @@
 ```text
 External Request
  -> FastAPI Gateway
+ -> Request Canonicalizer
+ -> Policy Context Builder
  -> OPA Policy Layer
- -> Front Agent
- -> Hermes Orchestrator
-    -> route / assign
-    -> delegate_task to restricted sub-agents
-    -> sub-agents push structured outputs
-    -> collect
-    -> validate
-    -> compare
-    -> retry / escalate
-    -> synthesize one result
-    -> emit orchestrated output
- -> Final Validation
- -> Final Response / Action
- -> Output Tool Agent
- -> Channels / Platforms
+ -> Request Classifier
+    -> repeat read-only query
+       -> Reuse Gate
+       -> Source Freshness Check
+       -> Approved Response Cache
+       -> Final Validation
+       -> Final Response / Action
+    -> fresh query or action request
+       -> Front Agent
+       -> Hermes Orchestrator
+       -> restricted sub-agents
+       -> validation / compare / retry / synthesize
+       -> Final Validation
+       -> Execution Policy Gate
+       -> Output Tool Agent
+       -> Channels / Platforms
 ```
 
 ## Rules
 
 ```text
 - Front Agent delegates only.
-- Hermes owns sub-agent routing and loop control.
+- OPA is checked before reuse and before privileged execution.
+- Cached reuse is allowed only for approved read-only responses.
+- Source freshness must be checked before cache replay.
+- Hermes owns orchestration and loop control.
 - Sub-agents push structured outputs to Hermes.
-- OPA is external authority.
 - Output Tool Agent owns delivery.
 - GitHub access uses git_ai-artist_codex_token from environment.
 - Hermes never sees raw secrets.

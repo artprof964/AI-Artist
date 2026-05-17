@@ -3,6 +3,7 @@
 - `docs/overview_project_outline_params_latest_v2.md`
 - `docs/local-ai-agent-system-design_latest_v2.skill.md`
 - `docs/full_dependency_map_latest_v2.md`
+- `docs/query_source_tracking_schema_latest_v1.md`
 - `docs/diagrams/latest_mermaid_flow_v2.md`
 - `docs/diagrams/latest_mermaid_flow_v3.md`
 - `docs/diagrams/latest_interactive_flow_v2.html`
