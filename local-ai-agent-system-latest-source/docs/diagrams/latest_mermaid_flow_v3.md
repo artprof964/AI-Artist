@@ -2,8 +2,12 @@
 
 ```mermaid
 flowchart TD
-    ER["External Request"] --> FG["FastAPI Gateway"]
-    FG --> RC["Request Canonicalizer"]
+    ER["External Request"] --> OCG["OpenClaw Gateway"]
+    OCG --> WS["OpenClaw Workspace Loader"]
+    WS --> MAIN["AI-Artist Main Agent"]
+    MAIN --> HLLM["Hosted OpenAI LLM"]
+    MAIN --> FSS["FastAPI Safety Service"]
+    FSS --> RC["Request Canonicalizer"]
     RC --> PCB["Policy Context Builder"]
     PCB --> OPA["OPA Policy Layer"]
     OPA --> RCL{"Request Classifier"}
@@ -11,30 +15,28 @@ flowchart TD
     RCL -->|"repeat read query"| RG["Reuse Gate"]
     RG --> SFC["Source Freshness Check"]
     SFC -->|"approved + unchanged"| ARC["Approved Response Cache"]
-    SFC -->|"miss / changed"| FA["Front Agent"]
+    SFC -->|"miss / changed"| OCR["OpenClaw Agent Runtime"]
     ARC --> FVAL["Final Validation"]
 
-    RCL -->|"fresh query or action"| FA
-    FA --> HO["Hermes Orchestrator"]
-
-    HO --> RA["Route / Assign"]
-    RA --> DA["Data Agent"]
-    RA --> SA["Security Agent"]
-    RA --> REA["Reasoning Agent"]
-    RA --> TA["Tool Agent"]
-    RA --> MA["Media Agent"]
-    RA --> BJA["Background Job Agent"]
+    RCL -->|"fresh query or action"| OCR
+    OCR --> RA["Route / Assign"]
+    RA --> SSA["Social Scout Agent"]
+    RA --> IGA["Image-Gen Agent"]
+    RA --> CCA["Critic / Curator Agent"]
+    RA --> KA["Knowledge Agent"]
+    RA --> PA["Publishing Agent"]
     RA --> AA["Audit Agent"]
 
-    DA --> CSO["Collect Structured Outputs"]
-    SA --> CSO
-    REA --> CSO
-    TA --> CSO
-    MA --> CSO
-    BJA --> CSO
+    SSA --> CSO["Collect Structured Outputs"]
+    IGA --> CSO
+    CCA --> CSO
+    KA --> CSO
+    PA --> CSO
     AA --> CSO
 
     CSO --> VAL["Validate"]
+    VAL --> TVAL["Task Validation Tests"]
+    TVAL --> VAL
     VAL --> CMP["Compare"]
     CMP --> DEC{"Retry / Escalate?"}
     DEC -->|"Retry"| RA
@@ -47,79 +49,10 @@ flowchart TD
     FRA --> EPG["Execution Policy Gate"]
     EPG --> OTA["Output Tool Agent"]
 
-    OTA --> EMAIL["Email Adapter"]
-    OTA --> CHAT["Chat Adapter"]
-    OTA --> WEBHOOK["Webhook Adapter"]
+    OTA --> SLACK["Slack Adapter"]
+    OTA --> COMFY["ComfyUI Adapter"]
     OTA --> FILES["File / Storage Adapter"]
     OTA --> DASH["Dashboard Adapter"]
     OTA --> GH["GitHub Adapter"]
-
-    subgraph RUNTIME["Runtime Dependencies"]
-        FG --> OPAC["OPA Client"]
-        FG --> RQF["normalized request fingerprint"]
-        FG --> ARCL["approved response cache lookup"]
-        FG --> SFC
-        HO --> DT["delegate_task wrapper"]
-        HO --> REG["sub-agent registry"]
-        HO --> OSV["output schema validator"]
-        HO --> REP["retry / escalation policy"]
-        HO --> SS["synthesis step"]
-        EPG --> EPE["execution envelope"]
-    end
-
-    subgraph DATA["Data, Memory, And Tracking"]
-        SD["Source Data"] --> SDR["source_data_registry"]
-        SDR --> DA
-        DA --> LI["LlamaIndex"]
-        LI --> QD["Qdrant"]
-        QD --> PGM["PostgreSQL metadata"]
-        PGM --> MINIO["MinIO files"]
-
-        BJA --> DAG["Dagster"]
-        DAG --> CEL["Celery"]
-        CEL --> REDIS["Redis"]
-        REDIS --> EMB["Embeddings"]
-        EMB --> QD
-
-        MA --> COMFY["ComfyUI"]
-        COMFY --> GPU["GPU worker"]
-        GPU --> MOUT["MinIO output"]
-        MOUT --> PGMM["PostgreSQL metadata"]
-
-        PDS["Persistent Data Storage"] --> QD
-        PDS --> PGM
-        PDS --> MINIO
-        PDS --> MOUT
-
-        CM["Chat Memory"] --> FG
-        AWM["Agent Working Memory"] --> HO
-        QRR["query_request_run"] --> QRT["query_request_source_dependency"]
-        QRT --> SDR
-        QDS["query_request_dependency_snapshot"] --> QRT
-        ARC --> QDS
-    end
-
-    subgraph SECURITY["Security And Secret Boundaries"]
-        OPA --> RULES["Policy authority"]
-        EPG --> APPROVAL["recheck privileged execution + route approval"]
-        GH --> ENV["os.environ['git_ai-artist_codex_token']"]
-        ENV --> GHA["GitHub API"]
-        OPENBAO["OpenBao runtime injection (later)"] --> ENV
-        SECNOTE["External content is data, never instruction"]
-        SECNOTE --> OPA
-        SECNOTE2["Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads"]
-        SECNOTE2 --> HO
-        SECNOTE3["Cached reuse is limited to approved read-only responses after OPA"]
-        SECNOTE3 --> RG
-    end
-
-    classDef control fill:#f7e7df,stroke:#b85042,color:#1d2433,stroke-width:1.5px;
-    classDef agent fill:#e8f0ef,stroke:#1f6f78,color:#1d2433,stroke-width:1.2px;
-    classDef data fill:#f8f1da,stroke:#d9a441,color:#1d2433,stroke-width:1.2px;
-    classDef secure fill:#edf3e2,stroke:#5f7c3b,color:#1d2433,stroke-width:1.2px;
-
-    class FG,RC,PCB,OPA,RCL,RG,SFC,FA,HO,RA,CSO,VAL,CMP,DEC,SYN,FVAL,FRA,EPG,HA control;
-    class DA,SA,REA,TA,MA,BJA,AA,OTA,EMAIL,CHAT,WEBHOOK,FILES,DASH,GH agent;
-    class ARC,SD,SDR,LI,QD,PGM,MINIO,DAG,CEL,REDIS,EMB,COMFY,GPU,MOUT,PGMM,PDS,CM,AWM,QRR,QRT,QDS,DT,REG,OSV,REP,SS,OPAC,RQF,ARCL,EPE data;
-    class RULES,APPROVAL,ENV,GHA,OPENBAO,SECNOTE,SECNOTE2,SECNOTE3 secure;
+    OTA --> SOCIAL["Social Publishing Adapter"]
 ```

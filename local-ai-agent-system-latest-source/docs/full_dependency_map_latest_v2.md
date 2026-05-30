@@ -1,8 +1,10 @@
-# Latest Dependency Map
+# Latest Dependency Map - OpenClaw + Hosted LLM
 
 ```text
 External Request
- -> FastAPI Gateway
+ -> OpenClaw Gateway
+ -> AI-Artist Main Agent
+ -> FastAPI Safety Service
  -> Request Canonicalizer
  -> Policy Context Builder
  -> OPA Policy Layer
@@ -14,8 +16,8 @@ External Request
        -> Final Validation
        -> Final Response
     -> fresh query or action request
-       -> Front Agent
-       -> Hermes Orchestrator
+       -> OpenClaw Main Agent
+       -> OpenClaw Agent Runtime
           -> route / assign
           -> delegate_task to restricted sub-agents
           -> sub-agents push structured outputs
@@ -33,18 +35,26 @@ External Request
 ## Runtime
 
 ```text
-FastAPI
+OpenClaw Gateway
+ |- workspace loader
+ |- channel adapters
+ |- AI-Artist Main Agent
+ |- OpenAI hosted LLM client
+ |- agent registry
+ |- tool hooks
+ `- safety-service adapter
+
+FastAPI Safety Service
  |- request canonicalizer
  |- policy context builder
  |- OPA client
  |- request classifier
  |- reuse gate
  |- source freshness check
- |- Front Agent
- |- Hermes Orchestrator
- `- Output Tool Agent
+ |- execution envelope signer
+ `- audit logger
 
-Hermes Orchestrator
+OpenClaw Agent Runtime
  |- delegate_task wrapper
  |- sub-agent registry
  |- output schema validator
@@ -57,7 +67,7 @@ Execution Policy Gate
  |- human approval routing
  `- signed execution envelope to Tool / Output agents
 
-Output Tool Agent
+Output Tool Agent / OpenClaw Tool Adapters
  |- email adapter
  |- chat adapter
  |- webhook adapter
@@ -66,15 +76,34 @@ Output Tool Agent
  `- GitHub adapter
 ```
 
+## Interface Contracts
+
+```text
+OpenClaw Gateway -> FastAPI Safety Service
+  request envelope, tool preflight, execution-envelope request, audit event
+
+FastAPI Safety Service -> OPA
+  policy input and allow/deny response
+
+OpenClaw Agent Runtime -> Sub-Agents
+  bounded task payload and SubAgentOutput
+
+ComfyUI Adapter -> MinIO / PostgreSQL
+  generated artifact, provenance metadata, review status
+
+GitHub / Slack / Publishing Adapters
+  signed execution envelope required for external writes
+```
+
 ## Data And Memory
 
 ```text
-Source Data -> source_data_registry -> Data Agent -> LlamaIndex -> Qdrant -> PostgreSQL metadata -> MinIO files
+Source Data -> source_data_registry -> Knowledge Agent -> LlamaIndex -> Qdrant -> PostgreSQL metadata -> MinIO files
 Background Job Agent -> Dagster -> Celery -> Redis -> embeddings -> Qdrant
 Media Agent -> ComfyUI -> GPU worker -> MinIO output -> PostgreSQL metadata
 Persistent Data Storage -> Qdrant + PostgreSQL metadata + MinIO files + MinIO output
-Chat Memory -> session / thread context
-Agent Working Memory -> Hermes state + bounded sub-agent task state
+Chat Memory -> OpenClaw session / thread context
+Agent Working Memory -> OpenClaw agent state + bounded sub-agent task state
 Approved Response Cache -> repeated approved read-only responses
 Query Source Tracking Tables -> request fingerprint + dependency set + change detection
 ```
@@ -93,9 +122,11 @@ Normalized request fingerprint -> requester scope + policy scope
 ## Secrets
 
 ```text
+Hosted LLM Client -> os.environ["OPENAI_API_KEY"]
 GitHub Adapter -> os.environ["git_ai-artist_codex_token"]
 Production later -> OpenBao runtime injection
-Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads
+Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads.
+OpenAI requests must be logged by request id / model / token counts only, not raw secrets.
 ```
 
 ## Speed Optimization Rules

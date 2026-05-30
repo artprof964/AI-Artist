@@ -70,11 +70,11 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 ## Purpose
 
-This project is a documentation-first blueprint for a local AI agent system.
-It describes an orchestrated multi-agent architecture centered on a FastAPI
-gateway, request canonicalization, OPA policy enforcement, a Hermes
-orchestrator, restricted sub-agents, a safe read-only reuse path, and an
-output tool agent.
+This project is a documentation-first blueprint for the AI-Artist agent system.
+The selected implementation stack is OpenClaw as the agent control plane plus a
+hosted OpenAI LLM as the primary reasoning backend. FastAPI, OPA, PostgreSQL,
+Qdrant, MinIO, and Redis provide the local safety, policy, persistence, and
+reuse layer around OpenClaw.
 
 ## Short Overview
 
@@ -95,7 +95,9 @@ delivered.
 
 ```text
 External Request
- -> FastAPI Gateway
+ -> OpenClaw Gateway
+ -> AI-Artist Main Agent
+ -> FastAPI Safety Service
  -> Request Canonicalizer
  -> Policy Context Builder
  -> OPA Policy Layer
@@ -107,8 +109,8 @@ External Request
        -> Final Validation
        -> Final Response / Action
     -> fresh query or action request
-       -> Front Agent
-       -> Hermes Orchestrator
+       -> OpenClaw Main Agent
+       -> OpenClaw Agent Runtime
           -> route / assign
           -> delegate_task to restricted sub-agents
           -> sub-agents push structured outputs
@@ -125,23 +127,23 @@ External Request
 
 ## Invariants
 
-- Front Agent delegates only.
-- Hermes owns routing, collection, validation, comparison, retries, and synthesis.
-- Sub-agents return structured outputs to Hermes.
+- AI-Artist Main Agent delegates specialized work and does not bypass policy gates.
+- OpenClaw Agent Runtime owns routing, collection, validation, comparison, retries, and synthesis.
+- Sub-agents return structured outputs to the main OpenClaw runtime.
 - OPA is the policy authority before reuse and before privileged execution.
 - Cached reuse is limited to approved read-only responses.
 - Output Tool Agent owns delivery to external channels.
 - GitHub access uses `git_ai-artist_codex_token` from the environment.
-- Hermes must never receive raw secrets.
+- OpenClaw agents must never receive raw secrets.
 - Actions should remain auditable.
 
 ## Stack Summary
 
-- FastAPI
+- OpenClaw
+- hosted OpenAI Responses API
+- FastAPI safety service
 - OPA
-- Hermes Agent
-- vLLM or Ollama
-- Qwen, Llama, or Mistral
+- GPT-5.2, GPT-5 mini, GPT-5 nano
 - LlamaIndex
 - Qdrant
 - PostgreSQL
@@ -156,6 +158,10 @@ External Request
 ## Key Files
 
 - `docs/overview_project_outline_params_latest_v2.md`
+- `docs/implementation_stack_openclaw_hosted_llm_latest_v1.md`
+- `docs/interface_process_standard_latest_v1.md`
+- `docs/task_validation_matrix_latest_v1.md`
+- `docs/project_status_latest_v1.md`
 - `docs/local-ai-agent-system-design_latest_v2.skill.md`
 - `docs/full_dependency_map_latest_v2.md`
 - `docs/diagrams/latest_mermaid_flow_v2.md`
@@ -172,3 +178,5 @@ External Request
 - Keep secrets out of orchestration payloads.
 - If runnable source code is added later, align it with the flow and invariants
   documented here and in `docs/`.
+- Add or update validation tests for each implementation task before marking it
+  complete in the project tracker.

@@ -1,6 +1,10 @@
 # All Generated Files Manifest
 
 - `docs/overview_project_outline_params_latest_v2.md`
+- `docs/implementation_stack_openclaw_hosted_llm_latest_v1.md`
+- `docs/interface_process_standard_latest_v1.md`
+- `docs/task_validation_matrix_latest_v1.md`
+- `docs/project_status_latest_v1.md`
 - `docs/local-ai-agent-system-design_latest_v2.skill.md`
 - `docs/full_dependency_map_latest_v2.md`
 - `docs/query_source_tracking_schema_latest_v1.md`

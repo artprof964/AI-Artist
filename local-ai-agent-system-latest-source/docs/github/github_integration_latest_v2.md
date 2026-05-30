@@ -21,7 +21,9 @@ gh auth status
 ## Architecture
 
 ```text
-Execution Policy Gate
+OpenClaw Tool Adapter
+ -> FastAPI Safety Service
+ -> Execution Policy Gate
  -> Tool Agent
  -> OPA recheck
  -> GitHub Adapter
@@ -29,8 +31,18 @@ Execution Policy Gate
  -> GitHub API
 ```
 
-Hermes never sees or logs the token.
+OpenClaw agents never see or log the token.
 GitHub writes remain behind the execution policy gate and approval rules.
 
 Compatibility note: if a shared adapter expects `GITHUB_API_TOKEN`, map it at
 runtime from `git_ai-artist_codex_token` instead of duplicating the secret in files.
+
+## Validation
+
+```text
+GitHub adapter tests must use a mocked GitHub API.
+The token may be read only by the adapter process.
+OpenClaw agents, hosted LLM payloads, prompts, logs, memory, and audit payloads
+must not contain the raw token.
+GitHub write attempts must fail unless a signed execution envelope is present.
+```

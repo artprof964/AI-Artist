@@ -1,10 +1,22 @@
-# Local AI Agent System - Optimized Source Outline
+# AI-Artist Agent System - Optimized Source Outline
+
+## Selected Direction
+
+```text
+Agent control plane: OpenClaw
+Primary LLM backend: hosted OpenAI Responses API
+Primary model lane: GPT-5.2, with GPT-5 mini / nano for cost-controlled paths
+Image generation: ComfyUI with Flux / SDXL
+Safety layer: FastAPI + OPA + PostgreSQL audit/cache/source tracking
+```
 
 ## Optimized Core Flow
 
 ```text
 External Request
- -> FastAPI Gateway
+ -> OpenClaw Gateway
+ -> AI-Artist Main Agent
+ -> FastAPI Safety Service
  -> Request Canonicalizer
  -> Policy Context Builder
  -> OPA Policy Layer
@@ -16,10 +28,10 @@ External Request
        -> Final Validation
        -> Final Response / Action
     -> fresh query or action request
-       -> Front Agent
-       -> Hermes Orchestrator
+       -> OpenClaw Main Agent
+       -> OpenClaw Agent Runtime
           -> route / assign
-          -> delegate_task to restricted sub-agents
+          -> delegate_task to restricted OpenClaw sub-agents
           -> collect structured outputs
           -> validate
           -> compare
@@ -34,27 +46,44 @@ External Request
 ## Invariants
 
 ```text
-Front Agent delegates only.
+AI-Artist Main Agent delegates specialized work and does not bypass policy gates.
 OPA is the authority both before reuse and before privileged execution.
 Cached reuse is allowed only for approved read-only responses.
 Source freshness must be checked before a cached response is replayed.
-Hermes Orchestrator owns route / assign / collect / validate / compare / retry / synthesize.
-Sub-agents push structured outputs to Hermes.
+OpenClaw Agent Runtime owns route / assign / collect / validate / compare / retry / synthesize.
+Sub-agents push structured outputs to the main agent runtime.
 Output Tool Agent owns delivery and external execution.
 GitHub token comes from Windows env variable git_ai-artist_codex_token.
-Hermes never receives raw secrets.
+OpenClaw agents never receive raw secrets.
 Chat memory, agent memory, and persistent data storage remain separate concerns.
 All actions and cache reuses are auditable.
+Every implementation task has a validation test before it can be marked done.
+```
+
+## Standard Interface Process
+
+```text
+1. Intake: OpenClaw receives request and loads workspace context.
+2. Normalize: FastAPI Safety Service creates request fingerprint.
+3. Classify: request becomes read, action, or mixed.
+4. Policy Check: Safety Service asks OPA for continuation/reuse permission.
+5. Reuse Decision: read-only repeat requests check cache and source freshness.
+6. Orchestrate: OpenClaw routes fresh work to restricted sub-agents.
+7. Validate: runtime validates SubAgentOutput and synthesizes one result.
+8. Execution Gate: privileged actions require signed execution envelope.
+9. Deliver: Output Tool Agent executes approved delivery.
+10. Audit: request, policy, reuse, tool, and artifact events are recorded.
 ```
 
 ## Open-Source Stack
 
 ```text
-FastAPI
+OpenClaw Gateway
+OpenClaw workspace files: SOUL.md, IDENTITY.md, USER.md, AGENTS.md, TOOLS.md, MEMORY.md
+Hosted OpenAI Responses API
+FastAPI safety service
 OPA
-Hermes Agent
-vLLM / Ollama
-Qwen / Llama / Mistral
+GPT-5.2 / GPT-5 mini / GPT-5 nano
 LlamaIndex
 Qdrant
 PostgreSQL
@@ -70,31 +99,51 @@ Persistent data storage for source data, vectors, metadata, and artifacts
 OpenBao
 Presidio
 OpenTelemetry + Loki + Prometheus + Grafana
-Docker Compose first, k3s later
+Docker Compose first, k3s later if scaling requires it
 GitHub API via Tool Agent
 ```
 
 ## Build Order
 
 ```text
-1. FastAPI health endpoint
-2. PostgreSQL / Qdrant / MinIO / Redis
-3. OPA base policies
-4. request canonicalizer + policy context builder
-5. Hermes Orchestrator adapter
-6. SubAgentOutput schema
-7. mock sub-agents
-8. source registry + persistent data storage + source data ingestion
-9. query source tracking table + indexes
-10. repeat-query reuse gate behind OPA
-11. Data Agent + RAG
-12. Security Agent
-13. Tool Agent
-14. Media Agent + ComfyUI
-15. Background Job Agent
-16. execution policy gate
-17. Output Tool Agent
-18. GitHub adapter
-19. audit + observability
-20. production hardening
+1. Repository scaffold + Docker Compose
+2. OpenClaw AI-Artist workspace skeleton
+3. Hosted OpenAI configuration + smoke test
+4. FastAPI safety service health endpoint
+5. request canonicalizer + policy context builder
+6. OPA base policies
+7. PostgreSQL / Qdrant / MinIO / Redis
+8. query source tracking table + indexes
+9. OpenClaw tool hook for safety-service checks
+10. SubAgentOutput schema
+11. mock sub-agents
+12. source registry + persistent data storage + source data ingestion
+13. repeat-query reuse gate behind OPA
+14. Knowledge Agent + RAG
+15. Security Agent
+16. Tool Agent
+17. Image-Gen Agent + ComfyUI
+18. Background Job Agent
+19. execution policy gate
+20. Output Tool Agent
+21. GitHub adapter
+22. Slack integration
+23. audit + observability
+24. production hardening
+```
+
+## Validation Rule
+
+```text
+Each build-order item maps to one or more validation tests in
+task_validation_matrix_latest_v1.md. CI must include docs-consistency, unit,
+integration, and security gates before production hardening.
+```
+
+## Current Project Status
+
+```text
+See project_status_latest_v1.md for the latest status snapshot.
+Current implementation state: blueprint aligned, implementation scaffold pending.
+Next task: T03 repository scaffold.
 ```

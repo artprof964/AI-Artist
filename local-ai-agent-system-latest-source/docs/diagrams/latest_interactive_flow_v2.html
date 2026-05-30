@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Optimized Local AI Agent Flow</title>
+<title>AI-Artist OpenClaw Hosted LLM Flow</title>
 <style>
 body{font-family:Georgia,serif;margin:0;background:#f5f1e8;color:#202533}
 main{max-width:1100px;margin:0 auto;padding:24px}
@@ -23,14 +23,16 @@ li{margin:8px 0;line-height:1.5}
 <body>
 <main>
   <section class="hero">
-    <h1>Optimized Local AI Agent Flow</h1>
-    <p>The optimized architecture adds canonical request normalization, a safe repeat-query reuse path behind OPA, source-freshness checks, and a second policy gate before privileged execution.</p>
+    <h1>AI-Artist OpenClaw Hosted LLM Flow</h1>
+    <p>The selected architecture uses OpenClaw as the agent control plane, hosted OpenAI models for reasoning, ComfyUI for image generation, and a FastAPI/OPA safety layer for reuse, audit, and privileged execution.</p>
   </section>
   <section class="grid">
     <article class="box">
       <h2>Core Flow</h2>
       <pre>External Request
- -> FastAPI Gateway
+ -> OpenClaw Gateway
+ -> AI-Artist Main Agent
+ -> FastAPI Safety Service
  -> Request Canonicalizer
  -> Policy Context Builder
  -> OPA Policy Layer
@@ -42,9 +44,9 @@ li{margin:8px 0;line-height:1.5}
        -> Final Validation
        -> Final Response
     -> fresh query or action request
-       -> Front Agent
-       -> Hermes Orchestrator
-       -> Restricted Sub-Agents
+       -> OpenClaw Main Agent
+       -> OpenClaw Agent Runtime
+       -> Restricted OpenClaw Sub-Agents
        -> Validation / Compare / Retry / Synthesis
        -> Final Validation
        -> Execution Policy Gate
@@ -55,6 +57,9 @@ li{margin:8px 0;line-height:1.5}
       <h2>Control Rules</h2>
       <ul>
         <li>OPA is checked before reuse and before privileged execution.</li>
+        <li>Hosted OpenAI models are the primary LLM backend.</li>
+        <li>OpenClaw owns agent workspaces, channel adapters, and tool hooks.</li>
+        <li>Every implementation task has a validation test before it can be marked done.</li>
         <li>Only approved read-only responses are eligible for replay.</li>
         <li>Source freshness must be checked before cache reuse.</li>
         <li>Secrets stay out of chat memory, agent memory, prompts, logs, and audit payloads.</li>

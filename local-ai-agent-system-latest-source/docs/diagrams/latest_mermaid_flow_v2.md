@@ -2,8 +2,10 @@
 
 ```mermaid
 flowchart TD
-    ER["External Request"] --> FG["FastAPI Gateway"]
-    FG --> RC["Request Canonicalizer"]
+    ER["External Request"] --> FG["OpenClaw Gateway"]
+    FG --> MAIN["AI-Artist Main Agent"]
+    MAIN --> FSS["FastAPI Safety Service"]
+    FSS --> RC["Request Canonicalizer"]
     RC --> PCB["Policy Context Builder"]
     PCB --> OPA["OPA Policy Layer"]
     OPA --> RCL{"Request Classifier"}
@@ -11,13 +13,14 @@ flowchart TD
     RCL -->|"repeat read query"| RG["Reuse Gate"]
     RG --> SFC["Source Freshness Check"]
     SFC -->|"approved + unchanged"| ARC["Approved Response Cache"]
-    SFC -->|"miss / changed"| FA["Front Agent"]
+    SFC -->|"miss / changed"| FA["OpenClaw Main Agent"]
     ARC --> FVAL["Final Validation"]
 
     RCL -->|"fresh query or action"| FA
-    FA --> HO["Hermes Orchestrator"]
-    HO --> SUB["Restricted Sub-Agents"]
-    SUB --> SYN["Validation / Compare / Retry / Synthesis"]
+    FA --> HO["OpenClaw Agent Runtime"]
+    HO --> SUB["Restricted OpenClaw Sub-Agents"]
+    SUB --> TESTS["Task Validation Tests"]
+    TESTS --> SYN["Validation / Compare / Retry / Synthesis"]
     SYN --> FVAL
     FVAL --> FRA["Final Response / Action"]
     FRA --> EPG["Execution Policy Gate"]
