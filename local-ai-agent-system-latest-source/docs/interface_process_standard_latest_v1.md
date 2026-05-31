@@ -56,7 +56,7 @@ can be marked done.
 38. Publishing outcome statuses use `backend/publishing_status.py`.
 38a. Local publishing dry-run response fields and deterministic ID material use `backend/publishing_contracts.py`.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
-40. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
+40. Knowledge Agent names, retrieval artifact types, vector payload fields/shape, approved-source payload flags, collection defaults, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 41. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 41a. Audit actor/policy scope payload field names use `backend/audit_contracts.py`.
 42. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
@@ -296,7 +296,7 @@ Output:
    - Sub-agent outputs are constructed through the shared output contract helper.
    - Mock orchestration agent names, artifact types, synthesis text, and telemetry field/tag shapes use the shared mock-agent contract.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
-   - Retrieval embedding defaults, stable token-index hashing, vector-search limit/sort behavior, positive-hit filtering, and score precision use shared Knowledge Agent contracts.
+   - Retrieval vector payload fields/shape, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, positive-hit filtering, and score precision use shared Knowledge Agent contracts.
    - Knowledge retrieval result snippets use the shared contextual snippet helper.
    - Retrieval vector similarity, embedding dimension validation, zero-vector handling, rubric helper clamping, and orchestration confidence use shared numeric helpers.
    - Critic/Curator score bounds, score conversion, pass thresholds, and publication penalties call the shared rubric scoring contracts directly without local wrapper functions.

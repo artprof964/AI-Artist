@@ -61,7 +61,7 @@ Source registry optional lookup: centralized in SourceFreshnessRegistry.find_sou
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
 Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes
-Knowledge Agent contracts, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, and result-score cutoff/precision: centralized in backend/knowledge_contracts.py
+Knowledge Agent contracts, vector payload fields, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, and result-score cutoff/precision: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and pass/fail helpers: centralized in backend/critic_rubric.py
 Text tokenization, direct Safety Service classifier token parsing, labels, and contextual snippets: centralized in backend/text_utils.py
@@ -173,7 +173,7 @@ Source registry lookup: shared by source freshness key/id checks and source inge
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
 Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry events/messages/metrics, telemetry field/tag shapes, and tests
-Knowledge Agent contracts: shared across Knowledge retrieval output conversion, approved-hit filtering, artifact metadata, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, and tests
+Knowledge Agent contracts: shared across Knowledge retrieval output conversion, vector payload construction/reading, approved-hit filtering, artifact metadata, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary and scoring contracts: shared across Critic/Curator scoring, score conversion, pass/fail decisions, and rubric tests
 Text utilities: shared directly across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
@@ -234,7 +234,8 @@ request metadata contract validation: 28 focused tests passed; schema defaults, 
 adapter result field validation: 48 focused tests passed; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 runtime field contract validation: 17 focused tests passed; service observability and OpenClaw policy telemetry field names share runtime_field_contracts.py
-final pytest: 494 passed, 1 warning
+knowledge vector payload validation: 20 focused tests passed; vector payload fields and payload construction centralized in knowledge_contracts.py
+final pytest: 496 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

@@ -6,14 +6,20 @@ from backend.knowledge_contracts import (
     DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS,
     KNOWLEDGE_AGENT_NAME,
     KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
+    KNOWLEDGE_CONTENT_PAYLOAD_FIELD,
+    KNOWLEDGE_METADATA_PAYLOAD_FIELD,
     KNOWLEDGE_MIN_RESULT_SCORE,
     KNOWLEDGE_MIN_SEARCH_LIMIT,
     KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
     KNOWLEDGE_RESULT_SCORE_DIGITS,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+    KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD,
     KNOWLEDGE_STABLE_TOKEN_HASH_MULTIPLIER,
     KNOWLEDGE_STABLE_TOKEN_HASH_SEED,
+    KNOWLEDGE_TITLE_PAYLOAD_FIELD,
+    KNOWLEDGE_URI_PAYLOAD_FIELD,
     knowledge_hit_is_positive,
+    knowledge_vector_payload,
     round_knowledge_score,
     knowledge_search_hit_sort_key,
     knowledge_search_limit_is_valid,
@@ -152,24 +158,28 @@ def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:
                 point_id="approved-local-note",
                 vector=embedding_model.embed("default-deny write actions approved local source"),
                 payload={
-                    "source_id": "approved-local-note",
-                    "title": "Approved Local Note",
-                    "uri": "workspace://approved",
-                    "content": "Approved local source for default-deny write actions.",
+                    KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD: "approved-local-note",
+                    KNOWLEDGE_TITLE_PAYLOAD_FIELD: "Approved Local Note",
+                    KNOWLEDGE_URI_PAYLOAD_FIELD: "workspace://approved",
+                    KNOWLEDGE_CONTENT_PAYLOAD_FIELD: (
+                        "Approved local source for default-deny write actions."
+                    ),
                     KNOWLEDGE_APPROVED_PAYLOAD_FIELD: True,
-                    "metadata": {"sample_data": True},
+                    KNOWLEDGE_METADATA_PAYLOAD_FIELD: {"sample_data": True},
                 },
             ),
             VectorPoint(
                 point_id="unapproved-local-note",
                 vector=embedding_model.embed("default-deny write actions unapproved source"),
                 payload={
-                    "source_id": "unapproved-local-note",
-                    "title": "Unapproved Local Note",
-                    "uri": "workspace://unapproved",
-                    "content": "Unapproved source for default-deny write actions.",
+                    KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD: "unapproved-local-note",
+                    KNOWLEDGE_TITLE_PAYLOAD_FIELD: "Unapproved Local Note",
+                    KNOWLEDGE_URI_PAYLOAD_FIELD: "workspace://unapproved",
+                    KNOWLEDGE_CONTENT_PAYLOAD_FIELD: (
+                        "Unapproved source for default-deny write actions."
+                    ),
                     KNOWLEDGE_APPROVED_PAYLOAD_FIELD: False,
-                    "metadata": {"sample_data": True},
+                    KNOWLEDGE_METADATA_PAYLOAD_FIELD: {"sample_data": True},
                 },
             ),
         ],
@@ -214,6 +224,28 @@ def test_knowledge_vector_search_contracts_are_centralized() -> None:
     ) == [(0.7, "source-a"), (0.7, "source-c"), (0.5, "source-b")]
 
 
+def test_knowledge_vector_payload_shape_is_centralized() -> None:
+    assert KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD == "source_id"
+    assert KNOWLEDGE_TITLE_PAYLOAD_FIELD == "title"
+    assert KNOWLEDGE_URI_PAYLOAD_FIELD == "uri"
+    assert KNOWLEDGE_CONTENT_PAYLOAD_FIELD == "content"
+    assert KNOWLEDGE_METADATA_PAYLOAD_FIELD == "metadata"
+    assert knowledge_vector_payload(
+        source_id="source-a",
+        title="Source A",
+        uri="workspace://source-a",
+        content="local content",
+        metadata={"sample": True},
+    ) == {
+        KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD: "source-a",
+        KNOWLEDGE_TITLE_PAYLOAD_FIELD: "Source A",
+        KNOWLEDGE_URI_PAYLOAD_FIELD: "workspace://source-a",
+        KNOWLEDGE_CONTENT_PAYLOAD_FIELD: "local content",
+        KNOWLEDGE_APPROVED_PAYLOAD_FIELD: True,
+        KNOWLEDGE_METADATA_PAYLOAD_FIELD: {"sample": True},
+    }
+
+
 def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
     source = read_backend_source("knowledge.py")
 
@@ -223,6 +255,7 @@ def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
     assert "round_knowledge_score(" in source
     assert "knowledge_search_limit_is_valid(" in source
     assert "knowledge_search_hit_sort_key(" in source
+    assert "knowledge_vector_payload(" in source
     assert "dimensions: int = 64" not in source
     assert "total = 0" not in source
     assert "total * 33" not in source
@@ -230,6 +263,27 @@ def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
     assert "round(hit.score, 6)" not in source
     assert "limit <= 0" not in source
     assert "(-hit.score, hit.point_id)" not in source
+
+
+def test_knowledge_agent_uses_shared_vector_payload_fields() -> None:
+    source = read_backend_source("knowledge.py")
+
+    for literal in (
+        '"source_id": document.source_id',
+        '"title": document.title',
+        '"uri": document.uri',
+        '"content": document.content',
+        '"metadata": document.metadata',
+        'payload["source_id"]',
+        'payload["title"]',
+        'payload["uri"]',
+        'payload["content"]',
+        'payload.get("metadata")',
+        'hit.payload.get("source_id"',
+    ):
+        assert literal not in source
+    assert "knowledge_vector_payload(" in source
+    assert "KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD" in source
 
 
 def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:
