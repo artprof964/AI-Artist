@@ -3,6 +3,18 @@ from backend.request_metadata import (
     request_metadata_fields,
     request_observability_fields,
 )
+from backend.request_metadata_contracts import (
+    DEFAULT_REQUEST_CHANNEL,
+    DEFAULT_REQUEST_METADATA_AGENT,
+    DEFAULT_REQUEST_METADATA_WORKSPACE,
+    POLICY_SCOPE_FIELD,
+    REQUEST_CHANNEL_FIELD,
+    REQUEST_FINGERPRINT_FIELD,
+    REQUEST_METADATA_AGENT_FIELD,
+    REQUEST_METADATA_WORKSPACE_FIELD,
+    REQUEST_TEXT_FIELD,
+    REQUESTER_SCOPE_FIELD,
+)
 from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.orchestrator import MockAgentRequest
 from backend.schemas import CanonicalizeRequest
@@ -14,8 +26,8 @@ def test_request_metadata_fields_centralizes_workspace_and_agent_mapping() -> No
     metadata = RequestMetadata(workspace="ai-artist-main", agent="knowledge")
 
     assert request_metadata_fields(metadata) == {
-        "workspace": "ai-artist-main",
-        "agent": "knowledge",
+        REQUEST_METADATA_WORKSPACE_FIELD: "ai-artist-main",
+        REQUEST_METADATA_AGENT_FIELD: "knowledge",
     }
 
 
@@ -29,12 +41,12 @@ def test_request_fingerprint_fields_centralize_canonical_request_shape() -> None
         channel="cli",
         metadata=metadata,
     ) == {
-        "request_text": "research flux references",
-        "requester_scope": "user:local",
-        "policy_scope": "workspace:ai-artist-main",
-        "channel": "cli",
-        "workspace": "ai-artist-main",
-        "agent": "knowledge",
+        REQUEST_TEXT_FIELD: "research flux references",
+        REQUESTER_SCOPE_FIELD: "user:local",
+        POLICY_SCOPE_FIELD: "workspace:ai-artist-main",
+        REQUEST_CHANNEL_FIELD: DEFAULT_REQUEST_CHANNEL,
+        REQUEST_METADATA_WORKSPACE_FIELD: "ai-artist-main",
+        REQUEST_METADATA_AGENT_FIELD: "knowledge",
     }
 
 
@@ -42,19 +54,19 @@ def test_request_observability_fields_centralize_telemetry_shape() -> None:
     metadata = RequestMetadata(workspace="ai-artist-main", agent="knowledge")
 
     assert request_observability_fields(channel="slack", metadata=metadata) == {
-        "channel": "slack",
-        "workspace": "ai-artist-main",
-        "agent": "knowledge",
+        REQUEST_CHANNEL_FIELD: "slack",
+        REQUEST_METADATA_WORKSPACE_FIELD: "ai-artist-main",
+        REQUEST_METADATA_AGENT_FIELD: "knowledge",
     }
     assert request_observability_fields(
         channel="slack",
         metadata=metadata,
         request_fingerprint="sha256:abc",
     ) == {
-        "channel": "slack",
-        "workspace": "ai-artist-main",
-        "agent": "knowledge",
-        "request_fingerprint": "sha256:abc",
+        REQUEST_CHANNEL_FIELD: "slack",
+        REQUEST_METADATA_WORKSPACE_FIELD: "ai-artist-main",
+        REQUEST_METADATA_AGENT_FIELD: "knowledge",
+        REQUEST_FINGERPRINT_FIELD: "sha256:abc",
     }
 
 
@@ -84,3 +96,36 @@ def test_default_request_scopes_are_centralized() -> None:
     for source in (schema_source, orchestrator_source):
         assert 'requester_scope: str = "local-user"' not in source
         assert 'policy_scope: str = "default"' not in source
+
+
+def test_request_metadata_contract_vocabulary_is_centralized() -> None:
+    assert DEFAULT_REQUEST_METADATA_WORKSPACE == "ai-artist-main"
+    assert DEFAULT_REQUEST_METADATA_AGENT == "ai-artist-main"
+    assert DEFAULT_REQUEST_CHANNEL == "cli"
+    assert REQUEST_TEXT_FIELD == "request_text"
+    assert REQUESTER_SCOPE_FIELD == "requester_scope"
+    assert POLICY_SCOPE_FIELD == "policy_scope"
+    assert REQUEST_CHANNEL_FIELD == "channel"
+    assert REQUEST_METADATA_WORKSPACE_FIELD == "workspace"
+    assert REQUEST_METADATA_AGENT_FIELD == "agent"
+    assert REQUEST_FINGERPRINT_FIELD == "request_fingerprint"
+
+
+def test_request_metadata_helpers_use_shared_contract_fields() -> None:
+    metadata_source = read_backend_source("request_metadata.py")
+    schema_source = read_backend_source("schemas.py")
+
+    for literal in (
+        '"request_text"',
+        '"requester_scope"',
+        '"policy_scope"',
+        '"channel"',
+        '"workspace"',
+        '"agent"',
+        '"request_fingerprint"',
+    ):
+        assert literal not in metadata_source
+    assert '"ai-artist-main"' not in schema_source
+    assert 'channel: Channel = "cli"' not in schema_source
+    assert "DEFAULT_REQUEST_METADATA_WORKSPACE" in schema_source
+    assert "DEFAULT_REQUEST_CHANNEL" in schema_source

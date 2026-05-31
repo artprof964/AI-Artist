@@ -4,6 +4,11 @@ from uuid import UUID
 
 from backend.health_contracts import HealthStatus
 from backend.interface_types import AuditEventType, Channel, Operation, RequestKind
+from backend.request_metadata_contracts import (
+    DEFAULT_REQUEST_CHANNEL,
+    DEFAULT_REQUEST_METADATA_AGENT,
+    DEFAULT_REQUEST_METADATA_WORKSPACE,
+)
 from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.runtime_ids import runtime_uuid
 from backend.source_freshness_contracts import (
@@ -23,8 +28,8 @@ class HealthResponse(BaseModel):
 class RequestMetadata(BaseModel):
     model_config = ConfigDict(extra="allow")
 
-    workspace: str = "ai-artist-main"
-    agent: str = "ai-artist-main"
+    workspace: str = DEFAULT_REQUEST_METADATA_WORKSPACE
+    agent: str = DEFAULT_REQUEST_METADATA_AGENT
 
 
 class CanonicalizeRequest(BaseModel):
@@ -32,7 +37,7 @@ class CanonicalizeRequest(BaseModel):
     request_text: str = Field(min_length=1)
     requester_scope: str = DEFAULT_REQUESTER_SCOPE
     policy_scope: str = DEFAULT_POLICY_SCOPE
-    channel: Channel = "cli"
+    channel: Channel = DEFAULT_REQUEST_CHANNEL
     created_at: datetime = Field(default_factory=utc_now)
     metadata: RequestMetadata = Field(default_factory=RequestMetadata)
 

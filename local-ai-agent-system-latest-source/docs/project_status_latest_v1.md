@@ -46,7 +46,7 @@ Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py with shared payload field and audit event type contracts
 Canonical hashing, HMAC signatures, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
 Request identity, direct Safety Service request normalization, and trace IDs: centralized in backend/request_identity.py
-Request metadata mapping, canonical request fingerprint field shape, and canonicalization observability field shape: centralized in backend/request_metadata.py
+Request metadata defaults, default request channel, request envelope field names, canonical request fingerprint field shape, and canonicalization observability field shape: centralized in backend/request_metadata_contracts.py and backend/request_metadata.py
 Safety Service request/policy observability event/message/tag/field shapes: centralized in backend/service_observability_contracts.py
 Request scope and publishing scope defaults: centralized in backend/request_scope_contracts.py
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
@@ -158,7 +158,7 @@ Canonical hashing: shared across Safety Service request fingerprints, execution-
 Source ingestion contracts: shared approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape before registry writes
 Source ingestion hashes: source snapshots call shared canonical hash/version helpers directly before registry writes
 Request identity: shared directly across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
-Request metadata mapping: shared across Safety Service request fingerprints, metric tags, and canonicalization observability fields
+Request metadata contracts and mapping: shared across schema defaults, Safety Service request fingerprints, metric tags, and canonicalization observability fields
 Safety Service observability contracts: shared across canonicalization, classification, and policy evaluation event/message/tag/field shapes
 Request scope defaults: shared across API schemas, mock orchestration request envelopes, and publishing audit context
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
@@ -228,7 +228,8 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 489 passed, 1 warning
+request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
+final pytest: 491 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

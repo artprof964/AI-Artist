@@ -44,6 +44,7 @@
 - `../../validation_reports/interface_types_standardization_2026-05-31.md`
 - `../../validation_reports/classification_response_contract_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
+- `../../backend/request_metadata_contracts.py`
 - `../../backend/request_metadata.py`
 - `../../backend/request_scope_contracts.py`
 - `../../backend/api_contracts.py`
@@ -69,6 +70,7 @@
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`
 - `../../validation_reports/request_metadata_mapping_standardization_2026-05-31.md`
 - `../../validation_reports/request_metadata_fingerprint_observability_standardization_2026-05-31.md`
+- `../../validation_reports/request_metadata_contract_standardization_2026-06-01.md`
 - `../../validation_reports/request_scope_contract_standardization_2026-05-31.md`
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`
