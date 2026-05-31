@@ -149,6 +149,8 @@
 - `../../validation_reports/t22_publishing_approval_validation_2026-05-31.md`
 - `../../validation_reports/publishing_status_standardization_2026-05-31.md`
 - `../../validation_reports/publishing_operation_boundary_standardization_2026-05-31.md`
+- `../../validation_reports/publishing_response_contract_standardization_2026-05-31.md`
+- `../../backend/publishing_contracts.py`
 - `../../backend/publishing.py`
 - `../../backend/publishing_adapter.py`
 - `../../backend/publishing_status.py`

@@ -13,6 +13,11 @@ from backend.publishing_adapter import (
     PublishingExecutionGateError,
     PublishingRequest,
 )
+from backend.publishing_contracts import (
+    LOCAL_PUBLISH_ID_PREFIX,
+    local_publishing_id_material,
+    local_publishing_response,
+)
 from backend.publishing_status import (
     PUBLISHING_STATUS_BLOCKED,
     PUBLISHING_STATUS_PUBLISHED,
@@ -55,11 +60,10 @@ class LocalPublishingClient:
 
     def publish(self, target: str, payload: dict[str, Any]) -> dict[str, Any]:
         self.calls.append((target, payload))
-        return {
-            "external_post_id": deterministic_publish_id(target=target, payload=payload),
-            "status": PUBLISHING_STATUS_PUBLISHED,
-            "target": target,
-        }
+        return local_publishing_response(
+            external_post_id=deterministic_publish_id(target=target, payload=payload),
+            target=target,
+        )
 
 
 class PublishingAgent:
@@ -138,8 +142,8 @@ class PublishingAgent:
 
 def deterministic_publish_id(*, target: str, payload: dict[str, Any]) -> str:
     return deterministic_prefixed_id(
-        "local-publish",
-        {"payload": payload, "target": target},
+        LOCAL_PUBLISH_ID_PREFIX,
+        local_publishing_id_material(target=target, payload=payload),
     )
 
 

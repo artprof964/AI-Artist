@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 484 passed, 1 warning
+Final validation: 486 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -113,7 +113,8 @@ backend/comfyui_adapter.py: execution-envelope-gated image generation adapter us
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and shared rubric scoring boundaries.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and adapter-secret boundaries directly.
-backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation and publishing scope constants.
+backend/publishing_contracts.py: shared local publishing ID prefix, dry-run response fields, and deterministic ID material shape.
+backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation, publishing scope, and publishing response-shape constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
 backend/observability.py: telemetry stage/log-level constants, default metric values, metric-name constants/formatting, trace-id fallback formatting, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
@@ -332,6 +333,9 @@ shapes must flow through backend/response_cache_contracts.py before cache reuse
 observability changes.
 Publishing outcome status values must flow through backend/publishing_status.py
 before publishing agent or side-effect audit status text is added.
+Local publishing dry-run response fields, deterministic ID prefix, and ID
+material shape must flow through backend/publishing_contracts.py before local
+or future external publisher response logic changes.
 Pydantic model/dict coercion and validation messages at adapter and domain
 boundaries must flow through backend/model_coercion.py before direct model
 validation or one-off validation wrappers are added.

@@ -53,6 +53,7 @@ can be marked done.
 36a. OpenClaw tool policy metadata, redaction, metric tags, and telemetry fields use `backend/openclaw_contracts.py`.
 37. Telemetry stages, log levels, default metric values, metric-name constants/formatting, trace-id fallback formatting, and event-message formatting use `backend/observability.py`.
 38. Publishing outcome statuses use `backend/publishing_status.py`.
+38a. Local publishing dry-run response fields and deterministic ID material use `backend/publishing_contracts.py`.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
 40. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 41. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
@@ -324,6 +325,7 @@ Output:
    - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
    - Publishing side-effect audit events use the shared publish operation, payload field-name, and audit event type constants.
    - Publishing audit actor and policy scopes use the shared request-scope contract.
+   - Local publishing dry-run responses and deterministic IDs use the shared publishing contract helper.
 ```
 
 ## Definition Of Done
