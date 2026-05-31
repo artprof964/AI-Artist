@@ -1,9 +1,9 @@
-import subprocess
 import time
 from pathlib import Path
 from uuid import uuid4
 
 from backend.repo_paths import POSTGRES_INIT_DIR, repo_path, repo_root_from
+from backend.shell_commands import run_process
 
 
 REPO_ROOT = repo_root_from(Path(__file__))
@@ -40,13 +40,9 @@ EXPECTED_INDEXES = {
 }
 
 
-def run_command(args: list[str], *, check: bool = True) -> subprocess.CompletedProcess[str]:
-    return subprocess.run(args, check=check, capture_output=True, text=True)
-
-
 def wait_for_postgres(container_name: str) -> None:
     for _ in range(30):
-        result = run_command(
+        result = run_process(
             [
                 "docker",
                 "exec",
@@ -152,7 +148,7 @@ def test_query_tracking_migration_applies_and_rolls_back_cleanly() -> None:
     script = write_migration_check_script()
 
     try:
-        run_command(
+        run_process(
             [
                 "docker",
                 "run",
@@ -175,7 +171,7 @@ def test_query_tracking_migration_applies_and_rolls_back_cleanly() -> None:
         )
         wait_for_postgres(container_name)
 
-        result = run_command(
+        result = run_process(
             [
                 "docker",
                 "exec",
@@ -207,4 +203,4 @@ def test_query_tracking_migration_applies_and_rolls_back_cleanly() -> None:
         assert counts["index_count_after_rollback"] == 0
     finally:
         script.unlink(missing_ok=True)
-        run_command(["docker", "rm", "-f", container_name], check=False)
+        run_process(["docker", "rm", "-f", container_name], check=False)

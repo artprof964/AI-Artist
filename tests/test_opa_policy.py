@@ -1,5 +1,4 @@
 import json
-import subprocess
 from pathlib import Path
 from typing import Any
 
@@ -7,6 +6,7 @@ import pytest
 
 from backend.canonical_hash import canonical_json
 from backend.repo_paths import OPA_POLICY_PATH, repo_path, repo_root_from
+from backend.shell_commands import missing_command_result, run_process
 
 REPO_ROOT = repo_root_from(Path(__file__))
 OPA_POLICY = repo_path(REPO_ROOT, OPA_POLICY_PATH)
@@ -21,13 +21,9 @@ def opa_eval(query: str, input_data: dict[str, Any]) -> Any:
     return body["result"][0]["expressions"][0]["value"]
 
 
-def _run_opa_eval(
-    *,
-    input_data: dict[str, Any],
-    query: str,
-) -> subprocess.CompletedProcess[str]:
+def _run_opa_eval(*, input_data: dict[str, Any], query: str) -> Any:
     command = _opa_command()
-    return subprocess.run(
+    return run_process(
         [*command, query],
         input=canonical_json(input_data),
         check=True,
@@ -92,25 +88,21 @@ def _opa_command() -> list[str]:
     pytest.skip(_OPA_SKIP_REASON)
 
 
-def _probe_opa_command(command: list[str]) -> subprocess.CompletedProcess[str]:
+def _probe_opa_command(command: list[str]) -> Any:
     try:
-        return subprocess.run(
+        return run_process(
             [*command, "true"],
             input="{}",
+            check=False,
             capture_output=True,
             text=True,
             cwd=REPO_ROOT,
         )
     except FileNotFoundError as exc:
-        return subprocess.CompletedProcess(
-            args=command,
-            returncode=127,
-            stdout="",
-            stderr=str(exc),
-        )
+        return missing_command_result(command, exc)
 
 
-def _compact_error(result: subprocess.CompletedProcess[str]) -> str:
+def _compact_error(result: Any) -> str:
     output = (result.stderr or result.stdout).strip().splitlines()
     if not output:
         return f"exit {result.returncode}"
