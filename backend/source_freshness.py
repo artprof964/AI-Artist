@@ -6,7 +6,11 @@ from uuid import UUID
 from backend.mapping_utils import copy_mapping
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SourceFreshness
-from backend.source_registry_contracts import source_registry_row_not_found
+from backend.source_registry_contracts import (
+    SOURCE_DEPENDENCY_ROLE_READ,
+    SOURCE_INITIAL_CHANGE_SEQ,
+    source_registry_row_not_found,
+)
 from backend.time_utils import utc_now
 
 
@@ -31,7 +35,7 @@ class SourceDependency:
     source_key: str
     source_change_seq_at_run: int
     required_for_cache_reuse: bool = True
-    source_role: str = "read"
+    source_role: str = SOURCE_DEPENDENCY_ROLE_READ
 
 
 @dataclass(frozen=True)
@@ -72,7 +76,7 @@ class SourceFreshnessRegistry:
         metadata: dict[str, Any] | None = None,
     ) -> SourceRegistryEntry:
         existing = self._sources_by_key.get(source_key)
-        change_seq = existing.change_seq if existing is not None else 1
+        change_seq = existing.change_seq if existing is not None else SOURCE_INITIAL_CHANGE_SEQ
         source_id = existing.source_id if existing is not None else runtime_uuid()
         entry = SourceRegistryEntry(
             source_id=source_id,
@@ -114,7 +118,7 @@ class SourceFreshnessRegistry:
         source_keys: list[str],
         run_id: UUID | None = None,
         required_for_cache_reuse: bool = True,
-        source_role: str = "read",
+        source_role: str = SOURCE_DEPENDENCY_ROLE_READ,
     ) -> SourceDependencySnapshot:
         dependencies = tuple(
             SourceDependency(

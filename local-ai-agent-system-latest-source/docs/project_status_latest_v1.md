@@ -46,7 +46,7 @@ Request metadata mapping: centralized in backend/request_metadata.py
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
-Source registry missing-row messages: centralized in backend/source_registry_contracts.py
+Source registry missing-row messages, dependency roles, and initial change-sequence defaults: centralized in backend/source_registry_contracts.py
 Source ingestion contracts: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
@@ -147,7 +147,7 @@ Request metadata mapping: shared across Safety Service request fingerprints and 
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
-Source registry messages: shared across source-key and source-id freshness lookup failures
+Source registry contracts: shared across source-key/source-id freshness lookup failures, dependency roles, and initial change sequence defaults
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
@@ -203,10 +203,10 @@ service text boundary validation: 3 focused files passed; Safety Service guarded
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
 runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
-source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
+source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 436 passed, 1 skipped, 1 warning
+final pytest: 437 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

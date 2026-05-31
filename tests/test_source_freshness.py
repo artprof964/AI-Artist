@@ -5,6 +5,8 @@ from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_r
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import (
+    SOURCE_DEPENDENCY_ROLE_READ,
+    SOURCE_INITIAL_CHANGE_SEQ,
     SOURCE_REGISTRY_ROW_NOT_FOUND,
     source_registry_row_not_found,
 )
@@ -65,6 +67,7 @@ def test_source_snapshot_reports_required_sources_unchanged() -> None:
     )
 
     assert snapshot.required_source_count == 2
+    assert snapshot.dependencies[0].source_role == SOURCE_DEPENDENCY_ROLE_READ
     assert snapshot.changed_source_count == 0
     assert snapshot.all_required_sources_unchanged is True
     assert snapshot.source_freshness.changed_source_count == 0
@@ -82,8 +85,8 @@ def test_incremented_source_change_seq_marks_snapshot_stale() -> None:
     changed_source = registry.increment_change_seq("reference-brief")
     stale_snapshot = registry.evaluate_snapshot(dependencies=snapshot_at_run.dependencies)
 
-    assert changed_source.change_seq == 2
-    assert registry.get_source("reference-brief").change_seq == 2
+    assert changed_source.change_seq == SOURCE_INITIAL_CHANGE_SEQ + 1
+    assert registry.get_source("reference-brief").change_seq == SOURCE_INITIAL_CHANGE_SEQ + 1
     assert stale_snapshot.changed_source_count == 1
     assert stale_snapshot.all_required_sources_unchanged is False
     assert stale_snapshot.source_freshness.changed_source_count == 1
@@ -160,6 +163,23 @@ def test_source_registry_missing_row_message_contract_is_shared() -> None:
         source_registry_row_not_found("missing-source")
         == f"{SOURCE_REGISTRY_ROW_NOT_FOUND}: missing-source"
     )
+
+
+def test_source_registry_contract_defaults_are_shared() -> None:
+    registry = SourceFreshnessRegistry()
+    entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
+    snapshot = registry.record_dependency_snapshot(source_keys=["style-guide"])
+    source = read_backend_source("source_freshness.py")
+
+    assert SOURCE_DEPENDENCY_ROLE_READ == "read"
+    assert SOURCE_INITIAL_CHANGE_SEQ == 1
+    assert entry.change_seq == SOURCE_INITIAL_CHANGE_SEQ
+    assert snapshot.dependencies[0].source_role == SOURCE_DEPENDENCY_ROLE_READ
+    assert "SOURCE_DEPENDENCY_ROLE_READ" in source
+    assert "SOURCE_INITIAL_CHANGE_SEQ" in source
+    assert 'source_role: str = "read"' not in source
+    assert 'source_role: str = "read",' not in source
+    assert "else 1" not in source
 
 
 def test_source_freshness_uses_shared_missing_row_message_contract() -> None:
