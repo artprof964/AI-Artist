@@ -54,7 +54,7 @@ can be marked done.
 40. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 41. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 42. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
-43. Source registry missing-row messages, dependency-role defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
+43. Source registry missing-row messages, dependency-role defaults, empty change-sequence defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
 44. Execution-envelope validation failure and required-envelope messages use `backend/execution_gate_messages.py`.
 45. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
 46. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.

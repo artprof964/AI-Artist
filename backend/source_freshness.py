@@ -8,6 +8,7 @@ from backend.runtime_ids import runtime_uuid
 from backend.schemas import SourceFreshness
 from backend.source_registry_contracts import (
     SOURCE_DEPENDENCY_ROLE_READ,
+    SOURCE_EMPTY_CHANGE_SEQ,
     SOURCE_INITIAL_CHANGE_SEQ,
     source_registry_row_not_found,
 )
@@ -150,7 +151,7 @@ class SourceFreshnessRegistry:
         )
         max_change_seq = max(
             (dependency.source_change_seq_at_run for dependency in dependencies),
-            default=0,
+            default=SOURCE_EMPTY_CHANGE_SEQ,
         )
         return SourceDependencySnapshot(
             run_id=run_id or runtime_uuid(),

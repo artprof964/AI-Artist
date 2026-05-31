@@ -81,7 +81,7 @@ backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
-backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, and initial change-sequence contracts.
+backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
 backend/source_freshness_contracts.py: shared source-freshness schema defaults for fresh source snapshots.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, and registry metadata key contracts.
 backend/slack_contracts.py: shared Slack source label, validation message contracts, and token-purpose text.
@@ -219,7 +219,7 @@ backend/policy_contracts.py before local default-deny versioning changes.
 Source registry missing-row messages must flow through
 backend/source_registry_contracts.py before source freshness or future
 persistence adapters raise missing-row errors.
-Source dependency roles and initial source change sequence defaults must flow
+Source dependency roles plus empty and initial source change sequence defaults must flow
 through backend/source_registry_contracts.py before freshness snapshots or
 registry writes change source semantics.
 SourceFreshness schema defaults must flow through

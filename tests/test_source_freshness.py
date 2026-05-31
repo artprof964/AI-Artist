@@ -10,6 +10,7 @@ from backend.source_freshness_contracts import (
 from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import (
     SOURCE_DEPENDENCY_ROLE_READ,
+    SOURCE_EMPTY_CHANGE_SEQ,
     SOURCE_INITIAL_CHANGE_SEQ,
     SOURCE_REGISTRY_ROW_NOT_FOUND,
     source_registry_row_not_found,
@@ -173,16 +174,21 @@ def test_source_registry_contract_defaults_are_shared() -> None:
     registry = SourceFreshnessRegistry()
     entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
     snapshot = registry.record_dependency_snapshot(source_keys=["style-guide"])
+    empty_snapshot = registry.evaluate_snapshot(dependencies=())
     source = read_backend_source("source_freshness.py")
 
     assert SOURCE_DEPENDENCY_ROLE_READ == "read"
+    assert SOURCE_EMPTY_CHANGE_SEQ == 0
     assert SOURCE_INITIAL_CHANGE_SEQ == 1
     assert entry.change_seq == SOURCE_INITIAL_CHANGE_SEQ
+    assert empty_snapshot.max_source_change_seq_at_run == SOURCE_EMPTY_CHANGE_SEQ
     assert snapshot.dependencies[0].source_role == SOURCE_DEPENDENCY_ROLE_READ
     assert "SOURCE_DEPENDENCY_ROLE_READ" in source
+    assert "SOURCE_EMPTY_CHANGE_SEQ" in source
     assert "SOURCE_INITIAL_CHANGE_SEQ" in source
     assert 'source_role: str = "read"' not in source
     assert 'source_role: str = "read",' not in source
+    assert "default=0" not in source
     assert "else 1" not in source
 
 
