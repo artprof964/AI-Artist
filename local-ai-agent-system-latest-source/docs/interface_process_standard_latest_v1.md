@@ -62,6 +62,7 @@ can be marked done.
 50. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
 51. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 52. Production readiness Docker Compose, curl, and MinIO command strings use `backend/shell_commands.py`.
+53. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
 ```
 
 ## Standard Request Envelope
@@ -110,6 +111,8 @@ Rules:
   through the shared connection settings helper.
 - Readiness Docker Compose, curl, and MinIO command syntax is built through the
   shared shell command helper.
+- Readiness backup directories, container dump paths, and MinIO aliases use the
+  shared readiness path contract.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

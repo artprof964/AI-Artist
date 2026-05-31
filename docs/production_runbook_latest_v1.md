@@ -13,6 +13,8 @@ evaluation, audit recording, and execution-envelope generation. The local stack
 contains PostgreSQL, Redis, Qdrant, MinIO, and OPA through `docker compose`.
 Checked-in readiness command definitions are built through shared shell command
 helpers before they are mirrored into this runbook.
+Backup paths and local object-store aliases are centralized in the readiness
+path contract before command definitions or runbook examples are changed.
 
 Primary operator: local AI-Artist maintainer.
 Escalation owner: repository owner or current implementation lead.

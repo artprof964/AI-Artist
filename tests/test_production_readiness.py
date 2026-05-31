@@ -22,6 +22,12 @@ from backend.readiness import (
     validate_env_example,
     validate_runbook,
 )
+from backend.readiness_paths import (
+    MINIO_BACKUP_DIR,
+    MINIO_SOURCE_ALIAS,
+    POSTGRES_BACKUP_DIR,
+    POSTGRES_CONTAINER_DUMP_PATH,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -109,6 +115,29 @@ def test_readiness_commands_use_shared_shell_command_helpers() -> None:
     assert "docker_compose_exec(" in readiness_source
     assert "curl_command(" in readiness_source
     assert "minio_command(" in readiness_source
+
+
+def test_readiness_commands_use_shared_backup_path_contracts() -> None:
+    backup_commands = {command.slug: command.command for command in BACKUP_COMMANDS}
+    restore_commands = {command.slug: command.command for command in RESTORE_CHECK_COMMANDS}
+    readiness_source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+
+    assert POSTGRES_CONTAINER_DUMP_PATH in backup_commands["postgres_backup"]
+    assert POSTGRES_CONTAINER_DUMP_PATH in backup_commands["postgres_copy_backup"]
+    assert POSTGRES_CONTAINER_DUMP_PATH in restore_commands["postgres_restore_check"]
+    assert POSTGRES_BACKUP_DIR in backup_commands["postgres_copy_backup"]
+    assert MINIO_SOURCE_ALIAS in backup_commands["minio_backup"]
+    assert MINIO_BACKUP_DIR in backup_commands["minio_backup"]
+    assert MINIO_BACKUP_DIR in restore_commands["minio_restore_check"]
+
+    forbidden_literals = [
+        '".codex_tmp/backups/postgres/"',
+        '".codex_tmp/backups/minio/"',
+        '"/tmp/ai_artist_latest.dump"',
+        '"local-ai-artist/"',
+    ]
+    for literal in forbidden_literals:
+        assert literal not in readiness_source
 
 
 def test_readiness_report_passes_for_checked_in_runbook_and_env_example() -> None:

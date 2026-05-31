@@ -13,6 +13,12 @@ from backend.connection_settings import (
 )
 from backend.health_contracts import health_expected_signal
 from backend.markdown_utils import markdown_heading_text
+from backend.readiness_paths import (
+    MINIO_BACKUP_DIR,
+    MINIO_SOURCE_ALIAS,
+    POSTGRES_BACKUP_DIR,
+    POSTGRES_CONTAINER_DUMP_PATH,
+)
 from backend.shell_commands import (
     curl_command,
     docker_compose_command,
@@ -151,7 +157,7 @@ BACKUP_COMMANDS: tuple[CommandDefinition, ...] = (
             "-d",
             "ai_artist",
             "--format=custom",
-            "--file=/tmp/ai_artist_latest.dump",
+            f"--file={POSTGRES_CONTAINER_DUMP_PATH}",
         ),
         expected_signal="custom-format dump is written inside the postgres container",
     ),
@@ -160,10 +166,10 @@ BACKUP_COMMANDS: tuple[CommandDefinition, ...] = (
         target="PostgreSQL",
         command=docker_compose_command(
             "cp",
-            "postgres:/tmp/ai_artist_latest.dump",
-            ".codex_tmp/backups/postgres/",
+            f"postgres:{POSTGRES_CONTAINER_DUMP_PATH}",
+            POSTGRES_BACKUP_DIR,
         ),
-        expected_signal="dump file exists under .codex_tmp/backups/postgres",
+        expected_signal=f"dump file exists under {POSTGRES_BACKUP_DIR.rstrip('/')}",
     ),
     CommandDefinition(
         slug="minio_backup",
@@ -171,10 +177,10 @@ BACKUP_COMMANDS: tuple[CommandDefinition, ...] = (
         command=minio_command(
             "mirror",
             "--overwrite",
-            "local-ai-artist/",
-            ".codex_tmp/backups/minio/",
+            MINIO_SOURCE_ALIAS,
+            MINIO_BACKUP_DIR,
         ),
-        expected_signal="object tree is mirrored to .codex_tmp/backups/minio",
+        expected_signal=f"object tree is mirrored to {MINIO_BACKUP_DIR.rstrip('/')}",
     ),
     CommandDefinition(
         slug="qdrant_backup",
@@ -196,14 +202,14 @@ RESTORE_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
             "postgres",
             "pg_restore",
             "--list",
-            "/tmp/ai_artist_latest.dump",
+            POSTGRES_CONTAINER_DUMP_PATH,
         ),
         expected_signal="archive table of contents is readable",
     ),
     CommandDefinition(
         slug="minio_restore_check",
         target="MinIO",
-        command=minio_command("ls", "--recursive", ".codex_tmp/backups/minio/"),
+        command=minio_command("ls", "--recursive", MINIO_BACKUP_DIR),
         expected_signal="expected buckets and object prefixes are listed",
     ),
     CommandDefinition(
