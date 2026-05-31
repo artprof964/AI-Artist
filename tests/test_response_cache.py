@@ -1,8 +1,11 @@
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 
 import pytest
 
+from backend.interface_types import REQUEST_KIND_ACTION, REQUEST_KIND_MIXED, REQUEST_KIND_READ
+from backend.operations import OPERATION_READ, OPERATION_REUSE, OPERATION_WRITE
 from backend.response_cache import (
     ApprovedResponseCacheEntry,
     evaluate_cached_response_reuse,
@@ -12,12 +15,13 @@ from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, Sourc
 
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
 REQUEST_FINGERPRINT = "sha256:repeat-read-request"
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def base_policy_request() -> PolicyEvaluateRequest:
     return PolicyEvaluateRequest(
-        request_kind="read",
-        operation="reuse",
+        request_kind=REQUEST_KIND_READ,
+        operation=OPERATION_REUSE,
         requester_scope="user:local",
         policy_scope="workspace:ai-artist-main",
         requires_human_approval=False,
@@ -44,7 +48,7 @@ def base_cache_entry() -> ApprovedResponseCacheEntry:
         requester_scope="user:local",
         policy_scope="workspace:ai-artist-main",
         request_kind="read",
-        operation="read",
+        operation=OPERATION_READ,
         response_body={"answer": "cached read response"},
         approved_for_reuse=True,
         all_sources_unchanged=True,
@@ -67,7 +71,7 @@ def test_replays_approved_read_response_with_fresh_non_expired_cache_entry() -> 
     assert decision.response_body == {"answer": "cached read response"}
 
 
-@pytest.mark.parametrize("request_kind", ["action", "mixed"])
+@pytest.mark.parametrize("request_kind", [REQUEST_KIND_ACTION, REQUEST_KIND_MIXED])
 def test_rejects_non_read_replay_requests(request_kind: str) -> None:
     request = base_policy_request().model_copy(update={"request_kind": request_kind})
 
@@ -84,7 +88,7 @@ def test_rejects_non_read_replay_requests(request_kind: str) -> None:
 
 
 def test_rejects_non_reuse_policy_requests() -> None:
-    request = base_policy_request().model_copy(update={"operation": "read"})
+    request = base_policy_request().model_copy(update={"operation": OPERATION_READ})
 
     decision = evaluate_cached_response_reuse(
         policy_request=request,
@@ -168,7 +172,7 @@ def test_rejects_policy_denial_or_human_approval_requirement() -> None:
             "cached response is not read-only",
         ),
         (
-            replace(base_cache_entry(), operation="write"),
+            replace(base_cache_entry(), operation=OPERATION_WRITE),
             REQUEST_FINGERPRINT,
             "cached response is not read-only",
         ),
@@ -232,3 +236,14 @@ def test_rejects_missing_cache_entry() -> None:
 
     assert decision.replay is False
     assert decision.reason == "cache entry not found"
+
+
+def test_response_cache_uses_shared_request_kind_and_operation_constants() -> None:
+    source = (PROJECT_ROOT / "backend" / "response_cache.py").read_text(encoding="utf-8")
+
+    assert "REQUEST_KIND_READ" in source
+    assert "OPERATION_READ" in source
+    assert "OPERATION_REUSE" in source
+    assert 'operation != "reuse"' not in source
+    assert 'request_kind != "read"' not in source
+    assert 'operation != "read"' not in source

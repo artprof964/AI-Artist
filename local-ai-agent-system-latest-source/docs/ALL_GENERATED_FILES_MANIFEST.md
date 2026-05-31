@@ -52,6 +52,7 @@
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`
+- `../../validation_reports/response_cache_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/t14_source_freshness_validation_2026-05-31.md`
 - `../../validation_reports/t15_audit_event_log_validation_2026-05-31.md`
 - `../../validation_reports/t16_knowledge_agent_validation_2026-05-31.md`

@@ -2,7 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
-from backend.interface_types import Operation, RequestKind
+from backend.interface_types import REQUEST_KIND_READ, Operation, RequestKind
 from backend.observability import (
     LOG_LEVEL_INFO,
     LOG_LEVEL_WARNING,
@@ -26,6 +26,7 @@ from backend.reason_messages import (
     CACHE_SOURCES_STALE,
     SOURCE_FRESHNESS_CHECK_FAILED,
 )
+from backend.operations import OPERATION_READ, OPERATION_REUSE
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.time_utils import as_utc, utc_now
 
@@ -101,13 +102,13 @@ def evaluate_cached_response_reuse(
     if cache_entry is None:
         return observed_decision(replay=False, reason=CACHE_ENTRY_NOT_FOUND)
 
-    if policy_request.operation != "reuse":
+    if policy_request.operation != OPERATION_REUSE:
         return observed_decision(
             replay=False,
             reason=CACHE_REQUIRES_REUSE_OPERATION,
         )
 
-    if policy_request.request_kind != "read":
+    if policy_request.request_kind != REQUEST_KIND_READ:
         return observed_decision(replay=False, reason=CACHE_REQUIRES_READ_REQUEST)
 
     if not policy_request.source_freshness.all_required_sources_unchanged:
@@ -125,7 +126,7 @@ def evaluate_cached_response_reuse(
             reason=CACHE_HUMAN_APPROVAL_REQUIRED,
         )
 
-    if cache_entry.request_kind != "read" or cache_entry.operation != "read":
+    if cache_entry.request_kind != REQUEST_KIND_READ or cache_entry.operation != OPERATION_READ:
         return observed_decision(replay=False, reason=CACHE_RESPONSE_NOT_READ_ONLY)
 
     if cache_entry.request_fingerprint != request_fingerprint:

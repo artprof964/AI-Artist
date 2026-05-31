@@ -125,6 +125,7 @@ URL validation: shared across GitHub API path safety and source-ingestion domain
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
+Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
 Model coercion: shared across execution-envelope validation, image provenance input, critic metadata scoring, Knowledge Agent output, and mock sub-agent output
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, and security review probes
 Publishing statuses: shared across Publishing Agent result handling and side-effect audit payloads
@@ -139,7 +140,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 312 passed, 1 skipped, 1 warning
+final pytest: 313 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

@@ -214,6 +214,7 @@ Output:
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
+   - Cache replay request-kind and operation checks use shared interface and operation constants.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
    - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.
