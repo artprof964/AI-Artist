@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 373 passed, 1 skipped, 1 warning
+Final validation: 376 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -89,6 +89,7 @@ backend/response_cache.py: approved read-only response cache using shared reques
 backend/source_freshness.py: dependency snapshot, stale-source checks, and optional source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, endpoint URL composition, env-example rendering, and connection settings loader.
+backend/shell_commands.py: shared shell command construction for Docker Compose, curl, and MinIO command definitions.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared secret-redaction boundary.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
@@ -139,6 +140,9 @@ composition, env-example rendering, and runtime env resolution must be changed t
 backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias.
+Shell command strings for Docker Compose, curl, and MinIO readiness commands
+must flow through backend/shell_commands.py before production readiness command
+definitions are changed.
 Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Execution-envelope validation failure and required-envelope messages must flow through

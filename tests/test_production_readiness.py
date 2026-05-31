@@ -92,6 +92,25 @@ def test_readiness_commands_use_shared_connection_defaults() -> None:
     assert "http://localhost:8000" not in readiness_source
 
 
+def test_readiness_commands_use_shared_shell_command_helpers() -> None:
+    readiness_source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+
+    forbidden_fragments = [
+        '"docker compose ps"',
+        '"docker compose exec',
+        '"docker compose cp',
+        '"curl.exe -fsS',
+        '"mc mirror',
+        '"mc ls',
+    ]
+    for fragment in forbidden_fragments:
+        assert fragment not in readiness_source
+    assert "docker_compose_command(" in readiness_source
+    assert "docker_compose_exec(" in readiness_source
+    assert "curl_command(" in readiness_source
+    assert "minio_command(" in readiness_source
+
+
 def test_readiness_report_passes_for_checked_in_runbook_and_env_example() -> None:
     report = build_readiness_report(
         runbook_text=RUNBOOK_PATH.read_text(encoding="utf-8"),

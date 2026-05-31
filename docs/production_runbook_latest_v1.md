@@ -11,6 +11,8 @@ repeatable, and avoid calls to external services.
 The Safety Service owns request canonicalization, classification, local policy
 evaluation, audit recording, and execution-envelope generation. The local stack
 contains PostgreSQL, Redis, Qdrant, MinIO, and OPA through `docker compose`.
+Checked-in readiness command definitions are built through shared shell command
+helpers before they are mirrored into this runbook.
 
 Primary operator: local AI-Artist maintainer.
 Escalation owner: repository owner or current implementation lead.

@@ -13,6 +13,12 @@ from backend.connection_settings import (
 )
 from backend.health_contracts import health_expected_signal
 from backend.markdown_utils import markdown_heading_text
+from backend.shell_commands import (
+    curl_command,
+    docker_compose_command,
+    docker_compose_exec,
+    minio_command,
+)
 
 
 class ReadinessStatus(str, Enum):
@@ -89,43 +95,45 @@ HEALTH_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
     CommandDefinition(
         slug="compose_services",
         target="local stack",
-        command="docker compose ps",
+        command=docker_compose_command("ps"),
         expected_signal="postgres, redis, qdrant, minio, and opa report healthy",
     ),
     CommandDefinition(
         slug="postgres",
         target="PostgreSQL",
-        command="docker compose exec -T postgres pg_isready -U ai_artist -d ai_artist",
+        command=docker_compose_exec("postgres", "pg_isready", "-U", "ai_artist", "-d", "ai_artist"),
         expected_signal="accepting connections",
     ),
     CommandDefinition(
         slug="redis",
         target="Redis",
-        command="docker compose exec -T redis redis-cli ping",
+        command=docker_compose_exec("redis", "redis-cli", "ping"),
         expected_signal="PONG",
     ),
     CommandDefinition(
         slug="qdrant",
         target="Qdrant",
-        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_QDRANT_URL, 'healthz')}",
+        command=curl_command(connection_endpoint_url(DEFAULT_QDRANT_URL, "healthz")),
         expected_signal="healthz check passed",
     ),
     CommandDefinition(
         slug="minio",
         target="MinIO",
-        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_MINIO_ENDPOINT, 'minio/health/live')}",
+        command=curl_command(
+            connection_endpoint_url(DEFAULT_MINIO_ENDPOINT, "minio/health/live")
+        ),
         expected_signal="HTTP 200 and non-error response",
     ),
     CommandDefinition(
         slug="opa",
         target="OPA",
-        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_OPA_URL, 'health')}",
+        command=curl_command(connection_endpoint_url(DEFAULT_OPA_URL, "health")),
         expected_signal="HTTP 200 and non-error response",
     ),
     CommandDefinition(
         slug="safety_service",
         target="Safety Service",
-        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_SAFETY_SERVICE_URL, 'health')}",
+        command=curl_command(connection_endpoint_url(DEFAULT_SAFETY_SERVICE_URL, "health")),
         expected_signal=health_expected_signal(),
     ),
 )
@@ -135,30 +143,45 @@ BACKUP_COMMANDS: tuple[CommandDefinition, ...] = (
     CommandDefinition(
         slug="postgres_backup",
         target="PostgreSQL",
-        command=(
-            "docker compose exec -T postgres pg_dump -U ai_artist -d ai_artist "
-            "--format=custom --file=/tmp/ai_artist_latest.dump"
+        command=docker_compose_exec(
+            "postgres",
+            "pg_dump",
+            "-U",
+            "ai_artist",
+            "-d",
+            "ai_artist",
+            "--format=custom",
+            "--file=/tmp/ai_artist_latest.dump",
         ),
         expected_signal="custom-format dump is written inside the postgres container",
     ),
     CommandDefinition(
         slug="postgres_copy_backup",
         target="PostgreSQL",
-        command="docker compose cp postgres:/tmp/ai_artist_latest.dump .codex_tmp/backups/postgres/",
+        command=docker_compose_command(
+            "cp",
+            "postgres:/tmp/ai_artist_latest.dump",
+            ".codex_tmp/backups/postgres/",
+        ),
         expected_signal="dump file exists under .codex_tmp/backups/postgres",
     ),
     CommandDefinition(
         slug="minio_backup",
         target="MinIO",
-        command="mc mirror --overwrite local-ai-artist/ .codex_tmp/backups/minio/",
+        command=minio_command(
+            "mirror",
+            "--overwrite",
+            "local-ai-artist/",
+            ".codex_tmp/backups/minio/",
+        ),
         expected_signal="object tree is mirrored to .codex_tmp/backups/minio",
     ),
     CommandDefinition(
         slug="qdrant_backup",
         target="Qdrant",
-        command=(
-            "curl.exe -fsS -X POST "
-            f"{connection_endpoint_url(DEFAULT_QDRANT_URL, 'collections/{collection}/snapshots')}"
+        command=curl_command(
+            connection_endpoint_url(DEFAULT_QDRANT_URL, "collections/{collection}/snapshots"),
+            method="POST",
         ),
         expected_signal="snapshot name returned for each production collection",
     ),
@@ -169,19 +192,26 @@ RESTORE_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
     CommandDefinition(
         slug="postgres_restore_check",
         target="PostgreSQL",
-        command="docker compose exec -T postgres pg_restore --list /tmp/ai_artist_latest.dump",
+        command=docker_compose_exec(
+            "postgres",
+            "pg_restore",
+            "--list",
+            "/tmp/ai_artist_latest.dump",
+        ),
         expected_signal="archive table of contents is readable",
     ),
     CommandDefinition(
         slug="minio_restore_check",
         target="MinIO",
-        command="mc ls --recursive .codex_tmp/backups/minio/",
+        command=minio_command("ls", "--recursive", ".codex_tmp/backups/minio/"),
         expected_signal="expected buckets and object prefixes are listed",
     ),
     CommandDefinition(
         slug="qdrant_restore_check",
         target="Qdrant",
-        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_QDRANT_URL, 'collections/{collection}/snapshots')}",
+        command=curl_command(
+            connection_endpoint_url(DEFAULT_QDRANT_URL, "collections/{collection}/snapshots")
+        ),
         expected_signal="snapshot created during backup is listed",
     ),
 )

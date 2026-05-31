@@ -26,6 +26,7 @@ Safety Service health contract: centralized in backend/health_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry, endpoint URL composition, env-example rendering, and runtime env resolution: centralized in backend/connection_settings.py
+Shell command construction: centralized in backend/shell_commands.py
 Execution gates: centralized in backend/execution_gate.py
 Execution-envelope messages: centralized in backend/execution_gate_messages.py
 Slack adapter contracts: centralized in backend/slack_contracts.py
@@ -121,6 +122,7 @@ Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Safety Service health: shared health response and readiness expected-signal contract
 Connection registry, endpoint URL composition, env-example rendering, and runtime env resolution: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, readiness commands, docs, and tracker
+Shell command construction: shared across readiness Docker Compose, curl, and MinIO command definitions
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, signature, and expiry failures
@@ -155,6 +157,7 @@ Response fields: shared directly across provider-neutral LLM API response parsin
 ComfyUI contracts: shared across image provenance response validation, storage URI construction, and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety and source-ingestion domain allowlisting
 Connection endpoint URLs and env example rendering: shared across readiness health, backup, restore command definitions, and `.env.example`
+Shell commands: shared across readiness health, backup, and restore command definitions
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
 GitHub adapter contracts: shared across action labels, target labels, API validation messages, and token-purpose text
 File scanning: shared across security review workspace secret scans and future scanner paths
@@ -178,8 +181,8 @@ docker compose config: passed
 docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
-T28 production readiness: 8 passed; runbook, env schema rendering, shared service URL commands, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 373 passed, 1 skipped, 1 warning
+T28 production readiness: 9 passed; runbook, env schema rendering, shared service URL and shell command construction, health checks, backup commands, restore checks, retention, and contacts validated
+final pytest: 376 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
