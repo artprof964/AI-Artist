@@ -5,12 +5,12 @@ from typing import Any
 import pytest
 
 from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR
-from backend.repo_paths import read_backend_module_text
 from backend.slack_adapter import (
     SlackAdapter,
     SlackAdapterConfigurationError,
     SlackAdapterError,
 )
+from path_helpers import read_backend_source
 
 
 BOT_TOKEN = "xoxb-local-secret-token"
@@ -202,7 +202,7 @@ def test_slack_adapter_rejects_malformed_inbound_events(event_update: dict[str, 
 
 
 def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
-    source = read_backend_module_text("slack_adapter.py")
+    source = read_backend_source("slack_adapter.py")
 
     assert "from backend.connection_settings import" in source
     assert "from backend.payload_fields import" in source

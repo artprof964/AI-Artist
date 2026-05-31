@@ -13,7 +13,7 @@ from backend.github_contracts import (
     GITHUB_WRITE_ACTION_LABEL,
     github_token_required,
 )
-from backend.repo_paths import read_backend_module_text
+from path_helpers import read_backend_source
 
 
 def test_github_contracts_preserve_adapter_text() -> None:
@@ -35,7 +35,7 @@ def test_github_contracts_preserve_adapter_text() -> None:
 
 
 def test_github_adapter_uses_shared_contract_messages() -> None:
-    source = read_backend_module_text("github_adapter.py")
+    source = read_backend_source("github_adapter.py")
 
     forbidden_literals = [
         '"GitHub write"',

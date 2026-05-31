@@ -9,10 +9,10 @@ from backend.publishing_adapter import (
     PublishingExecutionGateError,
     PublishingRequest,
 )
-from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 from backend.time_utils import utc_now
+from path_helpers import read_backend_source
 
 
 REQUEST_ID = UUID("22222222-2222-2222-2222-222222222222")
@@ -167,14 +167,14 @@ def test_publishing_rejects_invalid_execution_envelopes_before_client_execution(
 
 
 def test_publishing_adapter_uses_shared_operation_constant_directly() -> None:
-    contents = read_backend_module_text("publishing_adapter.py")
+    contents = read_backend_source("publishing_adapter.py")
 
     assert "PUBLISH_OPERATION =" not in contents
     assert "operation=OPERATION_PUBLISH" in contents
 
 
 def test_publishing_adapter_uses_shared_missing_envelope_message() -> None:
-    contents = read_backend_module_text("publishing_adapter.py")
+    contents = read_backend_source("publishing_adapter.py")
 
     assert '"publishing requires an execution envelope"' not in contents
     assert 'execution_envelope_required("publishing")' in contents

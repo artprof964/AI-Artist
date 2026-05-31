@@ -9,10 +9,10 @@ from backend.comfyui_adapter import (
     ComfyUIExecutionGateError,
     ComfyUIImageGenerationRequest,
 )
-from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 from backend.time_utils import utc_now
+from path_helpers import read_backend_source
 
 
 REQUEST_ID = UUID("17171717-1717-1717-1717-171717171717")
@@ -146,14 +146,14 @@ def test_image_generation_fails_without_valid_execution_envelope(
 
 
 def test_comfyui_adapter_uses_shared_operation_constant_directly() -> None:
-    contents = read_backend_module_text("comfyui_adapter.py")
+    contents = read_backend_source("comfyui_adapter.py")
 
     assert "IMAGE_GENERATE_OPERATION =" not in contents
     assert "operation=OPERATION_IMAGE_GENERATE" in contents
 
 
 def test_comfyui_adapter_uses_shared_missing_envelope_message() -> None:
-    contents = read_backend_module_text("comfyui_adapter.py")
+    contents = read_backend_source("comfyui_adapter.py")
 
     assert '"image generation requires an execution envelope"' not in contents
     assert 'execution_envelope_required("image generation")' in contents

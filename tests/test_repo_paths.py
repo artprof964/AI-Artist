@@ -113,14 +113,19 @@ def test_repo_wide_guard_tests_use_shared_test_path_helpers() -> None:
 def test_migrated_source_inspection_tests_use_shared_path_helpers() -> None:
     migrated_tests = {
         "test_classification_contracts.py",
+        "test_comfyui_adapter.py",
         "test_health_contracts.py",
+        "test_http_methods.py",
+        "test_github_contracts.py",
         "test_mapping_utils.py",
         "test_model_coercion.py",
+        "test_publishing_adapter.py",
         "test_production_readiness.py",
         "test_request_metadata.py",
         "test_runtime_ids.py",
         "test_safety_service_units.py",
         "test_security_review.py",
+        "test_slack_adapter.py",
         "test_source_ingestion.py",
         "test_tree_shape.py",
     }
