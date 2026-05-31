@@ -29,7 +29,7 @@ can be marked done.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
 19. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
-19a. Local default-deny policy versioning uses `backend/policy_contracts.py`.
+19a. Local default-deny policy versioning, execution-envelope signing key, and execution-envelope TTL use `backend/policy_contracts.py`.
 19b. Source freshness schema defaults and unchanged-source checks use `backend/source_freshness_contracts.py`.
 20. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 21. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
@@ -262,7 +262,7 @@ Output:
 4. Policy Check
    - Safety Service asks OPA whether processing may continue.
    - Sensitive-operation checks come from the shared operation registry before envelopes are issued.
-   - Policy responses and execution envelopes stamp policy versions from the shared policy contract.
+   - Policy responses, execution-envelope policy versions, signing key, and expiry TTL use the shared policy contract.
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.

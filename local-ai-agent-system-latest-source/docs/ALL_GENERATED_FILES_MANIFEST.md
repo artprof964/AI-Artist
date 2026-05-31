@@ -260,6 +260,7 @@
 - `../../validation_reports/context_handoff_2026-05-31.md`
 - `../../validation_reports/openclaw_request_kind_standardization_2026-05-31.md`
 - `../../validation_reports/policy_version_contract_standardization_2026-05-31.md`
+- `../../validation_reports/envelope_signing_ttl_contract_standardization_2026-05-31.md`
 - `../../backend/policy_contracts.py`
 - `../../tests/test_policy_contracts.py`
 - `../../validation_reports/source_freshness_default_contract_standardization_2026-05-31.md`

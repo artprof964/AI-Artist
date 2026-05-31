@@ -48,7 +48,7 @@ Request scope and publishing scope defaults: centralized in backend/request_scop
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
-Local default-deny policy version: centralized in backend/policy_contracts.py
+Local default-deny policy version, execution-envelope signing key, and execution-envelope TTL: centralized in backend/policy_contracts.py
 Source registry missing-row messages, dependency roles, empty change-sequence defaults, and initial change-sequence defaults: centralized in backend/source_registry_contracts.py
 Source freshness schema defaults and unchanged-source checks: centralized in backend/source_freshness_contracts.py
 Source ingestion contracts and registry metadata keys: centralized in backend/source_ingestion_contracts.py
@@ -153,7 +153,7 @@ Request scope defaults: shared across API schemas, mock orchestration request en
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
-Policy contracts: shared across Safety Service policy responses and execution-envelope policy version stamps
+Policy contracts: shared across Safety Service policy responses, execution-envelope policy version stamps, execution-envelope signing, and envelope expiry TTL
 Source registry contracts: shared across source-key/source-id freshness lookup failures, dependency roles, empty source snapshots, and initial change sequence defaults
 Source freshness contracts: shared across schema defaults, unchanged-source checks, source dependency snapshots, policy requests, cache replay, and execution envelopes
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
@@ -215,7 +215,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 454 passed, 1 skipped, 1 warning
+final pytest: 456 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

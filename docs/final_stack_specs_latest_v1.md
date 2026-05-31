@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 454 passed, 1 skipped, 1 warning
+Final validation: 456 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,7 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/api_contracts.py: shared FastAPI app metadata and Safety Service route paths.
 backend/app.py: FastAPI endpoints using shared API contracts.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
-backend/policy_contracts.py: shared local default-deny policy version contract for policy responses and execution envelopes.
+backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, and execution-envelope TTL contracts for policy responses and execution envelopes.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
 backend/classification_contracts.py: shared classifier confidence and reason formatting.
@@ -214,8 +214,10 @@ backend/mapping_utils.py before domain-specific copy or merge logic is added.
 Cache, source-freshness, policy, and execution-envelope reason strings must
 flow through backend/reason_messages.py before service or cache decision text is
 added.
-Policy response and execution-envelope policy versions must flow through
-backend/policy_contracts.py before local default-deny versioning changes.
+Policy response and execution-envelope policy versions, local execution-envelope
+signing key, and execution-envelope TTL must flow through
+backend/policy_contracts.py before local default-deny or envelope-signing
+contracts change.
 Source registry missing-row messages must flow through
 backend/source_registry_contracts.py before source freshness or future
 persistence adapters raise missing-row errors.

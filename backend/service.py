@@ -1,5 +1,3 @@
-from datetime import timedelta
-
 from backend.audit import (
     list_audit_events_by_correlation_id,
     record_audit_event,
@@ -17,7 +15,11 @@ from backend.observability import (
     record_observability_stage,
     trace_id_from_request,
 )
-from backend.policy_contracts import LOCAL_DEFAULT_DENY_POLICY_VERSION
+from backend.policy_contracts import (
+    LOCAL_DEFAULT_DENY_POLICY_VERSION,
+    LOCAL_ENVELOPE_SIGNING_KEY,
+    execution_envelope_expires_at,
+)
 from backend.operations import (
     ACTION_TERMS,
     READ_TERMS,
@@ -49,9 +51,6 @@ from backend.schemas import (
 )
 from backend.text_utils import identifier_tokens
 from backend.time_utils import utc_now
-
-LOCAL_ENVELOPE_SIGNING_KEY = b"ai-artist-local-safety-service-dev-key"
-
 
 def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
     canonical_text = normalize_request_text(payload.request_text)
@@ -187,7 +186,7 @@ def create_execution_envelope(
     payload: ExecutionEnvelopeRequest,
 ) -> ExecutionEnvelopeResponse:
     issued_at = utc_now()
-    expires_at = issued_at + timedelta(minutes=15)
+    expires_at = execution_envelope_expires_at(issued_at)
     needs_approval = is_sensitive_operation(payload.operation)
     freshness_ok = payload.source_freshness.all_required_sources_unchanged
     approved = payload.human_approval.approved
