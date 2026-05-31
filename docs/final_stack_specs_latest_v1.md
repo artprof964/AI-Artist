@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 446 passed, 1 skipped, 1 warning
+Final validation: 447 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -68,7 +68,7 @@ backend/review_status.py: shared generated-image review status vocabulary and ch
 backend/critic_rubric.py: shared Critic/Curator rubric categories and pass/fail decision vocabulary.
 backend/text_utils.py: shared text tokenization, direct Safety Service classifier token parsing, label normalization, and contextual snippets.
 backend/markdown_utils.py: shared Markdown heading extraction for documentation validators.
-backend/numeric_utils.py: shared numeric clamps, averages, vector similarity, and numeric/vector validation messages.
+backend/numeric_utils.py: shared numeric clamps, averages, vector similarity, positive-integer checks, zero-magnitude checks, and numeric/vector validation messages.
 backend/time_utils.py: shared UTC datetime creation and normalization for runtime code and tests.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction plus payload validation messages.
 backend/response_fields.py: shared provider response field access, first-choice message parsing, shape validation, and response validation messages.
@@ -249,7 +249,8 @@ Safety Service classification must call backend/text_utils.py directly for
 classifier token parsing.
 Markdown heading extraction must flow through backend/markdown_utils.py before
 readiness or future documentation validators inspect section headings.
-Numeric clamps, rounded averages, vector similarity, and numeric/vector validation messages must flow through
+Numeric clamps, rounded averages, vector similarity, positive-integer checks,
+zero-magnitude checks, and numeric/vector validation messages must flow through
 backend/numeric_utils.py before orchestration, retrieval, or rubric-specific
 scoring logic is added.
 Critic/Curator rubric score bounds must call backend/numeric_utils.py directly

@@ -16,7 +16,12 @@ from backend.knowledge_contracts import (
     knowledge_results_summary,
 )
 from backend.mapping_utils import copy_mapping
-from backend.numeric_utils import EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE, cosine_similarity
+from backend.numeric_utils import (
+    EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE,
+    cosine_similarity,
+    is_zero_magnitude,
+    require_positive_integer,
+)
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SubAgentOutput
 from backend.subagent_output_contracts import build_subagent_output
@@ -143,8 +148,7 @@ class DeterministicEmbeddingModel:
     """Small local embedding model for deterministic tests and offline runs."""
 
     def __init__(self, dimensions: int = 64) -> None:
-        if dimensions <= 0:
-            raise ValueError(EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE)
+        require_positive_integer(dimensions, EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE)
         self.dimensions = dimensions
 
     def embed(self, text: str) -> tuple[float, ...]:
@@ -153,7 +157,7 @@ class DeterministicEmbeddingModel:
             index = self._stable_index(token)
             vector[index] += 1.0
         magnitude = math.sqrt(sum(value * value for value in vector))
-        if magnitude == 0.0:
+        if is_zero_magnitude(magnitude):
             return tuple(vector)
         return tuple(value / magnitude for value in vector)
 

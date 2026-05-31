@@ -263,3 +263,4 @@
 - `../../validation_reports/publishing_scope_default_standardization_2026-05-31.md`
 - `../../validation_reports/source_empty_change_seq_standardization_2026-05-31.md`
 - `../../validation_reports/source_freshness_predicate_standardization_2026-05-31.md`
+- `../../validation_reports/numeric_vector_helper_standardization_2026-05-31.md`

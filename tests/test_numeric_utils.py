@@ -1,6 +1,14 @@
 import pytest
 
-from backend.numeric_utils import clamp, cosine_similarity, rounded_clamp, rounded_mean
+from backend.numeric_utils import (
+    EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE,
+    clamp,
+    cosine_similarity,
+    is_zero_magnitude,
+    require_positive_integer,
+    rounded_clamp,
+    rounded_mean,
+)
 from path_helpers import read_backend_source
 
 
@@ -32,6 +40,15 @@ def test_cosine_similarity_returns_dot_product_for_normalized_vectors() -> None:
     assert cosine_similarity((1.0, 0.0), (0.25, 0.75)) == 0.25
 
 
+def test_positive_integer_and_zero_magnitude_helpers_centralize_vector_checks() -> None:
+    require_positive_integer(1, EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE)
+    with pytest.raises(ValueError, match="Embedding dimensions must be positive"):
+        require_positive_integer(0, EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE)
+
+    assert is_zero_magnitude(0.0) is True
+    assert is_zero_magnitude(0.1) is False
+
+
 def test_numeric_validation_messages_are_centralized_for_vector_boundaries() -> None:
     numeric_source = read_backend_source("numeric_utils.py")
     knowledge_source = read_backend_source("knowledge.py")
@@ -40,4 +57,8 @@ def test_numeric_validation_messages_are_centralized_for_vector_boundaries() -> 
     assert "VECTOR_DIMENSIONS_MUST_MATCH" in numeric_source
     assert "EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE" in numeric_source
     assert "EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE" in knowledge_source
+    assert "require_positive_integer(" in knowledge_source
+    assert "is_zero_magnitude(" in knowledge_source
     assert '"Embedding dimensions must be positive."' not in knowledge_source
+    assert "dimensions <= 0" not in knowledge_source
+    assert "magnitude == 0.0" not in knowledge_source

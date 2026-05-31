@@ -28,6 +28,15 @@ def rounded_mean(values: Iterable[float], *, digits: int) -> float:
     return round(sum(collected) / len(collected), digits)
 
 
+def require_positive_integer(value: int, message: str) -> None:
+    if value <= 0:
+        raise ValueError(message)
+
+
+def is_zero_magnitude(value: float) -> bool:
+    return value == 0.0
+
+
 def cosine_similarity(left: Sequence[float], right: Sequence[float]) -> float:
     if len(left) != len(right):
         raise ValueError(VECTOR_DIMENSIONS_MUST_MATCH)
@@ -40,6 +49,8 @@ __all__ = [
     "VECTOR_DIMENSIONS_MUST_MATCH",
     "clamp",
     "cosine_similarity",
+    "is_zero_magnitude",
+    "require_positive_integer",
     "rounded_clamp",
     "rounded_mean",
 ]
