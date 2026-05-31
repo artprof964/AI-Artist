@@ -58,7 +58,7 @@ Sub-agent output construction: centralized in backend/subagent_output_contracts.
 Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, and orchestration telemetry
 Knowledge Agent contracts: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
-Critic/Curator rubric categories and decisions: centralized in backend/critic_rubric.py
+Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and pass/fail helpers: centralized in backend/critic_rubric.py
 Text tokenization, direct Safety Service classifier token parsing, labels, and contextual snippets: centralized in backend/text_utils.py
 Markdown heading parsing: centralized in backend/markdown_utils.py
 Numeric scoring utilities, vector similarity, positive-integer checks, zero-magnitude checks, and numeric/vector validation messages: centralized in backend/numeric_utils.py
@@ -162,10 +162,10 @@ Sub-agent output construction: shared across Knowledge retrieval and mock orches
 Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry, and tests
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, approved-hit filtering, artifact metadata, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
-Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests
+Critic rubric vocabulary and scoring contracts: shared across Critic/Curator scoring, score conversion, pass/fail decisions, and rubric tests
 Text utilities: shared directly across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
 Markdown utilities: shared across production readiness runbook validation and future documentation validators
-Numeric utilities: shared directly across Knowledge vector similarity, embedding validation, empty-vector handling, Critic/Curator score clamping/averages, and mock orchestration confidence
+Numeric utilities: shared directly across Knowledge vector similarity, embedding validation, empty-vector handling, Critic/Curator rubric helper clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, execution-envelope expiry validation, and tests that need current UTC timestamps
 Payload fields: shared across Slack event parsing, nested event object validation, payload validation messages, audit scope extraction, and generated image metadata parsing
 Slack adapter boundaries: shared payload, request identity, secret-redaction, adapter secret, and connection error-message helpers are called directly without local wrapper functions
@@ -215,7 +215,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 447 passed, 1 skipped, 1 warning
+final pytest: 450 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

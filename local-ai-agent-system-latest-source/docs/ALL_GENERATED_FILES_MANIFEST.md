@@ -109,6 +109,7 @@
 - `../../tests/test_image_provenance.py`
 - `../../validation_reports/t19_critic_curator_validation_2026-05-31.md`
 - `../../validation_reports/critic_rubric_standardization_2026-05-31.md`
+- `../../validation_reports/critic_rubric_scoring_contract_standardization_2026-05-31.md`
 - `../../validation_reports/model_coercion_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/critic_numeric_boundary_standardization_2026-05-31.md`
 - `../../backend/critic_rubric.py`

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 447 passed, 1 skipped, 1 warning
+Final validation: 450 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -65,7 +65,7 @@ backend/reason_messages.py: shared cache, source-freshness, policy, and executio
 backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, and counting helpers.
 backend/subagent_output_contracts.py: shared SubAgentOutput construction and model-coercion boundary.
 backend/review_status.py: shared generated-image review status vocabulary and checks.
-backend/critic_rubric.py: shared Critic/Curator rubric categories and pass/fail decision vocabulary.
+backend/critic_rubric.py: shared Critic/Curator rubric categories, pass/fail decision vocabulary, score bounds, pass thresholds, scoring weights, publication penalties, and rubric score helpers.
 backend/text_utils.py: shared text tokenization, direct Safety Service classifier token parsing, label normalization, and contextual snippets.
 backend/markdown_utils.py: shared Markdown heading extraction for documentation validators.
 backend/numeric_utils.py: shared numeric clamps, averages, vector similarity, positive-integer checks, zero-magnitude checks, and numeric/vector validation messages.
@@ -106,7 +106,7 @@ backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
-backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and numeric-clamp boundaries.
+backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and shared rubric scoring boundaries.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and adapter-secret boundaries directly.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation and publishing scope constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
@@ -240,8 +240,10 @@ before orchestration-specific agent fixtures are changed.
 Generated image review status vocabulary and checks must flow through
 backend/review_status.py before provenance, critic, or publishing-specific
 review status logic is added.
-Critic/Curator rubric categories and decisions must flow through
-backend/critic_rubric.py before scorer-specific rubric logic is added.
+Critic/Curator rubric categories, decisions, score bounds, pass thresholds,
+category weights, publication penalties, score conversion helpers, and pass/fail
+checks must flow through backend/critic_rubric.py before scorer-specific rubric
+logic is added.
 Text tokenization, label/tag normalization, and contextual snippets must flow through
 backend/text_utils.py before classifier, retrieval, or rubric-specific token
 parsing logic is added.
@@ -253,8 +255,8 @@ Numeric clamps, rounded averages, vector similarity, positive-integer checks,
 zero-magnitude checks, and numeric/vector validation messages must flow through
 backend/numeric_utils.py before orchestration, retrieval, or rubric-specific
 scoring logic is added.
-Critic/Curator rubric score bounds must call backend/numeric_utils.py directly
-before category or publication-readiness scores are emitted.
+Critic/Curator rubric score bounds must call backend/critic_rubric.py shared
+rubric score helpers before category or publication-readiness scores are emitted.
 UTC datetime creation and normalization must flow directly through backend/time_utils.py
 before cache, provenance, execution gate, source freshness, observability, or
 future persistence time comparisons are added.

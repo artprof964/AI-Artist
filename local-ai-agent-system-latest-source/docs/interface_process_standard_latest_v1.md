@@ -35,7 +35,7 @@ can be marked done.
 21. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
 22. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
 23. Generated-image review status vocabulary and checks use `backend/review_status.py`.
-24. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
+24. Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and score helpers use `backend/critic_rubric.py`.
 25. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 26. Numeric clamps, rounded averages, vector similarity, positive-integer checks, and zero-magnitude checks use `backend/numeric_utils.py` directly at scoring boundaries.
 27. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
@@ -282,8 +282,8 @@ Output:
    - Mock orchestration agent names and artifact types use the shared mock-agent contract.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
    - Knowledge retrieval result snippets use the shared contextual snippet helper.
-   - Retrieval vector similarity, embedding dimension validation, zero-vector handling, rubric scoring, and orchestration confidence use shared numeric helpers.
-   - Critic/Curator score bounds call the shared numeric clamp directly without local wrapper functions.
+   - Retrieval vector similarity, embedding dimension validation, zero-vector handling, rubric helper clamping, and orchestration confidence use shared numeric helpers.
+   - Critic/Curator score bounds, score conversion, pass thresholds, and publication penalties call the shared rubric scoring contracts directly without local wrapper functions.
 
 7. Validate
    - Runtime validates `SubAgentOutput`, compares results, retries if needed,
