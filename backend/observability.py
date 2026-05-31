@@ -7,6 +7,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from backend.audit import redacted_audit_mapping
+from backend.runtime_field_contracts import CORRELATION_ID_FIELD
 from backend.time_utils import utc_now
 
 
@@ -214,7 +215,7 @@ def trace_id_from_request(
     request_id: UUID | str | None,
     metadata: dict[str, Any] | None = None,
 ) -> str:
-    correlation_id = (metadata or {}).get("correlation_id")
+    correlation_id = (metadata or {}).get(CORRELATION_ID_FIELD)
     if isinstance(correlation_id, str) and correlation_id:
         return correlation_id
     if request_id is not None:

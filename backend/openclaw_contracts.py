@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from backend.runtime_field_contracts import (
+    CORRELATION_ID_FIELD,
     OPERATION_FIELD,
     POLICY_SCOPE_FIELD,
     POLICY_VERSION_FIELD,
@@ -13,7 +14,7 @@ from backend.runtime_field_contracts import (
 )
 from backend.secret_redaction import redact_secret_value
 
-OPENCLAW_CORRELATION_ID_METADATA_KEY = "correlation_id"
+OPENCLAW_CORRELATION_ID_METADATA_KEY = CORRELATION_ID_FIELD
 OPENCLAW_TOOL_NAME_METADATA_KEY = "tool_name"
 OPENCLAW_TOOL_ARGUMENTS_METADATA_KEY = "tool_arguments"
 OPENCLAW_OPERATION_FIELD = OPERATION_FIELD

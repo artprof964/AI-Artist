@@ -28,6 +28,7 @@ from backend.observability import (
     request_trace_id,
     trace_id_from_request,
 )
+from backend.runtime_field_contracts import CORRELATION_ID_FIELD
 from path_helpers import read_backend_source
 
 
@@ -66,11 +67,14 @@ def test_observability_metric_and_trace_defaults_are_centralized() -> None:
     )
     assert request_trace_id("abc") == "request:abc"
     assert trace_id_from_request("abc") == "request:abc"
+    assert trace_id_from_request("abc", {CORRELATION_ID_FIELD: "trace:abc"}) == "trace:abc"
     assert trace_id_from_request(None) == UNKNOWN_REQUEST_TRACE_ID
     assert "metric_value: float = 1.0" not in source
     assert 'f"ai_artist.{stage}.{event}.total"' not in source
     assert 'return f"request:{request_id}"' not in source
     assert 'return "request:unknown"' not in source
+    assert '.get("correlation_id")' not in source
+    assert "CORRELATION_ID_FIELD" in source
 
 
 def test_observability_metric_names_are_centralized() -> None:

@@ -18,6 +18,7 @@ from backend.openclaw_contracts import (
     openclaw_tool_preflight_fields,
 )
 from backend.runtime_field_contracts import (
+    CORRELATION_ID_FIELD,
     OPERATION_FIELD,
     POLICY_SCOPE_FIELD,
     POLICY_VERSION_FIELD,
@@ -98,6 +99,7 @@ def test_openclaw_policy_fields_use_shared_runtime_contracts() -> None:
     source = read_backend_source("openclaw_contracts.py")
 
     assert OPENCLAW_OPERATION_FIELD == OPERATION_FIELD
+    assert OPENCLAW_CORRELATION_ID_METADATA_KEY == CORRELATION_ID_FIELD
     assert OPENCLAW_REQUEST_KIND_FIELD == REQUEST_KIND_FIELD
     assert OPENCLAW_REQUESTER_SCOPE_FIELD == REQUESTER_SCOPE_FIELD
     assert OPENCLAW_POLICY_SCOPE_FIELD == POLICY_SCOPE_FIELD
@@ -106,6 +108,7 @@ def test_openclaw_policy_fields_use_shared_runtime_contracts() -> None:
     assert OPENCLAW_REQUIRES_HUMAN_APPROVAL_FIELD == REQUIRES_HUMAN_APPROVAL_FIELD
     for literal in (
         'OPENCLAW_OPERATION_FIELD = "operation"',
+        'OPENCLAW_CORRELATION_ID_METADATA_KEY = "correlation_id"',
         'OPENCLAW_REQUEST_KIND_FIELD = "request_kind"',
         'OPENCLAW_REQUESTER_SCOPE_FIELD = "requester_scope"',
         'OPENCLAW_POLICY_SCOPE_FIELD = "policy_scope"',

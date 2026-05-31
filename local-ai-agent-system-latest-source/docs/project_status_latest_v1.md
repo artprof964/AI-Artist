@@ -39,7 +39,7 @@ Slack adapter contracts, event fields, scopes, payload shapes, and post-result s
 GitHub adapter contracts and token-required message routing: centralized in backend/github_contracts.py and backend/connection_settings.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, structured unredacted-secret checks, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
-Audit scope payload field names and audit response shape: centralized in backend/audit_contracts.py
+Audit scope payload field names, correlation-id field, and audit response shape: centralized in backend/audit_contracts.py
 ComfyUI generated-image URI, response field names, response validation contracts, and storage-reference resolution: centralized in backend/comfyui_contracts.py
 Gated adapter action and target labels: centralized in backend/adapter_gate_contracts.py
 Adapter result field vocabulary and mapping: centralized in backend/adapter_results.py
@@ -152,7 +152,7 @@ Execution gate messages: shared across invalid envelope, operation mismatch, tar
 Secret detection, structured unredacted-secret checks, and redaction: shared directly across audit, observability, LLM smoke request logging, OpenClaw hook, GitHub, Slack, and security review
 OpenClaw contracts: shared across tool policy metadata redaction, tool metric tags, preflight telemetry fields, policy decision telemetry fields, and executed telemetry fields
 Redacted audit mappings: shared directly by observability fields and metric tags
-Audit scope and response contracts: shared by audit record scope extraction, accepted response payloads, and side-effect audit payload scope field names
+Audit scope and response contracts: shared by audit record scope extraction, accepted response payloads, audit response correlation-id field names, and side-effect audit payload scope field names
 Gated adapter action and target labels: shared across Publishing and ComfyUI execution-envelope message construction; GitHub labels remain in the GitHub contract boundary
 Adapter result field vocabulary and mapping: shared across GitHub, Publishing, ComfyUI gated adapters, and side-effect audit payload result fields
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with payload field names routed through side_effect_audit_contracts.py and tool-call audit event typing routed through interface contracts
@@ -162,7 +162,7 @@ Source ingestion hashes: source snapshots call shared canonical hash/version hel
 Request identity: shared directly across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
 Request metadata contracts and mapping: shared across schema defaults, Safety Service request fingerprints, metric tags, and canonicalization observability fields
 Safety Service observability contracts: shared across canonicalization, classification, and policy evaluation event/message/tag/field shapes
-Runtime field contracts: shared across Safety Service policy observability, OpenClaw tool telemetry, and side-effect audit payload field names
+Runtime field contracts: shared across Safety Service policy observability, OpenClaw tool telemetry, observability trace fallback metadata, audit response correlation-id fields, and side-effect audit payload field names
 Request scope defaults: shared across API schemas, mock orchestration request envelopes, and publishing audit context
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
@@ -203,7 +203,7 @@ Interface types: shared directly across API schemas, operation classification, a
 API route contracts: shared directly across FastAPI decorators and endpoint tests
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants; cache reuse telemetry event/message/tag/field shapes use response_cache_contracts.py
 Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
-Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric-name constants, trace fallback ids, default event messages, service observability shape contracts, and security review probes
+Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric-name constants, trace fallback ids, shared correlation-id metadata lookup, default event messages, service observability shape contracts, and security review probes
 Publishing dry-run response contracts: shared across LocalPublishingClient response construction and deterministic local publishing IDs
 Publishing statuses: shared across Publishing Agent result handling, local publishing dry-run responses, and side-effect audit payloads
 Security review contracts: shared across workspace secret scanning, audit/observability redaction checks, policy bypass checks, and artifact prompt-hash review
@@ -239,7 +239,7 @@ test path helper validation: adapter/connector, domain, core, remaining simple, 
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
 adapter result field validation: 48 focused tests passed; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
-runtime field contract validation: 17 focused tests passed; service observability and OpenClaw policy telemetry field names share runtime_field_contracts.py
+correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload validation: 20 focused tests passed; vector payload fields and payload construction centralized in knowledge_contracts.py
 final pytest: 503 passed, 1 warning
 final ruff: all checks passed
