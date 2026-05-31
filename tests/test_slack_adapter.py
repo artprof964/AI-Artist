@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from pathlib import Path
 from typing import Any
 
 import pytest
@@ -144,3 +145,17 @@ def test_slack_adapter_rejects_malformed_inbound_events(event_update: dict[str, 
 
     with pytest.raises(SlackAdapterError):
         adapter.normalize_inbound_event(payload)
+
+
+def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
+    source = Path("backend/slack_adapter.py").read_text(encoding="utf-8")
+
+    assert "from backend.payload_fields import" in source
+    assert "from backend.request_identity import" in source
+    assert "from backend.secret_redaction import" in source
+    assert "def _required_string(" not in source
+    assert "def _optional_string(" not in source
+    assert "def _normalize_text(" not in source
+    assert "def _stable_request_id(" not in source
+    assert "def _redact_secret(" not in source
+    assert "def _redact_secret_text(" not in source

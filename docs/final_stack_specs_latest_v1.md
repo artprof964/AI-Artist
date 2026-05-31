@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 299 passed, 1 skipped, 1 warning
+Final validation: 300 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -83,7 +83,7 @@ backend/knowledge.py: deterministic source-cited retrieval.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter.
 backend/image_provenance.py: prompt/workflow hashing and provenance records.
 backend/critic_curator.py: deterministic image critique rubric.
-backend/slack_adapter.py: mocked Slack request/response adapter.
+backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, and secret-redaction boundaries directly.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary.
@@ -122,6 +122,9 @@ Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Secret redaction patterns and replacement behavior must flow through
 backend/secret_redaction.py before adapter-specific logging or response shaping.
+Slack payload parsing, request text normalization, stable request IDs, and
+response redaction must call the shared payload, request identity, and
+secret-redaction helpers directly at the adapter boundary.
 Gated adapter result envelope fields must flow through backend/adapter_results.py
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads must flow through backend/side_effect_audit.py before

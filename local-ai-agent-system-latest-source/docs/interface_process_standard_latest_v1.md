@@ -197,6 +197,7 @@ Output:
    - Safety Service canonicalizes request text and builds a stable fingerprint.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
+   - Slack adapter payload parsing, request identity, and secret redaction call the shared helpers directly at the adapter boundary.
    - Runtime UUID creation uses the shared runtime ID helper.
    - Metadata and payload copies use the shared mapping helper.
 

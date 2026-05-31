@@ -117,6 +117,7 @@ Text utilities: shared across Safety Service classifier terms, Knowledge retriev
 Numeric utilities: shared across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
+Slack adapter boundaries: shared payload, request identity, and secret-redaction helpers are called directly without local wrapper functions
 Response fields: shared across provider-neutral LLM API response parsing, ComfyUI image response parsing, and publishing audit status parsing
 URL validation: shared across GitHub API path safety and source-ingestion domain allowlisting
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
@@ -135,7 +136,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 299 passed, 1 skipped, 1 warning
+final pytest: 300 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
