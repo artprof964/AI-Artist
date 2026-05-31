@@ -58,7 +58,7 @@ Text tokenization, direct Safety Service classifier token parsing, labels, and c
 Markdown heading parsing: centralized in backend/markdown_utils.py
 Numeric scoring utilities, vector similarity, and numeric/vector validation messages: centralized in backend/numeric_utils.py
 Time creation/normalization: centralized in backend/time_utils.py for runtime code and tests
-Payload fields and nested payload objects: centralized in backend/payload_fields.py
+Payload fields, nested payload objects, and payload validation messages: centralized in backend/payload_fields.py
 Response fields and first-choice message parsing: centralized in backend/response_fields.py
 URL validation: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
 HTTP method vocabulary and normalization: centralized in backend/http_methods.py
@@ -156,7 +156,7 @@ Text utilities: shared directly across Safety Service classifier terms, Knowledg
 Markdown utilities: shared across production readiness runbook validation and future documentation validators
 Numeric utilities: shared directly across Knowledge vector similarity and embedding validation, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, execution-envelope expiry validation, and tests that need current UTC timestamps
-Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
+Payload fields: shared across Slack event parsing, nested event object validation, payload validation messages, audit scope extraction, and generated image metadata parsing
 Slack adapter boundaries: shared payload, request identity, secret-redaction, adapter secret, and connection error-message helpers are called directly without local wrapper functions
 Slack adapter contracts: shared across source labels, inbound event validation messages, outbound response validation messages, and token-purpose text
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, ComfyUI image response parsing, and publishing audit status parsing
@@ -203,7 +203,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 425 passed, 1 skipped, 1 warning
+final pytest: 426 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

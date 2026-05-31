@@ -8,6 +8,18 @@ class PayloadFieldError(ValueError):
     """Raised when a connector payload field has the wrong shape."""
 
 
+def required_string_field_message(key: str) -> str:
+    return f"payload field {key!r} must be a non-empty string"
+
+
+def optional_string_field_message(key: str) -> str:
+    return f"payload field {key!r} must be a string when present"
+
+
+def required_mapping_field_message(key: str) -> str:
+    return f"payload field {key!r} must be an object"
+
+
 def required_string_field(
     payload: dict[str, Any],
     key: str,
@@ -17,7 +29,7 @@ def required_string_field(
 ) -> str:
     value = payload.get(key)
     if not isinstance(value, str) or not value.strip():
-        raise error_type(message or f"payload field {key!r} must be a non-empty string")
+        raise error_type(message or required_string_field_message(key))
     return value
 
 
@@ -33,7 +45,7 @@ def optional_string_field(
     if value is None:
         return None
     if not isinstance(value, str):
-        raise error_type(message or f"payload field {key!r} must be a string when present")
+        raise error_type(message or optional_string_field_message(key))
     if empty_as_none and value == "":
         return None
     return value
@@ -53,14 +65,17 @@ def required_mapping_field(
 ) -> Mapping[str, Any]:
     value = payload.get(key)
     if not isinstance(value, Mapping):
-        raise error_type(message or f"payload field {key!r} must be an object")
+        raise error_type(message or required_mapping_field_message(key))
     return value
 
 
 __all__ = [
     "PayloadFieldError",
     "optional_string_field",
+    "optional_string_field_message",
     "required_mapping_field",
+    "required_mapping_field_message",
     "required_string_field",
+    "required_string_field_message",
     "string_field_or_none",
 ]

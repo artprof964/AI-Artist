@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 425 passed, 1 skipped, 1 warning
+Final validation: 426 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -67,7 +67,7 @@ backend/text_utils.py: shared text tokenization, direct Safety Service classifie
 backend/markdown_utils.py: shared Markdown heading extraction for documentation validators.
 backend/numeric_utils.py: shared numeric clamps, averages, vector similarity, and numeric/vector validation messages.
 backend/time_utils.py: shared UTC datetime creation and normalization for runtime code and tests.
-backend/payload_fields.py: shared connector payload string-field and nested-object extraction.
+backend/payload_fields.py: shared connector payload string-field and nested-object extraction plus payload validation messages.
 backend/response_fields.py: shared provider response field access, first-choice message parsing, and shape validation.
 backend/url_utils.py: shared URL domain and relative API path validation.
 backend/http_methods.py: shared HTTP method vocabulary and normalization for connector boundaries.
@@ -235,7 +235,7 @@ future persistence time comparisons are added.
 Tests that need current UTC time must call backend/time_utils.py instead of
 calling datetime.now(timezone.utc) directly.
 Connector payload required/optional string extraction, tolerant string reads,
-and nested-object extraction must flow through
+nested-object extraction, and payload validation messages must flow through
 backend/payload_fields.py before adapter-specific payload parsing logic is added.
 Provider response object/dict field access and shape validation must flow through
 backend/response_fields.py before adapter-specific SDK response parsing logic is
