@@ -3,7 +3,7 @@
 ## Purpose
 
 This document standardizes the implementation handoffs for the OpenClaw +
-hosted OpenAI AI-Artist system. Every component must speak through explicit
+provider-neutral LLM API AI-Artist system. Every component must speak through explicit
 interfaces, produce auditable records, and have a validation test before a task
 can be marked done.
 
@@ -11,7 +11,7 @@ can be marked done.
 
 ```text
 1. OpenClaw owns agent runtime and tool hooks.
-2. Hosted OpenAI owns reasoning only; it never receives raw secrets.
+2. The provider-neutral LLM API owns reasoning only; it never receives raw secrets.
 3. FastAPI Safety Service owns deterministic safety decisions.
 4. OPA owns policy authorization.
 5. PostgreSQL owns request, source, cache, and audit records.
@@ -60,7 +60,7 @@ Rules:
 
 - OpenClaw sends task context and request metadata only.
 - OpenClaw never forwards API keys, OAuth tokens, signing keys, or private
-  webhooks to the hosted LLM.
+  webhooks to the configured LLM API.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

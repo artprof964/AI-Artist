@@ -7,9 +7,9 @@ It records which source data items were used to answer a request, whether any
 required source changed since the last successful execution, and whether a
 cached read-only response can be safely reused after OPA approval.
 
-In the selected OpenClaw + hosted LLM implementation, OpenClaw calls the local
+In the selected OpenClaw + provider-neutral LLM API implementation, OpenClaw calls the local
 FastAPI Safety Service before reuse or privileged execution. The Safety Service
-owns writes to these tables; OpenClaw agents and hosted LLM calls do not receive
+owns writes to these tables; OpenClaw agents and LLM API calls do not receive
 raw database credentials.
 
 Validation tests must prove that source freshness blocks cache replay when any

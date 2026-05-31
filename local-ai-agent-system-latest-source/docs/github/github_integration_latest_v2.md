@@ -42,7 +42,7 @@ runtime from `git_ai-artist_codex_token` instead of duplicating the secret in fi
 ```text
 GitHub adapter tests must use a mocked GitHub API.
 The token may be read only by the adapter process.
-OpenClaw agents, hosted LLM payloads, prompts, logs, memory, and audit payloads
+OpenClaw agents, LLM API payloads, prompts, logs, memory, and audit payloads
 must not contain the raw token.
 GitHub write attempts must fail unless a signed execution envelope is present.
 ```

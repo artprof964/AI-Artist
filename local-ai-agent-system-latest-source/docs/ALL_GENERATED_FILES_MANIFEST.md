@@ -1,7 +1,7 @@
 # All Generated Files Manifest
 
 - `docs/overview_project_outline_params_latest_v2.md`
-- `docs/implementation_stack_openclaw_hosted_llm_latest_v1.md`
+- `docs/implementation_stack_openclaw_llm_api_latest_v1.md`
 - `docs/interface_process_standard_latest_v1.md`
 - `docs/task_validation_matrix_latest_v1.md`
 - `docs/project_status_latest_v1.md`
@@ -21,7 +21,9 @@
 - `../../validation_reports/t06_opa_default_deny_validation_2026-05-31.md`
 - `../../validation_reports/t07_postgres_migration_validation_2026-05-31.md`
 - `../../validation_reports/t08_openclaw_workspace_validation_2026-05-31.md`
-- `../../validation_reports/t09_openai_smoke_validation_2026-05-31.md`
+- `../../validation_reports/t09_llm_api_smoke_validation_2026-05-31.md`
+- `../../backend/llm_api_smoke.py`
+- `../../tests/test_llm_api_smoke.py`
 - `../../validation_reports/t10_openclaw_safety_hook_2026-05-31.md`
 - `../../validation_reports/t10_openclaw_safety_hook_validation_2026-05-31.md`
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`

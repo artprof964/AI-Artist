@@ -23,7 +23,7 @@ All checks passed
 ## Notes
 
 - `SOUL.md`, `IDENTITY.md`, `USER.md`, `AGENTS.md`, `TOOLS.md`, and `MEMORY.md` are present and non-empty.
-- The workspace declares OpenClaw and hosted OpenAI as the selected runtime direction.
+- The workspace declares OpenClaw and provider-neutral LLM API as the selected runtime direction.
 - Safety Service policy and execution-envelope endpoints are referenced in tool contracts.
 - Memory seed files are present and indexed from `MEMORY.md`.
 - Required planned sub-agents are registered.

@@ -12,7 +12,7 @@ The review is local-only and does not make network calls.
 ## Coverage
 
 - Scans `workspaces/**` prompt and memory text surfaces for raw secret-like values:
-  - OpenAI-style `sk-...`
+  - LLM API-style `sk-...`
   - GitHub `ghp_...` / related token families
   - Slack `xox...` tokens
   - Generic `api_key`, `token`, `password`, and `secret` assignments

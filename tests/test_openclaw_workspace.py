@@ -31,7 +31,7 @@ def test_ai_artist_main_workspace_declares_control_plane_and_policy_gate() -> No
     tools = read_workspace_file("TOOLS.md")
 
     assert "Control plane: OpenClaw" in identity
-    assert "hosted OpenAI Responses API" in identity
+    assert "provider-neutral LLM API" in identity
     assert "FastAPI Safety Service" in soul
     assert "execution policy gate" in soul
     assert "POST /v1/policy/evaluate" in tools

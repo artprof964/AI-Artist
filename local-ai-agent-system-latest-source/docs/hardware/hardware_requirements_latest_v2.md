@@ -1,6 +1,6 @@
 # Hardware Requirements - Latest
 
-The selected implementation uses OpenClaw plus a hosted OpenAI LLM, so local
+The selected implementation uses OpenClaw plus a provider-neutral LLM API, so local
 LLM inference hardware is no longer required for the MVP. GPU capacity is still
 needed for ComfyUI image generation unless that workload is moved to a GPU
 cloud provider.
@@ -37,7 +37,7 @@ Network:  10 GbE
 ## Best Layout
 
 ```text
-Hosted OpenAI -> LLM reasoning
+provider-neutral LLM API -> LLM reasoning
 GPU 1 -> ComfyUI media generation
 CPU workers -> parsing / ingestion / source processing
 NVMe -> Qdrant + PostgreSQL + MinIO hot data
@@ -47,7 +47,7 @@ NVMe -> Qdrant + PostgreSQL + MinIO hot data
 
 ```text
 MVP hardware validation checks:
-- hosted OpenAI smoke test works without local LLM GPU inference
+- provider-neutral LLM API smoke test works without local LLM GPU inference
 - Docker Compose services pass health checks
 - ComfyUI path is either mocked, local-GPU backed, or cloud-GPU backed
 - image-generation tasks fail cleanly when no approved GPU path exists

@@ -53,11 +53,12 @@ class ReadinessReport:
 
 
 REQUIRED_ENV_VARS: tuple[RequiredEnvVar, ...] = (
-    RequiredEnvVar("OPENAI_API_KEY", "Hosted OpenAI API access for smoke-tested model paths", True),
-    RequiredEnvVar("OPENAI_PRIMARY_MODEL", "Primary hosted model selection"),
-    RequiredEnvVar("OPENAI_FALLBACK_MODEL", "Fallback hosted model selection"),
-    RequiredEnvVar("OPENAI_CLASSIFIER_MODEL", "Request classifier model selection"),
-    RequiredEnvVar("OPENAI_EMBEDDING_MODEL", "Embedding model selection"),
+    RequiredEnvVar("LLM_API_KEY", "Provider-neutral LLM API access", True),
+    RequiredEnvVar("LLM_API_URL", "Provider-neutral LLM API endpoint"),
+    RequiredEnvVar("LLM_PRIMARY_MODEL", "Primary LLM model selection"),
+    RequiredEnvVar("LLM_FALLBACK_MODEL", "Fallback LLM model selection"),
+    RequiredEnvVar("LLM_CLASSIFIER_MODEL", "Request classifier model selection"),
+    RequiredEnvVar("LLM_EMBEDDING_MODEL", "Embedding model selection"),
     RequiredEnvVar("OPENCLAW_WORKSPACE_ROOT", "Local OpenClaw workspace root"),
     RequiredEnvVar("OPENCLAW_GATEWAY_URL", "Local OpenClaw gateway endpoint"),
     RequiredEnvVar("DATABASE_URL", "PostgreSQL application connection string"),

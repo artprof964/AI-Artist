@@ -4,7 +4,7 @@
 
 This folder is a documentation-first architecture pack for the AI-Artist
 agent system. The implementation direction is now fixed: **OpenClaw** is the
-agent control plane, and a **hosted OpenAI LLM** is the primary reasoning
+agent control plane, and a **provider-neutral LLM API** is the primary reasoning
 backend. The optimized model separates four concerns explicitly:
 
 - request normalization and policy context building
@@ -16,7 +16,7 @@ backend. The optimized model separates four concerns explicitly:
 
 - `SKILL.md`: project guidance and operating rules
 - `docs/overview_project_outline_params_latest_v2.md`: concise architecture outline
-- `docs/implementation_stack_openclaw_hosted_llm_latest_v1.md`: selected implementation stack
+- `docs/implementation_stack_openclaw_llm_api_latest_v1.md`: selected implementation stack
 - `docs/interface_process_standard_latest_v1.md`: standardized interfaces, request envelopes, and delivery process
 - `docs/task_validation_matrix_latest_v1.md`: validation test for each implementation task
 - `docs/project_status_latest_v1.md`: latest status, next implementation slice, and alignment check
@@ -75,7 +75,7 @@ The system has a complete validated local backend implementation. Current
 status is tracked in `docs/project_status_latest_v1.md`.
 
 The OPA default-deny policy tests, PostgreSQL migration validation,
-OpenClaw AI-Artist workspace validation, hosted OpenAI smoke validation,
+OpenClaw AI-Artist workspace validation, provider-neutral LLM API smoke validation,
 OpenClaw safety-service hook validation, SubAgentOutput schema validation, and
 mock sub-agent orchestration validation, approved read-only response cache
 validation, source freshness validation, audit event log validation,

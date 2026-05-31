@@ -5,7 +5,7 @@ flowchart TD
     ER["External Request"] --> OCG["OpenClaw Gateway"]
     OCG --> WS["OpenClaw Workspace Loader"]
     WS --> MAIN["AI-Artist Main Agent"]
-    MAIN --> HLLM["Hosted OpenAI LLM"]
+    MAIN --> HLLM["provider-neutral LLM API"]
     MAIN --> FSS["FastAPI Safety Service"]
     FSS --> RC["Request Canonicalizer"]
     RC --> PCB["Policy Context Builder"]

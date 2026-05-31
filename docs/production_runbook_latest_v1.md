@@ -44,7 +44,7 @@ all required keys without requiring real secrets in source control.
 Required secret keys may be blank in `.env.example`:
 
 ```text
-OPENAI_API_KEY
+LLM_API_KEY
 SLACK_BOT_TOKEN
 git_ai-artist_codex_token
 ```
@@ -52,10 +52,11 @@ git_ai-artist_codex_token
 Required local service keys:
 
 ```text
-OPENAI_PRIMARY_MODEL
-OPENAI_FALLBACK_MODEL
-OPENAI_CLASSIFIER_MODEL
-OPENAI_EMBEDDING_MODEL
+LLM_API_URL
+LLM_PRIMARY_MODEL
+LLM_FALLBACK_MODEL
+LLM_CLASSIFIER_MODEL
+LLM_EMBEDDING_MODEL
 OPENCLAW_WORKSPACE_ROOT
 OPENCLAW_GATEWAY_URL
 DATABASE_URL

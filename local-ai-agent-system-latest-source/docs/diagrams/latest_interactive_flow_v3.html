@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI-Artist OpenClaw Hosted LLM - Interactive Flow v3</title>
+<title>AI-Artist OpenClaw LLM API - Interactive Flow v3</title>
 <style>
 :root{
   --bg:#f4efe4;
@@ -114,8 +114,8 @@ h1{margin:0 0 12px;font-size:clamp(34px,5vw,62px);line-height:.94}
   <section class="hero">
     <article class="card intro">
       <span class="eyebrow">Interactive System Map</span>
-      <h1>AI-Artist OpenClaw Hosted LLM Flow</h1>
-      <p class="lede">This architecture selects OpenClaw as the agent control plane, hosted OpenAI models as the reasoning backend, ComfyUI as the image engine, and a FastAPI/OPA safety layer for cache reuse, audit, and privileged execution.</p>
+      <h1>AI-Artist OpenClaw LLM API Flow</h1>
+      <p class="lede">This architecture selects OpenClaw as the agent control plane, provider-neutral LLM API models as the reasoning backend, ComfyUI as the image engine, and a FastAPI/OPA safety layer for cache reuse, audit, and privileged execution.</p>
     </article>
     <aside class="card summary">
       <div class="stat"><strong>Entry Control</strong><span>OpenClaw receives work, loads the AI-Artist workspace, and calls the safety layer before reuse or execution decisions.</span></div>
@@ -143,7 +143,7 @@ h1{margin:0 0 12px;font-size:clamp(34px,5vw,62px);line-height:.94}
       <div class="lanes">
         <section class="card lane runtime">
           <h3>Runtime</h3>
-          <p>OpenClaw hosts agent workspaces, channel adapters, hosted OpenAI calls, and tool hooks; FastAPI provides the safety service; CI validates every task contract.</p>
+          <p>OpenClaw hosts agent workspaces, channel adapters, provider-neutral LLM API calls, and tool hooks; FastAPI provides the safety service; CI validates every task contract.</p>
         </section>
         <section class="card lane data">
           <h3>Data</h3>
@@ -181,7 +181,7 @@ h1{margin:0 0 12px;font-size:clamp(34px,5vw,62px);line-height:.94}
           <div class="classic-arrow"></div>
           <div class="classic-node control"><strong>OpenClaw Gateway</strong><span>Receives the request and loads the AI-Artist workspace.</span></div>
           <div class="classic-arrow"></div>
-          <div class="classic-node control"><strong>AI-Artist Main Agent + Hosted OpenAI LLM</strong><span>Runs reasoning through the hosted model lane before calling policy-sensitive tools.</span></div>
+          <div class="classic-node control"><strong>AI-Artist Main Agent + provider-neutral LLM API</strong><span>Runs reasoning through the configured model lane before calling policy-sensitive tools.</span></div>
           <div class="classic-arrow"></div>
           <div class="classic-node control"><strong>FastAPI Safety Service</strong><span>Normalizes request shape and builds policy scope before any reuse decision.</span></div>
           <div class="classic-arrow"></div>
@@ -354,7 +354,7 @@ const stages = [
     copy: "Delegates fresh or non-reusable requests into OpenClaw orchestration without bypassing policy.",
     tags: ["openclaw", "delegate"],
     points: [
-      "Runs hosted OpenAI reasoning for planning, critique, and synthesis.",
+      "Runs provider-neutral LLM API reasoning for planning, critique, and synthesis.",
       "Hands fresh work into OpenClaw runtime rather than bypassing tool gates.",
       "Preserves clean separation between intake, reasoning, and external execution."
     ],
@@ -493,12 +493,12 @@ const dependencyGroups = {
       {
         id: "runtime-entry",
         title: "Request Entry Spine",
-        summary: "OpenClaw, hosted OpenAI, FastAPI safety, OPA, and classification form the entry path.",
+        summary: "OpenClaw, provider-neutral LLM API, FastAPI safety, OPA, and classification form the entry path.",
         badges: ["entry", "policy"],
         copy: "The runtime spine shapes requests before either reuse or fresh execution begins.",
         points: [
           "OpenClaw receives the request",
-          "Hosted OpenAI handles reasoning",
+          "provider-neutral LLM API handles reasoning",
           "FastAPI safety service shapes policy-sensitive checks",
           "Request Canonicalizer builds stable fingerprints",
           "Policy Context Builder adds requester and policy scope",

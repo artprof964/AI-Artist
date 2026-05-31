@@ -1,4 +1,4 @@
-# Latest Dependency Map - OpenClaw + Hosted LLM
+# Latest Dependency Map - OpenClaw + LLM API
 
 ```text
 External Request
@@ -39,7 +39,7 @@ OpenClaw Gateway
  |- workspace loader
  |- channel adapters
  |- AI-Artist Main Agent
- |- OpenAI hosted LLM client
+ |- LLM API LLM API client
  |- agent registry
  |- tool hooks
  `- safety-service adapter
@@ -122,11 +122,11 @@ Normalized request fingerprint -> requester scope + policy scope
 ## Secrets
 
 ```text
-Hosted LLM Client -> os.environ["OPENAI_API_KEY"]
+LLM API Client -> os.environ["LLM_API_KEY"]
 GitHub Adapter -> os.environ["git_ai-artist_codex_token"]
 Production later -> OpenBao runtime injection
 Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads.
-OpenAI requests must be logged by request id / model / token counts only, not raw secrets.
+LLM API requests must be logged by request id / model / token counts only, not raw secrets.
 ```
 
 ## Speed Optimization Rules

@@ -72,7 +72,7 @@ Strong success criteria let you loop independently. Weak criteria ("make it work
 
 This project is a documentation-first blueprint for the AI-Artist agent system.
 The selected implementation stack is OpenClaw as the agent control plane plus a
-hosted OpenAI LLM as the primary reasoning backend. FastAPI, OPA, PostgreSQL,
+provider-neutral LLM API as the primary reasoning backend. FastAPI, OPA, PostgreSQL,
 Qdrant, MinIO, and Redis provide the local safety, policy, persistence, and
 reuse layer around OpenClaw.
 
@@ -140,10 +140,10 @@ External Request
 ## Stack Summary
 
 - OpenClaw
-- hosted OpenAI Responses API
+- provider-neutral LLM API
 - FastAPI safety service
 - OPA
-- GPT-5.2, GPT-5 mini, GPT-5 nano
+- provider-primary-model, provider-fallback-model, provider-classifier-model
 - LlamaIndex
 - Qdrant
 - PostgreSQL
@@ -158,7 +158,7 @@ External Request
 ## Key Files
 
 - `docs/overview_project_outline_params_latest_v2.md`
-- `docs/implementation_stack_openclaw_hosted_llm_latest_v1.md`
+- `docs/implementation_stack_openclaw_llm_api_latest_v1.md`
 - `docs/interface_process_standard_latest_v1.md`
 - `docs/task_validation_matrix_latest_v1.md`
 - `docs/project_status_latest_v1.md`

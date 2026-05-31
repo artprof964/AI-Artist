@@ -11,7 +11,7 @@
 ```text
 Overall status: All 28 implementation tasks are complete and locally validated.
 Selected control plane: OpenClaw
-Selected LLM backend: hosted OpenAI Responses API
+Selected LLM backend: provider-neutral LLM API
 Safety layer: FastAPI Safety Service + OPA + PostgreSQL
 Image layer: ComfyUI behind execution policy gate
 Tracker tasks: 28 total
@@ -27,7 +27,7 @@ Interface contracts: 28 defined
 ## Completed
 
 ```text
-T01 - Stack decision: OpenClaw + hosted OpenAI LLM
+T01 - Stack decision: OpenClaw + provider-neutral LLM API
 T02 - Project documentation and tracker alignment
 T03 - Repository scaffold: backend, workspaces, policies, tests, docker
 T04 - Docker Compose for PostgreSQL, Qdrant, MinIO, Redis, OPA
@@ -35,7 +35,7 @@ T05 - FastAPI Safety Service endpoints
 T06 - OPA default-deny policies
 T07 - PostgreSQL migrations
 T08 - OpenClaw AI-Artist workspace
-T09 - Hosted OpenAI configuration smoke test
+T09 - provider-neutral LLM API configuration smoke test
 T10 - OpenClaw safety-service tool hook
 T11 - SubAgentOutput schema validation
 T12 - Mock sub-agent orchestration
@@ -61,7 +61,7 @@ T28 - Production hardening and runbooks
 
 ```text
 The backend stack is implemented as a deterministic local development system.
-External publishing, GitHub writes, Slack delivery, hosted OpenAI, and ComfyUI
+External publishing, GitHub writes, Slack delivery, provider-neutral LLM API, and ComfyUI
 paths are represented with mocked or gated adapters unless a valid execution
 envelope, required configuration, and human approval are present.
 ```
@@ -69,12 +69,12 @@ envelope, required configuration, and human approval are present.
 ## Alignment Check
 
 ```text
-Architecture docs: aligned to OpenClaw + hosted OpenAI
+Architecture docs: aligned to OpenClaw + provider-neutral LLM API
 Diagrams: aligned to OpenClaw Gateway, FastAPI Safety Service, task validation, execution gate
 Tracker: aligned with 28 tasks, validation tests, interface contracts, Status, Finished
 Security model: aligned with default-deny, redaction, and execution-envelope rules
 Query tracking: aligned with Safety Service-owned persistence and source freshness
-Hardware: aligned with hosted LLM; GPU needed only for real ComfyUI path
+Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Deprecated architecture term scan: clean
 ```
@@ -89,5 +89,5 @@ T27 security review: 7 passed; prompt/memory secrets, audit redaction, observabi
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
 final pytest: 169 passed, 1 skipped, 1 warning
 final ruff: all checks passed
-skipped test: live hosted OpenAI smoke test requires OPENAI_API_KEY
+skipped test: live provider-neutral LLM API smoke test requires LLM_API_KEY
 ```

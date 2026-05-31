@@ -4,8 +4,8 @@
 
 ```text
 Agent control plane: OpenClaw
-Primary LLM backend: hosted OpenAI Responses API
-Primary model lane: GPT-5.2, with GPT-5 mini / nano for cost-controlled paths
+Primary LLM backend: provider-neutral LLM API
+Primary model lane: provider-primary-model, with provider fallback / classifier for cost-controlled paths
 Image generation: ComfyUI with Flux / SDXL
 Safety layer: FastAPI + OPA + PostgreSQL audit/cache/source tracking
 ```
@@ -80,10 +80,10 @@ Every implementation task has a validation test before it can be marked done.
 ```text
 OpenClaw Gateway
 OpenClaw workspace files: SOUL.md, IDENTITY.md, USER.md, AGENTS.md, TOOLS.md, MEMORY.md
-Hosted OpenAI Responses API
+provider-neutral LLM API
 FastAPI safety service
 OPA
-GPT-5.2 / GPT-5 mini / GPT-5 nano
+provider primary / fallback / classifier model lanes
 LlamaIndex
 Qdrant
 PostgreSQL
@@ -108,7 +108,7 @@ GitHub API via Tool Agent
 ```text
 1. Repository scaffold + Docker Compose
 2. OpenClaw AI-Artist workspace skeleton
-3. Hosted OpenAI configuration + smoke test
+3. provider-neutral LLM API configuration + smoke test
 4. FastAPI safety service health endpoint
 5. request canonicalizer + policy context builder
 6. OPA base policies

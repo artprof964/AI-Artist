@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>AI-Artist OpenClaw Hosted LLM Flow</title>
+<title>AI-Artist OpenClaw Provider-Neutral LLM API Flow</title>
 <style>
 body{font-family:Georgia,serif;margin:0;background:#f5f1e8;color:#202533}
 main{max-width:1100px;margin:0 auto;padding:24px}
@@ -23,8 +23,8 @@ li{margin:8px 0;line-height:1.5}
 <body>
 <main>
   <section class="hero">
-    <h1>AI-Artist OpenClaw Hosted LLM Flow</h1>
-    <p>The selected architecture uses OpenClaw as the agent control plane, hosted OpenAI models for reasoning, ComfyUI for image generation, and a FastAPI/OPA safety layer for reuse, audit, and privileged execution.</p>
+    <h1>AI-Artist OpenClaw Provider-Neutral LLM API Flow</h1>
+    <p>The selected architecture uses OpenClaw as the agent control plane, provider-neutral LLM API models for reasoning, ComfyUI for image generation, and a FastAPI/OPA safety layer for reuse, audit, and privileged execution.</p>
   </section>
   <section class="grid">
     <article class="box">
@@ -57,7 +57,7 @@ li{margin:8px 0;line-height:1.5}
       <h2>Control Rules</h2>
       <ul>
         <li>OPA is checked before reuse and before privileged execution.</li>
-        <li>Hosted OpenAI models are the primary LLM backend.</li>
+        <li>provider-neutral LLM API models are the primary LLM backend.</li>
         <li>OpenClaw owns agent workspaces, channel adapters, and tool hooks.</li>
         <li>Every implementation task has a validation test before it can be marked done.</li>
         <li>Only approved read-only responses are eligible for replay.</li>

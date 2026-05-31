@@ -26,7 +26,7 @@ def test_workspace_prompt_and_memory_files_do_not_contain_raw_secret_like_values
     assert findings == []
 
 
-def test_workspace_secret_scanner_flags_openai_github_slack_and_generic_assignments() -> None:
+def test_workspace_secret_scanner_flags_llm_api_github_slack_and_generic_assignments() -> None:
     scratch_root = REPO_ROOT / ".codex_tmp" / "t27_security_review"
     workspace = scratch_root / "workspaces" / "ai-artist-main" / "memory"
     try:
@@ -34,7 +34,7 @@ def test_workspace_secret_scanner_flags_openai_github_slack_and_generic_assignme
         (workspace / "MEMORY.md").write_text(
             "\n".join(
                 [
-                    "OPENAI_API_KEY=sk-local-review-secret",
+                    "LLM_API_KEY=sk-local-review-secret",
                     "github_token: ghp_localreviewsecret0000000000",
                     "slack = xoxb-local-review-secret",
                     "password = keepthissecret",

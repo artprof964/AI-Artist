@@ -6,7 +6,7 @@
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
 Final validation: 169 passed, 1 skipped, 1 warning
-Skipped test: live hosted OpenAI smoke test requires OPENAI_API_KEY
+Skipped test: live provider-neutral LLM API smoke test requires LLM_API_KEY
 Lint: ruff all checks passed
 ```
 
@@ -14,7 +14,7 @@ Lint: ruff all checks passed
 
 ```text
 Agent control plane: OpenClaw workspace files and safety hook contracts
-LLM backend: hosted OpenAI Responses API
+LLM backend: provider-neutral LLM API
 Safety service: FastAPI
 Policy authority: OPA default-deny policy
 Persistence: PostgreSQL query/source/cache/audit schema
@@ -54,7 +54,7 @@ backend/audit.py: in-memory audit repository and recursive secret redaction.
 backend/response_cache.py: approved read-only response cache.
 backend/source_freshness.py: dependency snapshot and stale-source checks.
 backend/source_ingestion.py: approved local source ingestion and domain/scheme rejection.
-backend/openai_smoke.py: hosted OpenAI configuration and redacted smoke request path.
+backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook.
 backend/orchestrator.py: mock sub-agent routing and synthesis.
 backend/knowledge.py: deterministic source-cited retrieval.
@@ -102,7 +102,7 @@ text in stored records.
 ```text
 T01-T02: stack decision and tracker/docs alignment
 T03-T07: repository scaffold, compose stack, Safety Service, OPA, PostgreSQL schema
-T08-T12: OpenClaw workspace, hosted OpenAI config, safety hook, schemas, mock agents
+T08-T12: OpenClaw workspace, provider-neutral LLM API config, safety hook, schemas, mock agents
 T13-T15: response cache, source freshness, audit log
 T16-T19: retrieval, ComfyUI gate, image provenance, critic/curator
 T20-T23: Slack, source ingestion, publishing approval, GitHub adapter

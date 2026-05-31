@@ -1,32 +1,32 @@
-# AI-Artist Implementation Stack - OpenClaw + Hosted LLM
+# AI-Artist Implementation Stack - OpenClaw + LLM API
 
 ## Decision
 
 The project will implement AI-Artist on **OpenClaw** as the agent control
-plane and use a **hosted OpenAI LLM** as the primary reasoning backend.
+plane and use a **provider-neutral LLM API** as the primary reasoning backend.
 
 This resolves the previous architecture split:
 
 - OpenClaw owns agent runtime, workspace bootstrap files, channel adapters,
   agent sessions, and tool invocation.
-- Hosted OpenAI models own language reasoning, planning, critique, and
+- Provider-neutral LLM API models own language reasoning, planning, critique, and
   multimodal analysis.
 - ComfyUI owns image generation and post-processing.
 - FastAPI, PostgreSQL, OPA, and the cache/freshness layer become a local
   safety, persistence, and orchestration support service around OpenClaw.
 
-## Selected Hosted Model Lane
+## Selected configured model lane
 
 ```text
-Primary reasoning model:      OpenAI GPT-5.2
-Cost-controlled fallback:     GPT-5 mini
-Fast classification model:    GPT-5 nano or equivalent small hosted model
-Embeddings:                   text-embedding-3-large by default
-Moderation / safety:          OpenAI moderation endpoint plus local policy checks
+Primary reasoning model:      Provider primary model
+Cost-controlled fallback:     provider-fallback-model
+Fast classification model:    provider-classifier-model or equivalent small configured model
+Embeddings:                   provider-embedding-model by default
+Moderation / safety:          provider moderation endpoint plus local policy checks
 Image generation:             ComfyUI with Flux / SDXL locally or on GPU cloud
 ```
 
-Use the OpenAI Responses API for agentic and reasoning calls. Keep model names
+Use the provider-neutral LLM API for agentic and reasoning calls. Keep model names
 in runtime configuration so the stack can move forward without code changes.
 
 ## Full Inline Stack
@@ -46,7 +46,7 @@ User / Channel
         -> local CLI / web chat for development
         -> social publishing adapters later
      -> AI-Artist Main Agent
-        -> hosted OpenAI Responses API
+        -> provider-neutral LLM API
         -> local safety service
            -> request canonicalizer
            -> policy context builder
@@ -107,8 +107,8 @@ OpenClaw Gateway
   - owns agent sessions and workspace loading
   - reads SOUL.md, AGENTS.md, TOOLS.md, memory files, and channel config
 
-Hosted LLM Provider
-  - OpenAI primary
+LLM API Provider
+  - LLM API primary
   - API keys injected through environment variables only
   - no raw secrets in prompts, logs, memory, or agent payloads
 
@@ -217,11 +217,11 @@ mypy                        Python type checks where useful
 ## Environment Variables
 
 ```text
-OPENAI_API_KEY=...
-OPENAI_PRIMARY_MODEL=gpt-5.2
-OPENAI_FALLBACK_MODEL=gpt-5-mini
-OPENAI_CLASSIFIER_MODEL=gpt-5-nano
-OPENAI_EMBEDDING_MODEL=text-embedding-3-large
+LLM_API_KEY=...
+LLM_PRIMARY_MODEL=provider-primary-model
+LLM_FALLBACK_MODEL=provider-fallback-model
+LLM_CLASSIFIER_MODEL=provider-classifier-model
+LLM_EMBEDDING_MODEL=provider-embedding-model
 
 OPENCLAW_WORKSPACE_ROOT=./workspaces
 OPENCLAW_GATEWAY_URL=http://localhost:18789
@@ -242,7 +242,7 @@ git_ai-artist_codex_token=...
 ```text
 1. Repository scaffold and local Docker Compose.
 2. OpenClaw workspace skeleton for AI-Artist Main Agent.
-3. Hosted OpenAI configuration and smoke test.
+3. provider-neutral LLM API configuration and smoke test.
 4. FastAPI safety service with health, canonicalize, classify, and policy endpoints.
 5. OPA default-deny policies for write actions and cache reuse.
 6. PostgreSQL migrations for query/source/cache/audit tables.
@@ -265,11 +265,11 @@ audited without opening source code.
 
 ## Optimization Notes
 
-- Keep the first slice narrow: one OpenClaw main workspace, one hosted model
+- Keep the first slice narrow: one OpenClaw main workspace, one configured model
   call, one safety service, one policy gate, and one mocked image task.
 - Do not wire social APIs before the policy and audit path exists.
 - Treat generated images as artifacts with provenance: prompt, model, workflow,
   seed, source references, and reviewer decision.
-- Use hosted LLMs for quality and speed now; add local LLM fallback later only
+- Use LLM APIs for quality and speed now; add local LLM fallback later only
   after the control plane and cache economics are visible.
 - Make every external write action require a signed execution envelope.

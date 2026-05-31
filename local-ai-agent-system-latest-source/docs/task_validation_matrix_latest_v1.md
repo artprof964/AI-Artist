@@ -6,7 +6,7 @@ contract is satisfied.
 
 | ID | Task | Validation Test | Status | Finished |
 |---|---|---|---|---|
-| T01 | Stack decision: OpenClaw + hosted OpenAI LLM | Documentation scan confirms OpenClaw is the control plane, hosted OpenAI is the primary LLM, and deprecated architecture terms are absent. | Bestanden | 2026-05-30 |
+| T01 | Stack decision: OpenClaw + provider-neutral LLM API | Documentation scan confirms OpenClaw is the control plane, provider-neutral LLM API is the primary LLM, and deprecated architecture terms are absent. | Bestanden | 2026-05-30 |
 | T02 | Project documentation and tracker alignment | Manifest includes all new docs, tracker dashboard totals match detail-plan status counts, and validation matrix exists. | Bestanden | 2026-05-30 |
 | T03 | Repository scaffold | `pytest`, lint command, and a tree check confirm `backend/`, `workspaces/`, `policies/`, `tests/`, and `docker-compose.yml` exist. | Bestanden | 2026-05-31 |
 | T04 | Docker Compose services | `docker compose config` succeeds and service health checks pass for PostgreSQL, Qdrant, MinIO, Redis, and OPA. | Bestanden | 2026-05-31 |
@@ -14,7 +14,7 @@ contract is satisfied.
 | T06 | OPA default-deny policies | Policy tests prove write, publish, delete, GitHub write, and cache replay are denied by default and allowed only with valid policy inputs. | Bestanden | 2026-05-31 |
 | T07 | PostgreSQL migrations | Migration test applies schema from empty DB, verifies all query/source/cache/audit tables and indexes, then rolls back cleanly. | Bestanden | 2026-05-31 |
 | T08 | OpenClaw AI-Artist workspace | Workspace test confirms required `SOUL.md`, `IDENTITY.md`, `USER.md`, `AGENTS.md`, `TOOLS.md`, `MEMORY.md`, and memory folders exist. | Bestanden | 2026-05-31 |
-| T09 | Hosted OpenAI configuration | Smoke test loads model env vars, calls the hosted LLM with a redacted request, and records request id/model without logging secrets. | Bestanden | 2026-05-31 |
+| T09 | Provider-neutral LLM API configuration | Smoke test loads model env vars, calls the configured LLM API with a redacted request, and records request id/model without logging secrets. | Bestanden | 2026-05-31 |
 | T10 | OpenClaw safety-service tool hook | Integration test attempts a tool call and confirms Safety Service receives the pre-execution request before any adapter runs. | Bestanden | 2026-05-31 |
 | T11 | `SubAgentOutput` schema | Schema tests accept valid agent outputs and reject missing status, malformed artifacts, invalid confidence, and unstructured errors. | Bestanden | 2026-05-31 |
 | T12 | Mock sub-agents | Orchestration test routes one request through all mock agents, collects structured outputs, and synthesizes a single result. | Bestanden | 2026-05-31 |

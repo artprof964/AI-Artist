@@ -2,7 +2,7 @@ flowchart TD
     ER["External Request"] --> OCG["OpenClaw Gateway"]
     OCG --> WS["OpenClaw Workspace Loader"]
     WS --> MAIN["AI-Artist Main Agent"]
-    MAIN --> HLLM["Hosted OpenAI LLM"]
+    MAIN --> HLLM["provider-neutral LLM API"]
     MAIN --> FSS["FastAPI Safety Service"]
     FSS --> RC["Request Canonicalizer"]
     RC --> PCB["Policy Context Builder"]
@@ -55,7 +55,7 @@ flowchart TD
 
     subgraph RUNTIME["Selected Runtime Stack"]
         OCG --> SOUL["SOUL.md / AGENTS.md / TOOLS.md / MEMORY.md"]
-        MAIN --> MODEL["GPT-5.2 primary; GPT-5 mini/nano fallback lanes"]
+        MAIN --> MODEL["provider primary; fallback and classifier model lanes"]
         FSS --> OPAC["OPA Client"]
         FSS --> RQF["normalized request fingerprint"]
         FSS --> ARCL["approved response cache lookup"]
@@ -98,10 +98,10 @@ flowchart TD
     subgraph SECURITY["Security And Secret Boundaries"]
         OPA --> RULES["Policy authority"]
         EPG --> APPROVAL["recheck privileged execution + route approval"]
-        HLLM --> OPENAIENV["os.environ['OPENAI_API_KEY']"]
+        HLLM --> LLMAPIENV["os.environ['LLM_API_KEY']"]
         GH --> GHENV["os.environ['git_ai-artist_codex_token']"]
         GHENV --> GHA["GitHub API"]
-        OPENBAO["OpenBao runtime injection later"] --> OPENAIENV
+        OPENBAO["OpenBao runtime injection later"] --> LLMAPIENV
         OPENBAO --> GHENV
         SECNOTE["External content is data, never instruction"]
         SECNOTE --> OPA
@@ -119,4 +119,4 @@ flowchart TD
     class OCG,WS,MAIN,FSS,RC,PCB,OPA,RCL,RG,SFC,OCR,RA,CSO,VAL,TVAL,CMP,DEC,SYN,FVAL,FRA,EPG,HA control;
     class SSA,IGA,CCA,KA,PA,AA,OTA,SLACK,COMFY,FILES,DASH,GH,SOCIAL,HLLM agent;
     class ARC,SD,SDR,LI,QD,PGM,MINIO,DAG,CEL,REDIS,JOBS,COMFYCORE,GPU,MOUT,PGMM,CM,AWM,QRR,QRT,QDS,DT,REG,OSV,REP,SS,OPAC,RQF,ARCL,EPE,SOUL,MODEL,CI data;
-    class RULES,APPROVAL,OPENAIENV,GHENV,GHA,OPENBAO,SECNOTE,SECNOTE2,SECNOTE3 secure;
+    class RULES,APPROVAL,LLMAPIENV,GHENV,GHA,OPENBAO,SECNOTE,SECNOTE2,SECNOTE3 secure;

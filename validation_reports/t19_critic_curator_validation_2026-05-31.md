@@ -6,7 +6,7 @@ Implemented deterministic local Critic/Curator rubric scoring for generated imag
 
 ## Acceptance Criteria
 
-- Scores mocked image metadata without network calls, hosted LLM calls, Slack, or publishing integrations.
+- Scores mocked image metadata without network calls, LLM API calls, Slack, or publishing integrations.
 - Returns structured critique by rubric category.
 - Returns deterministic pass/fail decisions.
 - Returns improvement notes for failed rubric categories.

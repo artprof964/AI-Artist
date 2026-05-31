@@ -5,7 +5,7 @@ from typing import Any, Protocol
 import httpx
 
 
-OPENAI_RESPONSES_URL = "https://api.openai.com/v1/responses"
+DEFAULT_LLM_API_URL = "https://llm-provider.example/v1/responses"
 SECRET_REDACTION = "[REDACTED]"
 SECRET_KEY_TERMS = {
     "api_key",
@@ -19,15 +19,16 @@ SECRET_KEY_TERMS = {
 
 
 @dataclass(frozen=True)
-class OpenAIModelConfig:
+class LLMAPIModelConfig:
     api_key: str
+    api_url: str
     primary_model: str
     fallback_model: str
     classifier_model: str
     embedding_model: str
 
 
-class OpenAIHTTPClient(Protocol):
+class LLMAPIHTTPClient(Protocol):
     def post(
         self,
         url: str,
@@ -38,18 +39,19 @@ class OpenAIHTTPClient(Protocol):
     ) -> httpx.Response: ...
 
 
-def load_openai_model_config(env: dict[str, str] | None = None) -> OpenAIModelConfig:
+def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelConfig:
     values = env if env is not None else os.environ
-    api_key = values.get("OPENAI_API_KEY", "")
+    api_key = values.get("LLM_API_KEY", "")
     if not api_key:
-        raise RuntimeError("OPENAI_API_KEY is required for the hosted OpenAI smoke test")
+        raise RuntimeError("LLM_API_KEY is required for the live LLM API smoke test")
 
-    return OpenAIModelConfig(
+    return LLMAPIModelConfig(
         api_key=api_key,
-        primary_model=values.get("OPENAI_PRIMARY_MODEL", "gpt-5.2"),
-        fallback_model=values.get("OPENAI_FALLBACK_MODEL", "gpt-5-mini"),
-        classifier_model=values.get("OPENAI_CLASSIFIER_MODEL", "gpt-5-nano"),
-        embedding_model=values.get("OPENAI_EMBEDDING_MODEL", "text-embedding-3-large"),
+        api_url=values.get("LLM_API_URL", DEFAULT_LLM_API_URL),
+        primary_model=values.get("LLM_PRIMARY_MODEL", "provider-primary-model"),
+        fallback_model=values.get("LLM_FALLBACK_MODEL", "provider-fallback-model"),
+        classifier_model=values.get("LLM_CLASSIFIER_MODEL", "provider-classifier-model"),
+        embedding_model=values.get("LLM_EMBEDDING_MODEL", "provider-embedding-model"),
     )
 
 
@@ -69,20 +71,20 @@ def redact_secrets(value: Any) -> Any:
     return value
 
 
-def build_smoke_request(config: OpenAIModelConfig) -> dict[str, Any]:
+def build_smoke_request(config: LLMAPIModelConfig) -> dict[str, Any]:
     return {
         "model": config.primary_model,
-        "input": "Return exactly: ai-artist-openai-smoke-ok",
+        "input": "Return exactly: ai-artist-llm-api-smoke-ok",
         "max_output_tokens": 32,
     }
 
 
-def run_hosted_openai_smoke_test(
+def run_llm_api_smoke_test(
     env: dict[str, str] | None = None,
     timeout_seconds: float = 30.0,
-    http_client: OpenAIHTTPClient | None = None,
+    http_client: LLMAPIHTTPClient | None = None,
 ) -> dict[str, Any]:
-    config = load_openai_model_config(env)
+    config = load_llm_api_model_config(env)
     request_body = build_smoke_request(config)
     headers = {
         "Authorization": f"Bearer {config.api_key}",
@@ -91,7 +93,7 @@ def run_hosted_openai_smoke_test(
 
     client = http_client or httpx
     response = client.post(
-        OPENAI_RESPONSES_URL,
+        config.api_url,
         headers=headers,
         json=request_body,
         timeout=timeout_seconds,
