@@ -88,6 +88,16 @@ def test_incremented_source_change_seq_marks_snapshot_stale() -> None:
     assert stale_snapshot.source_freshness.all_required_sources_unchanged is False
 
 
+def test_find_source_returns_optional_registry_entry_without_raising() -> None:
+    registry = SourceFreshnessRegistry()
+
+    assert registry.find_source("missing") is None
+
+    entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
+
+    assert registry.find_source("style-guide") == entry
+
+
 def test_stale_source_freshness_blocks_cached_response_replay() -> None:
     registry = SourceFreshnessRegistry()
     registry.upsert_source(source_key="reference-brief", source_type="document")

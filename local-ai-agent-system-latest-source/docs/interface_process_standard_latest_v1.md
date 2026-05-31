@@ -50,6 +50,7 @@ can be marked done.
 38. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
 39. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 40. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
+41. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
 ```
 
 ## Standard Request Envelope
@@ -228,6 +229,7 @@ Output:
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
    - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.
    - Source registry lookup failures format missing-row messages through the shared source registry contract helper.
+   - Source ingestion checks for existing registry rows through the source registry optional lookup API.
 
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.

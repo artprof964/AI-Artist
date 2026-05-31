@@ -160,6 +160,9 @@ class SourceFreshnessRegistry:
     def get_source(self, source_key: str) -> SourceRegistryEntry:
         return self._require_source(source_key)
 
+    def find_source(self, source_key: str) -> SourceRegistryEntry | None:
+        return self._sources_by_key.get(source_key)
+
     def _store(self, entry: SourceRegistryEntry) -> None:
         self._sources_by_key[entry.source_key] = entry
         self._sources_by_id[entry.source_id] = entry

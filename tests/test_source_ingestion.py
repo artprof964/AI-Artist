@@ -209,3 +209,10 @@ def test_source_ingestion_uses_shared_url_boundary_directly() -> None:
 
     assert "def _domain_for_candidate(" not in source
     assert "http_url_domain(" in source
+
+
+def test_source_ingestion_uses_source_registry_optional_lookup_directly() -> None:
+    source = (PROJECT_ROOT / "backend" / "source_ingestion.py").read_text(encoding="utf-8")
+
+    assert "def _existing_registry_entry(" not in source
+    assert ".find_source(" in source

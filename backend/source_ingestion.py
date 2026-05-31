@@ -124,7 +124,7 @@ class SourceIngestionService:
 
             content_hash = sha256_text(candidate.content)
             version_tag = sha256_version_tag(candidate.content)
-            existing_entry = _existing_registry_entry(self.registry, candidate.source_key)
+            existing_entry = self.registry.find_source(candidate.source_key)
             changed = (
                 existing_entry is not None
                 and (
@@ -169,13 +169,3 @@ class SourceIngestionService:
             registry_entries=tuple(registry_entries),
             rejected_sources=tuple(rejected_sources),
         )
-
-
-def _existing_registry_entry(
-    registry: SourceFreshnessRegistry,
-    source_key: str,
-) -> SourceRegistryEntry | None:
-    try:
-        return registry.get_source(source_key)
-    except KeyError:
-        return None
