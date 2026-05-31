@@ -153,6 +153,14 @@ def env_value(
     return default
 
 
+def connection_value_required(name: str, purpose: str) -> str:
+    return f"{name} is required for {purpose}"
+
+
+def unknown_connection_setting(setting_name: str) -> str:
+    return f"unknown connection setting: {setting_name}"
+
+
 def require_env_value(
     env: Mapping[str, str],
     name: str,
@@ -162,7 +170,7 @@ def require_env_value(
 ) -> str:
     value = env_value(env, name, aliases=aliases)
     if not value:
-        raise RuntimeError(f"{name} is required for {purpose}")
+        raise RuntimeError(connection_value_required(name, purpose))
     return value
 
 
@@ -179,12 +187,12 @@ def require_runtime_secret(
         value = env_value(values, name, aliases=aliases)
     else:
         if setting_name not in CONNECTION_SETTING_NAMES:
-            raise RuntimeError(f"unknown connection setting: {setting_name}")
+            raise RuntimeError(unknown_connection_setting(setting_name))
         value = getattr(load_connection_settings(values), setting_name)
 
     normalized = value.strip()
     if not normalized:
-        raise RuntimeError(f"{name} is required for {purpose}")
+        raise RuntimeError(connection_value_required(name, purpose))
     return normalized
 
 
@@ -261,6 +269,7 @@ __all__ = [
     "STANDARD_LLM_API_KEY_ENV_VAR",
     "ConnectionSettings",
     "connection_endpoint_url",
+    "connection_value_required",
     "env_example_text",
     "env_example_values",
     "env_value",
@@ -269,4 +278,5 @@ __all__ = [
     "require_env_value",
     "require_runtime_secret",
     "runtime_env",
+    "unknown_connection_setting",
 ]

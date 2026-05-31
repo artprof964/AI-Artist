@@ -25,7 +25,7 @@ Interface contracts: 28 defined
 Safety Service health contract: centralized in backend/health_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
-Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
+Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
 Shell command/process argument construction, process execution defaults, compact process errors, and delimited process-output parsing: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: centralized in backend/repo_paths.py
@@ -124,7 +124,7 @@ Query tracking: aligned with Safety Service-owned persistence and source freshne
 Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Safety Service health: shared health response and readiness expected-signal contract
-Connection registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, adapter secret lookup, and env-access guards: registry-driven across LLM smoke tests, Slack adapter, GitHub adapter, readiness validation, readiness commands, docs, and tracker
+Connection registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: registry-driven across LLM smoke tests, Slack adapter, GitHub adapter, readiness validation, readiness commands, docs, and tracker
 Shell command/process argument construction, process execution, compact process error formatting, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations, OPA probe diagnostics, and migration output parsing
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: shared across security review, scaffold, OPA, readiness validators, workspace validators, and contract guard tests
@@ -199,11 +199,11 @@ process argument validation: 2 focused files passed; OPA tests guarded against l
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
-runtime secret validation: LLM API smoke uses shared runtime-token resolution; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods; LLM smoke guarded against local redaction wrappers
+runtime secret validation: LLM API smoke uses shared runtime-token resolution and connection error messages; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods; LLM smoke guarded against local redaction wrappers
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 422 passed, 1 skipped, 1 warning
+final pytest: 424 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

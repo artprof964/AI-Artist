@@ -14,6 +14,7 @@ from backend.connection_settings import (
     GITHUB_TOKEN_ENV_VAR,
     SLACK_BOT_TOKEN_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
+    connection_value_required,
     connection_endpoint_url,
     env_example_text,
     env_example_values,
@@ -22,6 +23,7 @@ from backend.connection_settings import (
     require_env_value,
     require_runtime_secret,
     runtime_env,
+    unknown_connection_setting,
 )
 from backend.readiness import REQUIRED_ENV_VARS
 from backend.repo_paths import backend_module_filenames
@@ -112,7 +114,10 @@ def test_require_env_value_reports_standard_name_when_missing() -> None:
     try:
         require_env_value({}, DEEPSEEK_OPEN_ART_ENV_VAR, purpose="LLM API test")
     except RuntimeError as exc:
-        assert str(exc) == f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for LLM API test"
+        assert str(exc) == connection_value_required(
+            DEEPSEEK_OPEN_ART_ENV_VAR,
+            "LLM API test",
+        )
     else:
         raise AssertionError("missing required env value should raise")
 
@@ -151,7 +156,31 @@ def test_require_runtime_secret_reports_standard_name_when_missing() -> None:
             setting_name="github_token",
         )
 
-    assert str(exc.value) == f"{GITHUB_TOKEN_ENV_VAR} is required for GitHub adapter execution"
+    assert str(exc.value) == connection_value_required(
+        GITHUB_TOKEN_ENV_VAR,
+        "GitHub adapter execution",
+    )
+
+
+def test_require_runtime_secret_reports_unknown_connection_setting() -> None:
+    with pytest.raises(RuntimeError) as exc:
+        require_runtime_secret(
+            {GITHUB_TOKEN_ENV_VAR: "ghp_localtoken"},
+            GITHUB_TOKEN_ENV_VAR,
+            purpose="GitHub adapter execution",
+            setting_name="missing_setting",
+        )
+
+    assert str(exc.value) == unknown_connection_setting("missing_setting")
+
+
+def test_connection_error_messages_are_centralized() -> None:
+    source = read_backend_source("connection_settings.py")
+
+    assert "connection_value_required(" in source
+    assert "unknown_connection_setting(" in source
+    assert 'raise RuntimeError(f"{name} is required for {purpose}")' not in source
+    assert 'raise RuntimeError(f"unknown connection setting: {setting_name}")' not in source
 
 
 def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
