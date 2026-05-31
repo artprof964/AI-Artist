@@ -1,5 +1,7 @@
 from uuid import UUID
 
+import pytest
+
 from backend.knowledge_contracts import (
     KNOWLEDGE_AGENT_NAME,
     KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
@@ -120,6 +122,11 @@ def test_in_memory_qdrant_upsert_replaces_points_deterministically() -> None:
     assert len(output.sources) == 1
     assert output.sources[0].title == "Approved Sample Safety Rules"
     assert output.sources[0].uri == "workspace://ai-artist-main/memory/safety_rules.md"
+
+
+def test_deterministic_embedding_model_rejects_non_positive_dimensions() -> None:
+    with pytest.raises(ValueError, match="Embedding dimensions must be positive"):
+        DeterministicEmbeddingModel(dimensions=0)
 
 
 def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:

@@ -78,12 +78,14 @@
 - `../../backend/knowledge_contracts.py`
 - `../../validation_reports/text_utils_standardization_2026-05-31.md`
 - `../../validation_reports/numeric_utils_standardization_2026-05-31.md`
+- `../../validation_reports/numeric_validation_message_standardization_2026-05-31.md`
 - `../../validation_reports/time_direct_usage_standardization_2026-05-31.md`
 - `../../backend/text_utils.py`
 - `../../backend/numeric_utils.py`
 - `../../backend/time_utils.py`
 - `../../tests/test_text_utils.py`
 - `../../tests/test_numeric_utils.py`
+- `../../tests/test_knowledge_agent.py`
 - `../../validation_reports/t17_comfyui_adapter_validation_2026-05-31.md`
 - `../../validation_reports/execution_gate_message_standardization_2026-05-31.md`
 - `../../validation_reports/required_envelope_message_standardization_2026-05-31.md`

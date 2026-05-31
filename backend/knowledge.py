@@ -16,7 +16,7 @@ from backend.knowledge_contracts import (
     knowledge_results_summary,
 )
 from backend.mapping_utils import copy_mapping
-from backend.numeric_utils import cosine_similarity
+from backend.numeric_utils import EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE, cosine_similarity
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SubAgentOutput
 from backend.subagent_output_contracts import build_subagent_output
@@ -144,7 +144,7 @@ class DeterministicEmbeddingModel:
 
     def __init__(self, dimensions: int = 64) -> None:
         if dimensions <= 0:
-            raise ValueError("Embedding dimensions must be positive.")
+            raise ValueError(EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE)
         self.dimensions = dimensions
 
     def embed(self, text: str) -> tuple[float, ...]:

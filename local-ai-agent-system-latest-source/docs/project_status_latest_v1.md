@@ -56,7 +56,7 @@ Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories and decisions: centralized in backend/critic_rubric.py
 Text tokenization, direct Safety Service classifier token parsing, labels, and contextual snippets: centralized in backend/text_utils.py
 Markdown heading parsing: centralized in backend/markdown_utils.py
-Numeric scoring utilities and direct rubric clamps: centralized in backend/numeric_utils.py
+Numeric scoring utilities, vector similarity, and numeric/vector validation messages: centralized in backend/numeric_utils.py
 Time creation/normalization: centralized in backend/time_utils.py for runtime code and tests
 Payload fields and nested payload objects: centralized in backend/payload_fields.py
 Response fields and first-choice message parsing: centralized in backend/response_fields.py
@@ -154,7 +154,7 @@ Review statuses: shared across image provenance validation, critic/curator prove
 Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests
 Text utilities: shared directly across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
 Markdown utilities: shared across production readiness runbook validation and future documentation validators
-Numeric utilities: shared directly across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
+Numeric utilities: shared directly across Knowledge vector similarity and embedding validation, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, execution-envelope expiry validation, and tests that need current UTC timestamps
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
 Slack adapter boundaries: shared payload, request identity, secret-redaction, and adapter secret helpers are called directly without local wrapper functions
@@ -203,7 +203,7 @@ runtime secret validation: LLM API smoke uses shared runtime-token resolution; G
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 419 passed, 1 skipped, 1 warning
+final pytest: 421 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
