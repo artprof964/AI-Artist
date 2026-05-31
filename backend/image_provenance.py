@@ -1,11 +1,10 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
-import hashlib
-import json
 from threading import RLock
 from typing import Any, Literal, Protocol
 
+from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -155,17 +154,11 @@ def record_comfyui_image_provenance(
 
 
 def sha256_text(value: str) -> str:
-    return hashlib.sha256(value.encode("utf-8")).hexdigest()
+    return canonical_sha256_text(value)
 
 
 def sha256_workflow(workflow: dict[str, Any]) -> str:
-    canonical_workflow = json.dumps(
-        workflow,
-        ensure_ascii=False,
-        separators=(",", ":"),
-        sort_keys=True,
-    )
-    return sha256_text(canonical_workflow)
+    return sha256_json(workflow, ensure_ascii=False)
 
 
 def deterministic_image_id(
@@ -183,14 +176,7 @@ def deterministic_image_id(
         "storage_uri": storage_uri,
         "workflow_hash": workflow_hash,
     }
-    return sha256_text(
-        json.dumps(
-            material,
-            ensure_ascii=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        )
-    )
+    return sha256_json(material, ensure_ascii=False)
 
 
 def _coerce_provenance_input(

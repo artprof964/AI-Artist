@@ -2,11 +2,10 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-import hashlib
-import json
 from typing import Any
 from uuid import UUID
 
+from backend.canonical_hash import deterministic_prefixed_id
 from backend.publishing_adapter import (
     PublishingAdapter,
     PublishingClient,
@@ -123,14 +122,10 @@ class PublishingAgent:
 
 
 def deterministic_publish_id(*, target: str, payload: dict[str, Any]) -> str:
-    material = json.dumps(
+    return deterministic_prefixed_id(
+        "local-publish",
         {"payload": payload, "target": target},
-        default=str,
-        separators=(",", ":"),
-        sort_keys=True,
     )
-    digest = hashlib.sha256(material.encode("utf-8")).hexdigest()[:16]
-    return f"local-publish-{digest}"
 
 
 __all__ = [

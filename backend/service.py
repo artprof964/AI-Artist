@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import json
 import re
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
@@ -9,6 +8,7 @@ from backend.audit import (
     list_audit_events_by_correlation_id,
     record_audit_event,
 )
+from backend.canonical_hash import canonical_json, sha256_json
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.schemas import (
     CanonicalizeRequest,
@@ -59,9 +59,7 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
         "workspace": payload.metadata.workspace,
         "agent": payload.metadata.agent,
     }
-    digest = hashlib.sha256(
-        json.dumps(fingerprint_payload, sort_keys=True, separators=(",", ":")).encode("utf-8")
-    ).hexdigest()
+    digest = sha256_json(fingerprint_payload)
     response = CanonicalizeResponse(
         request_id=payload.request_id,
         canonical_text=canonical_text,
@@ -240,7 +238,7 @@ def create_execution_envelope(
     }
     signature = hmac.new(
         LOCAL_ENVELOPE_SIGNING_KEY,
-        json.dumps(signature_payload, sort_keys=True, separators=(",", ":")).encode("utf-8"),
+        canonical_json(signature_payload).encode("utf-8"),
         hashlib.sha256,
     ).hexdigest()
 

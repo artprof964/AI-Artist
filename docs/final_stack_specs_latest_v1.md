@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 194 passed, 1 skipped, 1 warning
+Final validation: 199 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,6 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
+backend/canonical_hash.py: canonical JSON, SHA-256 digests, and deterministic ID helpers.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
@@ -108,6 +109,9 @@ Gated adapter result envelope fields must flow through backend/adapter_results.p
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads must flow through backend/side_effect_audit.py before
 adapter-specific agents persist tool-call audit events.
+Canonical JSON, SHA-256 digests, and deterministic local IDs must flow through
+backend/canonical_hash.py before request fingerprints, artifact hashes, signatures,
+or mocked external IDs are created.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```

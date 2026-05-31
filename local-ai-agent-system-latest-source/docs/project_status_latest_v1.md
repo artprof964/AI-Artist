@@ -27,6 +27,7 @@ Execution gates: centralized in backend/execution_gate.py
 Secret redaction: centralized in backend/secret_redaction.py
 Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py
+Canonical hashing: centralized in backend/canonical_hash.py
 ```
 
 ## Completed
@@ -86,6 +87,7 @@ Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Secret redaction: shared across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
+Canonical hashing: shared across Safety Service request fingerprints, execution-envelope signatures, publishing IDs, and image provenance hashes
 Deprecated architecture term scan: clean
 ```
 
@@ -97,7 +99,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 194 passed, 1 skipped, 1 warning
+final pytest: 199 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
