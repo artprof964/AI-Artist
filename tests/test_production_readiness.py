@@ -28,15 +28,16 @@ from backend.readiness_paths import (
     POSTGRES_BACKUP_DIR,
     POSTGRES_CONTAINER_DUMP_PATH,
 )
+from backend.repo_paths import ENV_EXAMPLE_PATH, PRODUCTION_RUNBOOK_PATH, repo_path, repo_root_from
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-RUNBOOK_PATH = REPO_ROOT / "docs" / "production_runbook_latest_v1.md"
-ENV_EXAMPLE_PATH = REPO_ROOT / ".env.example"
+REPO_ROOT = repo_root_from(Path(__file__))
+RUNBOOK_PATH = repo_path(REPO_ROOT, PRODUCTION_RUNBOOK_PATH)
+ENV_EXAMPLE_FILE_PATH = repo_path(REPO_ROOT, ENV_EXAMPLE_PATH)
 
 
 def test_env_example_documents_required_readiness_keys_without_real_secrets() -> None:
-    env_text = ENV_EXAMPLE_PATH.read_text(encoding="utf-8")
+    env_text = ENV_EXAMPLE_FILE_PATH.read_text(encoding="utf-8")
     parsed = parse_env_example(env_text)
     check = validate_env_example(env_text)
 
@@ -49,7 +50,7 @@ def test_env_example_documents_required_readiness_keys_without_real_secrets() ->
 
 
 def test_env_example_matches_shared_connection_registry_rendering() -> None:
-    assert ENV_EXAMPLE_PATH.read_text(encoding="utf-8") == env_example_text()
+    assert ENV_EXAMPLE_FILE_PATH.read_text(encoding="utf-8") == env_example_text()
 
 
 def test_runbook_contains_all_required_readiness_sections() -> None:
@@ -143,7 +144,7 @@ def test_readiness_commands_use_shared_backup_path_contracts() -> None:
 def test_readiness_report_passes_for_checked_in_runbook_and_env_example() -> None:
     report = build_readiness_report(
         runbook_text=RUNBOOK_PATH.read_text(encoding="utf-8"),
-        env_example_text=ENV_EXAMPLE_PATH.read_text(encoding="utf-8"),
+        env_example_text=ENV_EXAMPLE_FILE_PATH.read_text(encoding="utf-8"),
     )
 
     assert report.ready, [check.detail for check in report.checks if not check.passed]

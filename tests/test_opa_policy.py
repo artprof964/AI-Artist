@@ -5,9 +5,10 @@ from typing import Any
 
 import pytest
 
+from backend.repo_paths import OPA_POLICY_PATH, repo_path, repo_root_from
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
-OPA_POLICY = REPO_ROOT / "policies" / "opa" / "ai_artist.rego"
+REPO_ROOT = repo_root_from(Path(__file__))
+OPA_POLICY = repo_path(REPO_ROOT, OPA_POLICY_PATH)
 _OPA_COMMAND: list[str] | None = None
 _OPA_SKIP_REASON: str | None = None
 

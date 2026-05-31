@@ -146,10 +146,12 @@
 - `../../validation_reports/connection_env_example_rendering_standardization_2026-05-31.md`
 - `../../validation_reports/shell_command_standardization_2026-05-31.md`
 - `../../validation_reports/readiness_path_standardization_2026-05-31.md`
+- `../../validation_reports/repo_path_standardization_2026-05-31.md`
 - `../../validation_reports/llm_api_key_standard_2026-05-31.md`
 - `../../backend/connection_settings.py`
 - `../../backend/shell_commands.py`
 - `../../backend/readiness_paths.py`
+- `../../backend/repo_paths.py`
 - `../../backend/http_methods.py`
 - `../../backend/github_adapter.py`
 - `../../backend/github_contracts.py`
@@ -158,6 +160,7 @@
 - `../../tests/test_http_methods.py`
 - `../../tests/test_shell_commands.py`
 - `../../tests/test_readiness_paths.py`
+- `../../tests/test_repo_paths.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
 - `../../validation_reports/health_contract_standardization_2026-05-31.md`

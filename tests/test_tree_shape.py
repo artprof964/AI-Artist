@@ -1,7 +1,15 @@
 from pathlib import Path
 
+from backend.repo_paths import (
+    DOCKER_COMPOSE_PATH,
+    ENV_EXAMPLE_PATH,
+    OPA_POLICY_PATH,
+    POSTGRES_QUERY_TRACKING_SCHEMA_PATH,
+    repo_path,
+    repo_root_from,
+)
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_backend_scaffold_tree_exists() -> None:
@@ -14,9 +22,9 @@ def test_backend_scaffold_tree_exists() -> None:
         "tests",
         "tests/test_safety_service_endpoints.py",
         "tests/test_tree_shape.py",
-        "docker-compose.yml",
-        "policies/opa/ai_artist.rego",
-        "infra/postgres/init/001_query_tracking.sql",
+        str(DOCKER_COMPOSE_PATH),
+        str(OPA_POLICY_PATH),
+        str(POSTGRES_QUERY_TRACKING_SCHEMA_PATH),
         "workspaces/ai-artist-main/SOUL.md",
         "workspaces/ai-artist-main/IDENTITY.md",
         "workspaces/ai-artist-main/USER.md",
@@ -37,15 +45,15 @@ def test_backend_scaffold_tree_exists() -> None:
         "workspaces/critic-curator/rubrics/image_quality.md",
         "pyproject.toml",
         "requirements.txt",
-        ".env.example",
+        str(ENV_EXAMPLE_PATH),
     ]
 
     for relative_path in expected_paths:
-        assert (REPO_ROOT / relative_path).exists(), f"missing {relative_path}"
+        assert repo_path(REPO_ROOT, Path(relative_path)).exists(), f"missing {relative_path}"
 
 
 def test_compose_defines_foundation_services() -> None:
-    compose = (REPO_ROOT / "docker-compose.yml").read_text(encoding="utf-8")
+    compose = repo_path(REPO_ROOT, DOCKER_COMPOSE_PATH).read_text(encoding="utf-8")
 
     for service in ["postgres:", "redis:", "qdrant:", "minio:", "opa:"]:
         assert service in compose
@@ -55,8 +63,8 @@ def test_compose_defines_foundation_services() -> None:
 
 
 def test_policy_and_database_scaffold_cover_required_contracts() -> None:
-    policy = (REPO_ROOT / "policies/opa/ai_artist.rego").read_text(encoding="utf-8")
-    schema = (REPO_ROOT / "infra/postgres/init/001_query_tracking.sql").read_text(
+    policy = repo_path(REPO_ROOT, OPA_POLICY_PATH).read_text(encoding="utf-8")
+    schema = repo_path(REPO_ROOT, POSTGRES_QUERY_TRACKING_SCHEMA_PATH).read_text(
         encoding="utf-8"
     )
 

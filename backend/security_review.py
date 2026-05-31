@@ -11,6 +11,7 @@ from backend.file_scanning import iter_review_text_files
 from backend.image_provenance import ImageProvenanceRecord
 from backend.mapping_utils import copy_mapping
 from backend.observability import InMemoryObservabilityCollector, TELEMETRY_STAGE_TOOL
+from backend.repo_paths import OPA_POLICY_PATH, repo_path
 from backend.schemas import (
     ExecutionEnvelopeRequest,
     HumanApproval,
@@ -20,9 +21,6 @@ from backend.schemas import (
 from backend.service import SENSITIVE_OPERATIONS, create_execution_envelope, evaluate_policy
 from backend.secret_redaction import contains_secret_like_value
 from backend.runtime_ids import runtime_uuid
-
-
-OPA_POLICY = Path("policies") / "opa" / "ai_artist.rego"
 
 
 @dataclass(frozen=True)
@@ -81,13 +79,14 @@ def review_observability_redaction(fields: dict[str, Any]) -> list[SecurityRevie
 
 def review_policy_bypass_controls(repo_root: Path) -> list[SecurityReviewFinding]:
     findings: list[SecurityReviewFinding] = []
-    policy_text = (repo_root / OPA_POLICY).read_text(encoding="utf-8")
+    policy_path = repo_path(repo_root, OPA_POLICY_PATH)
+    policy_text = policy_path.read_text(encoding="utf-8")
     if not re.search(r"(?m)^\s*default\s+allow\s*=\s*false\s*$", policy_text):
         findings.append(
             SecurityReviewFinding(
                 surface="policy",
                 message="OPA policy must keep default allow set to false",
-                location=str(repo_root / OPA_POLICY),
+                location=str(policy_path),
             )
         )
 
