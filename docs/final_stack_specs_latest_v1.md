@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 352 passed, 1 skipped, 1 warning
+Final validation: 355 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -58,6 +58,7 @@ backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache, source-freshness, policy, and execution-envelope reason strings.
 backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, and counting helpers.
+backend/subagent_output_contracts.py: shared SubAgentOutput construction and model-coercion boundary.
 backend/review_status.py: shared generated-image review status vocabulary and checks.
 backend/critic_rubric.py: shared Critic/Curator rubric categories and pass/fail decision vocabulary.
 backend/text_utils.py: shared text tokenization, label normalization, and contextual snippets.
@@ -170,6 +171,9 @@ before ingestion or future persistence code handles optional source rows.
 SubAgentOutput status vocabulary, priority, and aggregation must flow through
 backend/subagent_status.py before schema or orchestration-specific status
 logic is added.
+SubAgentOutput construction and model coercion must flow through
+backend/subagent_output_contracts.py before Knowledge retrieval, mock
+orchestration, or future sub-agent adapters return structured agent outputs.
 Mock sub-agent names and artifact types must flow through
 backend/mock_agent_contracts.py before orchestration-specific agent fixtures are
 changed.

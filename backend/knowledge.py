@@ -16,10 +16,10 @@ from backend.knowledge_contracts import (
     knowledge_results_summary,
 )
 from backend.mapping_utils import copy_mapping
-from backend.model_coercion import coerce_model
 from backend.numeric_utils import cosine_similarity
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SubAgentOutput
+from backend.subagent_output_contracts import build_subagent_output
 from backend.subagent_status import SUBAGENT_STATUS_OK
 from backend.text_utils import alnum_tokens, contextual_snippet
 
@@ -77,41 +77,37 @@ class KnowledgeAgentResponse:
         return knowledge_results_summary(len(self.results), source_ids)
 
     def to_subagent_output(self) -> SubAgentOutput:
-        return coerce_model(
-            {
-                "task_id": self.task_id,
-                "agent_name": KNOWLEDGE_AGENT_NAME,
-                "status": SUBAGENT_STATUS_OK,
-                "summary": self.summary,
-                "artifacts": [
-                    {
-                        "artifact_type": KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
-                        "artifact_id": f"{self.task_id}:{KNOWLEDGE_RETRIEVAL_ARTIFACT_SUFFIX}",
-                        "metadata": {
-                            "query": self.query,
-                            "result_count": len(self.results),
-                            "source_ids": [result.source_id for result in self.results],
-                        },
-                    }
-                ],
-                "sources": [
-                    {
-                        "source_id": result.citation.source_id,
-                        "title": result.citation.title,
-                        "uri": result.citation.uri,
-                        "metadata": {
-                            "score": result.score,
-                            "snippet": result.snippet,
-                            **result.metadata,
-                        },
-                    }
-                    for result in self.results
-                ],
-                "policy_notes": [KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL],
-                "confidence": 0.9 if self.results else 0.2,
-                "errors": [],
-            },
-            SubAgentOutput,
+        return build_subagent_output(
+            task_id=self.task_id,
+            agent_name=KNOWLEDGE_AGENT_NAME,
+            status=SUBAGENT_STATUS_OK,
+            summary=self.summary,
+            artifacts=[
+                {
+                    "artifact_type": KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+                    "artifact_id": f"{self.task_id}:{KNOWLEDGE_RETRIEVAL_ARTIFACT_SUFFIX}",
+                    "metadata": {
+                        "query": self.query,
+                        "result_count": len(self.results),
+                        "source_ids": [result.source_id for result in self.results],
+                    },
+                }
+            ],
+            sources=[
+                {
+                    "source_id": result.citation.source_id,
+                    "title": result.citation.title,
+                    "uri": result.citation.uri,
+                    "metadata": {
+                        "score": result.score,
+                        "snippet": result.snippet,
+                        **result.metadata,
+                    },
+                }
+                for result in self.results
+            ],
+            policy_notes=[KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL],
+            confidence=0.9 if self.results else 0.2,
         )
 
 

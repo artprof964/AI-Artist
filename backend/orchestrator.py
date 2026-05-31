@@ -12,7 +12,6 @@ from backend.mock_agent_contracts import (
     MOCK_ARTIFACT_IMAGE_PLAN,
     MOCK_ARTIFACT_REVIEW_CHECKLIST,
 )
-from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_mean
 from backend.observability import (
     LOG_LEVEL_INFO,
@@ -29,6 +28,7 @@ from backend.schemas import (
     SubAgentOutput,
     SubAgentSource,
 )
+from backend.subagent_output_contracts import build_subagent_output
 from backend.subagent_status import (
     SUBAGENT_STATUS_BLOCKED,
     SUBAGENT_STATUS_FAILED,
@@ -87,32 +87,29 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
             }
         ]
 
-    return coerce_model(
-        {
-            "task_id": request.task_id,
-            "agent_name": MOCK_AGENT_KNOWLEDGE,
-            "status": status,
-            "summary": summary,
-            "artifacts": [
-                {
-                    "artifact_type": MOCK_ARTIFACT_CONTEXT_NOTE,
-                    "artifact_id": f"{request.task_id}:knowledge-note",
-                    "metadata": {"request_excerpt": request.request_text[:80]},
-                }
-            ],
-            "sources": [
-                {
-                    "source_id": "workspace-memory-style-principles",
-                    "title": "Local AI-Artist style principles",
-                    "uri": "workspace://ai-artist-main/memory/style_principles.md",
-                    "metadata": {"source_kind": "local_workspace"},
-                }
-            ],
-            "policy_notes": ["Read-only local context lookup; no external source access."],
-            "confidence": 0.86 if status == SUBAGENT_STATUS_OK else 0.35,
-            "errors": errors,
-        },
-        SubAgentOutput,
+    return build_subagent_output(
+        task_id=request.task_id,
+        agent_name=MOCK_AGENT_KNOWLEDGE,
+        status=status,
+        summary=summary,
+        artifacts=[
+            {
+                "artifact_type": MOCK_ARTIFACT_CONTEXT_NOTE,
+                "artifact_id": f"{request.task_id}:knowledge-note",
+                "metadata": {"request_excerpt": request.request_text[:80]},
+            }
+        ],
+        sources=[
+            {
+                "source_id": "workspace-memory-style-principles",
+                "title": "Local AI-Artist style principles",
+                "uri": "workspace://ai-artist-main/memory/style_principles.md",
+                "metadata": {"source_kind": "local_workspace"},
+            }
+        ],
+        policy_notes=["Read-only local context lookup; no external source access."],
+        confidence=0.86 if status == SUBAGENT_STATUS_OK else 0.35,
+        errors=errors,
     )
 
 
@@ -135,28 +132,24 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
             }
         ]
 
-    return coerce_model(
-        {
-            "task_id": request.task_id,
-            "agent_name": MOCK_AGENT_IMAGE_PLANNER,
-            "status": status,
-            "summary": summary,
-            "artifacts": [
-                {
-                    "artifact_type": MOCK_ARTIFACT_IMAGE_PLAN,
-                    "artifact_id": f"{request.task_id}:image-plan",
-                    "metadata": {
-                        "execution": "not_started",
-                        "external_api_calls": 0,
-                    },
-                }
-            ],
-            "sources": [],
-            "policy_notes": ["No ComfyUI execution or image generation was attempted."],
-            "confidence": 0.78 if status == SUBAGENT_STATUS_OK else 0.45,
-            "errors": errors,
-        },
-        SubAgentOutput,
+    return build_subagent_output(
+        task_id=request.task_id,
+        agent_name=MOCK_AGENT_IMAGE_PLANNER,
+        status=status,
+        summary=summary,
+        artifacts=[
+            {
+                "artifact_type": MOCK_ARTIFACT_IMAGE_PLAN,
+                "artifact_id": f"{request.task_id}:image-plan",
+                "metadata": {
+                    "execution": "not_started",
+                    "external_api_calls": 0,
+                },
+            }
+        ],
+        policy_notes=["No ComfyUI execution or image generation was attempted."],
+        confidence=0.78 if status == SUBAGENT_STATUS_OK else 0.45,
+        errors=errors,
     )
 
 
@@ -179,32 +172,29 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
             }
         ]
 
-    return coerce_model(
-        {
-            "task_id": request.task_id,
-            "agent_name": MOCK_AGENT_CRITIC_CURATOR,
-            "status": status,
-            "summary": summary,
-            "artifacts": [
-                {
-                    "artifact_type": MOCK_ARTIFACT_REVIEW_CHECKLIST,
-                    "artifact_id": f"{request.task_id}:review-checklist",
-                    "metadata": {"review_status": REVIEW_STATUS_PENDING},
-                }
-            ],
-            "sources": [
-                {
-                    "source_id": "critic-image-quality-rubric",
-                    "title": "Image quality rubric",
-                    "uri": "workspace://critic-curator/rubrics/image_quality.md",
-                    "metadata": {"source_kind": "local_workspace"},
-                }
-            ],
-            "policy_notes": ["Review only; publishing remains blocked until later approval tasks."],
-            "confidence": 0.81 if status == SUBAGENT_STATUS_OK else 0.2,
-            "errors": errors,
-        },
-        SubAgentOutput,
+    return build_subagent_output(
+        task_id=request.task_id,
+        agent_name=MOCK_AGENT_CRITIC_CURATOR,
+        status=status,
+        summary=summary,
+        artifacts=[
+            {
+                "artifact_type": MOCK_ARTIFACT_REVIEW_CHECKLIST,
+                "artifact_id": f"{request.task_id}:review-checklist",
+                "metadata": {"review_status": REVIEW_STATUS_PENDING},
+            }
+        ],
+        sources=[
+            {
+                "source_id": "critic-image-quality-rubric",
+                "title": "Image quality rubric",
+                "uri": "workspace://critic-curator/rubrics/image_quality.md",
+                "metadata": {"source_kind": "local_workspace"},
+            }
+        ],
+        policy_notes=["Review only; publishing remains blocked until later approval tasks."],
+        confidence=0.81 if status == SUBAGENT_STATUS_OK else 0.2,
+        errors=errors,
     )
 
 
