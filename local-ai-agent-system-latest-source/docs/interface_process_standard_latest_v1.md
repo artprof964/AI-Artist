@@ -58,6 +58,7 @@ can be marked done.
 46. Publishing side-effect audit operation values use `backend/operations.py`.
 47. Gated adapter operation values use `backend/operations.py` directly.
 48. Slack source labels and adapter validation messages use `backend/slack_contracts.py`.
+49. GitHub adapter action labels, validation messages, and token-purpose text use `backend/github_contracts.py`.
 ```
 
 ## Standard Request Envelope
@@ -258,6 +259,7 @@ Output:
    - Domain and adapter inputs and structured outputs coerce model-or-dict payloads through the shared model coercion helper.
    - Provider SDK object-or-dict responses are read through the shared response-field helper.
    - Connector HTTP methods are normalized through the shared HTTP method helper.
+   - GitHub adapter labels, API validation messages, and token-purpose text use the shared GitHub contract before adapter errors are raised.
 
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation

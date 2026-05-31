@@ -29,6 +29,7 @@ Connection settings registry and runtime env resolution: centralized in backend/
 Execution gates: centralized in backend/execution_gate.py
 Execution-envelope messages: centralized in backend/execution_gate_messages.py
 Slack adapter contracts: centralized in backend/slack_contracts.py
+GitHub adapter contracts: centralized in backend/github_contracts.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
 ComfyUI generated-image URI contracts: centralized in backend/comfyui_contracts.py
@@ -152,6 +153,7 @@ Response fields: shared directly across provider-neutral LLM API response parsin
 ComfyUI contracts: shared across image provenance storage URI construction and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety and source-ingestion domain allowlisting
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
+GitHub adapter contracts: shared across action labels, target labels, API validation messages, and token-purpose text
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and execution gate validation errors
@@ -174,7 +176,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 365 passed, 1 skipped, 1 warning
+final pytest: 367 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

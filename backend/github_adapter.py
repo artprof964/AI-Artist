@@ -15,6 +15,20 @@ from backend.connection_settings import (
 )
 from backend.execution_gate import require_execution_envelope
 from backend.execution_gate_messages import execution_envelope_required
+from backend.github_contracts import (
+    GITHUB_ADAPTER_EXECUTION_PURPOSE,
+    GITHUB_API_METHOD_ALLOWED_MESSAGE,
+    GITHUB_API_METHOD_TYPE_MESSAGE,
+    GITHUB_API_PATH_ABSOLUTE_MESSAGE,
+    GITHUB_API_PATH_CONTROL_MESSAGE,
+    GITHUB_API_PATH_RELATIVE_MESSAGE,
+    GITHUB_API_PATH_SLASH_MESSAGE,
+    GITHUB_API_PATH_TRAVERSAL_MESSAGE,
+    GITHUB_API_PATH_TYPE_MESSAGE,
+    GITHUB_TARGET_LABEL,
+    GITHUB_WRITE_ACTION_LABEL,
+    github_token_required,
+)
 from backend.http_methods import normalize_http_write_method
 from backend.operations import OPERATION_GITHUB_WRITE
 from backend.schemas import ExecutionEnvelopeResponse
@@ -83,28 +97,28 @@ class GitHubAdapter:
         envelope = require_execution_envelope(
             request.execution_envelope,
             operation=OPERATION_GITHUB_WRITE,
-            missing_message=execution_envelope_required("GitHub write"),
+            missing_message=execution_envelope_required(GITHUB_WRITE_ACTION_LABEL),
             error_type=GitHubExecutionGateError,
             target=request.target,
-            target_label="GitHub target",
+            target_label=GITHUB_TARGET_LABEL,
             require_human_approval_when_marked=True,
             now=now,
         )
         method = normalize_http_write_method(
             request.method,
             error_type=GitHubExecutionGateError,
-            type_message="GitHub API method must be a string",
-            allowed_message="GitHub adapter only permits write methods",
+            type_message=GITHUB_API_METHOD_TYPE_MESSAGE,
+            allowed_message=GITHUB_API_METHOD_ALLOWED_MESSAGE,
         )
         path = safe_relative_api_path(
             request.path,
             error_type=GitHubExecutionGateError,
-            type_message="GitHub API path must be a string",
-            absolute_message="GitHub API path must not be an absolute URL",
-            relative_message="GitHub API path must be relative and start with /",
-            slash_message="GitHub API path must use forward slashes",
-            control_message="GitHub API path must not contain control characters",
-            traversal_message="GitHub API path must not contain traversal segments",
+            type_message=GITHUB_API_PATH_TYPE_MESSAGE,
+            absolute_message=GITHUB_API_PATH_ABSOLUTE_MESSAGE,
+            relative_message=GITHUB_API_PATH_RELATIVE_MESSAGE,
+            slash_message=GITHUB_API_PATH_SLASH_MESSAGE,
+            control_message=GITHUB_API_PATH_CONTROL_MESSAGE,
+            traversal_message=GITHUB_API_PATH_TRAVERSAL_MESSAGE,
         )
 
         token = self._read_runtime_token()
@@ -140,15 +154,13 @@ class GitHubAdapter:
             if self._token_env_var == GITHUB_TOKEN_ENV_VAR:
                 token = load_connection_settings(values).github_token
                 if not token:
-                    raise RuntimeError(
-                        f"{GITHUB_TOKEN_ENV_VAR} is required for GitHub adapter execution"
-                    )
+                    raise RuntimeError(github_token_required(GITHUB_TOKEN_ENV_VAR))
                 return token.strip()
 
             return require_env_value(
                 values,
                 self._token_env_var,
-                purpose="GitHub adapter execution",
+                purpose=GITHUB_ADAPTER_EXECUTION_PURPOSE,
             ).strip()
         except RuntimeError as exc:
             raise GitHubAdapterConfigurationError(str(exc)) from exc

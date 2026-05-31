@@ -132,6 +132,7 @@
 - `../../validation_reports/t23_github_adapter_implementation_2026-05-31.md`
 - `../../validation_reports/t23_github_adapter_validation_2026-05-31.md`
 - `../../validation_reports/github_url_boundary_standardization_2026-05-31.md`
+- `../../validation_reports/github_contract_standardization_2026-05-31.md`
 - `../../validation_reports/http_method_standardization_2026-05-31.md`
 - `../../validation_reports/gated_adapter_operation_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/connection_runtime_env_standardization_2026-05-31.md`
@@ -140,7 +141,9 @@
 - `../../backend/connection_settings.py`
 - `../../backend/http_methods.py`
 - `../../backend/github_adapter.py`
+- `../../backend/github_contracts.py`
 - `../../tests/test_github_adapter.py`
+- `../../tests/test_github_contracts.py`
 - `../../tests/test_http_methods.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
