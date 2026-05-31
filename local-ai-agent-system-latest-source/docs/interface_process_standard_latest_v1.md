@@ -20,7 +20,7 @@ can be marked done.
 8. Redis/Celery/Dagster own background execution state.
 9. ComfyUI owns image workflow execution.
 10. External write actions require a signed execution envelope.
-11. Canonical hashes, deterministic local IDs, and source version tags are produced through `backend/canonical_hash.py`.
+11. Canonical JSON, hashes, deterministic local IDs, source version tags, and security-review serialization are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 13. Text tokenization and label/tag normalization use `backend/text_utils.py`.
 14. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
@@ -186,7 +186,7 @@ Output:
 
 2. Normalize
    - Safety Service canonicalizes request text and builds a stable fingerprint.
-   - Canonical JSON and SHA-256 digest creation flows through the shared hash helper.
+   - Canonical JSON, SHA-256 digest creation, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
 
 3. Classify

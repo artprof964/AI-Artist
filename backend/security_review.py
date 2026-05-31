@@ -1,13 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-import json
 from pathlib import Path
 import re
 from typing import Any, Iterable
 from uuid import uuid4
 
 from backend.audit import redact_audit_value
+from backend.canonical_hash import canonical_json
 from backend.image_provenance import ImageProvenanceRecord
 from backend.observability import InMemoryObservabilityCollector
 from backend.schemas import (
@@ -69,14 +69,12 @@ def review_observability_redaction(fields: dict[str, Any]) -> list[SecurityRevie
         fields=fields,
         metric_tags=fields,
     )
-    serialized = json.dumps(
+    serialized = canonical_json(
         {
             "traces": [record.__dict__ for record in collector.traces()],
             "metrics": [record.__dict__ for record in collector.metrics()],
             "logs": [record.__dict__ for record in collector.logs()],
-        },
-        default=str,
-        sort_keys=True,
+        }
     )
     if _contains_secret_like_value(serialized):
         return [
@@ -159,7 +157,7 @@ def review_provenance_metadata(
         if isinstance(metadata, ImageProvenanceRecord)
         else dict(metadata)
     )
-    serialized = json.dumps(payload, sort_keys=True)
+    serialized = canonical_json(payload)
     findings: list[SecurityReviewFinding] = []
     if raw_prompt in serialized:
         findings.append(
@@ -195,7 +193,7 @@ def _contains_secret_like_value(text: str) -> bool:
 
 
 def _find_unredacted_secrets(value: Any, *, surface: str) -> list[SecurityReviewFinding]:
-    serialized = json.dumps(value, sort_keys=True)
+    serialized = canonical_json(value)
     if not _contains_secret_like_value(serialized):
         return []
     return [

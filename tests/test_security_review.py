@@ -150,3 +150,10 @@ def test_artifact_provenance_review_flags_raw_prompt_metadata() -> None:
         "artifact provenance exposes raw prompt text",
         "artifact provenance must use prompt_hash metadata",
     }
+
+
+def test_security_review_uses_canonical_json_for_backend_serialization() -> None:
+    source = (REPO_ROOT / "backend" / "security_review.py").read_text(encoding="utf-8")
+
+    assert "json.dumps" not in source
+    assert "canonical_json" in source
