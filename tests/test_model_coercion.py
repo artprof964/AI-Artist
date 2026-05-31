@@ -1,7 +1,11 @@
 import pytest
 from pydantic import BaseModel, Field
+from pathlib import Path
 
 from backend.model_coercion import ModelCoercionError, coerce_model
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 class ExampleModel(BaseModel):
@@ -35,3 +39,16 @@ def test_coerce_model_allows_custom_error_type_and_message() -> None:
             error_type=CustomCoercionError,
             message="custom coercion failure",
         )
+
+
+def test_backend_domain_code_uses_shared_model_coercion_boundary() -> None:
+    offenders: list[str] = []
+    allowed = {REPO_ROOT / "backend" / "model_coercion.py"}
+    for path in (REPO_ROOT / "backend").glob("*.py"):
+        if path in allowed:
+            continue
+        source = path.read_text(encoding="utf-8")
+        if ".model_validate(" in source:
+            offenders.append(str(path.relative_to(REPO_ROOT)))
+
+    assert offenders == []

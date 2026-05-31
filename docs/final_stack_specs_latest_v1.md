@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 268 passed, 1 skipped, 1 warning
+Final validation: 269 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -60,7 +60,7 @@ backend/payload_fields.py: shared connector payload string-field and nested-obje
 backend/response_fields.py: shared provider response field access and shape validation.
 backend/url_utils.py: shared URL domain and relative API path validation.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
-backend/model_coercion.py: shared Pydantic model/dict coercion for adapter boundaries.
+backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and domain boundaries.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
@@ -150,7 +150,8 @@ Operation constants, classifier term maps, and sensitive-operation rules must
 flow through backend/operations.py before service or adapter operation logic is
 added.
 Pydantic model/dict coercion at adapter and domain boundaries must flow through
-backend/model_coercion.py before one-off validation wrappers are added.
+backend/model_coercion.py before direct model validation or one-off validation
+wrappers are added.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```

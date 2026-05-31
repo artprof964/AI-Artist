@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.model_coercion import coerce_model
 from backend.schemas import SubAgentOutput
 from backend.numeric_utils import cosine_similarity
 from backend.runtime_ids import runtime_uuid
@@ -64,7 +65,7 @@ class KnowledgeAgentResponse:
         return f"Retrieved {len(self.results)} approved local result(s): {citations}."
 
     def to_subagent_output(self) -> SubAgentOutput:
-        return SubAgentOutput.model_validate(
+        return coerce_model(
             {
                 "task_id": self.task_id,
                 "agent_name": "knowledge",
@@ -97,7 +98,8 @@ class KnowledgeAgentResponse:
                 "policy_notes": ["Read-only retrieval from approved local sample data."],
                 "confidence": 0.9 if self.results else 0.2,
                 "errors": [],
-            }
+            },
+            SubAgentOutput,
         )
 
 

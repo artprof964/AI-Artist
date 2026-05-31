@@ -107,7 +107,7 @@ Payload fields: shared across Slack event parsing, nested event object validatio
 Response fields: shared across provider-neutral LLM API response parsing, ComfyUI image response parsing, and publishing audit status parsing
 URL validation: shared across GitHub API path safety and source-ingestion domain allowlisting
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
-Model coercion: shared across execution-envelope validation, image provenance input, and critic metadata scoring
+Model coercion: shared across execution-envelope validation, image provenance input, critic metadata scoring, Knowledge Agent output, and mock sub-agent output
 Deprecated architecture term scan: clean
 ```
 
@@ -119,7 +119,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 268 passed, 1 skipped, 1 warning
+final pytest: 269 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

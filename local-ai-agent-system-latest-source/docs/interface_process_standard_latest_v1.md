@@ -31,7 +31,7 @@ can be marked done.
 19. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
 20. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 21. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-22. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
+22. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -213,7 +213,7 @@ Output:
 7. Validate
    - Runtime validates `SubAgentOutput`, compares results, retries if needed,
      and synthesizes one response.
-   - Domain and adapter inputs coerce model-or-dict payloads through the shared model coercion helper.
+   - Domain and adapter inputs and structured outputs coerce model-or-dict payloads through the shared model coercion helper.
    - Provider SDK object-or-dict responses are read through the shared response-field helper.
 
 8. Execution Gate

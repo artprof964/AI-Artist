@@ -5,6 +5,7 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_mean
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.runtime_ids import runtime_uuid
@@ -68,7 +69,7 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
             }
         ]
 
-    return SubAgentOutput.model_validate(
+    return coerce_model(
         {
             "task_id": request.task_id,
             "agent_name": "knowledge",
@@ -92,7 +93,8 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
             "policy_notes": ["Read-only local context lookup; no external source access."],
             "confidence": 0.86 if status == "ok" else 0.35,
             "errors": errors,
-        }
+        },
+        SubAgentOutput,
     )
 
 
@@ -113,7 +115,7 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
             }
         ]
 
-    return SubAgentOutput.model_validate(
+    return coerce_model(
         {
             "task_id": request.task_id,
             "agent_name": "image_planner",
@@ -133,7 +135,8 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
             "policy_notes": ["No ComfyUI execution or image generation was attempted."],
             "confidence": 0.78 if status == "ok" else 0.45,
             "errors": errors,
-        }
+        },
+        SubAgentOutput,
     )
 
 
@@ -152,7 +155,7 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
             }
         ]
 
-    return SubAgentOutput.model_validate(
+    return coerce_model(
         {
             "task_id": request.task_id,
             "agent_name": "critic_curator",
@@ -176,7 +179,8 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
             "policy_notes": ["Review only; publishing remains blocked until later approval tasks."],
             "confidence": 0.81 if status == "ok" else 0.2,
             "errors": errors,
-        }
+        },
+        SubAgentOutput,
     )
 
 
