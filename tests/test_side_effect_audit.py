@@ -4,6 +4,13 @@ from backend.audit import audit_event_repository, list_audit_events_by_correlati
 from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_FIELD
 from backend.interface_types import AUDIT_EVENT_TOOL_CALL
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
+from backend.runtime_field_contracts import (
+    OPERATION_FIELD,
+    POLICY_SCOPE_FIELD,
+    REASON_FIELD,
+    STATUS_FIELD,
+    TARGET_FIELD,
+)
 from backend.side_effect_audit import (
     SideEffectAuditContext,
     build_side_effect_audit_payload,
@@ -94,16 +101,32 @@ def test_side_effect_audit_uses_shared_audit_event_type_constant() -> None:
 
 
 def test_side_effect_audit_payload_fields_are_centralized() -> None:
+    contracts_source = read_backend_source("side_effect_audit_contracts.py")
+
     assert SIDE_EFFECT_ACTOR_SCOPE_FIELD == "actor_scope"
     assert SIDE_EFFECT_POLICY_SCOPE_FIELD == "policy_scope"
     assert SIDE_EFFECT_ACTOR_SCOPE_FIELD == AUDIT_ACTOR_SCOPE_FIELD
     assert SIDE_EFFECT_POLICY_SCOPE_FIELD == AUDIT_POLICY_SCOPE_FIELD
+    assert SIDE_EFFECT_POLICY_SCOPE_FIELD == POLICY_SCOPE_FIELD
     assert SIDE_EFFECT_OPERATION_FIELD == "operation"
+    assert SIDE_EFFECT_OPERATION_FIELD == OPERATION_FIELD
     assert SIDE_EFFECT_TARGET_FIELD == "target"
+    assert SIDE_EFFECT_TARGET_FIELD == TARGET_FIELD
     assert SIDE_EFFECT_STATUS_FIELD == "status"
+    assert SIDE_EFFECT_STATUS_FIELD == STATUS_FIELD
     assert SIDE_EFFECT_REASON_FIELD == "reason"
+    assert SIDE_EFFECT_REASON_FIELD == REASON_FIELD
     assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == "execution_envelope_id"
     assert SIDE_EFFECT_CLIENT_RESPONSE_FIELD == "client_response"
+
+    for literal in (
+        'SIDE_EFFECT_POLICY_SCOPE_FIELD = "policy_scope"',
+        'SIDE_EFFECT_OPERATION_FIELD = "operation"',
+        'SIDE_EFFECT_TARGET_FIELD = "target"',
+        'SIDE_EFFECT_STATUS_FIELD = "status"',
+        'SIDE_EFFECT_REASON_FIELD = "reason"',
+    ):
+        assert literal not in contracts_source
 
     source = read_backend_source("side_effect_audit.py")
     for literal in (

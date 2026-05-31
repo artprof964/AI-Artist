@@ -1,8 +1,10 @@
 OPERATION_FIELD = "operation"
+TARGET_FIELD = "target"
 REQUEST_KIND_FIELD = "request_kind"
 REQUESTER_SCOPE_FIELD = "requester_scope"
 POLICY_SCOPE_FIELD = "policy_scope"
 ALLOW_FIELD = "allow"
+STATUS_FIELD = "status"
 REQUIRES_HUMAN_APPROVAL_FIELD = "requires_human_approval"
 REASON_FIELD = "reason"
 POLICY_VERSION_FIELD = "policy_version"
@@ -17,4 +19,6 @@ __all__ = [
     "REQUESTER_SCOPE_FIELD",
     "REQUEST_KIND_FIELD",
     "REQUIRES_HUMAN_APPROVAL_FIELD",
+    "STATUS_FIELD",
+    "TARGET_FIELD",
 ]

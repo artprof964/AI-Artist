@@ -60,7 +60,7 @@ backend/request_identity.py: request text normalization, direct Safety Service c
 backend/request_metadata_contracts.py: shared request metadata defaults, default request channel, request envelope field names, and fingerprint field names.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape using request metadata contracts.
 backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
-backend/runtime_field_contracts.py: shared operation, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry and policy contexts.
+backend/runtime_field_contracts.py: shared operation, target, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, and side-effect audit payloads.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -83,8 +83,8 @@ backend/model_coercion.py: shared Pydantic model/dict coercion and validation me
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/audit_contracts.py: shared audit scope payload field names.
-backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope fields.
-backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field and audit event type contracts.
+backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
+backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
@@ -209,9 +209,10 @@ before adapter-specific return dataclasses add extra fields.
 Audit scope payload field names must flow through backend/audit_contracts.py
 before audit records or side-effect audit payloads extract actor/policy scopes.
 Side-effect audit payload field names and event types must flow through
-backend/audit_contracts.py, backend/side_effect_audit_contracts.py,
-backend/side_effect_audit.py, and backend/interface_types.py before
-adapter-specific agents persist tool-call audit events.
+backend/audit_contracts.py, backend/runtime_field_contracts.py,
+backend/side_effect_audit_contracts.py, backend/side_effect_audit.py, and
+backend/interface_types.py before adapter-specific agents persist tool-call
+audit events.
 Canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic local IDs, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes must
 flow through backend/canonical_hash.py before request fingerprints, artifact
 hashes, image provenance hashes, source snapshot versions, signatures, mocked external IDs, security-review scans, deterministic test serializations, or deterministic test text hashes are created.
@@ -229,10 +230,11 @@ structured observability fields are built.
 Safety Service canonicalization, classification, and policy observability event,
 message, tag, and field shapes must flow through
 backend/service_observability_contracts.py before service telemetry is emitted.
-Operation, request-kind, requester/policy scope, allow, human-approval, reason,
-and policy-version field names must flow through
+Operation, target, status, request-kind, requester/policy scope, allow,
+human-approval, reason, and policy-version field names must flow through
 backend/runtime_field_contracts.py before service observability, OpenClaw tool
-telemetry, or future policy context field shapes are changed.
+telemetry, side-effect audit payloads, or future policy context field shapes are
+changed.
 Default requester, policy, publishing actor, and publishing policy scopes must
 flow through backend/request_scope_contracts.py before schemas, mock
 orchestration, publishing audit context, or future request envelopes change

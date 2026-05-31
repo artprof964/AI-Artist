@@ -26,7 +26,7 @@ can be marked done.
 14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 15. Request metadata defaults, default request channel, request envelope field names, RequestMetadata workspace/agent mapping, canonical request fingerprint fields, and canonicalization observability fields use `backend/request_metadata_contracts.py` and `backend/request_metadata.py`.
 15a. Safety Service canonicalization, classification, and policy observability event/message/tag/field shapes use `backend/service_observability_contracts.py`.
-15b. Operation, request-kind, requester/policy scope, allow, human-approval, reason, and policy-version field names use `backend/runtime_field_contracts.py` before service observability or OpenClaw tool telemetry shapes are changed.
+15b. Operation, target, status, request-kind, requester/policy scope, allow, human-approval, reason, and policy-version field names use `backend/runtime_field_contracts.py` before service observability, OpenClaw tool telemetry, or side-effect audit payload shapes are changed.
 16. Default requester, policy, publishing actor, and publishing policy scopes use `backend/request_scope_contracts.py`.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
@@ -67,7 +67,7 @@ can be marked done.
 47. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
 48. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
 49. Publishing side-effect audit operation values use `backend/operations.py`, and side-effect audit event types use `backend/interface_types.py`.
-49a. Side-effect audit payload field names use `backend/side_effect_audit_contracts.py`.
+49a. Side-effect audit payload field names use `backend/runtime_field_contracts.py` and `backend/side_effect_audit_contracts.py`.
 50. Gated adapter operation values use `backend/operations.py` directly.
 51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
 51. Slack source labels, requester/policy scopes, local-request payloads, outbound payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
@@ -257,7 +257,7 @@ Output:
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
    - Request metadata defaults, default channel, request envelope field names, and fingerprint field names use the shared metadata contract before schema or telemetry changes.
    - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
-   - Runtime policy/telemetry field names use the shared runtime field contract before service or OpenClaw telemetry shapes are changed.
+   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, or side-effect audit payload shapes are changed.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
@@ -331,6 +331,7 @@ Output:
    - Security review finding surfaces, messages, probe event/trace IDs, policy default-deny checks, review target formatting, and prompt-hash field checks use the shared security-review contract boundary.
    - Audit record actor/policy scope extraction and side-effect audit payload fields use the shared audit scope field-name constants.
    - Publishing side-effect audit events use the shared publish operation, payload field-name, and audit event type constants.
+   - Side-effect audit operation, target, status, reason, and policy-scope payload fields use the shared runtime field contract.
    - Publishing audit actor and policy scopes use the shared request-scope contract.
    - Local publishing dry-run responses and deterministic IDs use the shared publishing contract helper.
 ```
