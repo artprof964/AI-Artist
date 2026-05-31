@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 321 passed, 1 skipped, 1 warning
+Final validation: 323 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -63,7 +63,7 @@ backend/text_utils.py: shared text tokenization and label normalization.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
 backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction.
-backend/response_fields.py: shared provider response field access and shape validation.
+backend/response_fields.py: shared provider response field access, first-choice message parsing, and shape validation.
 backend/url_utils.py: shared URL domain and relative API path validation.
 backend/http_methods.py: shared HTTP method vocabulary and normalization for connector boundaries.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.

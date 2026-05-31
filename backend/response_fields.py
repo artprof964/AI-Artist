@@ -38,9 +38,19 @@ def require_response_mapping(
     return value
 
 
+def first_choice_message_content(response: Any) -> str | None:
+    choices = field_value(response, "choices", [])
+    if not choices:
+        return None
+    first_choice = choices[0]
+    message = field_value(first_choice, "message", {})
+    return field_value(message, "content")
+
+
 __all__ = [
     "ResponseFieldError",
     "field_value",
+    "first_choice_message_content",
     "required_response_list",
     "require_response_mapping",
 ]

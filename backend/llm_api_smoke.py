@@ -8,7 +8,7 @@ from backend.connection_settings import (
     load_connection_settings,
     runtime_env,
 )
-from backend.response_fields import field_value
+from backend.response_fields import field_value, first_choice_message_content
 from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
 
 
@@ -90,14 +90,5 @@ def run_llm_api_smoke_test(
         ),
         "response_id": field_value(response, "id"),
         "model": field_value(response, "model", config.primary_model),
-        "content": _first_choice_content(response),
+        "content": first_choice_message_content(response),
     }
-
-
-def _first_choice_content(response: Any) -> str | None:
-    choices = field_value(response, "choices", [])
-    if not choices:
-        return None
-    first_choice = choices[0]
-    message = field_value(first_choice, "message", {})
-    return field_value(message, "content")

@@ -3,6 +3,7 @@ import pytest
 from backend.response_fields import (
     ResponseFieldError,
     field_value,
+    first_choice_message_content,
     required_response_list,
     require_response_mapping,
 )
@@ -16,6 +17,14 @@ def test_field_value_reads_mapping_and_sdk_object_shapes() -> None:
     assert field_value({"id": "resp_123"}, "id") == "resp_123"
     assert field_value(SDKMessage(), "choices")[0]["message"]["content"] == "hello"
     assert field_value(SDKMessage(), "missing", "fallback") == "fallback"
+
+
+def test_first_choice_message_content_reads_mapping_and_sdk_object_shapes() -> None:
+    assert first_choice_message_content(
+        {"choices": [{"message": {"content": "hello from mapping"}}]}
+    ) == "hello from mapping"
+    assert first_choice_message_content(SDKMessage()) == "hello"
+    assert first_choice_message_content({"choices": []}) is None
 
 
 def test_required_response_list_accepts_non_empty_lists() -> None:

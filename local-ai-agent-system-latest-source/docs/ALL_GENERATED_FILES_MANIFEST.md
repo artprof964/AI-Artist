@@ -22,6 +22,7 @@
 - `../../validation_reports/t07_postgres_migration_validation_2026-05-31.md`
 - `../../validation_reports/t08_openclaw_workspace_validation_2026-05-31.md`
 - `../../validation_reports/t09_llm_api_smoke_validation_2026-05-31.md`
+- `../../validation_reports/llm_response_choice_parser_standardization_2026-05-31.md`
 - `../../backend/llm_api_smoke.py`
 - `../../tests/test_llm_api_smoke.py`
 - `../../validation_reports/t10_openclaw_safety_hook_2026-05-31.md`
