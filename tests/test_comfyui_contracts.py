@@ -2,12 +2,18 @@ import pytest
 
 from backend.comfyui_contracts import (
     COMFYUI_DEFAULT_IMAGE_TYPE,
+    COMFYUI_IMAGE_FILENAME_FIELD,
     COMFYUI_IMAGE_FILENAME_MESSAGE,
+    COMFYUI_IMAGE_STORAGE_URI_FIELD,
+    COMFYUI_IMAGE_SUBFOLDER_FIELD,
     COMFYUI_IMAGE_SUBFOLDER_MESSAGE,
+    COMFYUI_IMAGE_TYPE_FIELD,
     COMFYUI_IMAGE_TYPE_MESSAGE,
     COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED,
+    COMFYUI_RESPONSE_IMAGES_FIELD,
     COMFYUI_RESPONSE_IMAGES_REQUIRED,
     COMFYUI_URI_SCHEME,
+    comfyui_image_storage_reference,
     comfyui_image_storage_uri,
 )
 
@@ -19,6 +25,11 @@ class CustomComfyUIError(ValueError):
 def test_comfyui_image_storage_uri_uses_shared_uri_convention() -> None:
     assert COMFYUI_URI_SCHEME == "comfyui"
     assert COMFYUI_DEFAULT_IMAGE_TYPE == "output"
+    assert COMFYUI_RESPONSE_IMAGES_FIELD == "images"
+    assert COMFYUI_IMAGE_FILENAME_FIELD == "filename"
+    assert COMFYUI_IMAGE_SUBFOLDER_FIELD == "subfolder"
+    assert COMFYUI_IMAGE_TYPE_FIELD == "type"
+    assert COMFYUI_IMAGE_STORAGE_URI_FIELD == "storage_uri"
     assert COMFYUI_IMAGE_FILENAME_MESSAGE == "generated image must include filename or storage_uri"
     assert COMFYUI_IMAGE_TYPE_MESSAGE == "generated image type must be a non-empty string"
     assert COMFYUI_IMAGE_SUBFOLDER_MESSAGE == "generated image subfolder must be a string"
@@ -38,6 +49,21 @@ def test_comfyui_image_storage_uri_uses_shared_uri_convention() -> None:
 
 def test_comfyui_image_storage_uri_defaults_to_output_without_subfolder() -> None:
     assert comfyui_image_storage_uri({"filename": "studio.png"}) == (
+        "comfyui://output/studio.png"
+    )
+
+
+def test_comfyui_image_storage_reference_prefers_explicit_uri() -> None:
+    assert (
+        comfyui_image_storage_reference(
+            {
+                COMFYUI_IMAGE_FILENAME_FIELD: "studio.png",
+                COMFYUI_IMAGE_STORAGE_URI_FIELD: "local://artifacts/images/studio.png",
+            }
+        )
+        == "local://artifacts/images/studio.png"
+    )
+    assert comfyui_image_storage_reference({COMFYUI_IMAGE_FILENAME_FIELD: "studio.png"}) == (
         "comfyui://output/studio.png"
     )
 

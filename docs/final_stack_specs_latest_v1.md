@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 499 passed, 1 warning
+Final validation: 500 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -86,7 +86,7 @@ backend/audit_contracts.py: shared audit scope payload field names.
 backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
-backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
+backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image field names, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
 backend/source_freshness_contracts.py: shared source-freshness schema defaults and unchanged-source predicate for fresh source snapshots and cache replay.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, registry metadata key contracts, and registry metadata payload shape.
@@ -114,7 +114,7 @@ backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact,
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, embedding, vector-search, and result-score boundaries.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
-backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
+backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image response/storage contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and shared rubric scoring boundaries.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and adapter-secret boundaries directly.
 backend/publishing_contracts.py: shared local publishing ID prefix, dry-run response fields, and deterministic ID material shape.

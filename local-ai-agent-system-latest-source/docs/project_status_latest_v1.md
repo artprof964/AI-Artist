@@ -40,7 +40,7 @@ GitHub adapter contracts and token-required message routing: centralized in back
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, structured unredacted-secret checks, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
 Audit scope payload field names: centralized in backend/audit_contracts.py
-ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
+ComfyUI generated-image URI, response field names, response validation contracts, and storage-reference resolution: centralized in backend/comfyui_contracts.py
 Gated adapter action and target labels: centralized in backend/adapter_gate_contracts.py
 Adapter result field vocabulary and mapping: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py with shared payload field and audit event type contracts
@@ -185,7 +185,7 @@ Payload fields: shared across Slack event parsing, nested event object validatio
 Slack adapter boundaries: shared payload, request identity, secret-redaction, adapter secret, Slack contract, and connection error-message helpers are called directly without local wrapper functions
 Slack adapter contracts: shared across source labels, requester/policy scopes, local request payloads, outbound payloads, inbound event validation messages, outbound response validation messages, and token-purpose text
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, provider response field names, response validation messages, ComfyUI image response parsing, and publishing audit status parsing
-ComfyUI contracts: shared across image provenance response validation, storage URI construction, and future ComfyUI adapter response handling
+ComfyUI contracts: shared across image provenance response-field lookup, response validation, storage URI construction, storage-reference fallback, and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety, URL validation messages, and source-ingestion domain allowlisting
 Connection endpoint URLs and env example rendering/parsing: shared across readiness health, backup, restore command definitions, `.env.example`, and readiness validation
 Shell commands: shared across readiness health, backup, and restore command definitions
@@ -227,6 +227,7 @@ process argument validation: 2 focused files passed; OPA tests guarded against l
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
+ComfyUI response contract validation: 22 focused tests passed; response image field names and storage-reference fallback centralized in comfyui_contracts.py
 runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
@@ -237,7 +238,7 @@ adapter result field validation: 48 focused tests passed; gated adapter result e
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 runtime field contract validation: 17 focused tests passed; service observability and OpenClaw policy telemetry field names share runtime_field_contracts.py
 knowledge vector payload validation: 20 focused tests passed; vector payload fields and payload construction centralized in knowledge_contracts.py
-final pytest: 499 passed, 1 warning
+final pytest: 500 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

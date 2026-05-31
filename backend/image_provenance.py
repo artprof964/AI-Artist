@@ -6,12 +6,13 @@ from typing import Any, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text
 from backend.comfyui_contracts import (
+    COMFYUI_RESPONSE_IMAGES_FIELD,
     COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED,
     COMFYUI_RESPONSE_IMAGES_REQUIRED,
-    comfyui_image_storage_uri,
+    comfyui_image_storage_reference,
 )
 from backend.model_coercion import coerce_model
-from backend.response_fields import field_value, required_response_list, require_response_mapping
+from backend.response_fields import required_response_list, require_response_mapping
 from backend.review_status import ReviewStatus
 from backend.time_utils import as_utc, utc_now
 from pydantic import BaseModel, ConfigDict, Field
@@ -136,7 +137,7 @@ def record_comfyui_image_provenance(
 ) -> list[ImageProvenanceRecord]:
     images = required_response_list(
         client_response,
-        "images",
+        COMFYUI_RESPONSE_IMAGES_FIELD,
         error_type=ImageProvenanceError,
         message=COMFYUI_RESPONSE_IMAGES_REQUIRED,
     )
@@ -157,8 +158,7 @@ def record_comfyui_image_provenance(
                     "model": model,
                     "seed": seed,
                     "source_refs": source_refs,
-                    "storage_uri": field_value(image_response, "storage_uri")
-                    or comfyui_image_storage_uri(
+                    "storage_uri": comfyui_image_storage_reference(
                         image_response,
                         error_type=ImageProvenanceError,
                     ),
