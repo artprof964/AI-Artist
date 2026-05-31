@@ -27,18 +27,19 @@ can be marked done.
 15. Cache and source-freshness reason strings use `backend/reason_messages.py`.
 16. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 17. Generated-image review status vocabulary and checks use `backend/review_status.py`.
-18. Text tokenization and label/tag normalization use `backend/text_utils.py`.
-19. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
-20. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-21. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
-22. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-23. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
-24. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-25. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-26. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-27. Telemetry stages and log levels use `backend/observability.py`.
-28. Publishing outcome statuses use `backend/publishing_status.py`.
-29. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+18. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
+19. Text tokenization and label/tag normalization use `backend/text_utils.py`.
+20. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
+21. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+22. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
+23. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+24. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+25. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+26. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+27. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+28. Telemetry stages and log levels use `backend/observability.py`.
+29. Publishing outcome statuses use `backend/publishing_status.py`.
+30. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope

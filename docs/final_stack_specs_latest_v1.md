@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 295 passed, 1 skipped, 1 warning
+Final validation: 299 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -58,6 +58,7 @@ backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and
 backend/reason_messages.py: shared cache and source-freshness reason strings.
 backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, and counting helpers.
 backend/review_status.py: shared generated-image review status vocabulary and checks.
+backend/critic_rubric.py: shared Critic/Curator rubric categories and pass/fail decision vocabulary.
 backend/text_utils.py: shared text tokenization and label normalization.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
 backend/time_utils.py: shared UTC datetime creation and normalization.
@@ -144,6 +145,8 @@ logic is added.
 Generated image review status vocabulary and checks must flow through
 backend/review_status.py before provenance, critic, or publishing-specific
 review status logic is added.
+Critic/Curator rubric categories and decisions must flow through
+backend/critic_rubric.py before scorer-specific rubric logic is added.
 Text tokenization and label/tag normalization must flow through
 backend/text_utils.py before classifier, retrieval, or rubric-specific token
 parsing logic is added.

@@ -69,8 +69,11 @@
 - `../../backend/image_provenance.py`
 - `../../tests/test_image_provenance.py`
 - `../../validation_reports/t19_critic_curator_validation_2026-05-31.md`
+- `../../validation_reports/critic_rubric_standardization_2026-05-31.md`
 - `../../validation_reports/model_coercion_boundary_standardization_2026-05-31.md`
+- `../../backend/critic_rubric.py`
 - `../../backend/critic_curator.py`
+- `../../tests/test_critic_rubric.py`
 - `../../tests/test_critic_curator.py`
 - `../../validation_reports/t20_slack_adapter_validation_2026-05-31.md`
 - `../../validation_reports/payload_object_standardization_2026-05-31.md`

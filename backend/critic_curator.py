@@ -1,35 +1,25 @@
 from __future__ import annotations
 
-from typing import Literal
-
 from pydantic import BaseModel, ConfigDict, Field
 
+from backend.critic_rubric import (
+    CRITIC_DECISION_FAIL,
+    CRITIC_DECISION_PASS,
+    RUBRIC_CATEGORIES,
+    RUBRIC_CATEGORY_ARTIFACT_SEVERITY,
+    RUBRIC_CATEGORY_COMPOSITION,
+    RUBRIC_CATEGORY_PROMPT_ADHERENCE,
+    RUBRIC_CATEGORY_PROVENANCE_COMPLETENESS,
+    RUBRIC_CATEGORY_PUBLICATION_READINESS,
+    RUBRIC_CATEGORY_VISUAL_ORIGINALITY,
+    CriticDecision,
+    RubricCategory,
+)
 from backend.image_provenance import ImageProvenanceRecord
 from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_clamp, rounded_mean
 from backend.review_status import REVIEW_STATUS_REJECTED, is_review_status
 from backend.text_utils import normalize_label, token_set
-
-
-RubricCategory = Literal[
-    "prompt adherence",
-    "composition",
-    "visual originality",
-    "artifact severity",
-    "source/provenance completeness",
-    "publication readiness",
-]
-
-CriticDecision = Literal["pass", "fail"]
-
-RUBRIC_CATEGORIES: tuple[RubricCategory, ...] = (
-    "prompt adherence",
-    "composition",
-    "visual originality",
-    "artifact severity",
-    "source/provenance completeness",
-    "publication readiness",
-)
 
 PASSING_CATEGORY_SCORE = 3.5
 PASSING_OVERALL_SCORE = 3.7
@@ -127,7 +117,7 @@ def score_image_quality(metadata: ImageQualityMetadata | dict[str, object]) -> C
     return CriticCuratorResult(
         image_id=image_metadata.image_id,
         overall_score=overall_score,
-        decision="pass" if passed else "fail",
+        decision=CRITIC_DECISION_PASS if passed else CRITIC_DECISION_FAIL,
         category_scores=category_scores,
         improvement_notes=_collect_improvement_notes(category_scores),
     )
@@ -163,7 +153,7 @@ def _score_prompt_adherence(metadata: ImageQualityMetadata) -> RubricScore:
             critique = "Prompt adherence could not be verified from available metadata."
 
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Add visible subject/style terms that match the prompt."]
-    return _rubric_score("prompt adherence", score, critique, notes)
+    return _rubric_score(RUBRIC_CATEGORY_PROMPT_ADHERENCE, score, critique, notes)
 
 
 def _score_composition(metadata: ImageQualityMetadata) -> RubricScore:
@@ -177,7 +167,7 @@ def _score_composition(metadata: ImageQualityMetadata) -> RubricScore:
 
     critique = f"Composition has {strong_count} strong signals and {weak_count} weak signals."
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Improve framing, focal hierarchy, lighting, or visual balance."]
-    return _rubric_score("composition", score, critique, notes)
+    return _rubric_score(RUBRIC_CATEGORY_COMPOSITION, score, critique, notes)
 
 
 def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
@@ -188,7 +178,7 @@ def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
 
     critique = f"Originality has {positive_count} positive markers and {weak_count} weak markers."
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Add a clearer concept twist, material treatment, or viewpoint."]
-    return _rubric_score("visual originality", score, critique, notes)
+    return _rubric_score(RUBRIC_CATEGORY_VISUAL_ORIGINALITY, score, critique, notes)
 
 
 def _score_artifact_severity(metadata: ImageQualityMetadata) -> RubricScore:
@@ -201,14 +191,14 @@ def _score_artifact_severity(metadata: ImageQualityMetadata) -> RubricScore:
         f"and {critical_count} critical flags."
     )
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Regenerate or repair visible artifacts before review."]
-    return _rubric_score("artifact severity", score, critique, notes)
+    return _rubric_score(RUBRIC_CATEGORY_ARTIFACT_SEVERITY, score, critique, notes)
 
 
 def _score_provenance_completeness(metadata: ImageQualityMetadata) -> RubricScore:
     provenance = metadata.provenance
     if provenance is None:
         return _rubric_score(
-            "source/provenance completeness",
+            RUBRIC_CATEGORY_PROVENANCE_COMPLETENESS,
             0.0,
             "No ImageProvenanceRecord is attached.",
             ["Attach ImageProvenanceRecord metadata before curation."],
@@ -227,7 +217,7 @@ def _score_provenance_completeness(metadata: ImageQualityMetadata) -> RubricScor
     score = round((sum(checks) / len(checks)) * 5, 2)
     critique = f"Provenance includes {sum(checks)} of {len(checks)} required metadata signals."
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Record prompt/workflow hashes, source refs, model, seed, and storage URI."]
-    return _rubric_score("source/provenance completeness", score, critique, notes)
+    return _rubric_score(RUBRIC_CATEGORY_PROVENANCE_COMPLETENESS, score, critique, notes)
 
 
 def _score_publication_readiness(
@@ -248,7 +238,7 @@ def _score_publication_readiness(
         notes.append("Resolve failed rubric categories before publication review.")
     if metadata.content_warnings:
         notes.append("Clear content warnings through human review before publishing.")
-    return _rubric_score("publication readiness", score, critique, notes)
+    return _rubric_score(RUBRIC_CATEGORY_PUBLICATION_READINESS, score, critique, notes)
 
 
 def _rubric_score(
@@ -286,6 +276,8 @@ def _clamp_score(value: float) -> float:
 
 __all__ = [
     "CriticCuratorResult",
+    "CRITIC_DECISION_FAIL",
+    "CRITIC_DECISION_PASS",
     "CriticDecision",
     "ImageQualityMetadata",
     "PASSING_CATEGORY_SCORE",

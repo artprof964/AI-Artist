@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from backend.critic_curator import RUBRIC_CATEGORIES, score_image_batch, score_image_quality
+from backend.critic_rubric import CRITIC_DECISION_FAIL, CRITIC_DECISION_PASS
 from backend.image_provenance import ImageProvenanceRecord
 
 
@@ -67,7 +68,7 @@ def test_scores_strong_image_metadata_with_structured_passing_critique() -> None
     )
 
     assert result.image_id == PROVENANCE.image_id
-    assert result.decision == "pass"
+    assert result.decision == CRITIC_DECISION_PASS
     assert result.overall_score >= 4.0
     assert result.improvement_notes == []
     assert [score.category for score in result.category_scores] == list(RUBRIC_CATEGORIES)
@@ -130,7 +131,7 @@ def test_scores_weak_image_metadata_with_failure_and_improvement_notes() -> None
         }
     )
 
-    assert result.decision == "fail"
+    assert result.decision == CRITIC_DECISION_FAIL
     assert result.overall_score < 3.7
     assert {score.category for score in result.category_scores if not score.passed} == set(
         RUBRIC_CATEGORIES
@@ -166,4 +167,7 @@ def test_batch_scoring_is_deterministic_and_preserves_order() -> None:
     assert [result.model_dump() for result in first_run] == [
         result.model_dump() for result in second_run
     ]
-    assert [result.decision for result in first_run] == ["pass", "fail"]
+    assert [result.decision for result in first_run] == [
+        CRITIC_DECISION_PASS,
+        CRITIC_DECISION_FAIL,
+    ]
