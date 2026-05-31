@@ -3,6 +3,22 @@ from datetime import datetime
 from typing import Any
 
 from backend.observability import record_observability_stage, trace_id_from_request
+from backend.reason_messages import (
+    CACHE_ENTRY_EXPIRED,
+    CACHE_ENTRY_NOT_FOUND,
+    CACHE_HUMAN_APPROVAL_REQUIRED,
+    CACHE_NOT_APPROVED_FOR_REUSE,
+    CACHE_POLICY_DENIED,
+    CACHE_POLICY_SCOPE_MISMATCH,
+    CACHE_REPLAY_APPROVED,
+    CACHE_REQUESTER_SCOPE_MISMATCH,
+    CACHE_REQUEST_FINGERPRINT_MISMATCH,
+    CACHE_REQUIRES_READ_REQUEST,
+    CACHE_REQUIRES_REUSE_OPERATION,
+    CACHE_RESPONSE_NOT_READ_ONLY,
+    CACHE_SOURCES_STALE,
+    SOURCE_FRESHNESS_CHECK_FAILED,
+)
 from backend.schemas import Operation, PolicyEvaluateRequest, PolicyEvaluateResponse, RequestKind
 from backend.time_utils import as_utc, utc_now
 
@@ -76,59 +92,59 @@ def evaluate_cached_response_reuse(
         return decision
 
     if cache_entry is None:
-        return observed_decision(replay=False, reason="cache entry not found")
+        return observed_decision(replay=False, reason=CACHE_ENTRY_NOT_FOUND)
 
     if policy_request.operation != "reuse":
         return observed_decision(
             replay=False,
-            reason="cache replay requires reuse operation",
+            reason=CACHE_REQUIRES_REUSE_OPERATION,
         )
 
     if policy_request.request_kind != "read":
-        return observed_decision(replay=False, reason="cache replay requires read request")
+        return observed_decision(replay=False, reason=CACHE_REQUIRES_READ_REQUEST)
 
     if not policy_request.source_freshness.all_required_sources_unchanged:
-        return observed_decision(replay=False, reason="source freshness check failed")
+        return observed_decision(replay=False, reason=SOURCE_FRESHNESS_CHECK_FAILED)
 
     if policy_request.source_freshness.changed_source_count != 0:
-        return observed_decision(replay=False, reason="source freshness check failed")
+        return observed_decision(replay=False, reason=SOURCE_FRESHNESS_CHECK_FAILED)
 
     if not policy_response.allow:
-        return observed_decision(replay=False, reason="policy denied cache replay")
+        return observed_decision(replay=False, reason=CACHE_POLICY_DENIED)
 
     if policy_response.requires_human_approval:
         return observed_decision(
             replay=False,
-            reason="cache replay must not require human approval",
+            reason=CACHE_HUMAN_APPROVAL_REQUIRED,
         )
 
     if cache_entry.request_kind != "read" or cache_entry.operation != "read":
-        return observed_decision(replay=False, reason="cached response is not read-only")
+        return observed_decision(replay=False, reason=CACHE_RESPONSE_NOT_READ_ONLY)
 
     if cache_entry.request_fingerprint != request_fingerprint:
-        return observed_decision(replay=False, reason="request fingerprint mismatch")
+        return observed_decision(replay=False, reason=CACHE_REQUEST_FINGERPRINT_MISMATCH)
 
     if cache_entry.requester_scope != policy_request.requester_scope:
-        return observed_decision(replay=False, reason="requester scope mismatch")
+        return observed_decision(replay=False, reason=CACHE_REQUESTER_SCOPE_MISMATCH)
 
     if cache_entry.policy_scope != policy_request.policy_scope:
-        return observed_decision(replay=False, reason="policy scope mismatch")
+        return observed_decision(replay=False, reason=CACHE_POLICY_SCOPE_MISMATCH)
 
     if not cache_entry.approved_for_reuse:
         return observed_decision(
             replay=False,
-            reason="cache entry is not approved for reuse",
+            reason=CACHE_NOT_APPROVED_FOR_REUSE,
         )
 
     if not cache_entry.all_sources_unchanged:
-        return observed_decision(replay=False, reason="cache entry sources are stale")
+        return observed_decision(replay=False, reason=CACHE_SOURCES_STALE)
 
     if as_utc(cache_entry.expires_at) <= checked_at:
-        return observed_decision(replay=False, reason="cache entry expired")
+        return observed_decision(replay=False, reason=CACHE_ENTRY_EXPIRED)
 
     return observed_decision(
         replay=True,
-        reason="approved read-only cached response replayed",
+        reason=CACHE_REPLAY_APPROVED,
         cache_key=cache_entry.cache_key,
         response_body=cache_entry.response_body,
     )

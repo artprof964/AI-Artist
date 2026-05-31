@@ -31,6 +31,7 @@ Canonical hashing, HMAC signatures, and security-review serialization: centraliz
 Request identity and trace IDs: centralized in backend/request_identity.py
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
+Cache and source-freshness reason strings: centralized in backend/reason_messages.py
 Text tokenization and labels: centralized in backend/text_utils.py
 Numeric scoring utilities: centralized in backend/numeric_utils.py
 Time creation/normalization: centralized in backend/time_utils.py
@@ -102,6 +103,7 @@ Canonical hashing: shared across Safety Service request fingerprints, execution-
 Request identity: shared across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
+Reason messages: shared across cache reuse decisions and Safety Service source-freshness denial paths
 Text utilities: shared across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
 Numeric utilities: shared across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
@@ -121,7 +123,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 273 passed, 1 skipped, 1 warning
+final pytest: 275 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

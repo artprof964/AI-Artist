@@ -15,6 +15,7 @@ from backend.operations import (
     is_sensitive_operation,
 )
 from backend.request_identity import normalize_request_text, request_fingerprint
+from backend.reason_messages import SOURCE_FRESHNESS_CHECK_FAILED
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     CanonicalizeRequest,
@@ -131,7 +132,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
     elif not payload.source_freshness.all_required_sources_unchanged:
         response = PolicyEvaluateResponse(
             allow=False,
-            reason="source freshness check failed",
+            reason=SOURCE_FRESHNESS_CHECK_FAILED,
             requires_human_approval=payload.requires_human_approval,
             policy_version=POLICY_VERSION,
         )
@@ -184,7 +185,7 @@ def create_execution_envelope(
     allow = freshness_ok and (not needs_approval or approved)
 
     if not freshness_ok:
-        reason = "source freshness check failed"
+        reason = SOURCE_FRESHNESS_CHECK_FAILED
     elif needs_approval and not approved:
         reason = f"{payload.operation} requires human approval before execution envelope is valid"
     elif needs_approval:

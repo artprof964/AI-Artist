@@ -24,15 +24,16 @@ can be marked done.
 12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 13. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 14. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
-15. Text tokenization and label/tag normalization use `backend/text_utils.py`.
-16. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
-17. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-18. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
-19. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-20. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
-21. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-22. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-23. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+15. Cache and source-freshness reason strings use `backend/reason_messages.py`.
+16. Text tokenization and label/tag normalization use `backend/text_utils.py`.
+17. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
+18. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+19. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
+20. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+21. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+22. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+23. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+24. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -204,6 +205,7 @@ Output:
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
+   - Cache and source-freshness decision text uses the shared reason-message helper.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
 

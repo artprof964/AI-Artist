@@ -30,12 +30,15 @@
 - `../../validation_reports/canonical_hmac_signature_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_id_standardization_2026-05-31.md`
 - `../../validation_reports/mapping_utils_standardization_2026-05-31.md`
+- `../../validation_reports/reason_messages_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
 - `../../backend/runtime_ids.py`
 - `../../backend/mapping_utils.py`
+- `../../backend/reason_messages.py`
 - `../../tests/test_request_identity.py`
 - `../../tests/test_runtime_ids.py`
 - `../../tests/test_mapping_utils.py`
+- `../../tests/test_reason_messages.py`
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`
