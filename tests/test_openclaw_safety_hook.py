@@ -1,8 +1,7 @@
-import json
-
 from fastapi.testclient import TestClient
 
 from backend.app import app
+from backend.canonical_hash import canonical_json
 from backend.openclaw_hook import (
     SafetyDecision,
     ToolCallRequest,
@@ -144,7 +143,7 @@ def test_tool_call_reaches_safety_service_before_adapter_runs() -> None:
             "provider": {"api_key": "[REDACTED]"},
         },
     }
-    serialized_safety_metadata = json.dumps(safety_request.metadata, sort_keys=True)
+    serialized_safety_metadata = canonical_json(safety_request.metadata)
     assert "sk-test-secret" not in serialized_safety_metadata
     assert "oauth-test-secret" not in serialized_safety_metadata
     assert adapter.requests == [request]
@@ -195,7 +194,7 @@ def test_denied_tool_call_never_runs_adapter() -> None:
         "channel": "slack://workspace/channel",
         "headers": {"authorization": "[REDACTED]"},
     }
-    assert "publish-secret" not in json.dumps(safety_request.metadata, sort_keys=True)
+    assert "publish-secret" not in canonical_json(safety_request.metadata)
     assert adapter.requests == []
     assert result.executed is False
     assert result.request_id == request.request_id

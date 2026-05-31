@@ -1,10 +1,10 @@
 from datetime import datetime, timezone
 import hashlib
-import json
 
 import pytest
 from pydantic import ValidationError
 
+from backend.canonical_hash import sha256_json
 from backend.image_provenance import (
     ImageProvenanceError,
     ImageProvenanceInput,
@@ -63,14 +63,7 @@ def test_records_required_provenance_for_every_comfyui_image() -> None:
     )
 
     expected_prompt_hash = hashlib.sha256(PROMPT.encode("utf-8")).hexdigest()
-    expected_workflow_hash = hashlib.sha256(
-        json.dumps(
-            WORKFLOW,
-            ensure_ascii=False,
-            separators=(",", ":"),
-            sort_keys=True,
-        ).encode("utf-8")
-    ).hexdigest()
+    expected_workflow_hash = sha256_json(WORKFLOW, ensure_ascii=False)
 
     assert len(records) == 2
     assert store.list_records() == records

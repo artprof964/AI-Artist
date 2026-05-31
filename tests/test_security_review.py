@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import json
 from pathlib import Path
 import shutil
 
 from backend.audit import REDACTED_SECRET_VALUE, redact_audit_value
+from backend.canonical_hash import canonical_json
 from backend.image_provenance import LocalImageProvenanceStore, record_generated_image_provenance
 from backend.observability import InMemoryObservabilityCollector
 from backend.repo_paths import read_backend_module_text, repo_root_from, repo_path, WORKSPACES_DIR
@@ -70,9 +70,10 @@ def test_audit_payload_review_catches_nested_secret_like_keys_and_values() -> No
     assert redacted["nested"]["items"][0]["token"] == REDACTED_SECRET_VALUE
     assert redacted["nested"]["items"][1]["status"] == "ok"
     assert redacted["message"] == REDACTED_SECRET_VALUE
-    assert "sk-nested-review-secret" not in json.dumps(redacted, sort_keys=True)
-    assert "xoxb-nested-review-secret" not in json.dumps(redacted, sort_keys=True)
-    assert "ghp_nestedreviewsecret0000000000" not in json.dumps(redacted, sort_keys=True)
+    serialized_redacted = canonical_json(redacted)
+    assert "sk-nested-review-secret" not in serialized_redacted
+    assert "xoxb-nested-review-secret" not in serialized_redacted
+    assert "ghp_nestedreviewsecret0000000000" not in serialized_redacted
 
 
 def test_observability_review_redacts_secret_like_fields_from_events() -> None:
@@ -91,14 +92,12 @@ def test_observability_review_redacts_secret_like_fields_from_events() -> None:
         fields=fields,
         metric_tags=fields,
     )
-    serialized = json.dumps(
+    serialized = canonical_json(
         {
             "traces": [record.__dict__ for record in collector.traces()],
             "metrics": [record.__dict__ for record in collector.metrics()],
             "logs": [record.__dict__ for record in collector.logs()],
-        },
-        default=str,
-        sort_keys=True,
+        }
     )
 
     assert review_observability_redaction(fields) == []

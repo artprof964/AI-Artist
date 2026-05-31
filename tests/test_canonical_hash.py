@@ -2,6 +2,7 @@ from datetime import datetime, timezone
 import hashlib
 import hmac
 import json
+from pathlib import Path
 
 from backend.canonical_hash import (
     canonical_json,
@@ -11,6 +12,7 @@ from backend.canonical_hash import (
     sha256_text,
     sha256_version_tag,
 )
+from backend.repo_paths import read_repo_text, repo_root_from
 
 
 def test_canonical_json_sorts_keys_and_removes_whitespace() -> None:
@@ -79,3 +81,17 @@ def test_sha256_version_tag_uses_digest_prefix() -> None:
 
     assert sha256_version_tag(content) == f"sha256:{digest[:12]}"
     assert sha256_version_tag(content, digest_length=20) == f"sha256:{digest[:20]}"
+
+
+def test_non_canonical_hash_tests_do_not_use_json_dumps_directly() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    offenders: list[str] = []
+
+    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
+        if test_path.name == "test_canonical_hash.py":
+            continue
+        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+        if "json.dumps(" in source:
+            offenders.append(test_path.name)
+
+    assert offenders == []

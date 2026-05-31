@@ -1,10 +1,10 @@
-import json
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
 import pytest
 
 from backend.audit import REDACTED_SECRET_VALUE, redacted_audit_mapping
+from backend.canonical_hash import canonical_json
 from backend.observability import (
     TELEMETRY_STAGE_CACHE,
     TELEMETRY_STAGE_ORCHESTRATION,
@@ -186,14 +186,12 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
     assert (TELEMETRY_STAGE_TOOL, "executed") in log_events
     assert all(isinstance(record.fields, dict) for record in logs)
 
-    serialized_telemetry = json.dumps(
+    serialized_telemetry = canonical_json(
         {
             "traces": [record.__dict__ for record in traces],
             "metrics": [record.__dict__ for record in metrics],
             "logs": [record.__dict__ for record in logs],
-        },
-        default=str,
-        sort_keys=True,
+        }
     )
     assert "sk-observability-secret" not in serialized_telemetry
     assert "oauth-observability-secret" not in serialized_telemetry

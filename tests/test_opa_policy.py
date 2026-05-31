@@ -5,6 +5,7 @@ from typing import Any
 
 import pytest
 
+from backend.canonical_hash import canonical_json
 from backend.repo_paths import OPA_POLICY_PATH, repo_path, repo_root_from
 
 REPO_ROOT = repo_root_from(Path(__file__))
@@ -28,7 +29,7 @@ def _run_opa_eval(
     command = _opa_command()
     return subprocess.run(
         [*command, query],
-        input=json.dumps(input_data),
+        input=canonical_json(input_data),
         check=True,
         capture_output=True,
         text=True,
