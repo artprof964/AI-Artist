@@ -34,7 +34,7 @@ can be marked done.
 22. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
 23. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 24. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
-25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering, runtime env resolution, runtime secret resolution, and env-access guards use `backend/connection_settings.py`.
+25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, and env-access guards use `backend/connection_settings.py`.
 26. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 27. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 28. Provider response object/dict field access, first-choice message content extraction, and shape validation use `backend/response_fields.py`.
@@ -108,7 +108,7 @@ Rules:
 - Runtime env and connection settings are resolved through the shared
   connection settings helper before adapters or live tests read provider
   credentials.
-- `.env.example` must match the shared connection settings registry rendering.
+- `.env.example` must match the shared connection settings registry rendering and parsing.
 - Readiness health, backup, and restore endpoint commands compose service URLs
   through the shared connection settings helper.
 - Readiness Docker Compose, curl, and MinIO command syntax, test process

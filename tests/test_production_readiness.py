@@ -8,6 +8,7 @@ from backend.connection_settings import (
     DEFAULT_SAFETY_SERVICE_URL,
     connection_endpoint_url,
     env_example_text,
+    parse_env_text,
 )
 from backend.readiness import (
     BACKUP_COMMANDS,
@@ -58,6 +59,14 @@ def test_env_example_documents_required_readiness_keys_without_real_secrets() ->
 
 def test_env_example_matches_shared_connection_registry_rendering() -> None:
     assert read_repo_text(REPO_ROOT, ENV_EXAMPLE_PATH) == env_example_text()
+
+
+def test_readiness_uses_shared_env_parser() -> None:
+    readiness_source = read_backend_module_text("readiness.py", REPO_ROOT)
+
+    assert parse_env_example is parse_env_text
+    assert "def parse_env_example(" not in readiness_source
+    assert "parse_env_example = parse_env_text" in readiness_source
 
 
 def test_runbook_contains_all_required_readiness_sections() -> None:

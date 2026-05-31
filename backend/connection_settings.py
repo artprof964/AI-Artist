@@ -220,6 +220,17 @@ def env_example_text() -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
+def parse_env_text(env_text: str) -> dict[str, str]:
+    parsed: dict[str, str] = {}
+    for raw_line in env_text.splitlines():
+        line = raw_line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, value = line.split("=", 1)
+        parsed[key.strip()] = value.strip()
+    return parsed
+
+
 def connection_endpoint_url(base_url: str, path: str) -> str:
     return f"{base_url.rstrip('/')}/{path.lstrip('/')}"
 
@@ -254,6 +265,7 @@ __all__ = [
     "env_example_values",
     "env_value",
     "load_connection_settings",
+    "parse_env_text",
     "require_env_value",
     "require_runtime_secret",
     "runtime_env",

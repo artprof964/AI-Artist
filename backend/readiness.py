@@ -10,6 +10,7 @@ from backend.connection_settings import (
     DEFAULT_QDRANT_URL,
     DEFAULT_SAFETY_SERVICE_URL,
     connection_endpoint_url,
+    parse_env_text,
 )
 from backend.health_contracts import health_expected_signal
 from backend.markdown_utils import markdown_heading_text
@@ -223,15 +224,7 @@ RESTORE_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
 )
 
 
-def parse_env_example(env_text: str) -> dict[str, str]:
-    parsed: dict[str, str] = {}
-    for raw_line in env_text.splitlines():
-        line = raw_line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        parsed[key.strip()] = value.strip()
-    return parsed
+parse_env_example = parse_env_text
 
 
 def validate_env_example(env_text: str) -> ReadinessCheck:

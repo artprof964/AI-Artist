@@ -19,6 +19,7 @@ from backend.connection_settings import (
     env_example_text,
     env_example_values,
     load_connection_settings,
+    parse_env_text,
     require_env_value,
     require_runtime_secret,
     runtime_env,
@@ -223,3 +224,20 @@ def test_env_example_text_renders_registry_values_with_section_breaks() -> None:
         "SLACK_BOT_TOKEN=\n"
         "git_ai-artist_codex_token=\n"
     )
+
+
+def test_parse_env_text_reads_assignment_lines_and_ignores_comments() -> None:
+    assert parse_env_text(
+        """
+        # comment
+        deepseek-open-art = example-key
+
+        LLM_API_URL=https://api.deepseek.com
+        invalid-line
+        SLACK_BOT_TOKEN=
+        """
+    ) == {
+        "deepseek-open-art": "example-key",
+        "LLM_API_URL": "https://api.deepseek.com",
+        "SLACK_BOT_TOKEN": "",
+    }
