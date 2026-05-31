@@ -22,7 +22,14 @@ from backend.operations import (
     is_sensitive_operation,
 )
 from backend.request_identity import normalize_request_text, request_fingerprint
-from backend.reason_messages import SOURCE_FRESHNESS_CHECK_FAILED
+from backend.reason_messages import (
+    READ_ENVELOPE_NOT_REQUIRED,
+    READ_POLICY_ALLOWED,
+    SOURCE_FRESHNESS_CHECK_FAILED,
+    operation_approved_with_envelope,
+    operation_requires_human_approval,
+    sensitive_operation_requires_envelope,
+)
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     CanonicalizeRequest,
@@ -132,7 +139,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
     if is_sensitive_operation(payload.operation):
         response = PolicyEvaluateResponse(
             allow=False,
-            reason=f"{payload.operation} requires a later execution envelope and OPA approval",
+            reason=sensitive_operation_requires_envelope(payload.operation),
             requires_human_approval=True,
             policy_version=POLICY_VERSION,
         )
@@ -146,7 +153,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
     else:
         response = PolicyEvaluateResponse(
             allow=True,
-            reason="read-only operation allowed by local scaffold policy",
+            reason=READ_POLICY_ALLOWED,
             requires_human_approval=False,
             policy_version=POLICY_VERSION,
         )
@@ -194,11 +201,11 @@ def create_execution_envelope(
     if not freshness_ok:
         reason = SOURCE_FRESHNESS_CHECK_FAILED
     elif needs_approval and not approved:
-        reason = f"{payload.operation} requires human approval before execution envelope is valid"
+        reason = operation_requires_human_approval(payload.operation)
     elif needs_approval:
-        reason = f"{payload.operation} approved with signed execution envelope"
+        reason = operation_approved_with_envelope(payload.operation)
     else:
-        reason = "read-only operation does not require a privileged execution envelope"
+        reason = READ_ENVELOPE_NOT_REQUIRED
 
     envelope_id = runtime_uuid()
     signature_payload = {

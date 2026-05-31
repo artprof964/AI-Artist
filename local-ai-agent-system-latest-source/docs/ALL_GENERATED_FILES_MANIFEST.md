@@ -31,6 +31,7 @@
 - `../../validation_reports/runtime_id_standardization_2026-05-31.md`
 - `../../validation_reports/mapping_utils_standardization_2026-05-31.md`
 - `../../validation_reports/reason_messages_standardization_2026-05-31.md`
+- `../../validation_reports/policy_reason_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_status_standardization_2026-05-31.md`
 - `../../validation_reports/review_status_standardization_2026-05-31.md`
 - `../../validation_reports/interface_types_standardization_2026-05-31.md`

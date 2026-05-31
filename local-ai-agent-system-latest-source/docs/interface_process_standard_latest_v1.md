@@ -24,7 +24,7 @@ can be marked done.
 12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 13. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 14. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
-15. Cache and source-freshness reason strings use `backend/reason_messages.py`.
+15. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
 16. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 17. Generated-image review status vocabulary and checks use `backend/review_status.py`.
 18. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
@@ -213,7 +213,7 @@ Output:
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
-   - Cache and source-freshness decision text uses the shared reason-message helper.
+   - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
    - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.

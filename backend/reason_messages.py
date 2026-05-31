@@ -15,6 +15,22 @@ CACHE_NOT_APPROVED_FOR_REUSE = "cache entry is not approved for reuse"
 CACHE_SOURCES_STALE = "cache entry sources are stale"
 CACHE_ENTRY_EXPIRED = "cache entry expired"
 CACHE_REPLAY_APPROVED = "approved read-only cached response replayed"
+READ_POLICY_ALLOWED = "read-only operation allowed by local scaffold policy"
+READ_ENVELOPE_NOT_REQUIRED = (
+    "read-only operation does not require a privileged execution envelope"
+)
+
+
+def sensitive_operation_requires_envelope(operation: str) -> str:
+    return f"{operation} requires a later execution envelope and OPA approval"
+
+
+def operation_requires_human_approval(operation: str) -> str:
+    return f"{operation} requires human approval before execution envelope is valid"
+
+
+def operation_approved_with_envelope(operation: str) -> str:
+    return f"{operation} approved with signed execution envelope"
 
 
 __all__ = [
@@ -31,5 +47,10 @@ __all__ = [
     "CACHE_REQUIRES_REUSE_OPERATION",
     "CACHE_RESPONSE_NOT_READ_ONLY",
     "CACHE_SOURCES_STALE",
+    "READ_ENVELOPE_NOT_REQUIRED",
+    "READ_POLICY_ALLOWED",
     "SOURCE_FRESHNESS_CHECK_FAILED",
+    "operation_approved_with_envelope",
+    "operation_requires_human_approval",
+    "sensitive_operation_requires_envelope",
 ]
