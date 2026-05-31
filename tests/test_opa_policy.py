@@ -6,7 +6,12 @@ import pytest
 
 from backend.canonical_hash import canonical_json
 from backend.repo_paths import OPA_POLICY_PATH, repo_path, repo_root_from
-from backend.shell_commands import missing_command_result, run_process
+from backend.shell_commands import (
+    docker_compose_exec_args,
+    missing_command_result,
+    run_process,
+    shell_args,
+)
 
 REPO_ROOT = repo_root_from(Path(__file__))
 OPA_POLICY = repo_path(REPO_ROOT, OPA_POLICY_PATH)
@@ -43,11 +48,7 @@ def _opa_command() -> list[str]:
 
     candidates = [
         (
-            [
-                "docker",
-                "compose",
-                "exec",
-                "-T",
+            docker_compose_exec_args(
                 "opa",
                 "/opa",
                 "eval",
@@ -56,11 +57,11 @@ def _opa_command() -> list[str]:
                 "--data",
                 "/policies/ai_artist.rego",
                 "--stdin-input",
-            ],
+            ),
             "running docker compose opa service",
         ),
         (
-            [
+            shell_args(
                 "opa",
                 "eval",
                 "--format",
@@ -68,7 +69,7 @@ def _opa_command() -> list[str]:
                 "--data",
                 str(OPA_POLICY),
                 "--stdin-input",
-            ],
+            ),
             "local opa CLI",
         ),
     ]

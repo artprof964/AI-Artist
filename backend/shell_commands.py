@@ -9,12 +9,24 @@ def shell_command(*parts: object) -> str:
     return " ".join(str(part) for part in parts if str(part))
 
 
+def shell_args(*parts: object) -> list[str]:
+    return [str(part) for part in parts if str(part)]
+
+
 def docker_compose_command(*args: object) -> str:
     return shell_command("docker", "compose", *args)
 
 
+def docker_compose_args(*args: object) -> list[str]:
+    return shell_args("docker", "compose", *args)
+
+
 def docker_compose_exec(service: str, *args: object, tty: bool = False) -> str:
     return docker_compose_command("exec", "" if tty else "-T", service, *args)
+
+
+def docker_compose_exec_args(service: str, *args: object, tty: bool = False) -> list[str]:
+    return docker_compose_args("exec", "" if tty else "-T", service, *args)
 
 
 def curl_command(url: str, *, method: str | None = None, flags: str = "-fsS") -> str:
@@ -89,7 +101,9 @@ def parse_delimited_values_for_key(
 
 __all__ = [
     "curl_command",
+    "docker_compose_args",
     "docker_compose_command",
+    "docker_compose_exec_args",
     "docker_compose_exec",
     "missing_command_result",
     "minio_command",
@@ -97,5 +111,6 @@ __all__ = [
     "parse_delimited_key_value_rows",
     "parse_delimited_values_for_key",
     "run_process",
+    "shell_args",
     "shell_command",
 ]

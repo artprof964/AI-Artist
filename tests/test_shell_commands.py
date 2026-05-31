@@ -3,7 +3,9 @@ from pathlib import Path
 
 from backend.shell_commands import (
     curl_command,
+    docker_compose_args,
     docker_compose_command,
+    docker_compose_exec_args,
     docker_compose_exec,
     missing_command_result,
     minio_command,
@@ -11,6 +13,7 @@ from backend.shell_commands import (
     parse_delimited_key_value_rows,
     parse_delimited_values_for_key,
     run_process,
+    shell_args,
     shell_command,
 )
 from backend.repo_paths import read_repo_text, repo_root_from
@@ -18,12 +21,31 @@ from backend.repo_paths import read_repo_text, repo_root_from
 
 def test_shell_command_helpers_build_expected_command_lines() -> None:
     assert shell_command("docker", "compose", "", "ps") == "docker compose ps"
+    assert shell_args("docker", "compose", "", "ps") == ["docker", "compose", "ps"]
     assert docker_compose_command("up", "-d", "postgres", "redis") == (
         "docker compose up -d postgres redis"
     )
+    assert docker_compose_args("up", "-d", "postgres", "redis") == [
+        "docker",
+        "compose",
+        "up",
+        "-d",
+        "postgres",
+        "redis",
+    ]
     assert docker_compose_exec("postgres", "pg_isready", "-U", "ai_artist") == (
         "docker compose exec -T postgres pg_isready -U ai_artist"
     )
+    assert docker_compose_exec_args("postgres", "pg_isready", "-U", "ai_artist") == [
+        "docker",
+        "compose",
+        "exec",
+        "-T",
+        "postgres",
+        "pg_isready",
+        "-U",
+        "ai_artist",
+    ]
     assert curl_command("http://localhost:6333/healthz") == (
         "curl.exe -fsS http://localhost:6333/healthz"
     )
@@ -39,6 +61,13 @@ def test_docker_compose_exec_can_keep_tty_when_needed() -> None:
     assert docker_compose_exec("postgres", "bash", tty=True) == (
         "docker compose exec postgres bash"
     )
+    assert docker_compose_exec_args("postgres", "bash", tty=True) == [
+        "docker",
+        "compose",
+        "exec",
+        "postgres",
+        "bash",
+    ]
 
 
 def test_run_process_centralizes_subprocess_defaults(monkeypatch) -> None:
@@ -125,3 +154,12 @@ def test_postgres_migration_tests_use_shared_delimited_output_parsers() -> None:
     assert "def parse_psql_values(" not in source
     assert "parse_delimited_int_values(" in source
     assert "parse_delimited_values_for_key(" in source
+
+
+def test_opa_policy_tests_use_shared_process_argument_builders() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    source = read_repo_text(repo_root, Path("tests") / "test_opa_policy.py")
+
+    assert "docker_compose_exec_args(" in source
+    assert "shell_args(" in source
+    assert '"docker",\n                "compose",' not in source

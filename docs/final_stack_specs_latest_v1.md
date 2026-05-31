@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 409 passed, 1 skipped, 1 warning
+Final validation: 410 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -89,7 +89,7 @@ backend/response_cache.py: approved read-only response cache using shared reques
 backend/source_freshness.py: dependency snapshot, stale-source checks, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution and guards, endpoint URL composition, env-example rendering/parsing, and connection settings loader.
-backend/shell_commands.py: shared shell command construction for Docker Compose, curl, and MinIO command definitions plus subprocess execution defaults and delimited process-output parsing.
+backend/shell_commands.py: shared shell command and process argument construction for Docker Compose, curl, MinIO, and OPA command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, shared runtime secret resolution, and redacted smoke request path.
