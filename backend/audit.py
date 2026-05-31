@@ -7,6 +7,7 @@ from typing import Any, Protocol
 from uuid import UUID
 
 from backend.schemas import AuditEventRequest, AuditEventResponse, AuditEventType
+from backend.payload_fields import string_field_or_none
 from backend.secret_redaction import (
     REDACTED_SECRET_VALUE,
     redact_secret_value,
@@ -76,8 +77,8 @@ def audit_record_from_request(payload: AuditEventRequest) -> AuditEventRecord:
         audit_event_id=payload.event_id,
         correlation_id=payload.correlation_id,
         event_type=payload.event_type,
-        actor_scope=_optional_payload_string(redacted_payload, "actor_scope"),
-        policy_scope=_optional_payload_string(redacted_payload, "policy_scope"),
+        actor_scope=string_field_or_none(redacted_payload, "actor_scope"),
+        policy_scope=string_field_or_none(redacted_payload, "policy_scope"),
         request_id=payload.request_id,
         payload=redacted_payload,
         created_at=payload.occurred_at,
@@ -112,8 +113,3 @@ def list_audit_events_by_correlation_id(
         audit_response_from_record(record)
         for record in repository.list_by_correlation_id(correlation_id)
     ]
-
-
-def _optional_payload_string(payload: dict[str, Any], key: str) -> str | None:
-    value = payload.get(key)
-    return value if isinstance(value, str) else None

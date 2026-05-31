@@ -42,6 +42,9 @@
 - `../../backend/critic_curator.py`
 - `../../tests/test_critic_curator.py`
 - `../../validation_reports/t20_slack_adapter_validation_2026-05-31.md`
+- `../../validation_reports/payload_object_standardization_2026-05-31.md`
+- `../../backend/payload_fields.py`
+- `../../tests/test_payload_fields.py`
 - `../../backend/slack_adapter.py`
 - `../../tests/test_slack_adapter.py`
 - `../../validation_reports/t21_source_ingestion_validation_2026-05-31.md`

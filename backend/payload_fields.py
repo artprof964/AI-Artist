@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from collections.abc import Mapping
 from typing import Any
 
 
@@ -38,8 +39,28 @@ def optional_string_field(
     return value
 
 
+def string_field_or_none(payload: Mapping[str, Any], key: str) -> str | None:
+    value = payload.get(key)
+    return value if isinstance(value, str) else None
+
+
+def required_mapping_field(
+    payload: Mapping[str, Any],
+    key: str,
+    *,
+    error_type: type[Exception] = PayloadFieldError,
+    message: str | None = None,
+) -> Mapping[str, Any]:
+    value = payload.get(key)
+    if not isinstance(value, Mapping):
+        raise error_type(message or f"payload field {key!r} must be an object")
+    return value
+
+
 __all__ = [
     "PayloadFieldError",
     "optional_string_field",
+    "required_mapping_field",
     "required_string_field",
+    "string_field_or_none",
 ]

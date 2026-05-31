@@ -24,7 +24,7 @@ can be marked done.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
 13. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
 14. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
-15. Connector payload string-field extraction uses `backend/payload_fields.py`.
+15. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 16. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
 17. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 18. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
@@ -180,7 +180,7 @@ Output:
 ```text
 1. Intake
    - OpenClaw receives the request and loads workspace context.
-   - Channel adapters validate required and optional connector string fields through the shared payload-field helper.
+   - Channel adapters and audit records validate connector strings and nested payload objects through the shared payload-field helper.
 
 2. Normalize
    - Safety Service canonicalizes request text and builds a stable fingerprint.

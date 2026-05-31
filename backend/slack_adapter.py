@@ -4,7 +4,11 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
-from backend.payload_fields import optional_string_field, required_string_field
+from backend.payload_fields import (
+    optional_string_field,
+    required_mapping_field,
+    required_string_field,
+)
 from backend.request_identity import normalize_request_text, stable_request_uuid
 from backend.secret_redaction import (
     LOWER_REDACTED_SECRET_VALUE,
@@ -77,9 +81,16 @@ class SlackAdapter:
         self._bot_token = bot_token
 
     def normalize_inbound_event(self, payload: dict[str, Any]) -> SlackRequestEnvelope:
-        event = payload.get("event", payload)
-        if not isinstance(event, dict):
-            raise SlackAdapterError("Slack payload must include an event object")
+        event = (
+            required_mapping_field(
+                payload,
+                "event",
+                error_type=SlackAdapterError,
+                message="Slack payload must include an event object",
+            )
+            if "event" in payload
+            else payload
+        )
 
         channel = _required_string(event, "channel")
         user = _required_string(event, "user")

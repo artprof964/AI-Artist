@@ -3,7 +3,9 @@ import pytest
 from backend.payload_fields import (
     PayloadFieldError,
     optional_string_field,
+    required_mapping_field,
     required_string_field,
+    string_field_or_none,
 )
 
 
@@ -43,3 +45,20 @@ def test_optional_string_field_can_preserve_empty_strings() -> None:
 def test_optional_string_field_rejects_non_string_values() -> None:
     with pytest.raises(PayloadFieldError, match="payload field 'thread_ts' must be a string"):
         optional_string_field({"thread_ts": 123}, "thread_ts")
+
+
+def test_string_field_or_none_ignores_missing_or_non_string_values() -> None:
+    assert string_field_or_none({}, "actor_scope") is None
+    assert string_field_or_none({"actor_scope": 123}, "actor_scope") is None
+    assert string_field_or_none({"actor_scope": "user:local"}, "actor_scope") == "user:local"
+
+
+def test_required_mapping_field_returns_nested_mapping() -> None:
+    event = {"channel": "C123"}
+
+    assert required_mapping_field({"event": event}, "event") == event
+
+
+def test_required_mapping_field_rejects_missing_or_non_mapping_values() -> None:
+    with pytest.raises(PayloadFieldError, match="payload field 'event' must be an object"):
+        required_mapping_field({"event": "not-object"}, "event")
