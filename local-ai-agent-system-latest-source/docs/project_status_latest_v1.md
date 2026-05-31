@@ -48,6 +48,7 @@ Payload fields and nested payload objects: centralized in backend/payload_fields
 Response fields and first-choice message parsing: centralized in backend/response_fields.py
 URL validation: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
 HTTP method vocabulary and normalization: centralized in backend/http_methods.py
+File scanning suffixes and discovery: centralized in backend/file_scanning.py
 Operations: centralized in backend/operations.py
 Model coercion: centralized in backend/model_coercion.py and called directly at domain boundaries
 Telemetry stages and log levels: centralized in backend/observability.py
@@ -135,6 +136,7 @@ Response fields: shared directly across provider-neutral LLM API response parsin
 ComfyUI contracts: shared across image provenance storage URI construction and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety and source-ingestion domain allowlisting
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
+File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
@@ -152,7 +154,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 336 passed, 1 skipped, 1 warning
+final pytest: 339 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

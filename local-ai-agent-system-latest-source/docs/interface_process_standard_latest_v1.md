@@ -48,6 +48,7 @@ can be marked done.
 36. Source registry missing-row messages use `backend/source_registry_contracts.py`.
 37. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
 38. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
+39. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 ```
 
 ## Standard Request Envelope
@@ -257,6 +258,7 @@ Output:
    - Every request, cache reuse, policy decision, execution envelope, tool call,
      and artifact is recorded.
    - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
+   - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
 ```
 
 ## Definition Of Done

@@ -3,10 +3,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from pathlib import Path
 import re
-from typing import Any, Iterable
+from typing import Any
 
 from backend.audit import redact_audit_value
 from backend.canonical_hash import canonical_json
+from backend.file_scanning import iter_review_text_files
 from backend.image_provenance import ImageProvenanceRecord
 from backend.mapping_utils import copy_mapping
 from backend.observability import InMemoryObservabilityCollector, TELEMETRY_STAGE_TOOL
@@ -21,7 +22,6 @@ from backend.secret_redaction import contains_secret_like_value
 from backend.runtime_ids import runtime_uuid
 
 
-TEXT_REVIEW_SUFFIXES = {".json", ".md", ".txt", ".yaml", ".yml"}
 OPA_POLICY = Path("policies") / "opa" / "ai_artist.rego"
 
 
@@ -34,7 +34,7 @@ class SecurityReviewFinding:
 
 def scan_workspace_secret_files(workspaces_root: Path) -> list[SecurityReviewFinding]:
     findings: list[SecurityReviewFinding] = []
-    for path in _iter_text_review_files(workspaces_root):
+    for path in iter_review_text_files(workspaces_root):
         text = path.read_text(encoding="utf-8")
         for line_number, line in enumerate(text.splitlines(), start=1):
             if contains_secret_like_value(line):
@@ -167,16 +167,6 @@ def review_provenance_metadata(
             )
         )
     return findings
-
-
-def _iter_text_review_files(root: Path) -> Iterable[Path]:
-    if not root.exists():
-        return []
-    return (
-        path
-        for path in sorted(root.rglob("*"))
-        if path.is_file() and path.suffix.lower() in TEXT_REVIEW_SUFFIXES
-    )
 
 
 def _find_unredacted_secrets(value: Any, *, surface: str) -> list[SecurityReviewFinding]:

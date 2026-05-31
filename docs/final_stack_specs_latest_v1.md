@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 336 passed, 1 skipped, 1 warning
+Final validation: 339 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -66,6 +66,7 @@ backend/payload_fields.py: shared connector payload string-field and nested-obje
 backend/response_fields.py: shared provider response field access, first-choice message parsing, and shape validation.
 backend/url_utils.py: shared URL domain and relative API path validation.
 backend/http_methods.py: shared HTTP method vocabulary and normalization for connector boundaries.
+backend/file_scanning.py: shared reviewable text-file suffixes and recursive scanner file discovery.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and domain boundaries.
 backend/adapter_results.py: shared gated adapter result field mapping.
@@ -192,6 +193,9 @@ backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.
 HTTP method vocabulary and normalization must flow through backend/http_methods.py
 before connector-specific method allowlists are added.
+Reviewable text-file suffixes and recursive scanner discovery must flow through
+backend/file_scanning.py before security review or future scanner paths inspect
+workspace files.
 Operation constants, classifier term maps, and sensitive-operation rules must
 flow through backend/operations.py before service or adapter operation logic is
 added.
