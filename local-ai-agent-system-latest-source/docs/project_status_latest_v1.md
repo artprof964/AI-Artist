@@ -132,7 +132,7 @@ Test path/source helpers: shared across repo-wide guard tests, filesystem/proces
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, signature, and expiry failures
-Secret detection and redaction: shared directly across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
+Secret detection and redaction: shared directly across audit, observability, LLM smoke request logging, OpenClaw hook, GitHub, Slack, and security review
 Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
@@ -199,11 +199,11 @@ process argument validation: 2 focused files passed; OPA tests guarded against l
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
-runtime secret validation: LLM API smoke, GitHub, and Slack guarded against local runtime-token resolution
+runtime secret validation: LLM API smoke, GitHub, and Slack guarded against local runtime-token resolution; LLM smoke guarded against local redaction wrappers
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 412 passed, 1 skipped, 1 warning
+final pytest: 413 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

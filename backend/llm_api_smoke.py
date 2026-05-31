@@ -48,10 +48,6 @@ def load_llm_api_model_config(env: Mapping[str, str] | None = None) -> LLMAPIMod
     )
 
 
-def redact_secrets(value: Any) -> Any:
-    return redact_secret_value(value, redact_string_values=False)
-
-
 def build_smoke_request(config: LLMAPIModelConfig) -> dict[str, Any]:
     return {
         "model": config.primary_model,
@@ -83,12 +79,13 @@ def run_llm_api_smoke_test(
     )
 
     return {
-        "request": redact_secrets(
+        "request": redact_secret_value(
             {
                 "api_key": config.api_key,
                 "base_url": config.api_url,
                 "json": request_body,
-            }
+            },
+            redact_string_values=False,
         ),
         "response_id": field_value(response, "id"),
         "model": field_value(response, "model", config.primary_model),

@@ -15,9 +15,9 @@ from backend.llm_api_smoke import (
     SECRET_REDACTION,
     build_smoke_request,
     load_llm_api_model_config,
-    redact_secrets,
     run_llm_api_smoke_test,
 )
+from backend.secret_redaction import redact_secret_value
 from path_helpers import read_backend_source
 
 
@@ -51,7 +51,9 @@ def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
     assert config.classifier_model == "provider-classifier-model"
     assert config.embedding_model == "provider-embedding-model"
     assert config.api_key == "llm-test-secret"
-    assert "llm-test-secret" not in repr(redact_secrets(config.__dict__))
+    assert "llm-test-secret" not in repr(
+        redact_secret_value(config.__dict__, redact_string_values=False)
+    )
 
 
 def test_llm_api_model_config_allows_provider_overrides() -> None:
@@ -100,13 +102,14 @@ def test_smoke_request_targets_configured_llm_api_model() -> None:
     assert request["extra_body"] == {"thinking": {"type": "enabled"}}
 
 
-def test_redact_secrets_removes_nested_sensitive_values() -> None:
-    redacted = redact_secrets(
+def test_shared_redaction_removes_nested_sensitive_values() -> None:
+    redacted = redact_secret_value(
         {
             "Authorization": "Bearer llm-test-secret",
             "json": {"api_key": "llm-nested-secret", "model": "any-provider-model"},
             "items": [{"token": "xoxb-secret", "status": "ok"}],
-        }
+        },
+        redact_string_values=False,
     )
 
     assert redacted["Authorization"] == SECRET_REDACTION
@@ -152,6 +155,13 @@ def test_llm_api_smoke_uses_shared_response_choice_parser() -> None:
 
     assert "def _first_choice_content(" not in source
     assert "first_choice_message_content(" in source
+
+
+def test_llm_api_smoke_calls_shared_secret_redaction_directly() -> None:
+    source = read_backend_source("llm_api_smoke.py")
+
+    assert "def redact_secrets(" not in source
+    assert "redact_secret_value(" in source
 
 
 def test_llm_api_smoke_uses_shared_runtime_secret_resolver() -> None:
