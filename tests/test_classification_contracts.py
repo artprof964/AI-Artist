@@ -1,15 +1,10 @@
-from pathlib import Path
-
 from backend.classification_contracts import (
     CLASSIFICATION_CONFIDENCE_DEFAULT,
     CLASSIFICATION_CONFIDENCE_MIXED,
     classification_confidence,
     classification_reasons,
 )
-from backend.repo_paths import read_backend_module_text, repo_root_from
-
-
-REPO_ROOT = repo_root_from(Path(__file__))
+from path_helpers import read_backend_source
 
 
 def test_classification_confidence_is_centralized_by_request_kind() -> None:
@@ -26,7 +21,7 @@ def test_classification_reasons_are_centralized() -> None:
 
 
 def test_service_uses_shared_classification_contracts() -> None:
-    service_source = read_backend_module_text("service.py", REPO_ROOT)
+    service_source = read_backend_source("service.py")
 
     assert "classification_confidence(request_kind)" in service_source
     assert "classification_reasons(" in service_source

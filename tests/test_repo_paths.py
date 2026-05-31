@@ -108,3 +108,24 @@ def test_repo_wide_guard_tests_use_shared_test_path_helpers() -> None:
             offenders.append(test_filename)
 
     assert sorted(set(offenders)) == []
+
+
+def test_migrated_source_inspection_tests_use_shared_path_helpers() -> None:
+    migrated_tests = {
+        "test_classification_contracts.py",
+        "test_health_contracts.py",
+        "test_production_readiness.py",
+        "test_request_metadata.py",
+        "test_tree_shape.py",
+    }
+    offenders: list[str] = []
+
+    for test_filename, source in iter_test_module_sources():
+        if test_filename not in migrated_tests:
+            continue
+        if "repo_root_from(Path(__file__))" in source:
+            offenders.append(test_filename)
+        if "read_backend_module_text(" in source or "read_repo_text(" in source:
+            offenders.append(test_filename)
+
+    assert sorted(set(offenders)) == []

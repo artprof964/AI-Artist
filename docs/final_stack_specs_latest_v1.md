@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 411 passed, 1 skipped, 1 warning
+Final validation: 412 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -92,7 +92,7 @@ backend/connection_settings.py: registry-driven env var names, defaults, aliases
 backend/shell_commands.py: shared shell command and process argument construction for Docker Compose, curl, MinIO, and OPA command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
-tests/path_helpers.py: shared test project root, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
+tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, shared runtime secret resolution, and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared secret-redaction boundary.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
@@ -155,8 +155,9 @@ backend module discovery, source-text reads, and source-inspection file reads
 must flow through backend/repo_paths.py before runtime review checks, scaffold
 tests, contract guards, or documentation validators reference Compose, env,
 runbook, OPA policy, PostgreSQL schema, workspace, or backend module files.
-Repo-wide validation tests that scan checked-in test or backend source must use
-tests/path_helpers.py for project root resolution and source iteration.
+Repo-wide validation tests that scan checked-in project, backend, or test source
+must use tests/path_helpers.py for project root resolution, project text reads,
+backend source reads, test source reads, and source iteration.
 Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Execution-envelope validation failure and required-envelope messages must flow through

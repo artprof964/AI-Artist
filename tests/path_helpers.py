@@ -11,8 +11,12 @@ def read_backend_source(module_filename: str) -> str:
     return read_backend_module_text(module_filename, PROJECT_ROOT)
 
 
+def read_project_text(relative_path: Path) -> str:
+    return read_repo_text(PROJECT_ROOT, relative_path)
+
+
 def read_test_source(test_filename: str) -> str:
-    return read_repo_text(PROJECT_ROOT, TESTS_DIR / test_filename)
+    return read_project_text(TESTS_DIR / test_filename)
 
 
 def iter_test_module_sources(
