@@ -6,6 +6,7 @@ from uuid import UUID
 from backend.mapping_utils import copy_mapping
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SourceFreshness
+from backend.source_registry_contracts import source_registry_row_not_found
 from backend.time_utils import utc_now
 
 
@@ -167,10 +168,10 @@ class SourceFreshnessRegistry:
         try:
             return self._sources_by_key[source_key]
         except KeyError as exc:
-            raise KeyError(f"source_data_registry row not found: {source_key}") from exc
+            raise KeyError(source_registry_row_not_found(source_key)) from exc
 
     def _require_source_by_id(self, source_id: UUID) -> SourceRegistryEntry:
         try:
             return self._sources_by_id[source_id]
         except KeyError as exc:
-            raise KeyError(f"source_data_registry row not found: {source_id}") from exc
+            raise KeyError(source_registry_row_not_found(source_id)) from exc

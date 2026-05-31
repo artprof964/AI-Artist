@@ -3,6 +3,10 @@ from datetime import datetime, timedelta, timezone
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.source_freshness import SourceFreshnessRegistry
+from backend.source_registry_contracts import (
+    SOURCE_REGISTRY_ROW_NOT_FOUND,
+    source_registry_row_not_found,
+)
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -126,3 +130,19 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
     assert stale_snapshot.all_required_sources_unchanged is False
     assert stale_decision.replay is False
     assert stale_decision.reason == "source freshness check failed"
+
+
+def test_source_registry_missing_row_message_contract_is_shared() -> None:
+    assert (
+        source_registry_row_not_found("missing-source")
+        == f"{SOURCE_REGISTRY_ROW_NOT_FOUND}: missing-source"
+    )
+
+
+def test_source_freshness_uses_shared_missing_row_message_contract() -> None:
+    source = "backend/source_freshness.py"
+    with open(source, encoding="utf-8") as handle:
+        contents = handle.read()
+
+    assert "source_data_registry row not found:" not in contents
+    assert "source_registry_row_not_found(" in contents

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 329 passed, 1 skipped, 1 warning
+Final validation: 331 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -72,6 +72,7 @@ backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention and response-image storage reference helper.
+backend/source_registry_contracts.py: shared source registry missing-row message contract.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
@@ -151,6 +152,9 @@ backend/mapping_utils.py before domain-specific copy or merge logic is added.
 Cache, source-freshness, policy, and execution-envelope reason strings must
 flow through backend/reason_messages.py before service or cache decision text is
 added.
+Source registry missing-row messages must flow through
+backend/source_registry_contracts.py before source freshness or future
+persistence adapters raise missing-row errors.
 SubAgentOutput status vocabulary, priority, and aggregation must flow through
 backend/subagent_status.py before schema or orchestration-specific status
 logic is added.

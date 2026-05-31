@@ -45,6 +45,7 @@ can be marked done.
 33. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 34. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 35. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
+36. Source registry missing-row messages use `backend/source_registry_contracts.py`.
 ```
 
 ## Standard Request Envelope
@@ -222,6 +223,7 @@ Output:
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
    - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.
+   - Source registry lookup failures format missing-row messages through the shared source registry contract helper.
 
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
