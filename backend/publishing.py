@@ -7,14 +7,14 @@ import json
 from typing import Any
 from uuid import UUID
 
-from backend.audit import record_audit_event
 from backend.publishing_adapter import (
     PublishingAdapter,
     PublishingClient,
     PublishingExecutionGateError,
     PublishingRequest,
 )
-from backend.schemas import AuditEventRequest, AuditEventResponse, ExecutionEnvelopeResponse
+from backend.schemas import AuditEventResponse, ExecutionEnvelopeResponse
+from backend.side_effect_audit import SideEffectAuditContext, record_side_effect_audit_event
 
 
 @dataclass(frozen=True)
@@ -106,24 +106,19 @@ class PublishingAgent:
         request_id: UUID | None = None,
         client_response: dict[str, Any] | None = None,
     ) -> AuditEventResponse:
-        return record_audit_event(
-            AuditEventRequest(
-                event_type="tool_call",
-                request_id=request_id,
+        return record_side_effect_audit_event(
+            context=SideEffectAuditContext(
                 correlation_id=request.correlation_id,
-                payload={
-                    "actor_scope": request.actor_scope,
-                    "policy_scope": request.policy_scope,
-                    "operation": "publish",
-                    "target": request.target,
-                    "status": status,
-                    "reason": reason,
-                    "execution_envelope_id": (
-                        str(execution_envelope_id) if execution_envelope_id else None
-                    ),
-                    "client_response": client_response or {},
-                },
-            )
+                actor_scope=request.actor_scope,
+                policy_scope=request.policy_scope,
+                operation="publish",
+                target=request.target,
+            ),
+            status=status,
+            reason=reason,
+            request_id=request_id,
+            execution_envelope_id=execution_envelope_id,
+            client_response=client_response,
         )
 
 

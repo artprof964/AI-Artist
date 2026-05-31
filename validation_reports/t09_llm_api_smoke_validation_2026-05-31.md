@@ -17,7 +17,7 @@ Validated the provider-neutral LLM API configuration smoke test:
 7 passed, 1 skipped
 
 .venv\Scripts\python -m pytest -q -p no:cacheprovider
-192 passed, 1 skipped, 1 warning
+194 passed, 1 skipped, 1 warning
 
 .venv\Scripts\python -m ruff check backend\llm_api_smoke.py tests\test_llm_api_smoke.py
 All checks passed!
@@ -44,7 +44,7 @@ All checks passed!
 1 passed in 3.38s
 
 .venv\Scripts\python.exe -m pytest -q -p no:cacheprovider
-192 passed, 1 skipped, 1 warning
+194 passed, 1 skipped, 1 warning
 ```
 
 One earlier full-suite attempt failed outside T09 in

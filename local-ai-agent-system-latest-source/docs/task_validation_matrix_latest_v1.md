@@ -27,7 +27,7 @@ contract is satisfied.
 | T19 | Critic/Curator rubrics | Rubric test scores sample images or mocked image metadata and returns structured critique, pass/fail, and improvement notes. | Bestanden | 2026-05-31 |
 | T20 | Slack development channel | Slack adapter test uses a mocked Slack API to confirm inbound request handling and outbound response formatting. | Bestanden | 2026-05-31 |
 | T21 | Source ingestion | Ingestion test imports approved sample sources, stores snapshots, records source registry rows, and rejects disallowed source domains. | Bestanden | 2026-05-31 |
-| T22 | Publishing Agent with human approval | Shared execution-gate tests and publishing tests prove external publishing remains blocked until human approval is attached to the execution envelope. | Bestanden | 2026-05-31 |
+| T22 | Publishing Agent with human approval | Shared execution-gate, side-effect audit, and publishing tests prove external publishing remains blocked until human approval is attached to the execution envelope. | Bestanden | 2026-05-31 |
 | T23 | GitHub adapter | GitHub adapter and adapter-result tests use a mocked GitHub API and confirm `git_ai-artist_codex_token` is read only by the adapter, not agents. | Bestanden | 2026-05-31 |
 | T24 | Unit tests for safety service and policies | CI test suite runs canonicalizer, classifier, OPA, cache, freshness, and audit unit tests with `--cov-fail-under=90` over the safety service modules. | Bestanden | 2026-05-31 |
 | T25 | OpenClaw-to-safety integration tests | End-to-end test sends a request through OpenClaw hook, Safety Service, mock agents, validation, and final response synthesis. | Bestanden | 2026-05-31 |
