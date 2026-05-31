@@ -6,6 +6,7 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from backend.schemas import SubAgentOutput
+from backend.numeric_utils import cosine_similarity
 from backend.text_utils import alnum_tokens
 
 
@@ -176,7 +177,7 @@ class InMemoryQdrantVectorStore:
         hits = [
             VectorSearchHit(
                 point_id=point.point_id,
-                score=_cosine_similarity(query_vector, point.vector),
+                score=cosine_similarity(query_vector, point.vector),
                 payload=dict(point.payload),
             )
             for point in collection.values()
@@ -294,12 +295,6 @@ class KnowledgeAgent:
         if self._approved_source_ids:
             return source_id in self._approved_source_ids
         return hit.payload.get("approved") is True
-
-
-def _cosine_similarity(left: tuple[float, ...], right: tuple[float, ...]) -> float:
-    if len(left) != len(right):
-        raise ValueError("Vector dimensions must match.")
-    return sum(left_value * right_value for left_value, right_value in zip(left, right))
 
 
 def _make_snippet(content: str, query: str, *, max_length: int = 180) -> str:

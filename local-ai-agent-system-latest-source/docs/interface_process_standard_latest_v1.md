@@ -23,13 +23,14 @@ can be marked done.
 11. Canonical hashes, deterministic local IDs, and source version tags are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 13. Text tokenization and label/tag normalization use `backend/text_utils.py`.
-14. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-15. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
-16. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-17. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
-18. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-19. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-20. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
+14. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
+15. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+16. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
+17. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+18. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+19. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+20. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+21. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -205,6 +206,7 @@ Output:
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
+   - Retrieval vector similarity, rubric scoring, and orchestration confidence use shared numeric helpers.
 
 7. Validate
    - Runtime validates `SubAgentOutput`, compares results, retries if needed,

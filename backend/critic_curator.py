@@ -1,12 +1,12 @@
 from __future__ import annotations
 
-from statistics import mean
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.image_provenance import ImageProvenanceRecord
 from backend.model_coercion import coerce_model
+from backend.numeric_utils import rounded_clamp, rounded_mean
 from backend.text_utils import normalize_label, token_set
 
 
@@ -121,7 +121,7 @@ def score_image_quality(metadata: ImageQualityMetadata | dict[str, object]) -> C
     ]
     category_scores.append(_score_publication_readiness(image_metadata, category_scores))
 
-    overall_score = round(mean(score.score for score in category_scores), 2)
+    overall_score = rounded_mean((score.score for score in category_scores), digits=2)
     passed = overall_score >= PASSING_OVERALL_SCORE and all(score.passed for score in category_scores)
     return CriticCuratorResult(
         image_id=image_metadata.image_id,
@@ -233,7 +233,7 @@ def _score_publication_readiness(
     metadata: ImageQualityMetadata,
     earlier_scores: list[RubricScore],
 ) -> RubricScore:
-    base_score = mean(score.score for score in earlier_scores)
+    base_score = rounded_mean((score.score for score in earlier_scores), digits=4)
     if metadata.content_warnings:
         base_score -= 1.5
     if metadata.provenance and metadata.provenance.review_status == "rejected":
@@ -280,7 +280,7 @@ def _coerce_metadata(metadata: ImageQualityMetadata | dict[str, object]) -> Imag
 
 
 def _clamp_score(value: float) -> float:
-    return round(min(5.0, max(0.0, value)), 2)
+    return rounded_clamp(value, minimum=0.0, maximum=5.0, digits=2)
 
 
 __all__ = [

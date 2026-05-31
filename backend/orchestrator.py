@@ -5,6 +5,7 @@ from uuid import UUID, uuid4
 
 from pydantic import BaseModel, Field
 
+from backend.numeric_utils import rounded_mean
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.schemas import (
     SubAgentArtifact,
@@ -194,7 +195,7 @@ def synthesize_subagent_outputs(
 
     status = max(outputs, key=lambda output: STATUS_PRIORITY[output.status]).status
     status_counts = Counter(output.status for output in outputs)
-    confidence = round(sum(output.confidence for output in outputs) / len(outputs), 4)
+    confidence = rounded_mean((output.confidence for output in outputs), digits=4)
 
     summary_parts = [f"{output.agent_name}: {output.summary}" for output in outputs]
     policy_notes = [
