@@ -227,6 +227,49 @@ RESTORE_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
 parse_env_example = parse_env_text
 
 
+def env_example_missing_keys_detail(missing: tuple[str, ...]) -> str:
+    return f".env.example is missing required keys: {', '.join(missing)}"
+
+
+def env_example_real_secret_detail(non_placeholder_secrets: tuple[str, ...]) -> str:
+    return (
+        ".env.example should not contain real secret-looking values for: "
+        f"{', '.join(non_placeholder_secrets)}"
+    )
+
+
+def env_example_pass_detail(required_count: int) -> str:
+    return f".env.example documents {required_count} required keys without real secrets"
+
+
+def runbook_section_pass_detail(heading: str) -> str:
+    return f"Runbook includes {heading}"
+
+
+def runbook_missing_heading_detail(heading: str) -> str:
+    return f"missing heading {heading!r}"
+
+
+def runbook_missing_terms_detail(missing_terms: tuple[str, ...]) -> str:
+    return f"missing terms: {', '.join(missing_terms)}"
+
+
+def readiness_detail_list(details: tuple[str, ...]) -> str:
+    return "; ".join(details)
+
+
+def command_definitions_pass_detail(slug: str) -> str:
+    return f"{slug} command definitions cover required targets"
+
+
+def command_missing_targets_detail(missing_targets: tuple[str, ...]) -> str:
+    return f"missing targets: {', '.join(missing_targets)}"
+
+
+def command_incomplete_detail(incomplete: tuple[str, ...]) -> str:
+    return f"incomplete commands: {', '.join(incomplete)}"
+
+
 def validate_env_example(env_text: str) -> ReadinessCheck:
     env_values = parse_env_example(env_text)
     missing = tuple(required.name for required in REQUIRED_ENV_VARS if required.name not in env_values)
@@ -240,21 +283,18 @@ def validate_env_example(env_text: str) -> ReadinessCheck:
         return ReadinessCheck(
             slug="environment",
             status=ReadinessStatus.FAIL,
-            detail=f".env.example is missing required keys: {', '.join(missing)}",
+            detail=env_example_missing_keys_detail(missing),
         )
     if non_placeholder_secrets:
         return ReadinessCheck(
             slug="environment",
             status=ReadinessStatus.FAIL,
-            detail=(
-                ".env.example should not contain real secret-looking values for: "
-                f"{', '.join(non_placeholder_secrets)}"
-            ),
+            detail=env_example_real_secret_detail(non_placeholder_secrets),
         )
     return ReadinessCheck(
         slug="environment",
         status=ReadinessStatus.PASS,
-        detail=f".env.example documents {len(REQUIRED_ENV_VARS)} required keys without real secrets",
+        detail=env_example_pass_detail(len(REQUIRED_ENV_VARS)),
     )
 
 
@@ -272,20 +312,20 @@ def validate_runbook(runbook_text: str) -> tuple[ReadinessCheck, ...]:
                 ReadinessCheck(
                     slug=f"runbook:{requirement.slug}",
                     status=ReadinessStatus.PASS,
-                    detail=f"Runbook includes {requirement.heading}",
+                    detail=runbook_section_pass_detail(requirement.heading),
                 )
             )
         else:
             details: list[str] = []
             if not heading_present:
-                details.append(f"missing heading {requirement.heading!r}")
+                details.append(runbook_missing_heading_detail(requirement.heading))
             if missing_terms:
-                details.append(f"missing terms: {', '.join(missing_terms)}")
+                details.append(runbook_missing_terms_detail(missing_terms))
             checks.append(
                 ReadinessCheck(
                     slug=f"runbook:{requirement.slug}",
                     status=ReadinessStatus.FAIL,
-                    detail="; ".join(details),
+                    detail=readiness_detail_list(tuple(details)),
                 )
             )
     return tuple(checks)
@@ -316,20 +356,20 @@ def validate_command_definitions() -> tuple[ReadinessCheck, ...]:
                 ReadinessCheck(
                     slug=f"commands:{slug}",
                     status=ReadinessStatus.PASS,
-                    detail=f"{slug} command definitions cover required targets",
+                    detail=command_definitions_pass_detail(slug),
                 )
             )
         else:
             details = []
             if missing_targets:
-                details.append(f"missing targets: {', '.join(missing_targets)}")
+                details.append(command_missing_targets_detail(missing_targets))
             if incomplete:
-                details.append(f"incomplete commands: {', '.join(incomplete)}")
+                details.append(command_incomplete_detail(incomplete))
             checks.append(
                 ReadinessCheck(
                     slug=f"commands:{slug}",
                     status=ReadinessStatus.FAIL,
-                    detail="; ".join(details),
+                    detail=readiness_detail_list(tuple(details)),
                 )
             )
     return tuple(checks)
@@ -357,7 +397,17 @@ __all__ = [
     "RequiredEnvVar",
     "RunbookRequirement",
     "build_readiness_report",
+    "command_definitions_pass_detail",
+    "command_incomplete_detail",
+    "command_missing_targets_detail",
+    "env_example_missing_keys_detail",
+    "env_example_pass_detail",
+    "env_example_real_secret_detail",
     "parse_env_example",
+    "readiness_detail_list",
+    "runbook_missing_heading_detail",
+    "runbook_missing_terms_detail",
+    "runbook_section_pass_detail",
     "validate_command_definitions",
     "validate_env_example",
     "validate_runbook",

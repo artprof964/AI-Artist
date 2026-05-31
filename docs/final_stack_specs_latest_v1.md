@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 435 passed, 1 skipped, 1 warning
+Final validation: 436 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -109,7 +109,7 @@ backend/publishing_status.py: shared publishing outcome status vocabulary and ch
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
 backend/observability.py: telemetry stage/log-level constants, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
 backend/security_review.py: deterministic security checklist helpers.
-backend/readiness.py: production readiness schema and runbook validators.
+backend/readiness.py: production readiness schema, centralized readiness detail messages, and runbook validators.
 ```
 
 ## Interfaces
@@ -154,6 +154,9 @@ definitions, test process invocations, or migration output parsers are changed.
 Production readiness backup directories, container dump paths, and MinIO source
 aliases must flow through backend/readiness_paths.py before runbook or command
 definitions are changed.
+Production readiness env, runbook, and command validation detail messages must
+flow through backend/readiness.py helpers before readiness checks expose new
+human-readable status text.
 Repository artifact paths, repo-root resolution, workspace paths/text reads,
 backend module discovery, source-text reads, and source-inspection file reads
 must flow through backend/repo_paths.py before runtime review checks, scaffold

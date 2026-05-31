@@ -64,8 +64,9 @@ can be marked done.
 52. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 53. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
 54. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
-55. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
-56. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
+55. Production readiness env, runbook, and command validation detail messages use `backend/readiness.py`.
+56. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
+57. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
 ```
 
 ## Standard Request Envelope
@@ -118,6 +119,8 @@ Rules:
   through the shared shell command helper.
 - Readiness backup directories, container dump paths, and MinIO aliases use the
   shared readiness path contract.
+- Readiness env, runbook, and command validation detail messages use the shared
+  readiness message helpers.
 - Repository artifact paths, repo-root resolution, workspace paths/text reads,
   backend module discovery, source-text reads, and source-inspection file reads
   use the shared repo path contract before runtime review checks, scaffold

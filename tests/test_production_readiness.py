@@ -16,7 +16,17 @@ from backend.readiness import (
     RUNBOOK_REQUIREMENTS,
     ReadinessStatus,
     build_readiness_report,
+    command_definitions_pass_detail,
+    command_incomplete_detail,
+    command_missing_targets_detail,
+    env_example_missing_keys_detail,
+    env_example_pass_detail,
+    env_example_real_secret_detail,
     parse_env_example,
+    readiness_detail_list,
+    runbook_missing_heading_detail,
+    runbook_missing_terms_detail,
+    runbook_section_pass_detail,
     validate_command_definitions,
     validate_env_example,
     validate_runbook,
@@ -154,6 +164,51 @@ def test_readiness_report_passes_for_checked_in_runbook_and_env_example() -> Non
     )
 
     assert report.ready, [check.detail for check in report.checks if not check.passed]
+
+
+def test_readiness_detail_messages_are_centralized() -> None:
+    source = read_backend_source("readiness.py")
+    validator_source = source.split("def validate_env_example", 1)[1]
+
+    assert env_example_missing_keys_detail(("A", "B")) == (
+        ".env.example is missing required keys: A, B"
+    )
+    assert env_example_real_secret_detail(("TOKEN",)) == (
+        ".env.example should not contain real secret-looking values for: TOKEN"
+    )
+    assert env_example_pass_detail(3) == (
+        ".env.example documents 3 required keys without real secrets"
+    )
+    assert runbook_section_pass_detail("Health Checks") == "Runbook includes Health Checks"
+    assert runbook_missing_heading_detail("Health Checks") == "missing heading 'Health Checks'"
+    assert runbook_missing_terms_detail(("pytest", "ruff")) == "missing terms: pytest, ruff"
+    assert readiness_detail_list(("missing heading 'A'", "missing terms: b")) == (
+        "missing heading 'A'; missing terms: b"
+    )
+    assert command_definitions_pass_detail("health") == (
+        "health command definitions cover required targets"
+    )
+    assert command_missing_targets_detail(("MinIO", "Qdrant")) == (
+        "missing targets: MinIO, Qdrant"
+    )
+    assert command_incomplete_detail(("postgres_backup",)) == (
+        "incomplete commands: postgres_backup"
+    )
+
+    forbidden_fragments = [
+        'detail=f".env.example is missing required keys:',
+        '".env.example should not contain real secret-looking values for: "',
+        'detail=f".env.example documents {len(REQUIRED_ENV_VARS)} required keys without real secrets"',
+        'detail=f"Runbook includes {requirement.heading}"',
+        'details.append(f"missing heading {requirement.heading!r}")',
+        'details.append(f"missing terms: {',
+        'detail="; ".join(details)',
+        'detail=f"{slug} command definitions cover required targets"',
+        'details.append(f"missing targets: {',
+        'details.append(f"incomplete commands: {',
+    ]
+    for fragment in forbidden_fragments:
+        assert fragment not in validator_source
 
 
 def test_runbook_validator_fails_when_required_sections_are_missing() -> None:
