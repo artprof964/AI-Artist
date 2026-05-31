@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 277 passed, 1 skipped, 1 warning
+Final validation: 282 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -55,6 +55,7 @@ backend/request_identity.py: request text normalization, fingerprints, stable re
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache and source-freshness reason strings.
+backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, and counting helpers.
 backend/text_utils.py: shared text tokenization and label normalization.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
 backend/time_utils.py: shared UTC datetime creation and normalization.
@@ -134,6 +135,9 @@ Mapping copies and metadata/payload merges must flow through
 backend/mapping_utils.py before domain-specific copy or merge logic is added.
 Cache and source-freshness reason strings must flow through
 backend/reason_messages.py before policy or cache decision text is added.
+SubAgentOutput status vocabulary, priority, and aggregation must flow through
+backend/subagent_status.py before schema or orchestration-specific status
+logic is added.
 Text tokenization and label/tag normalization must flow through
 backend/text_utils.py before classifier, retrieval, or rubric-specific token
 parsing logic is added.

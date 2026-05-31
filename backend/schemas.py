@@ -3,6 +3,7 @@ from typing import Any, Literal
 from uuid import UUID
 
 from backend.runtime_ids import runtime_uuid
+from backend.subagent_status import SubAgentStatus
 from backend.time_utils import utc_now
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -26,7 +27,6 @@ AuditEventType = Literal[
     "tool_call",
     "artifact",
 ]
-SubAgentStatus = Literal["ok", "needs_retry", "blocked", "failed"]
 
 
 class HealthResponse(BaseModel):

@@ -1,4 +1,3 @@
-from collections import Counter
 from collections.abc import Callable
 from typing import Any
 from uuid import UUID
@@ -14,19 +13,19 @@ from backend.schemas import (
     SubAgentError,
     SubAgentOutput,
     SubAgentSource,
+)
+from backend.subagent_status import (
+    SUBAGENT_STATUS_BLOCKED,
+    SUBAGENT_STATUS_FAILED,
+    SUBAGENT_STATUS_NEEDS_RETRY,
+    SUBAGENT_STATUS_OK,
     SubAgentStatus,
+    count_subagent_statuses,
+    dominant_subagent_status,
 )
 
 
 MockAgent = Callable[["MockAgentRequest"], SubAgentOutput]
-
-STATUS_PRIORITY: dict[SubAgentStatus, int] = {
-    "ok": 0,
-    "needs_retry": 1,
-    "blocked": 2,
-    "failed": 3,
-}
-
 
 class MockAgentRequest(BaseModel):
     task_id: UUID = Field(default_factory=runtime_uuid)
@@ -55,7 +54,11 @@ def _should_simulate(request: MockAgentRequest, agent_name: str, status: SubAgen
 
 
 def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
-    status: SubAgentStatus = "blocked" if _should_simulate(request, "knowledge", "blocked") else "ok"
+    status: SubAgentStatus = (
+        SUBAGENT_STATUS_BLOCKED
+        if _should_simulate(request, "knowledge", SUBAGENT_STATUS_BLOCKED)
+        else SUBAGENT_STATUS_OK
+    )
     errors = []
     summary = "Collected local project context for the request."
     if status == "blocked":
@@ -91,7 +94,7 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
                 }
             ],
             "policy_notes": ["Read-only local context lookup; no external source access."],
-            "confidence": 0.86 if status == "ok" else 0.35,
+            "confidence": 0.86 if status == SUBAGENT_STATUS_OK else 0.35,
             "errors": errors,
         },
         SubAgentOutput,
@@ -100,7 +103,9 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
 
 def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
     status: SubAgentStatus = (
-        "needs_retry" if _should_simulate(request, "image_planner", "needs_retry") else "ok"
+        SUBAGENT_STATUS_NEEDS_RETRY
+        if _should_simulate(request, "image_planner", SUBAGENT_STATUS_NEEDS_RETRY)
+        else SUBAGENT_STATUS_OK
     )
     errors = []
     summary = "Prepared a local image planning brief without running generation."
@@ -133,7 +138,7 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
             ],
             "sources": [],
             "policy_notes": ["No ComfyUI execution or image generation was attempted."],
-            "confidence": 0.78 if status == "ok" else 0.45,
+            "confidence": 0.78 if status == SUBAGENT_STATUS_OK else 0.45,
             "errors": errors,
         },
         SubAgentOutput,
@@ -141,7 +146,11 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
 
 
 def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
-    status: SubAgentStatus = "failed" if _should_simulate(request, "critic_curator", "failed") else "ok"
+    status: SubAgentStatus = (
+        SUBAGENT_STATUS_FAILED
+        if _should_simulate(request, "critic_curator", SUBAGENT_STATUS_FAILED)
+        else SUBAGENT_STATUS_OK
+    )
     errors = []
     summary = "Created a deterministic review checklist for later artifact evaluation."
     if status == "failed":
@@ -177,7 +186,7 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
                 }
             ],
             "policy_notes": ["Review only; publishing remains blocked until later approval tasks."],
-            "confidence": 0.81 if status == "ok" else 0.2,
+            "confidence": 0.81 if status == SUBAGENT_STATUS_OK else 0.2,
             "errors": errors,
         },
         SubAgentOutput,
@@ -198,8 +207,9 @@ def synthesize_subagent_outputs(
     if not outputs:
         raise ValueError("At least one SubAgentOutput is required for synthesis.")
 
-    status = max(outputs, key=lambda output: STATUS_PRIORITY[output.status]).status
-    status_counts = Counter(output.status for output in outputs)
+    statuses = [output.status for output in outputs]
+    status = dominant_subagent_status(statuses)
+    status_counts = count_subagent_statuses(statuses)
     confidence = rounded_mean((output.confidence for output in outputs), digits=4)
 
     summary_parts = [f"{output.agent_name}: {output.summary}" for output in outputs]
