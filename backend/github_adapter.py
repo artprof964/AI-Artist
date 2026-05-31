@@ -14,6 +14,7 @@ from backend.connection_settings import (
     runtime_env,
 )
 from backend.execution_gate import require_execution_envelope
+from backend.http_methods import normalize_http_write_method
 from backend.operations import OPERATION_GITHUB_WRITE
 from backend.schemas import ExecutionEnvelopeResponse
 from backend.secret_redaction import redact_secret_value
@@ -91,7 +92,12 @@ class GitHubAdapter:
             require_human_approval_when_marked=True,
             now=now,
         )
-        method = _normalize_write_method(request.method)
+        method = normalize_http_write_method(
+            request.method,
+            error_type=GitHubExecutionGateError,
+            type_message="GitHub API method must be a string",
+            allowed_message="GitHub adapter only permits write methods",
+        )
         path = _normalize_api_path(request.path)
 
         token = self._read_runtime_token()
@@ -139,16 +145,6 @@ class GitHubAdapter:
             ).strip()
         except RuntimeError as exc:
             raise GitHubAdapterConfigurationError(str(exc)) from exc
-
-def _normalize_write_method(method: str) -> str:
-    if not isinstance(method, str):
-        raise GitHubExecutionGateError("GitHub API method must be a string")
-
-    normalized = method.strip().upper()
-    if normalized not in {"POST", "PATCH", "PUT", "DELETE"}:
-        raise GitHubExecutionGateError("GitHub adapter only permits write methods")
-    return normalized
-
 
 def _normalize_api_path(path: str) -> str:
     return safe_relative_api_path(

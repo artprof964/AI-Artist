@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 300 passed, 1 skipped, 1 warning
+Final validation: 309 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -65,6 +65,7 @@ backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction.
 backend/response_fields.py: shared provider response field access and shape validation.
 backend/url_utils.py: shared URL domain and relative API path validation.
+backend/http_methods.py: shared HTTP method vocabulary and normalization for connector boundaries.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and domain boundaries.
 backend/adapter_results.py: shared gated adapter result field mapping.
@@ -168,6 +169,8 @@ added.
 URL/domain extraction and relative API path validation must flow through
 backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.
+HTTP method vocabulary and normalization must flow through backend/http_methods.py
+before connector-specific method allowlists are added.
 Operation constants, classifier term maps, and sensitive-operation rules must
 flow through backend/operations.py before service or adapter operation logic is
 added.

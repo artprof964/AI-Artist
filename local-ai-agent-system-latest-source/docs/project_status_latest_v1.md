@@ -42,6 +42,7 @@ Time creation/normalization: centralized in backend/time_utils.py
 Payload fields and nested payload objects: centralized in backend/payload_fields.py
 Response fields: centralized in backend/response_fields.py
 URL validation: centralized in backend/url_utils.py
+HTTP method vocabulary and normalization: centralized in backend/http_methods.py
 Operations: centralized in backend/operations.py
 Model coercion: centralized in backend/model_coercion.py
 Telemetry stages and log levels: centralized in backend/observability.py
@@ -120,6 +121,7 @@ Payload fields: shared across Slack event parsing, nested event object validatio
 Slack adapter boundaries: shared payload, request identity, and secret-redaction helpers are called directly without local wrapper functions
 Response fields: shared across provider-neutral LLM API response parsing, ComfyUI image response parsing, and publishing audit status parsing
 URL validation: shared across GitHub API path safety and source-ingestion domain allowlisting
+HTTP methods: shared across GitHub write method validation and future connector method allowlists
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
 Model coercion: shared across execution-envelope validation, image provenance input, critic metadata scoring, Knowledge Agent output, and mock sub-agent output
@@ -136,7 +138,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 300 passed, 1 skipped, 1 warning
+final pytest: 309 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

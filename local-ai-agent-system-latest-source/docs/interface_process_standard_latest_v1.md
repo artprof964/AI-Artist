@@ -35,11 +35,12 @@ can be marked done.
 23. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 24. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
 25. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-26. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-27. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-28. Telemetry stages and log levels use `backend/observability.py`.
-29. Publishing outcome statuses use `backend/publishing_status.py`.
-30. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+26. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
+27. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+28. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+29. Telemetry stages and log levels use `backend/observability.py`.
+30. Publishing outcome statuses use `backend/publishing_status.py`.
+31. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -226,6 +227,7 @@ Output:
      and synthesizes one response.
    - Domain and adapter inputs and structured outputs coerce model-or-dict payloads through the shared model coercion helper.
    - Provider SDK object-or-dict responses are read through the shared response-field helper.
+   - Connector HTTP methods are normalized through the shared HTTP method helper.
 
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
