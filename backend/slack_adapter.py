@@ -1,9 +1,10 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from typing import Any, Protocol
+from typing import Any, Mapping, Protocol
 from uuid import UUID
 
+from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR, require_runtime_secret
 from backend.payload_fields import (
     optional_string_field,
     required_mapping_field,
@@ -16,6 +17,7 @@ from backend.secret_redaction import (
     redact_secret_value,
 )
 from backend.slack_contracts import (
+    SLACK_ADAPTER_EXECUTION_PURPOSE,
     SLACK_SOURCE,
     slack_event_object_required,
     slack_optional_string_field,
@@ -26,6 +28,10 @@ from backend.slack_contracts import (
 
 class SlackAdapterError(ValueError):
     """Raised when a Slack event or response cannot be adapted safely."""
+
+
+class SlackAdapterConfigurationError(RuntimeError):
+    """Raised when the adapter cannot read its runtime Slack bot token."""
 
 
 class SlackClient(Protocol):
@@ -83,9 +89,18 @@ class SlackPostResult:
 
 
 class SlackAdapter:
-    def __init__(self, client: SlackClient, *, bot_token: str | None = None) -> None:
+    def __init__(
+        self,
+        client: SlackClient,
+        *,
+        bot_token: str | None = None,
+        env: Mapping[str, str] | None = None,
+        token_env_var: str = SLACK_BOT_TOKEN_ENV_VAR,
+    ) -> None:
         self._client = client
         self._bot_token = bot_token
+        self._env = env
+        self._token_env_var = token_env_var
 
     def normalize_inbound_event(self, payload: dict[str, Any]) -> SlackRequestEnvelope:
         event = (
@@ -177,13 +192,16 @@ class SlackAdapter:
         envelope: SlackRequestEnvelope,
         response_text: str,
     ) -> dict[str, Any]:
+        normalized_text = normalize_request_text(response_text, lowercase=False)
+        if not normalized_text:
+            raise SlackAdapterError(slack_response_text_required())
+
+        bot_token = self._read_runtime_token()
         text = redact_secret_text(
-            normalize_request_text(response_text, lowercase=False),
-            explicit_secrets=((self._bot_token,) if self._bot_token else ()),
+            normalized_text,
+            explicit_secrets=(bot_token,),
             replacement=LOWER_REDACTED_SECRET_VALUE,
         )
-        if not text:
-            raise SlackAdapterError(slack_response_text_required())
 
         return {
             "channel": envelope.channel,
@@ -197,10 +215,11 @@ class SlackAdapter:
         response_text: str,
     ) -> SlackPostResult:
         posted_payload = self.format_outbound_response(envelope, response_text)
+        bot_token = self._read_runtime_token()
         client_response = self._client.chat_postMessage(**posted_payload)
         sanitized_response = redact_secret_value(
             client_response,
-            explicit_secrets=((self._bot_token,) if self._bot_token else ()),
+            explicit_secrets=(bot_token,),
             replacement=LOWER_REDACTED_SECRET_VALUE,
         )
 
@@ -213,9 +232,30 @@ class SlackAdapter:
             client_response=sanitized_response,
         )
 
+    def _read_runtime_token(self) -> str:
+        if self._bot_token is not None:
+            normalized = self._bot_token.strip()
+            if normalized:
+                return normalized
+
+        try:
+            return require_runtime_secret(
+                self._env,
+                self._token_env_var,
+                purpose=SLACK_ADAPTER_EXECUTION_PURPOSE,
+                setting_name=(
+                    "slack_bot_token"
+                    if self._token_env_var == SLACK_BOT_TOKEN_ENV_VAR
+                    else None
+                ),
+            )
+        except RuntimeError as exc:
+            raise SlackAdapterConfigurationError(str(exc)) from exc
+
 
 __all__ = [
     "SlackAdapter",
+    "SlackAdapterConfigurationError",
     "SlackAdapterError",
     "SlackClient",
     "SlackPostResult",

@@ -4,8 +4,13 @@ from typing import Any
 
 import pytest
 
+from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR
 from backend.repo_paths import read_backend_module_text
-from backend.slack_adapter import SlackAdapter, SlackAdapterError
+from backend.slack_adapter import (
+    SlackAdapter,
+    SlackAdapterConfigurationError,
+    SlackAdapterError,
+)
 
 
 BOT_TOKEN = "xoxb-local-secret-token"
@@ -119,6 +124,55 @@ def test_slack_adapter_redacts_token_shapes_from_outbound_payload_and_result() -
     assert unexpected_token not in repr(client.calls)
 
 
+def test_slack_adapter_can_read_token_from_injected_connection_env() -> None:
+    client = MockSlackClient(BOT_TOKEN)
+    adapter = SlackAdapter(
+        client,
+        env={SLACK_BOT_TOKEN_ENV_VAR: f"  {BOT_TOKEN}  "},
+    )
+    envelope = adapter.normalize_inbound_event(slack_event_payload())
+
+    result = adapter.send_response(envelope, f"Do not leak {BOT_TOKEN}.")
+
+    assert result.posted_payload["text"] == "Do not leak [redacted]."
+    assert result.client_response["token"] == "[redacted]"
+    assert BOT_TOKEN not in repr(result)
+
+
+def test_slack_adapter_supports_custom_runtime_token_env_name() -> None:
+    client = MockSlackClient(BOT_TOKEN)
+    adapter = SlackAdapter(
+        client,
+        env={"CUSTOM_SLACK_TOKEN": f"  {BOT_TOKEN}  "},
+        token_env_var="CUSTOM_SLACK_TOKEN",
+    )
+    envelope = adapter.normalize_inbound_event(slack_event_payload())
+
+    result = adapter.send_response(envelope, f"Do not leak {BOT_TOKEN}.")
+
+    assert result.client_response["token"] == "[redacted]"
+
+
+def test_slack_adapter_reports_missing_runtime_token_before_send() -> None:
+    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env={SLACK_BOT_TOKEN_ENV_VAR: "   "})
+    envelope = adapter.normalize_inbound_event(slack_event_payload())
+
+    with pytest.raises(SlackAdapterConfigurationError) as exc:
+        adapter.send_response(envelope, "Drafted 3 directions for review.")
+
+    assert str(exc.value) == f"{SLACK_BOT_TOKEN_ENV_VAR} is required for Slack adapter execution"
+
+
+def test_slack_adapter_rejects_empty_response_before_token_read() -> None:
+    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env={SLACK_BOT_TOKEN_ENV_VAR: "   "})
+    envelope = adapter.normalize_inbound_event(slack_event_payload())
+
+    with pytest.raises(SlackAdapterError) as exc:
+        adapter.send_response(envelope, "   ")
+
+    assert str(exc.value) == "Slack response text must be non-empty"
+
+
 def test_slack_adapter_uses_message_ts_as_thread_fallback() -> None:
     payload = slack_event_payload()
     payload["event"].pop("thread_ts")
@@ -150,9 +204,14 @@ def test_slack_adapter_rejects_malformed_inbound_events(event_update: dict[str, 
 def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
     source = read_backend_module_text("slack_adapter.py")
 
+    assert "from backend.connection_settings import" in source
     assert "from backend.payload_fields import" in source
     assert "from backend.request_identity import" in source
     assert "from backend.secret_redaction import" in source
+    assert "require_runtime_secret(" in source
+    assert "load_connection_settings(" not in source
+    assert "require_env_value(" not in source
+    assert "runtime_env(" not in source
     assert "def _required_string(" not in source
     assert "def _optional_string(" not in source
     assert "def _normalize_text(" not in source

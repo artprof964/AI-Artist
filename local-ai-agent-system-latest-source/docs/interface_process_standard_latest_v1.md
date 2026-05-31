@@ -57,7 +57,7 @@ can be marked done.
 45. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
 46. Publishing side-effect audit operation values use `backend/operations.py`.
 47. Gated adapter operation values use `backend/operations.py` directly.
-48. Slack source labels and adapter validation messages use `backend/slack_contracts.py`.
+48. Slack source labels, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
 49. GitHub adapter action labels, validation messages, and token-purpose text use `backend/github_contracts.py`.
 50. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
 51. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
@@ -236,7 +236,7 @@ Output:
    - Request metadata workspace/agent fields use the shared metadata mapping helper.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
-   - Slack adapter payload parsing, request identity, and secret redaction call the shared helpers directly at the adapter boundary.
+   - Slack adapter payload parsing, request identity, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
    - Slack source labels and adapter validation messages use the shared Slack contract before adapter errors are raised.
    - Runtime UUID creation uses the shared runtime ID helper.
    - Metadata and payload copies use the shared mapping helper.

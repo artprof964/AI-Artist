@@ -452,7 +452,10 @@ const stages = [
       "Writes durable artifacts into the correct storage layers."
     ],
     links: ["GitHub Adapter", "File / Storage Adapter", "Channels / Platforms", "Persistent Data Storage"],
-    controls: ["Runtime token source: connection_settings runtime_env -> git_ai-artist_codex_token."]
+    controls: [
+      "Slack runtime token source: connection_settings runtime_env -> SLACK_BOT_TOKEN.",
+      "GitHub runtime token source: connection_settings runtime_env -> git_ai-artist_codex_token."
+    ]
   },
   {
     id: "storage-layer",

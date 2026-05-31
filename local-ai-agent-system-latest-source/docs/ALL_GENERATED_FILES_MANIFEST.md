@@ -110,6 +110,7 @@
 - `../../validation_reports/t20_slack_adapter_validation_2026-05-31.md`
 - `../../validation_reports/slack_boundary_helper_standardization_2026-05-31.md`
 - `../../validation_reports/slack_contract_standardization_2026-05-31.md`
+- `../../validation_reports/slack_runtime_secret_standardization_2026-05-31.md`
 - `../../validation_reports/payload_object_standardization_2026-05-31.md`
 - `../../backend/payload_fields.py`
 - `../../tests/test_payload_fields.py`

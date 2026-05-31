@@ -2,6 +2,7 @@ from __future__ import annotations
 
 
 SLACK_SOURCE = "slack"
+SLACK_ADAPTER_EXECUTION_PURPOSE = "Slack adapter execution"
 
 
 def slack_event_object_required() -> str:
@@ -21,6 +22,7 @@ def slack_response_text_required() -> str:
 
 
 __all__ = [
+    "SLACK_ADAPTER_EXECUTION_PURPOSE",
     "SLACK_SOURCE",
     "slack_event_object_required",
     "slack_optional_string_field",

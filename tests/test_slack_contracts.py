@@ -1,5 +1,6 @@
 from backend.repo_paths import read_backend_module_text
 from backend.slack_contracts import (
+    SLACK_ADAPTER_EXECUTION_PURPOSE,
     SLACK_SOURCE,
     slack_event_object_required,
     slack_optional_string_field,
@@ -10,6 +11,7 @@ from backend.slack_contracts import (
 
 def test_slack_contracts_preserve_message_text() -> None:
     assert SLACK_SOURCE == "slack"
+    assert SLACK_ADAPTER_EXECUTION_PURPOSE == "Slack adapter execution"
     assert slack_event_object_required() == "Slack payload must include an event object"
     assert (
         slack_required_string_field("channel")
@@ -29,6 +31,7 @@ def test_slack_adapter_uses_shared_contract_messages() -> None:
         '"Slack payload must include an event object"',
         '"Slack event field',
         '"Slack response text must be non-empty"',
+        '"Slack adapter execution"',
         'source: str = "slack"',
     ]
     for literal in forbidden_literals:
@@ -38,3 +41,4 @@ def test_slack_adapter_uses_shared_contract_messages() -> None:
     assert "slack_optional_string_field(" in source
     assert "slack_response_text_required()" in source
     assert "source: str = SLACK_SOURCE" in source
+    assert "SLACK_ADAPTER_EXECUTION_PURPOSE" in source

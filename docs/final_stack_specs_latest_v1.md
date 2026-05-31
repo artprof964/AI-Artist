@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 400 passed, 1 skipped, 1 warning
+Final validation: 404 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -80,7 +80,7 @@ backend/secret_redaction.py: shared secret-key detection, token-shape detection,
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults and rejection message contracts.
-backend/slack_contracts.py: shared Slack source label and validation message contracts.
+backend/slack_contracts.py: shared Slack source label, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, and token-purpose text.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate_messages.py: shared execution-envelope validation failure and required-envelope message contracts.
@@ -101,7 +101,7 @@ backend/knowledge.py: deterministic source-cited retrieval using shared Knowledg
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and numeric-clamp boundaries.
-backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, and secret-redaction boundaries directly.
+backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and runtime secret boundaries directly.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
