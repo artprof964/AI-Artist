@@ -7,6 +7,7 @@ from backend.knowledge_contracts import (
     KNOWLEDGE_AGENT_NAME,
     KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
     KNOWLEDGE_MIN_RESULT_SCORE,
+    KNOWLEDGE_MIN_SEARCH_LIMIT,
     KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
     KNOWLEDGE_RESULT_SCORE_DIGITS,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
@@ -14,6 +15,8 @@ from backend.knowledge_contracts import (
     KNOWLEDGE_STABLE_TOKEN_HASH_SEED,
     knowledge_hit_is_positive,
     round_knowledge_score,
+    knowledge_search_hit_sort_key,
+    knowledge_search_limit_is_valid,
     stable_token_index,
 )
 from backend.knowledge import (
@@ -200,6 +203,17 @@ def test_knowledge_embedding_and_result_score_contracts_are_centralized() -> Non
     assert round_knowledge_score(0.123456789) == 0.123457
 
 
+def test_knowledge_vector_search_contracts_are_centralized() -> None:
+    assert KNOWLEDGE_MIN_SEARCH_LIMIT == 1
+    assert knowledge_search_limit_is_valid(1) is True
+    assert knowledge_search_limit_is_valid(0) is False
+    assert knowledge_search_hit_sort_key(0.75, "source-b") == (-0.75, "source-b")
+    assert sorted(
+        [(0.5, "source-b"), (0.7, "source-c"), (0.7, "source-a")],
+        key=lambda item: knowledge_search_hit_sort_key(item[0], item[1]),
+    ) == [(0.7, "source-a"), (0.7, "source-c"), (0.5, "source-b")]
+
+
 def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
     source = read_backend_source("knowledge.py")
 
@@ -207,11 +221,15 @@ def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
     assert "stable_token_index(" in source
     assert "knowledge_hit_is_positive(" in source
     assert "round_knowledge_score(" in source
+    assert "knowledge_search_limit_is_valid(" in source
+    assert "knowledge_search_hit_sort_key(" in source
     assert "dimensions: int = 64" not in source
     assert "total = 0" not in source
     assert "total * 33" not in source
     assert "hit.score > 0.0" not in source
     assert "round(hit.score, 6)" not in source
+    assert "limit <= 0" not in source
+    assert "(-hit.score, hit.point_id)" not in source
 
 
 def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:

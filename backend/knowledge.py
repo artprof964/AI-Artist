@@ -16,6 +16,8 @@ from backend.knowledge_contracts import (
     KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
     knowledge_hit_is_positive,
     knowledge_results_summary,
+    knowledge_search_hit_sort_key,
+    knowledge_search_limit_is_valid,
     round_knowledge_score,
     stable_token_index,
 )
@@ -187,7 +189,7 @@ class InMemoryQdrantVectorStore:
         *,
         limit: int,
     ) -> list[VectorSearchHit]:
-        if limit <= 0:
+        if not knowledge_search_limit_is_valid(limit):
             return []
         collection = self._collections.get(collection_name, {})
         hits = [
@@ -198,7 +200,7 @@ class InMemoryQdrantVectorStore:
             )
             for point in collection.values()
         ]
-        hits.sort(key=lambda hit: (-hit.score, hit.point_id))
+        hits.sort(key=lambda hit: knowledge_search_hit_sort_key(hit.score, hit.point_id))
         return hits[:limit]
 
 

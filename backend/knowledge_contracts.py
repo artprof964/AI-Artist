@@ -17,6 +17,7 @@ KNOWLEDGE_STABLE_TOKEN_HASH_SEED = 0
 KNOWLEDGE_STABLE_TOKEN_HASH_MULTIPLIER = 33
 KNOWLEDGE_MIN_RESULT_SCORE = 0.0
 KNOWLEDGE_RESULT_SCORE_DIGITS = 6
+KNOWLEDGE_MIN_SEARCH_LIMIT = 1
 
 
 def knowledge_results_summary(result_count: int, source_ids: list[str]) -> str:
@@ -39,12 +40,21 @@ def round_knowledge_score(score: float) -> float:
     return round(score, KNOWLEDGE_RESULT_SCORE_DIGITS)
 
 
+def knowledge_search_limit_is_valid(limit: int) -> bool:
+    return limit >= KNOWLEDGE_MIN_SEARCH_LIMIT
+
+
+def knowledge_search_hit_sort_key(score: float, point_id: str) -> tuple[float, str]:
+    return (-score, point_id)
+
+
 __all__ = [
     "DEFAULT_KNOWLEDGE_COLLECTION_NAME",
     "DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS",
     "KNOWLEDGE_AGENT_NAME",
     "KNOWLEDGE_APPROVED_PAYLOAD_FIELD",
     "KNOWLEDGE_MIN_RESULT_SCORE",
+    "KNOWLEDGE_MIN_SEARCH_LIMIT",
     "KNOWLEDGE_NO_APPROVED_RESULTS_SUMMARY",
     "KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL",
     "KNOWLEDGE_RESULT_SCORE_DIGITS",
@@ -54,6 +64,8 @@ __all__ = [
     "KNOWLEDGE_STABLE_TOKEN_HASH_SEED",
     "knowledge_hit_is_positive",
     "knowledge_results_summary",
+    "knowledge_search_hit_sort_key",
+    "knowledge_search_limit_is_valid",
     "round_knowledge_score",
     "stable_token_index",
 ]
