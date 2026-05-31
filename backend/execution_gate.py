@@ -3,6 +3,17 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any
 
+from backend.execution_gate_messages import (
+    EXECUTION_ENVELOPE_EXPIRED,
+    EXECUTION_ENVELOPE_INVALID,
+    EXECUTION_ENVELOPE_MISSING_SIGNATURE,
+    EXECUTION_ENVELOPE_NOT_ALLOWED,
+    EXECUTION_ENVELOPE_NOT_VALID,
+    EXECUTION_ENVELOPE_REQUIRES_HUMAN_APPROVAL,
+    execution_envelope_operation_mismatch,
+    execution_envelope_target_mismatch,
+    operation_requires_human_approval,
+)
 from backend.model_coercion import coerce_model
 from backend.schemas import ExecutionEnvelopeResponse
 from backend.time_utils import as_utc, utc_now
@@ -51,7 +62,7 @@ def _coerce_envelope(
         envelope,
         ExecutionEnvelopeResponse,
         error_type=error_type,
-        message="execution envelope is invalid",
+        message=EXECUTION_ENVELOPE_INVALID,
     )
 
 
@@ -67,32 +78,32 @@ def _validate_execution_envelope(
     now: datetime | None,
 ) -> None:
     if envelope.operation != operation:
-        raise error_type(f"execution envelope operation must be {operation}")
+        raise error_type(execution_envelope_operation_mismatch(operation))
 
     if target is not None and envelope.target != target:
-        raise error_type(f"execution envelope target does not match {target_label}")
+        raise error_type(execution_envelope_target_mismatch(target_label))
 
     if not envelope.valid:
-        raise error_type("execution envelope is not valid")
+        raise error_type(EXECUTION_ENVELOPE_NOT_VALID)
 
     if not envelope.allow:
-        raise error_type("execution envelope does not allow execution")
+        raise error_type(EXECUTION_ENVELOPE_NOT_ALLOWED)
 
     if require_human_approval and not envelope.human_approval.approved:
-        raise error_type(f"{operation} requires human approval")
+        raise error_type(operation_requires_human_approval(operation))
 
     if require_human_approval_when_marked and (
         envelope.requires_human_approval and not envelope.human_approval.approved
     ):
-        raise error_type("execution envelope requires human approval")
+        raise error_type(EXECUTION_ENVELOPE_REQUIRES_HUMAN_APPROVAL)
 
     if not envelope.signature:
-        raise error_type("execution envelope must include a signature")
+        raise error_type(EXECUTION_ENVELOPE_MISSING_SIGNATURE)
 
     comparison_time = as_utc(now or utc_now())
     expires_at = as_utc(envelope.expires_at)
     if expires_at <= comparison_time:
-        raise error_type("execution envelope is expired")
+        raise error_type(EXECUTION_ENVELOPE_EXPIRED)
 
 
 __all__ = [

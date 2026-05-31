@@ -73,6 +73,8 @@
 - `../../tests/test_text_utils.py`
 - `../../tests/test_numeric_utils.py`
 - `../../validation_reports/t17_comfyui_adapter_validation_2026-05-31.md`
+- `../../validation_reports/execution_gate_message_standardization_2026-05-31.md`
+- `../../backend/execution_gate_messages.py`
 - `../../validation_reports/comfyui_contract_standardization_2026-05-31.md`
 - `../../backend/comfyui_contracts.py`
 - `../../tests/test_comfyui_contracts.py`

@@ -4,6 +4,17 @@ from uuid import UUID
 import pytest
 
 from backend.execution_gate import ExecutionGateError, require_execution_envelope
+from backend.execution_gate_messages import (
+    EXECUTION_ENVELOPE_EXPIRED,
+    EXECUTION_ENVELOPE_INVALID,
+    EXECUTION_ENVELOPE_MISSING_SIGNATURE,
+    EXECUTION_ENVELOPE_NOT_ALLOWED,
+    EXECUTION_ENVELOPE_NOT_VALID,
+    EXECUTION_ENVELOPE_REQUIRES_HUMAN_APPROVAL,
+    execution_envelope_operation_mismatch,
+    execution_envelope_target_mismatch,
+    operation_requires_human_approval,
+)
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
 
 
@@ -119,3 +130,46 @@ def test_execution_gate_can_require_human_approval_only_when_marked() -> None:
             require_human_approval_when_marked=True,
             now=NOW,
         )
+
+
+def test_execution_gate_error_message_contracts_are_shared() -> None:
+    assert EXECUTION_ENVELOPE_INVALID == "execution envelope is invalid"
+    assert EXECUTION_ENVELOPE_NOT_VALID == "execution envelope is not valid"
+    assert EXECUTION_ENVELOPE_NOT_ALLOWED == "execution envelope does not allow execution"
+    assert (
+        EXECUTION_ENVELOPE_REQUIRES_HUMAN_APPROVAL
+        == "execution envelope requires human approval"
+    )
+    assert EXECUTION_ENVELOPE_MISSING_SIGNATURE == "execution envelope must include a signature"
+    assert EXECUTION_ENVELOPE_EXPIRED == "execution envelope is expired"
+    assert (
+        execution_envelope_operation_mismatch("publish")
+        == "execution envelope operation must be publish"
+    )
+    assert (
+        execution_envelope_target_mismatch("publish target")
+        == "execution envelope target does not match publish target"
+    )
+    assert operation_requires_human_approval("publish") == "publish requires human approval"
+
+
+def test_execution_gate_uses_shared_error_message_contracts() -> None:
+    source = "backend/execution_gate.py"
+    with open(source, encoding="utf-8") as handle:
+        contents = handle.read()
+
+    forbidden_literals = [
+        '"execution envelope is invalid"',
+        '"execution envelope is not valid"',
+        '"execution envelope does not allow execution"',
+        '"execution envelope requires human approval"',
+        '"execution envelope must include a signature"',
+        '"execution envelope is expired"',
+        '"execution envelope operation must be',
+        '"execution envelope target does not match',
+        '" requires human approval"',
+    ]
+    for literal in forbidden_literals:
+        assert literal not in contents
+    assert "execution_envelope_operation_mismatch(" in contents
+    assert "execution_envelope_target_mismatch(" in contents

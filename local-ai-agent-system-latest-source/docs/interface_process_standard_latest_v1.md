@@ -46,6 +46,7 @@ can be marked done.
 34. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 35. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
 36. Source registry missing-row messages use `backend/source_registry_contracts.py`.
+37. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
 ```
 
 ## Standard Request Envelope
@@ -241,6 +242,7 @@ Output:
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
+   - Envelope validation failure messages use the shared execution-gate message contract.
    - Execution-envelope signatures use the shared canonical HMAC helper.
    - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.
    - Connector API paths are normalized and rejected for absolute URLs, traversal,
