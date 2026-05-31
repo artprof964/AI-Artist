@@ -19,10 +19,10 @@ from backend.service import (
     evaluate_policy,
 )
 from backend.time_utils import as_utc
-from backend.repo_paths import read_backend_module_text
+from backend.repo_paths import read_backend_module_text, repo_root_from
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:

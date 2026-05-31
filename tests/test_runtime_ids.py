@@ -4,11 +4,12 @@ from uuid import UUID
 from backend.repo_paths import (
     backend_module_filenames,
     read_backend_module_text,
+    repo_root_from,
 )
 from backend.runtime_ids import prefixed_runtime_id, runtime_uuid
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_runtime_uuid_returns_valid_uuid() -> None:

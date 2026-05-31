@@ -12,6 +12,7 @@ OPA_POLICY_PATH = Path("policies") / "opa" / "ai_artist.rego"
 POSTGRES_INIT_DIR = Path("infra") / "postgres" / "init"
 POSTGRES_QUERY_TRACKING_SCHEMA_PATH = POSTGRES_INIT_DIR / "001_query_tracking.sql"
 BACKEND_DIR = Path("backend")
+WORKSPACES_DIR = Path("workspaces")
 
 
 def repo_root_from(path: Path) -> Path:
@@ -30,6 +31,10 @@ def backend_module_path(module_filename: str) -> Path:
     return BACKEND_DIR / module_filename
 
 
+def workspace_path(workspace_name: str, *relative_parts: str) -> Path:
+    return WORKSPACES_DIR / workspace_name / Path(*relative_parts)
+
+
 def backend_module_filenames(repo_root: Path | None = None) -> tuple[str, ...]:
     backend_path = repo_path(repo_root or current_repo_root(), BACKEND_DIR)
     return tuple(path.name for path in sorted(backend_path.glob("*.py")))
@@ -45,6 +50,14 @@ def read_backend_module_text(
     return read_repo_text(repo_root or current_repo_root(), backend_module_path(module_filename))
 
 
+def read_workspace_text(
+    repo_root: Path,
+    workspace_name: str,
+    *relative_parts: str,
+) -> str:
+    return read_repo_text(repo_root, workspace_path(workspace_name, *relative_parts))
+
+
 __all__ = [
     "BACKEND_STACK_SETUP_PATH",
     "BACKEND_DIR",
@@ -55,11 +68,14 @@ __all__ = [
     "POSTGRES_INIT_DIR",
     "POSTGRES_QUERY_TRACKING_SCHEMA_PATH",
     "PRODUCTION_RUNBOOK_PATH",
+    "WORKSPACES_DIR",
     "backend_module_filenames",
     "backend_module_path",
     "current_repo_root",
     "read_backend_module_text",
     "read_repo_text",
+    "read_workspace_text",
     "repo_path",
     "repo_root_from",
+    "workspace_path",
 ]

@@ -19,6 +19,7 @@ from backend.repo_paths import (
     backend_module_filenames,
     backend_module_path,
     read_backend_module_text,
+    repo_root_from,
 )
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
@@ -29,7 +30,7 @@ NOW = datetime.now(timezone.utc)
 GITHUB_TARGET = "github://artprof964/AI-Art/issues"
 GITHUB_PATH = "/repos/artprof964/AI-Art/issues"
 MOCK_GITHUB_TOKEN = "ghp_mocked_t23_secret_token_1234567890"
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = repo_root_from(Path(__file__))
 
 
 class MockGitHubAPI:

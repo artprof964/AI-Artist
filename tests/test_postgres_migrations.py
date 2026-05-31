@@ -3,11 +3,13 @@ import time
 from pathlib import Path
 from uuid import uuid4
 
+from backend.repo_paths import POSTGRES_INIT_DIR, repo_path, repo_root_from
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+
+REPO_ROOT = repo_root_from(Path(__file__))
 POSTGRES_IMAGE = "postgres:16-alpine"
 CHECK_DIR = REPO_ROOT / ".codex_tmp" / "postgres_migration_checks"
-SCHEMA_DIR = REPO_ROOT / "infra" / "postgres" / "init"
+SCHEMA_DIR = repo_path(REPO_ROOT, POSTGRES_INIT_DIR)
 
 EXPECTED_TABLES = {
     "query_request_run",

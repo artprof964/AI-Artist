@@ -7,7 +7,7 @@ import shutil
 from backend.audit import REDACTED_SECRET_VALUE, redact_audit_value
 from backend.image_provenance import LocalImageProvenanceStore, record_generated_image_provenance
 from backend.observability import InMemoryObservabilityCollector
-from backend.repo_paths import read_backend_module_text
+from backend.repo_paths import read_backend_module_text, repo_root_from, repo_path, WORKSPACES_DIR
 from backend.security_review import (
     review_audit_payload_redaction,
     review_observability_redaction,
@@ -17,12 +17,12 @@ from backend.security_review import (
 )
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = repo_root_from(Path(__file__))
 RAW_PROMPT = "paint a quiet studio scene with soft window light"
 
 
 def test_workspace_prompt_and_memory_files_do_not_contain_raw_secret_like_values() -> None:
-    findings = scan_workspace_secret_files(REPO_ROOT / "workspaces")
+    findings = scan_workspace_secret_files(repo_path(REPO_ROOT, WORKSPACES_DIR))
 
     assert findings == []
 

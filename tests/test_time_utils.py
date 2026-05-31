@@ -1,11 +1,15 @@
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
-from backend.repo_paths import backend_module_filenames, read_backend_module_text
+from backend.repo_paths import (
+    backend_module_filenames,
+    read_backend_module_text,
+    repo_root_from,
+)
 from backend.time_utils import as_utc, utc_now
 
 
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = repo_root_from(Path(__file__))
 
 
 def test_utc_now_returns_timezone_aware_utc_datetime() -> None:

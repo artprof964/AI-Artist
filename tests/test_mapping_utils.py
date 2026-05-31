@@ -5,10 +5,11 @@ from backend.repo_paths import (
     backend_module_filenames,
     backend_module_path,
     read_backend_module_text,
+    repo_root_from,
 )
 
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_copy_mapping_returns_mutable_copy_without_aliasing() -> None:

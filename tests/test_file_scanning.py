@@ -2,8 +2,9 @@ from pathlib import Path
 import shutil
 
 from backend.file_scanning import TEXT_REVIEW_SUFFIXES, iter_review_text_files
+from backend.repo_paths import repo_root_from
 
-REPO_ROOT = Path(__file__).resolve().parents[1]
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_review_text_suffix_contract_covers_project_text_sources() -> None:

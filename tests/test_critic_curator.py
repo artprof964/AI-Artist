@@ -4,16 +4,10 @@ from pathlib import Path
 from backend.critic_curator import RUBRIC_CATEGORIES, score_image_batch, score_image_quality
 from backend.critic_rubric import CRITIC_DECISION_FAIL, CRITIC_DECISION_PASS
 from backend.image_provenance import ImageProvenanceRecord
-from backend.repo_paths import read_backend_module_text
+from backend.repo_paths import read_backend_module_text, read_workspace_text, repo_root_from
 
 
-RUBRIC_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "workspaces"
-    / "critic-curator"
-    / "rubrics"
-    / "image_quality.md"
-)
+REPO_ROOT = repo_root_from(Path(__file__))
 
 PROVENANCE = ImageProvenanceRecord(
     image_id="studio-hero-001",
@@ -31,7 +25,9 @@ PROVENANCE = ImageProvenanceRecord(
 def test_rubric_categories_match_workspace_markdown() -> None:
     rubric_categories = [
         line.removeprefix("- ").strip()
-        for line in RUBRIC_PATH.read_text(encoding="utf-8").splitlines()
+        for line in read_workspace_text(
+            REPO_ROOT, "critic-curator", "rubrics", "image_quality.md"
+        ).splitlines()
         if line.startswith("- ")
     ]
 

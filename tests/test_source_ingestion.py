@@ -14,12 +14,12 @@ from backend.source_ingestion_contracts import (
     DEFAULT_APPROVED_SOURCE_DOMAINS,
     SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
 )
-from backend.repo_paths import read_backend_module_text
+from backend.repo_paths import read_backend_module_text, repo_root_from
 
 
 NOW = datetime(2026, 5, 31, 10, 30, tzinfo=timezone.utc)
 APPROVED_DOMAINS = set(DEFAULT_APPROVED_SOURCE_DOMAINS)
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
+PROJECT_ROOT = repo_root_from(Path(__file__))
 
 
 def approved_sample_sources() -> list[SourceIngestionCandidate]:

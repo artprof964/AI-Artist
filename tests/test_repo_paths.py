@@ -8,12 +8,15 @@ from backend.repo_paths import (
     POSTGRES_INIT_DIR,
     POSTGRES_QUERY_TRACKING_SCHEMA_PATH,
     PRODUCTION_RUNBOOK_PATH,
+    WORKSPACES_DIR,
     backend_module_filenames,
     backend_module_path,
     read_backend_module_text,
     read_repo_text,
+    read_workspace_text,
     repo_path,
     repo_root_from,
+    workspace_path,
 )
 
 
@@ -26,6 +29,10 @@ def test_repo_path_contracts_preserve_current_artifact_locations() -> None:
     assert POSTGRES_INIT_DIR == Path("infra") / "postgres" / "init"
     assert POSTGRES_QUERY_TRACKING_SCHEMA_PATH == (
         Path("infra") / "postgres" / "init" / "001_query_tracking.sql"
+    )
+    assert WORKSPACES_DIR == Path("workspaces")
+    assert workspace_path("ai-artist-main", "memory", "safety_rules.md") == (
+        Path("workspaces") / "ai-artist-main" / "memory" / "safety_rules.md"
     )
 
 
@@ -47,6 +54,9 @@ def test_backend_module_path_and_text_reader_use_repo_path_contract() -> None:
         "service.py", repo_root
     )
     assert "service.py" in backend_module_filenames(repo_root)
+    assert "execution policy" in read_workspace_text(
+        repo_root, "ai-artist-main", "memory", "safety_rules.md"
+    )
 
 
 def test_backend_source_inspection_tests_use_shared_reader() -> None:
@@ -58,6 +68,20 @@ def test_backend_source_inspection_tests_use_shared_reader() -> None:
             continue
         source = read_repo_text(repo_root, Path("tests") / test_path.name)
         if 'Path("backend/' in source or ' / "backend" / ' in source:
+            offenders.append(test_path.name)
+
+    assert offenders == []
+
+
+def test_tests_use_shared_repo_root_helper() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    offenders: list[str] = []
+
+    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
+        if test_path.name == "test_repo_paths.py":
+            continue
+        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+        if "Path(__file__).resolve().parents[1]" in source:
             offenders.append(test_path.name)
 
     assert offenders == []
