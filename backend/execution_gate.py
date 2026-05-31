@@ -89,14 +89,10 @@ def _validate_execution_envelope(
     if not envelope.signature:
         raise error_type("execution envelope must include a signature")
 
-    comparison_time = _as_aware_utc(now or utc_now())
-    expires_at = _as_aware_utc(envelope.expires_at)
+    comparison_time = as_utc(now or utc_now())
+    expires_at = as_utc(envelope.expires_at)
     if expires_at <= comparison_time:
         raise error_type("execution envelope is expired")
-
-
-def _as_aware_utc(value: datetime) -> datetime:
-    return as_utc(value)
 
 
 __all__ = [

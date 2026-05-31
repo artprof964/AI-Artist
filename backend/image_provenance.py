@@ -87,7 +87,7 @@ class LocalImageProvenanceStore:
             source_refs=list(payload.source_refs),
             storage_uri=payload.storage_uri,
             review_status=payload.review_status,
-            created_at=_as_utc(payload.created_at),
+            created_at=as_utc(payload.created_at),
         )
 
         with self._lock:
@@ -224,10 +224,6 @@ def _storage_uri_from_comfyui_image(image: dict[str, Any] | Any) -> str:
     if normalized_subfolder:
         return f"comfyui://{image_type}/{normalized_subfolder}/{filename}"
     return f"comfyui://{image_type}/{filename}"
-
-
-def _as_utc(value: datetime) -> datetime:
-    return as_utc(value)
 
 
 __all__ = [

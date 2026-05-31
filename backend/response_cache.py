@@ -38,7 +38,7 @@ def evaluate_cached_response_reuse(
     cache_entry: ApprovedResponseCacheEntry | None,
     now: datetime | None = None,
 ) -> CacheReplayDecision:
-    checked_at = _as_utc(now or utc_now())
+    checked_at = as_utc(now or utc_now())
     trace_id = trace_id_from_request(policy_request.request_id, policy_request.metadata)
 
     def observed_decision(
@@ -123,7 +123,7 @@ def evaluate_cached_response_reuse(
     if not cache_entry.all_sources_unchanged:
         return observed_decision(replay=False, reason="cache entry sources are stale")
 
-    if _as_utc(cache_entry.expires_at) <= checked_at:
+    if as_utc(cache_entry.expires_at) <= checked_at:
         return observed_decision(replay=False, reason="cache entry expired")
 
     return observed_decision(
@@ -132,7 +132,3 @@ def evaluate_cached_response_reuse(
         cache_key=cache_entry.cache_key,
         response_body=cache_entry.response_body,
     )
-
-
-def _as_utc(value: datetime) -> datetime:
-    return as_utc(value)

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 261 passed, 1 skipped, 1 warning
+Final validation: 262 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -130,7 +130,7 @@ parsing logic is added.
 Numeric clamps, rounded averages, and vector similarity must flow through
 backend/numeric_utils.py before orchestration, retrieval, or rubric-specific
 scoring logic is added.
-UTC datetime creation and normalization must flow through backend/time_utils.py
+UTC datetime creation and normalization must flow directly through backend/time_utils.py
 before cache, provenance, execution gate, source freshness, observability, or
 future persistence time comparisons are added.
 Connector payload required/optional string extraction, tolerant string reads,

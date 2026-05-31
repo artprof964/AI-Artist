@@ -25,7 +25,7 @@ can be marked done.
 13. Text tokenization and label/tag normalization use `backend/text_utils.py`.
 14. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
 15. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-16. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
+16. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 17. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 18. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
 19. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
@@ -217,7 +217,7 @@ Output:
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
-   - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use shared UTC creation and normalization.
+   - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.
    - Connector API paths are normalized and rejected for absolute URLs, traversal,
      backslashes, and control characters before token reads.
 

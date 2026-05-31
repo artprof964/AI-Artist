@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 
 import pytest
 
-from backend.response_cache import _as_utc
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
@@ -18,6 +17,7 @@ from backend.service import (
     create_execution_envelope,
     evaluate_policy,
 )
+from backend.time_utils import as_utc
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:
@@ -130,4 +130,4 @@ def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
 def test_cache_datetime_normalization_treats_naive_datetimes_as_utc() -> None:
     naive = datetime(2026, 5, 31, 12, 0)
 
-    assert _as_utc(naive) == datetime(2026, 5, 31, 12, 0, tzinfo=timezone.utc)
+    assert as_utc(naive) == datetime(2026, 5, 31, 12, 0, tzinfo=timezone.utc)
