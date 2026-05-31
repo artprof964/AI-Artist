@@ -55,6 +55,8 @@
 - `../../tests/test_publishing_adapter.py`
 - `../../validation_reports/t23_github_adapter_implementation_2026-05-31.md`
 - `../../validation_reports/t23_github_adapter_validation_2026-05-31.md`
+- `../../validation_reports/connection_runtime_env_standardization_2026-05-31.md`
+- `../../backend/connection_settings.py`
 - `../../backend/github_adapter.py`
 - `../../tests/test_github_adapter.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`

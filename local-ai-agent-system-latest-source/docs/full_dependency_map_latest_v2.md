@@ -122,8 +122,8 @@ Normalized request fingerprint -> requester scope + policy scope
 ## Secrets
 
 ```text
-LLM API Client -> os.environ["deepseek-open-art"]
-GitHub Adapter -> os.environ["git_ai-artist_codex_token"]
+LLM API Client -> backend/connection_settings.py -> runtime env value "deepseek-open-art"
+GitHub Adapter -> backend/connection_settings.py -> runtime env value "git_ai-artist_codex_token"
 Production later -> OpenBao runtime injection
 Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads.
 LLM API requests must be logged by request id / model / token counts only, not raw secrets.

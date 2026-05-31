@@ -147,6 +147,17 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
     assert MOCK_GITHUB_TOKEN not in repr(result)
 
 
+def test_github_adapter_can_read_token_from_injected_connection_env() -> None:
+    client = MockGitHubAPI()
+    adapter = GitHubAdapter(client, env={GITHUB_TOKEN_ENV_VAR: MOCK_GITHUB_TOKEN})
+    envelope = approved_envelope()
+
+    result = adapter.write(github_write_request(envelope=envelope), now=NOW)
+
+    assert client.calls[0]["token"] == MOCK_GITHUB_TOKEN
+    assert result.client_response["authorization"] == "[REDACTED]"
+
+
 def test_github_token_env_var_is_owned_by_adapter_not_backend_agents() -> None:
     allowed_owners = {"connection_settings.py", "github_adapter.py"}
     forbidden_refs: list[str] = []

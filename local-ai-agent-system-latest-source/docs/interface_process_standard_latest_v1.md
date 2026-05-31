@@ -22,12 +22,13 @@ can be marked done.
 10. External write actions require a signed execution envelope.
 11. Canonical hashes, deterministic local IDs, and source version tags are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
-13. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
-14. Connector payload string-field extraction uses `backend/payload_fields.py`.
-15. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
-16. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-17. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-18. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
+13. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+14. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
+15. Connector payload string-field extraction uses `backend/payload_fields.py`.
+16. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+17. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+18. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+19. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -69,6 +70,8 @@ Rules:
 - OpenClaw sends task context and request metadata only.
 - OpenClaw never forwards API keys, OAuth tokens, signing keys, or private
   webhooks to the configured LLM API.
+- Runtime env and connection settings are resolved through the shared
+  connection settings helper before adapters read provider credentials.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

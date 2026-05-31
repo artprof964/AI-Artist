@@ -10,6 +10,7 @@ from backend.connection_settings import (
     env_example_values,
     load_connection_settings,
     require_env_value,
+    runtime_env,
 )
 from backend.readiness import REQUIRED_ENV_VARS
 
@@ -69,3 +70,9 @@ def test_require_env_value_reports_standard_name_when_missing() -> None:
         assert str(exc) == f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for LLM API test"
     else:
         raise AssertionError("missing required env value should raise")
+
+
+def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
+    env = {DEEPSEEK_OPEN_ART_ENV_VAR: "explicit-secret"}
+
+    assert runtime_env(env) is env

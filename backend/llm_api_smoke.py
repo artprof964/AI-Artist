@@ -1,4 +1,3 @@
-import os
 from dataclasses import dataclass
 from typing import Any, Protocol
 
@@ -7,6 +6,7 @@ from openai import OpenAI
 from backend.connection_settings import (
     DEEPSEEK_OPEN_ART_ENV_VAR,
     load_connection_settings,
+    runtime_env,
 )
 from backend.response_fields import field_value
 from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
@@ -30,8 +30,7 @@ class LLMAPIHTTPClient(Protocol):
 
 
 def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelConfig:
-    values = env if env is not None else os.environ
-    settings = load_connection_settings(values)
+    settings = load_connection_settings(runtime_env(env))
     if not settings.llm_api_key:
         raise RuntimeError(
             f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test"

@@ -2,13 +2,17 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-import os
-from typing import Any, Protocol
+from typing import Any, Mapping, Protocol
 from uuid import UUID
 
 from backend.adapter_results import targeted_result_fields
 from backend.audit import redact_audit_value
-from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
+from backend.connection_settings import (
+    GITHUB_TOKEN_ENV_VAR,
+    load_connection_settings,
+    require_env_value,
+    runtime_env,
+)
 from backend.execution_gate import require_execution_envelope
 from backend.operations import OPERATION_GITHUB_WRITE
 from backend.schemas import ExecutionEnvelopeResponse
@@ -65,9 +69,11 @@ class GitHubAdapter:
         client: GitHubAPIClient,
         *,
         token_env_var: str = GITHUB_TOKEN_ENV_VAR,
+        env: Mapping[str, str] | None = None,
     ) -> None:
         self._client = client
         self._token_env_var = token_env_var
+        self._env = env
 
     def write(
         self,
@@ -117,8 +123,17 @@ class GitHubAdapter:
 
     def _read_runtime_token(self) -> str:
         try:
+            values = runtime_env(self._env)
+            if self._token_env_var == GITHUB_TOKEN_ENV_VAR:
+                token = load_connection_settings(values).github_token
+                if not token:
+                    raise RuntimeError(
+                        f"{GITHUB_TOKEN_ENV_VAR} is required for GitHub adapter execution"
+                    )
+                return token.strip()
+
             return require_env_value(
-                os.environ,
+                values,
                 self._token_env_var,
                 purpose="GitHub adapter execution",
             ).strip()

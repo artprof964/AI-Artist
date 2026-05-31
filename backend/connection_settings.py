@@ -126,8 +126,12 @@ def require_env_value(
     return value
 
 
+def runtime_env(env: Mapping[str, str] | None = None) -> Mapping[str, str]:
+    return env if env is not None else os.environ
+
+
 def load_connection_settings(env: Mapping[str, str] | None = None) -> ConnectionSettings:
-    values = env if env is not None else os.environ
+    values = runtime_env(env)
 
     return ConnectionSettings(
         llm_api_key=env_value(
@@ -206,4 +210,5 @@ __all__ = [
     "env_value",
     "load_connection_settings",
     "require_env_value",
+    "runtime_env",
 ]
