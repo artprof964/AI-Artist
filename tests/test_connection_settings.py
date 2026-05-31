@@ -1,6 +1,8 @@
 import ast
 from pathlib import Path
 
+import pytest
+
 from backend.connection_settings import (
     CONNECTION_ENV_VARS,
     CONNECTION_SETTING_NAMES,
@@ -18,6 +20,7 @@ from backend.connection_settings import (
     env_example_values,
     load_connection_settings,
     require_env_value,
+    require_runtime_secret,
     runtime_env,
 )
 from backend.readiness import REQUIRED_ENV_VARS
@@ -116,6 +119,43 @@ def test_require_env_value_reports_standard_name_when_missing() -> None:
         assert str(exc) == f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for LLM API test"
     else:
         raise AssertionError("missing required env value should raise")
+
+
+def test_require_runtime_secret_trims_and_loads_registry_setting() -> None:
+    env = {GITHUB_TOKEN_ENV_VAR: "  ghp_localtoken  "}
+
+    assert (
+        require_runtime_secret(
+            env,
+            GITHUB_TOKEN_ENV_VAR,
+            purpose="GitHub adapter execution",
+            setting_name="github_token",
+        )
+        == "ghp_localtoken"
+    )
+
+
+def test_require_runtime_secret_supports_custom_env_names() -> None:
+    assert (
+        require_runtime_secret(
+            {"CUSTOM_GITHUB_TOKEN": "  custom-token  "},
+            "CUSTOM_GITHUB_TOKEN",
+            purpose="custom adapter",
+        )
+        == "custom-token"
+    )
+
+
+def test_require_runtime_secret_reports_standard_name_when_missing() -> None:
+    with pytest.raises(RuntimeError) as exc:
+        require_runtime_secret(
+            {GITHUB_TOKEN_ENV_VAR: "   "},
+            GITHUB_TOKEN_ENV_VAR,
+            purpose="GitHub adapter execution",
+            setting_name="github_token",
+        )
+
+    assert str(exc.value) == f"{GITHUB_TOKEN_ENV_VAR} is required for GitHub adapter execution"
 
 
 def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:

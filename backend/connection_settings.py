@@ -166,6 +166,28 @@ def require_env_value(
     return value
 
 
+def require_runtime_secret(
+    env: Mapping[str, str] | None,
+    name: str,
+    *,
+    purpose: str,
+    setting_name: str | None = None,
+    aliases: tuple[str, ...] = (),
+) -> str:
+    values = runtime_env(env)
+    if setting_name is None:
+        value = env_value(values, name, aliases=aliases)
+    else:
+        if setting_name not in CONNECTION_SETTING_NAMES:
+            raise RuntimeError(f"unknown connection setting: {setting_name}")
+        value = getattr(load_connection_settings(values), setting_name)
+
+    normalized = value.strip()
+    if not normalized:
+        raise RuntimeError(f"{name} is required for {purpose}")
+    return normalized
+
+
 def runtime_env(env: Mapping[str, str] | None = None) -> Mapping[str, str]:
     return env if env is not None else os.environ
 
@@ -233,5 +255,6 @@ __all__ = [
     "env_value",
     "load_connection_settings",
     "require_env_value",
+    "require_runtime_secret",
     "runtime_env",
 ]

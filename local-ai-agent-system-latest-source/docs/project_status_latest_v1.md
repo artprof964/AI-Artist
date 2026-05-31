@@ -25,7 +25,7 @@ Interface contracts: 28 defined
 Safety Service health contract: centralized in backend/health_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
-Connection settings registry, endpoint URL composition, env-example rendering, runtime env resolution, and env-access guards: centralized in backend/connection_settings.py
+Connection settings registry, endpoint URL composition, env-example rendering, runtime env resolution, runtime secret resolution, and env-access guards: centralized in backend/connection_settings.py
 Shell command construction, process execution defaults, and delimited process-output parsing: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: centralized in backend/repo_paths.py
@@ -123,7 +123,7 @@ Query tracking: aligned with Safety Service-owned persistence and source freshne
 Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Safety Service health: shared health response and readiness expected-signal contract
-Connection registry, endpoint URL composition, env-example rendering, runtime env resolution, and env-access guards: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, readiness commands, docs, and tracker
+Connection registry, endpoint URL composition, env-example rendering, runtime env resolution, runtime secret resolution, and env-access guards: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, readiness commands, docs, and tracker
 Shell command construction, process execution, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations and migration output parsing
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: shared across security review, scaffold, OPA, readiness validators, workspace validators, and contract guard tests
@@ -196,7 +196,8 @@ process execution validation: 2 focused files passed; tests guarded against dire
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
-final pytest: 396 passed, 1 skipped, 1 warning
+runtime secret validation: 3 focused files passed; GitHub adapter guarded against local runtime-token resolution
+final pytest: 400 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

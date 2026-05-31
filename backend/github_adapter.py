@@ -9,9 +9,7 @@ from backend.adapter_results import targeted_result_fields
 from backend.audit import redact_audit_value
 from backend.connection_settings import (
     GITHUB_TOKEN_ENV_VAR,
-    load_connection_settings,
-    require_env_value,
-    runtime_env,
+    require_runtime_secret,
 )
 from backend.execution_gate import require_execution_envelope
 from backend.execution_gate_messages import execution_envelope_required
@@ -27,7 +25,6 @@ from backend.github_contracts import (
     GITHUB_API_PATH_TYPE_MESSAGE,
     GITHUB_TARGET_LABEL,
     GITHUB_WRITE_ACTION_LABEL,
-    github_token_required,
 )
 from backend.http_methods import normalize_http_write_method
 from backend.operations import OPERATION_GITHUB_WRITE
@@ -150,18 +147,16 @@ class GitHubAdapter:
 
     def _read_runtime_token(self) -> str:
         try:
-            values = runtime_env(self._env)
-            if self._token_env_var == GITHUB_TOKEN_ENV_VAR:
-                token = load_connection_settings(values).github_token
-                if not token:
-                    raise RuntimeError(github_token_required(GITHUB_TOKEN_ENV_VAR))
-                return token.strip()
-
-            return require_env_value(
-                values,
+            return require_runtime_secret(
+                self._env,
                 self._token_env_var,
                 purpose=GITHUB_ADAPTER_EXECUTION_PURPOSE,
-            ).strip()
+                setting_name=(
+                    "github_token"
+                    if self._token_env_var == GITHUB_TOKEN_ENV_VAR
+                    else None
+                ),
+            )
         except RuntimeError as exc:
             raise GitHubAdapterConfigurationError(str(exc)) from exc
 

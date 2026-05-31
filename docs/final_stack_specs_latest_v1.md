@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 396 passed, 1 skipped, 1 warning
+Final validation: 400 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -88,7 +88,7 @@ backend/execution_gate.py: shared execution-envelope coercion and validation for
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, and optional source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
-backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution and guards, endpoint URL composition, env-example rendering, and connection settings loader.
+backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution and guards, endpoint URL composition, env-example rendering, and connection settings loader.
 backend/shell_commands.py: shared shell command construction for Docker Compose, curl, and MinIO command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
@@ -138,7 +138,7 @@ Safety Service health status, service name, response payload, and readiness
 expected-signal text must flow through backend/health_contracts.py before
 endpoint, schema, or runbook readiness health-check logic is changed.
 Connection names, defaults, secret aliases, target setting fields, endpoint URL
-composition, env-example rendering, and runtime env resolution/access guards must be changed through
+composition, env-example rendering, runtime env resolution, runtime secret resolution, and env-access guards must be changed through
 backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias.
