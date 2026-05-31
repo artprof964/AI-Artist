@@ -13,6 +13,29 @@ from backend.time_utils import utc_now
 TelemetryStage = Literal["request", "policy", "cache", "orchestration", "tool"]
 LogLevel = Literal["info", "warning", "error"]
 
+TELEMETRY_STAGE_REQUEST: TelemetryStage = "request"
+TELEMETRY_STAGE_POLICY: TelemetryStage = "policy"
+TELEMETRY_STAGE_CACHE: TelemetryStage = "cache"
+TELEMETRY_STAGE_ORCHESTRATION: TelemetryStage = "orchestration"
+TELEMETRY_STAGE_TOOL: TelemetryStage = "tool"
+
+LOG_LEVEL_INFO: LogLevel = "info"
+LOG_LEVEL_WARNING: LogLevel = "warning"
+LOG_LEVEL_ERROR: LogLevel = "error"
+
+TELEMETRY_STAGES: tuple[TelemetryStage, ...] = (
+    TELEMETRY_STAGE_REQUEST,
+    TELEMETRY_STAGE_POLICY,
+    TELEMETRY_STAGE_CACHE,
+    TELEMETRY_STAGE_ORCHESTRATION,
+    TELEMETRY_STAGE_TOOL,
+)
+LOG_LEVELS: tuple[LogLevel, ...] = (
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_WARNING,
+    LOG_LEVEL_ERROR,
+)
+
 
 @dataclass(frozen=True)
 class TraceRecord:
@@ -66,7 +89,7 @@ class InMemoryObservabilityCollector:
         metric_name: str | None = None,
         metric_value: float = 1.0,
         metric_tags: dict[str, Any] | None = None,
-        log_level: LogLevel = "info",
+        log_level: LogLevel = LOG_LEVEL_INFO,
         message: str | None = None,
         fields: dict[str, Any] | None = None,
     ) -> None:
@@ -150,7 +173,7 @@ def record_observability_stage(
     metric_name: str | None = None,
     metric_value: float = 1.0,
     metric_tags: dict[str, Any] | None = None,
-    log_level: LogLevel = "info",
+    log_level: LogLevel = LOG_LEVEL_INFO,
     message: str | None = None,
     fields: dict[str, Any] | None = None,
 ) -> None:
@@ -176,8 +199,20 @@ def _safe_dict(value: dict[str, Any] | None) -> dict[str, Any]:
 
 __all__ = [
     "InMemoryObservabilityCollector",
+    "LOG_LEVEL_ERROR",
+    "LOG_LEVEL_INFO",
+    "LOG_LEVEL_WARNING",
+    "LOG_LEVELS",
+    "LogLevel",
     "MetricRecord",
     "StructuredLogRecord",
+    "TELEMETRY_STAGE_CACHE",
+    "TELEMETRY_STAGE_ORCHESTRATION",
+    "TELEMETRY_STAGE_POLICY",
+    "TELEMETRY_STAGE_REQUEST",
+    "TELEMETRY_STAGE_TOOL",
+    "TELEMETRY_STAGES",
+    "TelemetryStage",
     "TraceRecord",
     "observability_collector",
     "record_observability_stage",

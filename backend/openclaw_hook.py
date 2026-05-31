@@ -3,7 +3,11 @@ from typing import Any, Protocol
 from uuid import UUID
 
 from backend.interface_types import Operation, RequestKind
-from backend.observability import record_observability_stage
+from backend.observability import (
+    LOG_LEVEL_WARNING,
+    TELEMETRY_STAGE_TOOL,
+    record_observability_stage,
+)
 from backend.request_identity import prefixed_trace_id
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
@@ -93,7 +97,7 @@ def execute_tool_call_with_safety(
     adapter: ToolAdapter,
 ) -> ToolCallResult:
     record_observability_stage(
-        stage="tool",
+        stage=TELEMETRY_STAGE_TOOL,
         event="preflight",
         trace_id=request.correlation_id,
         request_id=request.request_id,
@@ -112,13 +116,13 @@ def execute_tool_call_with_safety(
     decision = safety_client.evaluate_tool_call(policy_request)
     if not decision.allow:
         record_observability_stage(
-            stage="tool",
+            stage=TELEMETRY_STAGE_TOOL,
             event="denied",
             trace_id=request.correlation_id,
             request_id=request.request_id,
             metric_name="ai_artist.tool.denied.total",
             metric_tags={"tool_name": request.tool_name, "operation": request.operation},
-            log_level="warning",
+            log_level=LOG_LEVEL_WARNING,
             message="tool call denied",
             fields={
                 "tool_name": request.tool_name,
@@ -136,7 +140,7 @@ def execute_tool_call_with_safety(
         )
 
     record_observability_stage(
-        stage="tool",
+        stage=TELEMETRY_STAGE_TOOL,
         event="approved",
         trace_id=request.correlation_id,
         request_id=request.request_id,
@@ -152,7 +156,7 @@ def execute_tool_call_with_safety(
     )
     adapter_result = adapter.run(request)
     record_observability_stage(
-        stage="tool",
+        stage=TELEMETRY_STAGE_TOOL,
         event="executed",
         trace_id=request.correlation_id,
         request_id=request.request_id,

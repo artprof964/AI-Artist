@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 290 passed, 1 skipped, 1 warning
+Final validation: 292 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -85,7 +85,7 @@ backend/critic_curator.py: deterministic image critique rubric.
 backend/slack_adapter.py: mocked Slack request/response adapter.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary.
-backend/observability.py: traces, metrics, structured logs, redaction.
+backend/observability.py: telemetry stage/log-level constants, traces, metrics, structured logs, redaction.
 backend/security_review.py: deterministic security checklist helpers.
 backend/readiness.py: production readiness schema and runbook validators.
 ```
@@ -167,6 +167,9 @@ added.
 Request kind, channel, operation, and audit event type contracts must flow
 through backend/interface_types.py before schema, classifier, or audit-specific
 literal types are added.
+Telemetry stages and log levels must flow through backend/observability.py
+constants before service, cache, orchestration, tool, or review-specific
+telemetry calls are added.
 Pydantic model/dict coercion at adapter and domain boundaries must flow through
 backend/model_coercion.py before direct model validation or one-off validation
 wrappers are added.

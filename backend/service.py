@@ -5,7 +5,14 @@ from backend.audit import (
     record_audit_event,
 )
 from backend.canonical_hash import hmac_sha256_json
-from backend.observability import record_observability_stage, trace_id_from_request
+from backend.observability import (
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_WARNING,
+    TELEMETRY_STAGE_POLICY,
+    TELEMETRY_STAGE_REQUEST,
+    record_observability_stage,
+    trace_id_from_request,
+)
 from backend.operations import (
     ACTION_TERMS,
     READ_TERMS,
@@ -60,7 +67,7 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
         metadata=payload.metadata,
     )
     record_observability_stage(
-        stage="request",
+        stage=TELEMETRY_STAGE_REQUEST,
         event="canonicalize",
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
@@ -101,7 +108,7 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
         reasons=[f"operation:{operation}", f"kind:{request_kind}"],
     )
     record_observability_stage(
-        stage="request",
+        stage=TELEMETRY_STAGE_REQUEST,
         event="classify",
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
@@ -145,7 +152,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
         )
 
     record_observability_stage(
-        stage="policy",
+        stage=TELEMETRY_STAGE_POLICY,
         event="evaluate",
         trace_id=trace_id_from_request(payload.request_id, payload.metadata),
         request_id=payload.request_id,
@@ -155,7 +162,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
             "request_kind": payload.request_kind,
             "allow": response.allow,
         },
-        log_level="info" if response.allow else "warning",
+        log_level=LOG_LEVEL_INFO if response.allow else LOG_LEVEL_WARNING,
         message="policy evaluated",
         fields={
             "operation": payload.operation,

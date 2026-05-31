@@ -9,7 +9,7 @@ from backend.audit import redact_audit_value
 from backend.canonical_hash import canonical_json
 from backend.image_provenance import ImageProvenanceRecord
 from backend.mapping_utils import copy_mapping
-from backend.observability import InMemoryObservabilityCollector
+from backend.observability import InMemoryObservabilityCollector, TELEMETRY_STAGE_TOOL
 from backend.schemas import (
     ExecutionEnvelopeRequest,
     HumanApproval,
@@ -64,7 +64,7 @@ def review_audit_payload_redaction(payload: dict[str, Any]) -> list[SecurityRevi
 def review_observability_redaction(fields: dict[str, Any]) -> list[SecurityReviewFinding]:
     collector = InMemoryObservabilityCollector()
     collector.record_stage(
-        stage="tool",
+        stage=TELEMETRY_STAGE_TOOL,
         event="security_review_probe",
         trace_id="security-review",
         fields=fields,

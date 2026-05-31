@@ -36,7 +36,8 @@ can be marked done.
 24. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 25. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 26. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-27. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+27. Telemetry stages and log levels use `backend/observability.py`.
+28. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope

@@ -3,7 +3,13 @@ from datetime import datetime
 from typing import Any
 
 from backend.interface_types import Operation, RequestKind
-from backend.observability import record_observability_stage, trace_id_from_request
+from backend.observability import (
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_WARNING,
+    TELEMETRY_STAGE_CACHE,
+    record_observability_stage,
+    trace_id_from_request,
+)
 from backend.reason_messages import (
     CACHE_ENTRY_EXPIRED,
     CACHE_ENTRY_NOT_FOUND,
@@ -72,13 +78,13 @@ def evaluate_cached_response_reuse(
             response_body=response_body,
         )
         record_observability_stage(
-            stage="cache",
+            stage=TELEMETRY_STAGE_CACHE,
             event="reuse_evaluate",
             trace_id=trace_id,
             request_id=policy_request.request_id,
             metric_name="ai_artist.cache.reuse_evaluated.total",
             metric_tags={"replay": decision.replay, "reason": decision.reason},
-            log_level="info" if decision.replay else "warning",
+            log_level=LOG_LEVEL_INFO if decision.replay else LOG_LEVEL_WARNING,
             message="cache reuse evaluated",
             fields={
                 "operation": policy_request.operation,

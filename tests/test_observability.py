@@ -4,7 +4,14 @@ from uuid import UUID
 
 import pytest
 
-from backend.observability import observability_collector
+from backend.observability import (
+    TELEMETRY_STAGE_CACHE,
+    TELEMETRY_STAGE_ORCHESTRATION,
+    TELEMETRY_STAGE_POLICY,
+    TELEMETRY_STAGE_REQUEST,
+    TELEMETRY_STAGE_TOOL,
+    observability_collector,
+)
 from backend.openclaw_hook import (
     SafetyDecision,
     ToolCallRequest,
@@ -148,7 +155,13 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
     traces = observability_collector.traces()
     metrics = observability_collector.metrics()
     logs = observability_collector.logs()
-    expected_stages = {"request", "policy", "cache", "orchestration", "tool"}
+    expected_stages = {
+        TELEMETRY_STAGE_REQUEST,
+        TELEMETRY_STAGE_POLICY,
+        TELEMETRY_STAGE_CACHE,
+        TELEMETRY_STAGE_ORCHESTRATION,
+        TELEMETRY_STAGE_TOOL,
+    }
 
     assert expected_stages <= {record.stage for record in traces}
     assert expected_stages <= {record.stage for record in metrics}
@@ -164,11 +177,11 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
     assert "ai_artist.tool.executed.total" in {metric.name for metric in metrics}
 
     log_events = {(record.stage, record.event) for record in logs}
-    assert ("request", "canonicalize") in log_events
-    assert ("policy", "evaluate") in log_events
-    assert ("cache", "reuse_evaluate") in log_events
-    assert ("orchestration", "complete") in log_events
-    assert ("tool", "executed") in log_events
+    assert (TELEMETRY_STAGE_REQUEST, "canonicalize") in log_events
+    assert (TELEMETRY_STAGE_POLICY, "evaluate") in log_events
+    assert (TELEMETRY_STAGE_CACHE, "reuse_evaluate") in log_events
+    assert (TELEMETRY_STAGE_ORCHESTRATION, "complete") in log_events
+    assert (TELEMETRY_STAGE_TOOL, "executed") in log_events
     assert all(isinstance(record.fields, dict) for record in logs)
 
     serialized_telemetry = json.dumps(

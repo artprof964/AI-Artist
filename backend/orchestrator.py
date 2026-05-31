@@ -6,7 +6,13 @@ from pydantic import BaseModel, Field
 
 from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_mean
-from backend.observability import record_observability_stage, trace_id_from_request
+from backend.observability import (
+    LOG_LEVEL_INFO,
+    LOG_LEVEL_WARNING,
+    TELEMETRY_STAGE_ORCHESTRATION,
+    record_observability_stage,
+    trace_id_from_request,
+)
 from backend.review_status import REVIEW_STATUS_PENDING
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
@@ -235,7 +241,7 @@ def synthesize_subagent_outputs(
 def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrationResult:
     trace_id = trace_id_from_request(request.task_id, request.metadata)
     record_observability_stage(
-        stage="orchestration",
+        stage=TELEMETRY_STAGE_ORCHESTRATION,
         event="start",
         trace_id=trace_id,
         request_id=request.task_id,
@@ -252,13 +258,13 @@ def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrat
     outputs = [agent(request) for agent in MOCK_SUB_AGENTS]
     result = synthesize_subagent_outputs(request.task_id, outputs)
     record_observability_stage(
-        stage="orchestration",
+        stage=TELEMETRY_STAGE_ORCHESTRATION,
         event="complete",
         trace_id=trace_id,
         request_id=request.task_id,
         metric_name="ai_artist.orchestration.completed.total",
         metric_tags={"status": result.status, "agent_count": len(result.agent_outputs)},
-        log_level="info" if result.status == "ok" else "warning",
+        log_level=LOG_LEVEL_INFO if result.status == "ok" else LOG_LEVEL_WARNING,
         message="orchestration completed",
         fields={
             "task_id": str(result.task_id),

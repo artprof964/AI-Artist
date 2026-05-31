@@ -105,8 +105,10 @@
 - `../../validation_reports/t25_openclaw_safety_integration_validation_2026-05-31.md`
 - `../../tests/test_openclaw_safety_hook.py`
 - `../../validation_reports/t26_observability_validation_2026-05-31.md`
+- `../../validation_reports/observability_constants_standardization_2026-05-31.md`
 - `../../backend/observability.py`
 - `../../tests/test_observability.py`
+- `../../tests/test_observability_constants.py`
 - `../../validation_reports/t27_security_review_validation_2026-05-31.md`
 - `../../validation_reports/security_review_canonical_json_standardization_2026-05-31.md`
 - `../../backend/security_review.py`
