@@ -17,6 +17,7 @@ from backend.observability import (
     record_observability_stage,
     trace_id_from_request,
 )
+from backend.policy_contracts import LOCAL_DEFAULT_DENY_POLICY_VERSION
 from backend.operations import (
     ACTION_TERMS,
     READ_TERMS,
@@ -49,7 +50,6 @@ from backend.schemas import (
 from backend.text_utils import identifier_tokens
 from backend.time_utils import utc_now
 
-POLICY_VERSION = "local-default-deny-v0"
 LOCAL_ENVELOPE_SIGNING_KEY = b"ai-artist-local-safety-service-dev-key"
 
 
@@ -136,21 +136,21 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
             allow=False,
             reason=sensitive_operation_requires_envelope(payload.operation),
             requires_human_approval=True,
-            policy_version=POLICY_VERSION,
+            policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
         )
     elif not payload.source_freshness.all_required_sources_unchanged:
         response = PolicyEvaluateResponse(
             allow=False,
             reason=SOURCE_FRESHNESS_CHECK_FAILED,
             requires_human_approval=payload.requires_human_approval,
-            policy_version=POLICY_VERSION,
+            policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
         )
     else:
         response = PolicyEvaluateResponse(
             allow=True,
             reason=READ_POLICY_ALLOWED,
             requires_human_approval=False,
-            policy_version=POLICY_VERSION,
+            policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
         )
 
     record_observability_stage(
@@ -220,7 +220,7 @@ def create_execution_envelope(
         "valid": allow,
         "issued_at": issued_at.isoformat(),
         "expires_at": expires_at.isoformat(),
-        "policy_version": POLICY_VERSION,
+        "policy_version": LOCAL_DEFAULT_DENY_POLICY_VERSION,
     }
     signature = hmac_sha256_json(LOCAL_ENVELOPE_SIGNING_KEY, signature_payload)
 
@@ -234,7 +234,7 @@ def create_execution_envelope(
         allow=allow,
         reason=reason,
         requires_human_approval=needs_approval,
-        policy_version=POLICY_VERSION,
+        policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
         issued_at=issued_at,
         expires_at=expires_at,
         signature=f"hmac-sha256:{signature}",

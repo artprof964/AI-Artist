@@ -13,6 +13,7 @@ from backend.orchestrator import (
     MockOrchestrationResult,
     run_mock_subagent_orchestration,
 )
+from backend.policy_contracts import LOCAL_DEFAULT_DENY_POLICY_VERSION
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness, SubAgentOutput
 from path_helpers import read_backend_source
 
@@ -151,7 +152,7 @@ def test_tool_call_reaches_safety_service_before_adapter_runs() -> None:
     assert adapter.requests[0].metadata["oauth_token"] == "oauth-test-secret"
     assert result.executed is True
     assert result.safety_decision.allow is True
-    assert result.safety_decision.policy_version == "local-default-deny-v0"
+    assert result.safety_decision.policy_version == LOCAL_DEFAULT_DENY_POLICY_VERSION
     assert result.request_id == request.request_id
     assert result.correlation_id == "trace-openclaw-read-001"
     assert result.adapter_result == {
@@ -201,7 +202,7 @@ def test_denied_tool_call_never_runs_adapter() -> None:
     assert result.correlation_id == "trace-openclaw-publish-001"
     assert result.adapter_result is None
     assert result.safety_decision.requires_human_approval is True
-    assert result.safety_decision.policy_version == "local-default-deny-v0"
+    assert result.safety_decision.policy_version == LOCAL_DEFAULT_DENY_POLICY_VERSION
 
 
 def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthesis() -> None:
@@ -236,7 +237,7 @@ def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthes
     assert result.correlation_id == "trace-openclaw-e2e-001"
     assert result.safety_decision.allow is True
     assert result.safety_decision.requires_human_approval is False
-    assert result.safety_decision.policy_version == "local-default-deny-v0"
+    assert result.safety_decision.policy_version == LOCAL_DEFAULT_DENY_POLICY_VERSION
     assert len(safety_client.requests) == 1
 
     safety_request = safety_client.requests[0]
