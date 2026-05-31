@@ -2,7 +2,6 @@ from backend.audit import (
     list_audit_events_by_correlation_id,
     record_audit_event,
 )
-from backend.canonical_hash import hmac_sha256_json
 from backend.classification_contracts import (
     classification_confidence,
     classification_reasons,
@@ -22,6 +21,7 @@ from backend.policy_contracts import (
     LOCAL_DEFAULT_DENY_POLICY_VERSION,
     LOCAL_ENVELOPE_SIGNING_KEY,
     execution_envelope_expires_at,
+    execution_envelope_signature,
 )
 from backend.operations import (
     ACTION_TERMS,
@@ -205,26 +205,21 @@ def create_execution_envelope(
         reason = READ_ENVELOPE_NOT_REQUIRED
 
     envelope_id = runtime_uuid()
-    signature_payload = {
-        "execution_envelope_id": str(envelope_id),
-        "human_approval": {
-            "approved": payload.human_approval.approved,
-            "approved_at": (
-                payload.human_approval.approved_at.isoformat()
-                if payload.human_approval.approved_at
-                else None
-            ),
-            "approver_scope": payload.human_approval.approver_scope,
-        },
-        "request_id": str(payload.request_id),
-        "operation": payload.operation,
-        "target": payload.target,
-        "valid": allow,
-        "issued_at": issued_at.isoformat(),
-        "expires_at": expires_at.isoformat(),
-        "policy_version": LOCAL_DEFAULT_DENY_POLICY_VERSION,
-    }
-    signature = hmac_sha256_json(LOCAL_ENVELOPE_SIGNING_KEY, signature_payload)
+    signature = execution_envelope_signature(
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+        execution_envelope_id=envelope_id,
+        request_id=payload.request_id,
+        operation=payload.operation,
+        target=payload.target,
+        human_approval=payload.human_approval,
+        valid=allow,
+        allow=allow,
+        reason=reason,
+        requires_human_approval=needs_approval,
+        policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
+        issued_at=issued_at,
+        expires_at=expires_at,
+    )
 
     return ExecutionEnvelopeResponse(
         execution_envelope_id=envelope_id,
@@ -239,7 +234,7 @@ def create_execution_envelope(
         policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
         issued_at=issued_at,
         expires_at=expires_at,
-        signature=f"hmac-sha256:{signature}",
+        signature=signature,
     )
 
 

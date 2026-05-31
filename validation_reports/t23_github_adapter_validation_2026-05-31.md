@@ -60,7 +60,7 @@ No blocking T23 findings remain after the serial hardening pass.
 
 ## Residual Risk
 
-- The execution envelope signature is checked for presence, not cryptographic recomputation/verification inside the adapter. That remains consistent with the existing envelope model but is a future hardening point.
+- Superseded on 2026-05-31: execution-envelope signatures are now recomputed and verified centrally by `backend/execution_gate.py` through `backend/policy_contracts.py` before gated adapter execution.
 - The AST guard checks direct literal/name references in top-level `backend/*.py` files. It would not catch dynamically assembled env var names or future backend subpackages unless the guard is expanded.
 - The full regression suite emits the existing Starlette/httpx `TestClient` deprecation warning.
 

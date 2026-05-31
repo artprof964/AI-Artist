@@ -266,6 +266,7 @@
 - `../../validation_reports/side_effect_audit_event_type_contract_standardization_2026-05-31.md`
 - `../../validation_reports/policy_version_contract_standardization_2026-05-31.md`
 - `../../validation_reports/envelope_signing_ttl_contract_standardization_2026-05-31.md`
+- `../../validation_reports/execution_envelope_signature_verification_standardization_2026-05-31.md`
 - `../../backend/policy_contracts.py`
 - `../../tests/test_policy_contracts.py`
 - `../../validation_reports/source_freshness_default_contract_standardization_2026-05-31.md`

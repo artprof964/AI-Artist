@@ -6,6 +6,7 @@ import pytest
 from backend.execution_gate import ExecutionGateError, require_execution_envelope
 from backend.execution_gate_messages import (
     EXECUTION_ENVELOPE_EXPIRED,
+    EXECUTION_ENVELOPE_INVALID_SIGNATURE,
     EXECUTION_ENVELOPE_INVALID,
     EXECUTION_ENVELOPE_MISSING_SIGNATURE,
     EXECUTION_ENVELOPE_NOT_ALLOWED,
@@ -15,6 +16,10 @@ from backend.execution_gate_messages import (
     execution_envelope_operation_mismatch,
     execution_envelope_target_mismatch,
     operation_requires_human_approval,
+)
+from backend.policy_contracts import (
+    LOCAL_ENVELOPE_SIGNING_KEY,
+    execution_envelope_signature,
 )
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
 from backend.time_utils import utc_now
@@ -43,10 +48,27 @@ def envelope(**overrides: object) -> ExecutionEnvelopeResponse:
         "policy_version": "test-policy",
         "issued_at": NOW,
         "expires_at": NOW + timedelta(minutes=5),
-        "signature": "hmac-sha256:signature",
+        "signature": "",
         "reason": "approved",
     }
+    should_sign = "signature" not in overrides
     base.update(overrides)
+    if should_sign:
+        base["signature"] = execution_envelope_signature(
+            signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+            execution_envelope_id=base["execution_envelope_id"],
+            request_id=base["request_id"],
+            operation=base["operation"],
+            target=base["target"],
+            human_approval=base["human_approval"],
+            valid=base["valid"],
+            allow=base["allow"],
+            reason=base["reason"],
+            requires_human_approval=base["requires_human_approval"],
+            policy_version=base["policy_version"],
+            issued_at=base["issued_at"],
+            expires_at=base["expires_at"],
+        )
     return ExecutionEnvelopeResponse.model_validate(base)
 
 
@@ -135,6 +157,20 @@ def test_execution_gate_can_require_human_approval_only_when_marked() -> None:
         )
 
 
+def test_execution_gate_rejects_tampered_signed_envelope() -> None:
+    signed_envelope = envelope().model_copy(update={"reason": "tampered reason"})
+
+    with pytest.raises(ExecutionGateError, match="signature is invalid"):
+        require_execution_envelope(
+            signed_envelope,
+            operation="publish",
+            missing_message="missing",
+            target="channel:main",
+            require_human_approval=True,
+            now=NOW,
+        )
+
+
 def test_execution_gate_error_message_contracts_are_shared() -> None:
     assert EXECUTION_ENVELOPE_INVALID == "execution envelope is invalid"
     assert EXECUTION_ENVELOPE_NOT_VALID == "execution envelope is not valid"
@@ -144,6 +180,7 @@ def test_execution_gate_error_message_contracts_are_shared() -> None:
         == "execution envelope requires human approval"
     )
     assert EXECUTION_ENVELOPE_MISSING_SIGNATURE == "execution envelope must include a signature"
+    assert EXECUTION_ENVELOPE_INVALID_SIGNATURE == "execution envelope signature is invalid"
     assert EXECUTION_ENVELOPE_EXPIRED == "execution envelope is expired"
     assert (
         execution_envelope_operation_mismatch("publish")
@@ -166,6 +203,7 @@ def test_execution_gate_uses_shared_error_message_contracts() -> None:
         '"execution envelope does not allow execution"',
         '"execution envelope requires human approval"',
         '"execution envelope must include a signature"',
+        '"execution envelope signature is invalid"',
         '"execution envelope is expired"',
         '"execution envelope operation must be',
         '"execution envelope target does not match',

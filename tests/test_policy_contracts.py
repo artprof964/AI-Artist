@@ -2,12 +2,15 @@ from datetime import datetime, timezone
 from uuid import UUID
 
 from backend.policy_contracts import (
+    EXECUTION_ENVELOPE_SIGNATURE_PREFIX,
     EXECUTION_ENVELOPE_TTL_MINUTES,
     LOCAL_DEFAULT_DENY_POLICY_VERSION,
     LOCAL_ENVELOPE_SIGNING_KEY,
     execution_envelope_expires_at,
+    execution_envelope_signature,
+    execution_envelope_signature_is_valid,
 )
-from backend.schemas import ExecutionEnvelopeRequest, PolicyEvaluateRequest
+from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, PolicyEvaluateRequest
 from backend.service import create_execution_envelope, evaluate_policy
 from path_helpers import read_backend_source
 
@@ -52,8 +55,90 @@ def test_execution_envelope_signing_and_ttl_contracts_are_shared() -> None:
 
     assert LOCAL_ENVELOPE_SIGNING_KEY == b"ai-artist-local-safety-service-dev-key"
     assert EXECUTION_ENVELOPE_TTL_MINUTES == 15
+    assert EXECUTION_ENVELOPE_SIGNATURE_PREFIX == "hmac-sha256:"
     assert execution_envelope_expires_at(issued_at) == datetime(
         2026, 5, 31, 10, 15, tzinfo=timezone.utc
+    )
+
+
+def test_execution_envelope_signature_contract_covers_envelope_fields() -> None:
+    issued_at = datetime(2026, 5, 31, 10, 0, tzinfo=timezone.utc)
+    expires_at = execution_envelope_expires_at(issued_at)
+    human_approval = HumanApproval(
+        approved=True,
+        approver_scope="user:owner",
+        approved_at=issued_at,
+    )
+
+    signature = execution_envelope_signature(
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+        execution_envelope_id=UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        operation="publish",
+        target="slack://workspace/channel",
+        human_approval=human_approval,
+        valid=True,
+        allow=True,
+        reason="publish approved with execution envelope",
+        requires_human_approval=True,
+        policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
+        issued_at=issued_at,
+        expires_at=expires_at,
+    )
+
+    assert signature.startswith(EXECUTION_ENVELOPE_SIGNATURE_PREFIX)
+    assert signature == execution_envelope_signature(
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+        execution_envelope_id=UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        operation="publish",
+        target="slack://workspace/channel",
+        human_approval=human_approval,
+        valid=True,
+        allow=True,
+        reason="publish approved with execution envelope",
+        requires_human_approval=True,
+        policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
+        issued_at=issued_at,
+        expires_at=expires_at,
+    )
+    assert signature != execution_envelope_signature(
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+        execution_envelope_id=UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        operation="publish",
+        target="slack://workspace/channel",
+        human_approval=human_approval,
+        valid=True,
+        allow=True,
+        reason="tampered reason",
+        requires_human_approval=True,
+        policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
+        issued_at=issued_at,
+        expires_at=expires_at,
+    )
+
+
+def test_created_execution_envelope_signature_verifies_through_shared_contract() -> None:
+    envelope = create_execution_envelope(
+        ExecutionEnvelopeRequest(
+            request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+            request_kind="action",
+            operation="publish",
+            requester_scope="user:local",
+            policy_scope="workspace:ai-artist-main",
+            target="slack://workspace/channel",
+            human_approval=HumanApproval(approved=True, approver_scope="user:owner"),
+        )
+    )
+
+    assert execution_envelope_signature_is_valid(
+        envelope,
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+    )
+    assert not execution_envelope_signature_is_valid(
+        envelope.model_copy(update={"reason": "tampered"}),
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
     )
 
 
@@ -63,7 +148,10 @@ def test_service_uses_shared_envelope_signing_and_ttl_contracts() -> None:
 
     assert "LOCAL_ENVELOPE_SIGNING_KEY" in service_source
     assert "execution_envelope_expires_at(" in service_source
+    assert "execution_envelope_signature(" in service_source
     assert "timedelta(minutes=15)" not in service_source
     assert "ai-artist-local-safety-service-dev-key" not in service_source
+    assert "signature_payload =" not in service_source
+    assert "hmac_sha256_json" not in service_source
     assert "LOCAL_ENVELOPE_SIGNING_KEY = b" in contract_source
     assert "EXECUTION_ENVELOPE_TTL_MINUTES = 15" in contract_source

@@ -3,6 +3,7 @@ EXECUTION_ENVELOPE_NOT_VALID = "execution envelope is not valid"
 EXECUTION_ENVELOPE_NOT_ALLOWED = "execution envelope does not allow execution"
 EXECUTION_ENVELOPE_REQUIRES_HUMAN_APPROVAL = "execution envelope requires human approval"
 EXECUTION_ENVELOPE_MISSING_SIGNATURE = "execution envelope must include a signature"
+EXECUTION_ENVELOPE_INVALID_SIGNATURE = "execution envelope signature is invalid"
 EXECUTION_ENVELOPE_EXPIRED = "execution envelope is expired"
 
 

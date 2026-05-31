@@ -62,5 +62,5 @@ Acceptance is satisfied: external/local mocked publishing remains blocked until 
 
 ## Residual Risk
 
-- The adapter checks that a signature is present but does not independently recompute/verify the HMAC signature contents. This is acceptable for the validated task scope if envelope creation is trusted, but it is a future hardening point.
+- Superseded on 2026-05-31: execution-envelope signatures are now recomputed and verified centrally by `backend/execution_gate.py` through `backend/policy_contracts.py` before gated adapter execution.
 - Validation covered focused publishing tests, adjacent safety/OPA regressions, repository-wide linting, and the full repository test suite.

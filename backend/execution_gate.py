@@ -5,6 +5,7 @@ from typing import Any
 
 from backend.execution_gate_messages import (
     EXECUTION_ENVELOPE_EXPIRED,
+    EXECUTION_ENVELOPE_INVALID_SIGNATURE,
     EXECUTION_ENVELOPE_INVALID,
     EXECUTION_ENVELOPE_MISSING_SIGNATURE,
     EXECUTION_ENVELOPE_NOT_ALLOWED,
@@ -15,6 +16,10 @@ from backend.execution_gate_messages import (
     operation_requires_human_approval,
 )
 from backend.model_coercion import coerce_model
+from backend.policy_contracts import (
+    LOCAL_ENVELOPE_SIGNING_KEY,
+    execution_envelope_signature_is_valid,
+)
 from backend.schemas import ExecutionEnvelopeResponse
 from backend.time_utils import as_utc, utc_now
 
@@ -104,6 +109,12 @@ def _validate_execution_envelope(
     expires_at = as_utc(envelope.expires_at)
     if expires_at <= comparison_time:
         raise error_type(EXECUTION_ENVELOPE_EXPIRED)
+
+    if not execution_envelope_signature_is_valid(
+        envelope,
+        signing_key=LOCAL_ENVELOPE_SIGNING_KEY,
+    ):
+        raise error_type(EXECUTION_ENVELOPE_INVALID_SIGNATURE)
 
 
 __all__ = [

@@ -32,8 +32,8 @@ Readiness backup paths: centralized in backend/readiness_paths.py
 Readiness validation detail messages: centralized in backend/readiness.py
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: centralized in backend/repo_paths.py
 Test project-root resolution, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration: centralized in tests/path_helpers.py
-Execution gates: centralized in backend/execution_gate.py
-Execution-envelope messages: centralized in backend/execution_gate_messages.py
+Execution gates, expiry checks, and signature verification: centralized in backend/execution_gate.py
+Execution-envelope messages including signature failures: centralized in backend/execution_gate_messages.py
 Slack adapter contracts, scopes, and payload shapes: centralized in backend/slack_contracts.py
 GitHub adapter contracts and token-required message routing: centralized in backend/github_contracts.py and backend/connection_settings.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
@@ -48,7 +48,7 @@ Request scope and publishing scope defaults: centralized in backend/request_scop
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
-Local default-deny policy version, execution-envelope signing key, and execution-envelope TTL: centralized in backend/policy_contracts.py
+Local default-deny policy version, execution-envelope signing key, signature payload/signing/verification helpers, and execution-envelope TTL: centralized in backend/policy_contracts.py
 Source registry missing-row messages, dependency roles, empty change-sequence defaults, and initial change-sequence defaults: centralized in backend/source_registry_contracts.py
 Source freshness schema defaults and unchanged-source checks: centralized in backend/source_freshness_contracts.py
 Source ingestion contracts and registry metadata payloads: centralized in backend/source_ingestion_contracts.py
@@ -138,8 +138,8 @@ Readiness validation detail messages: shared across env, runbook, and command ch
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: shared across security review, scaffold, OPA, readiness validators, workspace validators, and contract guard tests
 Test path/source helpers: shared across repo-wide guard tests, filesystem/process fixture tests, and checked-in source inspection tests for connection settings, connection env-access checks, canonical hashing, classification contracts, health contracts, request metadata, mapping utilities, model coercion, runtime IDs, Safety Service, security review, source ingestion, source freshness, ComfyUI, Publishing, publishing status, Slack, HTTP method, GitHub adapter, GitHub contract, image provenance, Critic/Curator, Knowledge Agent, mock sub-agents, sub-agent output/status, execution gate, interface types, LLM API smoke, observability, OpenClaw hook, reason messages, review statuses, response cache, production readiness, tree shape, time utilities, shell commands, OPA policy, PostgreSQL migration, OpenClaw workspace, file scanning, and repo path contracts
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
-Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
-Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, signature, and expiry failures
+Execution gate: shared across GitHub, Publishing, and ComfyUI adapters for semantic validation, expiry checks, and signature verification
+Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, missing/invalid signature, and expiry failures
 Secret detection, structured unredacted-secret checks, and redaction: shared directly across audit, observability, LLM smoke request logging, OpenClaw hook, GitHub, Slack, and security review
 Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
@@ -153,7 +153,7 @@ Request scope defaults: shared across API schemas, mock orchestration request en
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
-Policy contracts: shared across Safety Service policy responses, execution-envelope policy version stamps, execution-envelope signing, and envelope expiry TTL
+Policy contracts: shared across Safety Service policy responses, execution-envelope policy version stamps, execution-envelope signing payloads, signature verification, and envelope expiry TTL
 Source registry contracts: shared across source-key/source-id freshness lookup failures, dependency roles, empty source snapshots, and initial change sequence defaults
 Source freshness contracts: shared across schema defaults, unchanged-source checks, source dependency snapshots, policy requests, cache replay, and execution envelopes
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
@@ -181,7 +181,7 @@ HTTP methods: shared across GitHub write method validation, validation messages,
 GitHub adapter contracts: shared across action labels, target labels, API validation messages, token-purpose text, token-required message routing through connection settings, and adapter secret lookup
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
-Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and execution gate validation errors
+Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and execution gate validation/signature errors
 Classification response contract: shared across Safety Service classifier confidence and reason fields
 Publishing operation constants: shared directly across publishing adapter gates and publishing audit records
 Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
@@ -215,7 +215,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 465 passed, 1 skipped, 1 warning
+final pytest: 468 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

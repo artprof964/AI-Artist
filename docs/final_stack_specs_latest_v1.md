@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 465 passed, 1 skipped, 1 warning
+Final validation: 468 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -49,8 +49,8 @@ evaluation, execution-envelope signing, audit event recording.
 ```text
 backend/api_contracts.py: shared FastAPI app metadata and Safety Service route paths.
 backend/app.py: FastAPI endpoints using shared API contracts.
-backend/service.py: canonicalization, classification, local policy gate, execution envelope.
-backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, and execution-envelope TTL contracts for policy responses and execution envelopes.
+backend/service.py: canonicalization, classification, local policy gate, execution envelope creation using shared signing contracts.
+backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, signature prefix, signature payload/signing/verification helpers, and execution-envelope TTL contracts for policy responses and execution envelopes.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
 backend/classification_contracts.py: shared classifier confidence and reason formatting.
@@ -87,8 +87,8 @@ backend/source_ingestion_contracts.py: shared source ingestion approved-domain d
 backend/slack_contracts.py: shared Slack source label, scope, local-request payload, outbound payload, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
-backend/execution_gate_messages.py: shared execution-envelope validation failure and required-envelope message contracts.
-backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
+backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
+backend/execution_gate.py: shared execution-envelope coercion, semantic validation, expiry validation, and signature verification for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, source registry role/change-sequence contracts, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version, URL-domain validation, registry metadata payload, and source-registry default boundaries.
@@ -135,7 +135,8 @@ OPA default allow remains false.
 Read-only reuse requires read classification, OPA approval, non-expired cache,
 matching requester/policy scope, and unchanged source dependencies.
 Write, publish, delete, GitHub write, and image generation are denied until a
-valid operation-matching execution envelope exists.
+valid operation-matching execution envelope with a verified shared HMAC
+signature exists.
 External publish/write paths require human approval.
 OpenClaw agents, prompts, logs, audit payloads, and memory files must not
 contain raw API keys, OAuth tokens, Slack tokens, GitHub tokens, signing keys, or
@@ -172,10 +173,11 @@ runbook, OPA policy, PostgreSQL schema, workspace, or backend module files.
 Repo-wide validation tests that scan checked-in project, backend, or test source
 must use tests/path_helpers.py for project root resolution, project text reads,
 backend source reads, test source reads, and source iteration.
-Execution-envelope validation must flow through backend/execution_gate.py before
-adapter-specific side-effect logic.
-Execution-envelope validation failure and required-envelope messages must flow through
-backend/execution_gate_messages.py before gated adapters expose envelope errors.
+Execution-envelope validation, expiry checks, and signature verification must
+flow through backend/execution_gate.py before adapter-specific side-effect logic.
+Execution-envelope validation failure, signature failure, and required-envelope
+messages must flow through backend/execution_gate_messages.py before gated
+adapters expose envelope errors.
 Secret detection patterns, assignment scanning, structured unredacted-secret checks, and replacement behavior must
 flow through backend/secret_redaction.py before adapter-specific logging,
 response shaping, security review, or future scanner logic.
@@ -216,9 +218,9 @@ Cache, source-freshness, policy, and execution-envelope reason strings must
 flow through backend/reason_messages.py before service or cache decision text is
 added.
 Policy response and execution-envelope policy versions, local execution-envelope
-signing key, and execution-envelope TTL must flow through
-backend/policy_contracts.py before local default-deny or envelope-signing
-contracts change.
+signing key, signature prefix, signature payload/signing/verification helpers,
+and execution-envelope TTL must flow through backend/policy_contracts.py before
+local default-deny or envelope-signing contracts change.
 Source registry missing-row messages must flow through
 backend/source_registry_contracts.py before source freshness or future
 persistence adapters raise missing-row errors.

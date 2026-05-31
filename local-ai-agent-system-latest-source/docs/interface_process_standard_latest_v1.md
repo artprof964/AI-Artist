@@ -21,7 +21,7 @@ can be marked done.
 9. MinIO owns generated files and source snapshots.
 10. Redis/Celery/Dagster own background execution state.
 11. ComfyUI owns image workflow execution.
-12. External write actions require a signed execution envelope.
+12. External write actions require a signed execution envelope whose signature verifies at the shared execution gate.
 13. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
 14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 15. RequestMetadata workspace/agent mapping uses `backend/request_metadata.py`.
@@ -29,7 +29,7 @@ can be marked done.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
 19. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
-19a. Local default-deny policy versioning, execution-envelope signing key, and execution-envelope TTL use `backend/policy_contracts.py`.
+19a. Local default-deny policy versioning, execution-envelope signing key, signature payload/signing/verification helpers, and execution-envelope TTL use `backend/policy_contracts.py`.
 19b. Source freshness schema defaults and unchanged-source checks use `backend/source_freshness_contracts.py`.
 20. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 21. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
@@ -55,7 +55,7 @@ can be marked done.
 41. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 42. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
 43. Source registry missing-row messages, dependency-role defaults, empty change-sequence defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
-44. Execution-envelope validation failure and required-envelope messages use `backend/execution_gate_messages.py`.
+44. Execution-envelope validation failure, signature failure, and required-envelope messages use `backend/execution_gate_messages.py`.
 45. Secret-like value detection, assignment scanning, structured unredacted-secret checks, and redaction use `backend/secret_redaction.py`.
 46. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 47. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
@@ -262,7 +262,7 @@ Output:
 4. Policy Check
    - Safety Service asks OPA whether processing may continue.
    - Sensitive-operation checks come from the shared operation registry before envelopes are issued.
-   - Policy responses, execution-envelope policy versions, signing key, and expiry TTL use the shared policy contract.
+   - Policy responses, execution-envelope policy versions, signing payload, signing key, signature verification, and expiry TTL use the shared policy contract.
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
@@ -299,8 +299,8 @@ Output:
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
    - Gated adapters pass shared operation constants directly into the execution gate.
-   - Envelope validation failure messages use the shared execution-gate message contract.
-   - Execution-envelope signatures use the shared canonical HMAC helper.
+   - Envelope validation and signature failure messages use the shared execution-gate message contract.
+   - Execution-envelope signatures are created and verified through the shared policy contract, backed by the canonical HMAC helper.
    - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.
    - Connector API paths are normalized and rejected for absolute URLs, traversal,
      backslashes, and control characters before token reads.

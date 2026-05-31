@@ -139,13 +139,16 @@ def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
 
 def test_execution_envelope_signing_uses_shared_canonical_hmac_helper() -> None:
     source = read_backend_source("service.py")
+    contract_source = read_backend_source("policy_contracts.py")
     import_lines = [
         line.strip()
         for line in source.splitlines()
         if line.startswith("import ") or line.startswith("from ")
     ]
 
-    assert "hmac_sha256_json" in source
+    assert "execution_envelope_signature(" in source
+    assert "hmac_sha256_json" not in source
+    assert "hmac_sha256_json" in contract_source
     assert "import hashlib" not in import_lines
     assert "import hmac" not in import_lines
     assert "canonical_json(signature_payload)" not in source
