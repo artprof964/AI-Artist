@@ -94,7 +94,7 @@ backend/shell_commands.py: shared shell command and process argument constructio
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
-backend/llm_api_smoke.py: provider-neutral LLM API configuration, shared runtime secret resolution, and redacted smoke request path.
+backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, shared runtime secret resolution, and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared secret-redaction boundary.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.

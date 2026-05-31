@@ -13,6 +13,7 @@ from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
 
 
 SECRET_REDACTION = REDACTED_SECRET_VALUE
+LLM_API_SMOKE_TEST_PURPOSE = "the live LLM API smoke test"
 
 
 @dataclass(frozen=True)
@@ -34,7 +35,7 @@ def load_llm_api_model_config(env: Mapping[str, str] | None = None) -> LLMAPIMod
     api_key = require_runtime_secret(
         env,
         STANDARD_LLM_API_KEY_ENV_VAR,
-        purpose="the live LLM API smoke test",
+        purpose=LLM_API_SMOKE_TEST_PURPOSE,
         setting_name="llm_api_key",
     )
 

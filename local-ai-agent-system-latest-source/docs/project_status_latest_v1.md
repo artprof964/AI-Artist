@@ -157,7 +157,7 @@ Markdown utilities: shared across production readiness runbook validation and fu
 Numeric utilities: shared directly across Knowledge vector similarity and embedding validation, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, execution-envelope expiry validation, and tests that need current UTC timestamps
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
-Slack adapter boundaries: shared payload, request identity, secret-redaction, and adapter secret helpers are called directly without local wrapper functions
+Slack adapter boundaries: shared payload, request identity, secret-redaction, adapter secret, and connection error-message helpers are called directly without local wrapper functions
 Slack adapter contracts: shared across source labels, inbound event validation messages, outbound response validation messages, and token-purpose text
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, ComfyUI image response parsing, and publishing audit status parsing
 ComfyUI contracts: shared across image provenance response validation, storage URI construction, and future ComfyUI adapter response handling
@@ -199,7 +199,7 @@ process argument validation: 2 focused files passed; OPA tests guarded against l
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
-runtime secret validation: LLM API smoke uses shared runtime-token resolution and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods; LLM smoke guarded against local redaction wrappers
+runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers

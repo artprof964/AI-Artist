@@ -8,10 +8,12 @@ from backend.connection_settings import (
     DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
+    connection_value_required,
     require_runtime_secret,
     runtime_env,
 )
 from backend.llm_api_smoke import (
+    LLM_API_SMOKE_TEST_PURPOSE,
     SECRET_REDACTION,
     build_smoke_request,
     load_llm_api_model_config,
@@ -85,7 +87,10 @@ def test_llm_api_model_config_requires_api_key() -> None:
     with pytest.raises(RuntimeError) as exc:
         load_llm_api_model_config({})
 
-    assert str(exc.value) == f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test"
+    assert str(exc.value) == connection_value_required(
+        DEEPSEEK_OPEN_ART_ENV_VAR,
+        LLM_API_SMOKE_TEST_PURPOSE,
+    )
 
 
 def test_smoke_request_targets_configured_llm_api_model() -> None:
@@ -168,14 +173,17 @@ def test_llm_api_smoke_uses_shared_runtime_secret_resolver() -> None:
     source = read_backend_source("llm_api_smoke.py")
 
     assert "require_runtime_secret(" in source
+    assert "LLM_API_SMOKE_TEST_PURPOSE" in source
     assert "if not settings.llm_api_key" not in source
     assert "require_env_value(" not in source
     assert "runtime_env(" not in source
+    assert '"the live LLM API smoke test"' in source
+    assert 'purpose="the live LLM API smoke test"' not in source
 
 
 @pytest.mark.skipif(
     not runtime_env().get(STANDARD_LLM_API_KEY_ENV_VAR),
-    reason=f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test",
+    reason=connection_value_required(DEEPSEEK_OPEN_ART_ENV_VAR, LLM_API_SMOKE_TEST_PURPOSE),
 )
 def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     result = run_llm_api_smoke_test()
@@ -187,7 +195,7 @@ def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     api_key = require_runtime_secret(
         runtime_env(),
         STANDARD_LLM_API_KEY_ENV_VAR,
-        purpose="LLM API smoke test",
+        purpose=LLM_API_SMOKE_TEST_PURPOSE,
         setting_name="llm_api_key",
     )
     assert api_key not in repr(result)

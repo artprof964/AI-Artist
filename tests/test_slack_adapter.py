@@ -4,12 +4,13 @@ from typing import Any
 
 import pytest
 
-from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR
+from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR, connection_value_required
 from backend.slack_adapter import (
     SlackAdapter,
     SlackAdapterConfigurationError,
     SlackAdapterError,
 )
+from backend.slack_contracts import SLACK_ADAPTER_EXECUTION_PURPOSE
 from path_helpers import read_backend_source
 
 
@@ -160,7 +161,10 @@ def test_slack_adapter_reports_missing_runtime_token_before_send() -> None:
     with pytest.raises(SlackAdapterConfigurationError) as exc:
         adapter.send_response(envelope, "Drafted 3 directions for review.")
 
-    assert str(exc.value) == f"{SLACK_BOT_TOKEN_ENV_VAR} is required for Slack adapter execution"
+    assert str(exc.value) == connection_value_required(
+        SLACK_BOT_TOKEN_ENV_VAR,
+        SLACK_ADAPTER_EXECUTION_PURPOSE,
+    )
 
 
 def test_slack_adapter_rejects_empty_response_before_token_read() -> None:
