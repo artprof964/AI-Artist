@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 263 passed, 1 skipped, 1 warning
+Final validation: 265 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,7 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
-backend/canonical_hash.py: canonical JSON, SHA-256 digests, deterministic ID helpers, version tags, and security-review serialization.
+backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/text_utils.py: shared text tokenization and label normalization.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
@@ -118,7 +118,7 @@ Gated adapter result envelope fields must flow through backend/adapter_results.p
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads must flow through backend/side_effect_audit.py before
 adapter-specific agents persist tool-call audit events.
-Canonical JSON, SHA-256 digests, deterministic local IDs, version tags, and security-review serialization must
+Canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic local IDs, version tags, and security-review serialization must
 flow through backend/canonical_hash.py before request fingerprints, artifact
 hashes, source snapshot versions, signatures, mocked external IDs, or security-review scans are created.
 Request text normalization, fingerprint wrappers, stable channel request UUIDs,

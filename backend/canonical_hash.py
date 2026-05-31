@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import hashlib
+import hmac
 import json
 from typing import Any
 
@@ -23,6 +24,19 @@ def sha256_json(value: Any, *, ensure_ascii: bool = True) -> str:
     return sha256_text(canonical_json(value, ensure_ascii=ensure_ascii))
 
 
+def hmac_sha256_json(
+    key: bytes,
+    value: Any,
+    *,
+    ensure_ascii: bool = True,
+) -> str:
+    return hmac.new(
+        key,
+        canonical_json(value, ensure_ascii=ensure_ascii).encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+
 def sha256_version_tag(value: str, *, digest_length: int = 12) -> str:
     return f"sha256:{sha256_text(value)[:digest_length]}"
 
@@ -41,6 +55,7 @@ def deterministic_prefixed_id(
 __all__ = [
     "canonical_json",
     "deterministic_prefixed_id",
+    "hmac_sha256_json",
     "sha256_json",
     "sha256_text",
     "sha256_version_tag",

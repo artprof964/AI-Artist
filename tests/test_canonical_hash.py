@@ -1,10 +1,12 @@
 from datetime import datetime, timezone
 import hashlib
+import hmac
 import json
 
 from backend.canonical_hash import (
     canonical_json,
     deterministic_prefixed_id,
+    hmac_sha256_json,
     sha256_json,
     sha256_text,
     sha256_version_tag,
@@ -35,6 +37,24 @@ def test_sha256_helpers_match_standard_library_hashing() -> None:
 
     assert sha256_text(expected_json) == hashlib.sha256(expected_json.encode("utf-8")).hexdigest()
     assert sha256_json(material) == hashlib.sha256(expected_json.encode("utf-8")).hexdigest()
+
+
+def test_hmac_sha256_json_uses_canonical_json_signature_material() -> None:
+    material = {"target": "mock://feed", "payload": {"caption": "ready"}}
+    key = b"local-test-key"
+    expected_json = json.dumps(
+        material,
+        default=str,
+        ensure_ascii=True,
+        separators=(",", ":"),
+        sort_keys=True,
+    )
+
+    assert hmac_sha256_json(key, material) == hmac.new(
+        key,
+        expected_json.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
 
 
 def test_deterministic_prefixed_id_uses_canonical_json_digest_prefix() -> None:

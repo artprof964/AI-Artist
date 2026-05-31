@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -18,6 +19,9 @@ from backend.service import (
     evaluate_policy,
 )
 from backend.time_utils import as_utc
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:
@@ -125,6 +129,20 @@ def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
     assert stale_publish_envelope.allow is False
     assert stale_publish_envelope.requires_human_approval is True
     assert stale_publish_envelope.reason == "source freshness check failed"
+
+
+def test_execution_envelope_signing_uses_shared_canonical_hmac_helper() -> None:
+    source = (REPO_ROOT / "backend" / "service.py").read_text(encoding="utf-8")
+    import_lines = [
+        line.strip()
+        for line in source.splitlines()
+        if line.startswith("import ") or line.startswith("from ")
+    ]
+
+    assert "hmac_sha256_json" in source
+    assert "import hashlib" not in import_lines
+    assert "import hmac" not in import_lines
+    assert "canonical_json(signature_payload)" not in source
 
 
 def test_cache_datetime_normalization_treats_naive_datetimes_as_utc() -> None:

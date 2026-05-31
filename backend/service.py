@@ -1,5 +1,3 @@
-import hashlib
-import hmac
 from datetime import timedelta
 from uuid import uuid4
 
@@ -7,7 +5,7 @@ from backend.audit import (
     list_audit_events_by_correlation_id,
     record_audit_event,
 )
-from backend.canonical_hash import canonical_json
+from backend.canonical_hash import hmac_sha256_json
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.operations import (
     ACTION_TERMS,
@@ -214,11 +212,7 @@ def create_execution_envelope(
         "expires_at": expires_at.isoformat(),
         "policy_version": POLICY_VERSION,
     }
-    signature = hmac.new(
-        LOCAL_ENVELOPE_SIGNING_KEY,
-        canonical_json(signature_payload).encode("utf-8"),
-        hashlib.sha256,
-    ).hexdigest()
+    signature = hmac_sha256_json(LOCAL_ENVELOPE_SIGNING_KEY, signature_payload)
 
     return ExecutionEnvelopeResponse(
         execution_envelope_id=envelope_id,
