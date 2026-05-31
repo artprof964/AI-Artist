@@ -9,6 +9,7 @@ from backend.observability import (
     TELEMETRY_STAGE_REQUEST,
     TELEMETRY_STAGE_TOOL,
     TELEMETRY_STAGES,
+    observability_event_message,
 )
 from path_helpers import read_backend_source
 
@@ -26,6 +27,14 @@ def test_observability_stage_and_log_level_vocabulary_is_centralized() -> None:
         LOG_LEVEL_WARNING,
         LOG_LEVEL_ERROR,
     )
+
+
+def test_observability_event_message_is_centralized() -> None:
+    source = read_backend_source("observability.py")
+
+    assert observability_event_message("reuse_evaluate") == "reuse evaluate"
+    assert "observability_event_message(" in source
+    assert 'message=message or event.replace("_", " ")' not in source
 
 
 def test_runtime_modules_use_observability_stage_constants() -> None:

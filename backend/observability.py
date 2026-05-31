@@ -37,6 +37,10 @@ LOG_LEVELS: tuple[LogLevel, ...] = (
 )
 
 
+def observability_event_message(event: str) -> str:
+    return event.replace("_", " ")
+
+
 @dataclass(frozen=True)
 class TraceRecord:
     trace_id: str
@@ -116,7 +120,7 @@ class InMemoryObservabilityCollector:
         )
         log = StructuredLogRecord(
             level=log_level,
-            message=message or event.replace("_", " "),
+            message=message or observability_event_message(event),
             stage=stage,
             event=event,
             trace_id=trace_id,
@@ -208,6 +212,7 @@ __all__ = [
     "TelemetryStage",
     "TraceRecord",
     "observability_collector",
+    "observability_event_message",
     "record_observability_stage",
     "trace_id_from_request",
 ]

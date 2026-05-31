@@ -222,6 +222,7 @@
 - `../../validation_reports/t26_observability_validation_2026-05-31.md`
 - `../../validation_reports/observability_constants_standardization_2026-05-31.md`
 - `../../validation_reports/observability_redacted_mapping_standardization_2026-05-31.md`
+- `../../validation_reports/observability_event_message_standardization_2026-05-31.md`
 - `../../backend/observability.py`
 - `../../tests/test_observability.py`
 - `../../tests/test_observability_constants.py`

@@ -43,7 +43,7 @@ can be marked done.
 31. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 32. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
 33. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-34. Telemetry stages and log levels use `backend/observability.py`.
+34. Telemetry stages, log levels, and event-message formatting use `backend/observability.py`.
 35. Publishing outcome statuses use `backend/publishing_status.py`.
 36. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
 37. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
