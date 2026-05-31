@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 386 passed, 1 skipped, 1 warning
+Final validation: 387 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -53,7 +53,7 @@ backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
 backend/classification_contracts.py: shared classifier confidence and reason formatting.
 backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
-backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, and deterministic test serialization.
+backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, deterministic test serialization, and deterministic test text hashes.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping for fingerprints and observability fields.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
@@ -172,9 +172,9 @@ Gated adapter result envelope fields must flow through backend/adapter_results.p
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads must flow through backend/side_effect_audit.py before
 adapter-specific agents persist tool-call audit events.
-Canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic local IDs, version tags, security-review serialization, and deterministic test serialization must
+Canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic local IDs, version tags, security-review serialization, deterministic test serialization, and deterministic test text hashes must
 flow through backend/canonical_hash.py before request fingerprints, artifact
-hashes, source snapshot versions, signatures, mocked external IDs, security-review scans, or deterministic test serializations are created.
+hashes, source snapshot versions, signatures, mocked external IDs, security-review scans, deterministic test serializations, or deterministic test text hashes are created.
 Request text normalization, fingerprint wrappers, stable channel request UUIDs,
 and prefixed runtime trace IDs must flow through backend/request_identity.py
 before service or adapter specific request identity logic is added.

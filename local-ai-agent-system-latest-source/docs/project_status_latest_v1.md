@@ -38,7 +38,7 @@ Secret detection, redaction, and redacted audit mappings: centralized in backend
 ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
 Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py
-Canonical hashing, HMAC signatures, security-review serialization, and deterministic test serialization: centralized in backend/canonical_hash.py
+Canonical hashing, HMAC signatures, security-review serialization, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
 Request identity and trace IDs: centralized in backend/request_identity.py
 Request metadata mapping: centralized in backend/request_metadata.py
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
@@ -134,7 +134,7 @@ Secret detection and redaction: shared directly across audit, observability, LLM
 Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
-Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, and deterministic test serialization
+Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
 Source ingestion contracts: shared approved-domain defaults and rejection messages before registry writes
 Source ingestion hashes: source snapshots call shared canonical hash/version helpers directly before registry writes
 Request identity: shared across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
@@ -191,7 +191,8 @@ T28 production readiness: 10 passed; runbook, env schema rendering, shared servi
 repo path validation: 6 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, repo-root lookup, workspace file lookups, backend module discovery, backend module source reads, raw-open source-inspection guard tests, source-inspection guard tests, and repo-root guard tests centralized
 time utility validation: 6 focused files passed; direct test `datetime.now(timezone.utc)` calls guarded
 canonical JSON validation: 6 focused files passed; non-canonical-hash tests guarded against direct `json.dumps`
-final pytest: 386 passed, 1 skipped, 1 warning
+test text-hash validation: 2 focused files passed; non-canonical-hash tests guarded against direct `hashlib` imports
+final pytest: 387 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

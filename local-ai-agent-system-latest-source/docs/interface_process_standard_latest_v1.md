@@ -21,7 +21,7 @@ can be marked done.
 9. Redis/Celery/Dagster own background execution state.
 10. ComfyUI owns image workflow execution.
 11. External write actions require a signed execution envelope.
-12. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, and security-review serialization are produced through `backend/canonical_hash.py`.
+12. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
 13. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 14. RequestMetadata workspace/agent mapping uses `backend/request_metadata.py`.
 15. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
