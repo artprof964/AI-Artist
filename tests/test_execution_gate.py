@@ -16,6 +16,7 @@ from backend.execution_gate_messages import (
     execution_envelope_target_mismatch,
     operation_requires_human_approval,
 )
+from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
 
 
@@ -156,9 +157,7 @@ def test_execution_gate_error_message_contracts_are_shared() -> None:
 
 
 def test_execution_gate_uses_shared_error_message_contracts() -> None:
-    source = "backend/execution_gate.py"
-    with open(source, encoding="utf-8") as handle:
-        contents = handle.read()
+    contents = read_backend_module_text("execution_gate.py")
 
     forbidden_literals = [
         '"execution envelope is invalid"',

@@ -1,5 +1,6 @@
 from datetime import datetime, timedelta, timezone
 
+from backend.repo_paths import read_backend_module_text
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.source_freshness import SourceFreshnessRegistry
@@ -150,9 +151,7 @@ def test_source_registry_missing_row_message_contract_is_shared() -> None:
 
 
 def test_source_freshness_uses_shared_missing_row_message_contract() -> None:
-    source = "backend/source_freshness.py"
-    with open(source, encoding="utf-8") as handle:
-        contents = handle.read()
+    contents = read_backend_module_text("source_freshness.py")
 
     assert "source_data_registry row not found:" not in contents
     assert "source_registry_row_not_found(" in contents

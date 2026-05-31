@@ -85,3 +85,17 @@ def test_tests_use_shared_repo_root_helper() -> None:
             offenders.append(test_path.name)
 
     assert offenders == []
+
+
+def test_backend_source_inspection_tests_do_not_use_raw_open() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    offenders: list[str] = []
+
+    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
+        if test_path.name == "test_repo_paths.py":
+            continue
+        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+        if "open(source, encoding=" in source:
+            offenders.append(test_path.name)
+
+    assert offenders == []
