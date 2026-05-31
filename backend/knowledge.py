@@ -6,6 +6,7 @@ from typing import Any, Protocol
 from uuid import UUID
 
 from backend.knowledge_contracts import (
+    DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS,
     DEFAULT_KNOWLEDGE_COLLECTION_NAME,
     KNOWLEDGE_AGENT_NAME,
     KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
@@ -13,7 +14,10 @@ from backend.knowledge_contracts import (
     KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_SUFFIX,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+    knowledge_hit_is_positive,
     knowledge_results_summary,
+    round_knowledge_score,
+    stable_token_index,
 )
 from backend.mapping_utils import copy_mapping
 from backend.numeric_utils import (
@@ -147,7 +151,7 @@ class VectorStore(Protocol):
 class DeterministicEmbeddingModel:
     """Small local embedding model for deterministic tests and offline runs."""
 
-    def __init__(self, dimensions: int = 64) -> None:
+    def __init__(self, dimensions: int = DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS) -> None:
         require_positive_integer(dimensions, EMBEDDING_DIMENSIONS_MUST_BE_POSITIVE)
         self.dimensions = dimensions
 
@@ -162,10 +166,7 @@ class DeterministicEmbeddingModel:
         return tuple(value / magnitude for value in vector)
 
     def _stable_index(self, token: str) -> int:
-        total = 0
-        for character in token:
-            total = (total * 33 + ord(character)) % self.dimensions
-        return total
+        return stable_token_index(token, self.dimensions)
 
 
 class InMemoryQdrantVectorStore:
@@ -269,7 +270,7 @@ class KnowledgeAgent:
         results = tuple(
             self._hit_to_result(hit, query)
             for hit in hits
-            if hit.score > 0.0 and self._is_approved_hit(hit)
+            if knowledge_hit_is_positive(hit.score) and self._is_approved_hit(hit)
         )
         return KnowledgeAgentResponse(
             task_id=task_id or runtime_uuid(),
@@ -294,7 +295,7 @@ class KnowledgeAgent:
             title=str(payload["title"]),
             uri=str(payload["uri"]),
             snippet=contextual_snippet(content, query),
-            score=round(hit.score, 6),
+            score=round_knowledge_score(hit.score),
             citation=KnowledgeCitation(
                 source_id=str(payload["source_id"]),
                 title=str(payload["title"]),

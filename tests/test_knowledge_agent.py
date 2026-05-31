@@ -3,10 +3,18 @@ from uuid import UUID
 import pytest
 
 from backend.knowledge_contracts import (
+    DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS,
     KNOWLEDGE_AGENT_NAME,
     KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
+    KNOWLEDGE_MIN_RESULT_SCORE,
     KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
+    KNOWLEDGE_RESULT_SCORE_DIGITS,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+    KNOWLEDGE_STABLE_TOKEN_HASH_MULTIPLIER,
+    KNOWLEDGE_STABLE_TOKEN_HASH_SEED,
+    knowledge_hit_is_positive,
+    round_knowledge_score,
+    stable_token_index,
 )
 from backend.knowledge import (
     DeterministicEmbeddingModel,
@@ -178,6 +186,32 @@ def test_knowledge_agent_contract_vocabulary_is_centralized() -> None:
     assert '"approved": True' not in source
     assert '"approved") is True' not in source
     assert "Read-only retrieval from approved local sample data." not in source
+
+
+def test_knowledge_embedding_and_result_score_contracts_are_centralized() -> None:
+    assert DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS == 64
+    assert KNOWLEDGE_STABLE_TOKEN_HASH_SEED == 0
+    assert KNOWLEDGE_STABLE_TOKEN_HASH_MULTIPLIER == 33
+    assert KNOWLEDGE_MIN_RESULT_SCORE == 0.0
+    assert KNOWLEDGE_RESULT_SCORE_DIGITS == 6
+    assert stable_token_index("default", 48) == 5
+    assert knowledge_hit_is_positive(KNOWLEDGE_MIN_RESULT_SCORE) is False
+    assert knowledge_hit_is_positive(0.000001) is True
+    assert round_knowledge_score(0.123456789) == 0.123457
+
+
+def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
+    source = read_backend_source("knowledge.py")
+
+    assert "DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS" in source
+    assert "stable_token_index(" in source
+    assert "knowledge_hit_is_positive(" in source
+    assert "round_knowledge_score(" in source
+    assert "dimensions: int = 64" not in source
+    assert "total = 0" not in source
+    assert "total * 33" not in source
+    assert "hit.score > 0.0" not in source
+    assert "round(hit.score, 6)" not in source
 
 
 def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:

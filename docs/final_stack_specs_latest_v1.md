@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 450 passed, 1 skipped, 1 warning
+Final validation: 452 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -101,9 +101,9 @@ tests/path_helpers.py: shared test project root, checked-in project text reads, 
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
-backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.
+backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, embedding defaults, stable token-index hashing, result score cutoff/precision, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
-backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
+backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, embedding, and result-score boundaries.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and shared rubric scoring boundaries.
@@ -237,6 +237,11 @@ orchestration, or future sub-agent adapters return structured agent outputs.
 Mock sub-agent names, artifact types, output text, error text, synthesis text,
 and orchestration telemetry must flow through backend/mock_agent_contracts.py
 before orchestration-specific agent fixtures are changed.
+Knowledge Agent names, retrieval artifact metadata, approved-source payload
+flags, collection defaults, embedding defaults, stable token-index hashing,
+result score cutoff/precision, policy notes, and summary vocabulary must flow
+through backend/knowledge_contracts.py before retrieval-specific behavior is
+changed.
 Generated image review status vocabulary and checks must flow through
 backend/review_status.py before provenance, critic, or publishing-specific
 review status logic is added.
