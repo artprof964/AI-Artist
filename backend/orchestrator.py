@@ -34,6 +34,10 @@ from backend.mock_agent_contracts import (
     MOCK_ORCHESTRATION_START_EVENT,
     MOCK_SYNTHESIS_EMPTY_OUTPUTS,
     MOCK_SYNTHESIS_SEPARATOR,
+    mock_orchestration_completed_fields,
+    mock_orchestration_completed_metric_tags,
+    mock_orchestration_started_fields,
+    mock_orchestration_started_metric_tags,
 )
 from backend.numeric_utils import rounded_mean
 from backend.observability import (
@@ -268,14 +272,14 @@ def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrat
         trace_id=trace_id,
         request_id=request.task_id,
         metric_name=MOCK_ORCHESTRATION_STARTED_METRIC,
-        metric_tags={"agent_count": len(MOCK_SUB_AGENTS)},
+        metric_tags=mock_orchestration_started_metric_tags(agent_count=len(MOCK_SUB_AGENTS)),
         message=MOCK_ORCHESTRATION_STARTED_MESSAGE,
-        fields={
-            "task_id": str(request.task_id),
-            "requester_scope": request.requester_scope,
-            "policy_scope": request.policy_scope,
-            "agent_count": len(MOCK_SUB_AGENTS),
-        },
+        fields=mock_orchestration_started_fields(
+            task_id=request.task_id,
+            requester_scope=request.requester_scope,
+            policy_scope=request.policy_scope,
+            agent_count=len(MOCK_SUB_AGENTS),
+        ),
     )
     outputs = [agent(request) for agent in MOCK_SUB_AGENTS]
     result = synthesize_subagent_outputs(request.task_id, outputs)
@@ -285,16 +289,19 @@ def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrat
         trace_id=trace_id,
         request_id=request.task_id,
         metric_name=MOCK_ORCHESTRATION_COMPLETED_METRIC,
-        metric_tags={"status": result.status, "agent_count": len(result.agent_outputs)},
+        metric_tags=mock_orchestration_completed_metric_tags(
+            status=result.status,
+            agent_count=len(result.agent_outputs),
+        ),
         log_level=LOG_LEVEL_INFO if result.status == SUBAGENT_STATUS_OK else LOG_LEVEL_WARNING,
         message=MOCK_ORCHESTRATION_COMPLETED_MESSAGE,
-        fields={
-            "task_id": str(result.task_id),
-            "status": result.status,
-            "status_counts": result.status_counts,
-            "artifact_count": len(result.artifacts),
-            "source_count": len(result.sources),
-            "error_count": len(result.errors),
-        },
+        fields=mock_orchestration_completed_fields(
+            task_id=result.task_id,
+            status=result.status,
+            status_counts=result.status_counts,
+            artifact_count=len(result.artifacts),
+            source_count=len(result.sources),
+            error_count=len(result.errors),
+        ),
     )
     return result

@@ -29,11 +29,24 @@ from backend.mock_agent_contracts import (
     MOCK_ORCHESTRATION_COMPLETED_MESSAGE,
     MOCK_ORCHESTRATION_COMPLETED_METRIC,
     MOCK_ORCHESTRATION_COMPLETE_EVENT,
+    MOCK_ORCHESTRATION_AGENT_COUNT_FIELD,
+    MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD,
+    MOCK_ORCHESTRATION_ERROR_COUNT_FIELD,
+    MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD,
+    MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD,
+    MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD,
+    MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD,
+    MOCK_ORCHESTRATION_STATUS_FIELD,
     MOCK_ORCHESTRATION_STARTED_MESSAGE,
     MOCK_ORCHESTRATION_STARTED_METRIC,
     MOCK_ORCHESTRATION_START_EVENT,
+    MOCK_ORCHESTRATION_TASK_ID_FIELD,
     MOCK_SYNTHESIS_EMPTY_OUTPUTS,
     MOCK_SYNTHESIS_SEPARATOR,
+    mock_orchestration_completed_fields,
+    mock_orchestration_completed_metric_tags,
+    mock_orchestration_started_fields,
+    mock_orchestration_started_metric_tags,
 )
 from backend.observability import (
     METRIC_ORCHESTRATION_COMPLETED,
@@ -162,6 +175,51 @@ def test_mock_agent_contract_vocabulary_is_centralized() -> None:
     assert MOCK_ORCHESTRATION_COMPLETED_METRIC == METRIC_ORCHESTRATION_COMPLETED
     assert MOCK_ORCHESTRATION_STARTED_MESSAGE == "orchestration started"
     assert MOCK_ORCHESTRATION_COMPLETED_MESSAGE == "orchestration completed"
+    assert MOCK_ORCHESTRATION_TASK_ID_FIELD == "task_id"
+    assert MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD == "requester_scope"
+    assert MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD == "policy_scope"
+    assert MOCK_ORCHESTRATION_AGENT_COUNT_FIELD == "agent_count"
+    assert MOCK_ORCHESTRATION_STATUS_FIELD == "status"
+    assert MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD == "status_counts"
+    assert MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD == "artifact_count"
+    assert MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD == "source_count"
+    assert MOCK_ORCHESTRATION_ERROR_COUNT_FIELD == "error_count"
+
+
+def test_mock_orchestration_telemetry_shapes_are_centralized() -> None:
+    assert mock_orchestration_started_metric_tags(agent_count=3) == {
+        MOCK_ORCHESTRATION_AGENT_COUNT_FIELD: 3,
+    }
+    assert mock_orchestration_started_fields(
+        task_id=TASK_ID,
+        requester_scope="user:local",
+        policy_scope="workspace:ai-artist-main",
+        agent_count=3,
+    ) == {
+        MOCK_ORCHESTRATION_TASK_ID_FIELD: str(TASK_ID),
+        MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD: "user:local",
+        MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD: "workspace:ai-artist-main",
+        MOCK_ORCHESTRATION_AGENT_COUNT_FIELD: 3,
+    }
+    assert mock_orchestration_completed_metric_tags(status="ok", agent_count=3) == {
+        MOCK_ORCHESTRATION_STATUS_FIELD: "ok",
+        MOCK_ORCHESTRATION_AGENT_COUNT_FIELD: 3,
+    }
+    assert mock_orchestration_completed_fields(
+        task_id=TASK_ID,
+        status="ok",
+        status_counts={"ok": 3},
+        artifact_count=3,
+        source_count=2,
+        error_count=0,
+    ) == {
+        MOCK_ORCHESTRATION_TASK_ID_FIELD: str(TASK_ID),
+        MOCK_ORCHESTRATION_STATUS_FIELD: "ok",
+        MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD: {"ok": 3},
+        MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD: 3,
+        MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD: 2,
+        MOCK_ORCHESTRATION_ERROR_COUNT_FIELD: 0,
+    }
 
 
 def test_orchestrator_uses_shared_mock_agent_contracts() -> None:
@@ -202,3 +260,22 @@ def test_orchestrator_uses_shared_mock_agent_contracts() -> None:
     assert "MOCK_IMAGE_PLANNER_ERROR_CODE_STYLE_DETAIL" in source
     assert "MOCK_CRITIC_CURATOR_POLICY_NOTE" in source
     assert "MOCK_ORCHESTRATION_STARTED_METRIC" in source
+    assert "mock_orchestration_started_metric_tags(" in source
+    assert "mock_orchestration_started_fields(" in source
+    assert "mock_orchestration_completed_metric_tags(" in source
+    assert "mock_orchestration_completed_fields(" in source
+    forbidden_telemetry_shapes = [
+        '"agent_count": len(MOCK_SUB_AGENTS)',
+        '"status": result.status',
+        '"agent_count": len(result.agent_outputs)',
+        '"task_id": str(request.task_id)',
+        '"requester_scope": request.requester_scope',
+        '"policy_scope": request.policy_scope',
+        '"task_id": str(result.task_id)',
+        '"status_counts": result.status_counts',
+        '"artifact_count": len(result.artifacts)',
+        '"source_count": len(result.sources)',
+        '"error_count": len(result.errors)',
+    ]
+    for literal in forbidden_telemetry_shapes:
+        assert literal not in source

@@ -33,7 +33,7 @@ can be marked done.
 19b. Source freshness schema defaults and unchanged-source checks use `backend/source_freshness_contracts.py`.
 20. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 21. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
-22. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
+22. Mock sub-agent names, artifact types, output text, error text, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes use `backend/mock_agent_contracts.py`.
 23. Generated-image review status vocabulary and checks use `backend/review_status.py`.
 24. Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and score helpers use `backend/critic_rubric.py`.
 25. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
@@ -281,7 +281,7 @@ Output:
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
    - Sub-agent outputs are constructed through the shared output contract helper.
-   - Mock orchestration agent names and artifact types use the shared mock-agent contract.
+   - Mock orchestration agent names, artifact types, synthesis text, and telemetry field/tag shapes use the shared mock-agent contract.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
    - Retrieval embedding defaults, stable token-index hashing, vector-search limit/sort behavior, positive-hit filtering, and score precision use shared Knowledge Agent contracts.
    - Knowledge retrieval result snippets use the shared contextual snippet helper.

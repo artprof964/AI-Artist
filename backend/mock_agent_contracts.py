@@ -65,6 +65,64 @@ MOCK_ORCHESTRATION_STARTED_METRIC = METRIC_ORCHESTRATION_STARTED
 MOCK_ORCHESTRATION_COMPLETED_METRIC = METRIC_ORCHESTRATION_COMPLETED
 MOCK_ORCHESTRATION_STARTED_MESSAGE = "orchestration started"
 MOCK_ORCHESTRATION_COMPLETED_MESSAGE = "orchestration completed"
+MOCK_ORCHESTRATION_TASK_ID_FIELD = "task_id"
+MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD = "requester_scope"
+MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD = "policy_scope"
+MOCK_ORCHESTRATION_AGENT_COUNT_FIELD = "agent_count"
+MOCK_ORCHESTRATION_STATUS_FIELD = "status"
+MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD = "status_counts"
+MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD = "artifact_count"
+MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD = "source_count"
+MOCK_ORCHESTRATION_ERROR_COUNT_FIELD = "error_count"
+
+
+def mock_orchestration_started_metric_tags(*, agent_count: int) -> dict[str, int]:
+    return {MOCK_ORCHESTRATION_AGENT_COUNT_FIELD: agent_count}
+
+
+def mock_orchestration_started_fields(
+    *,
+    task_id: object,
+    requester_scope: str,
+    policy_scope: str,
+    agent_count: int,
+) -> dict[str, str | int]:
+    return {
+        MOCK_ORCHESTRATION_TASK_ID_FIELD: str(task_id),
+        MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD: requester_scope,
+        MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD: policy_scope,
+        MOCK_ORCHESTRATION_AGENT_COUNT_FIELD: agent_count,
+    }
+
+
+def mock_orchestration_completed_metric_tags(
+    *,
+    status: str,
+    agent_count: int,
+) -> dict[str, str | int]:
+    return {
+        MOCK_ORCHESTRATION_STATUS_FIELD: status,
+        MOCK_ORCHESTRATION_AGENT_COUNT_FIELD: agent_count,
+    }
+
+
+def mock_orchestration_completed_fields(
+    *,
+    task_id: object,
+    status: str,
+    status_counts: dict[str, int],
+    artifact_count: int,
+    source_count: int,
+    error_count: int,
+) -> dict[str, object]:
+    return {
+        MOCK_ORCHESTRATION_TASK_ID_FIELD: str(task_id),
+        MOCK_ORCHESTRATION_STATUS_FIELD: status,
+        MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD: status_counts,
+        MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD: artifact_count,
+        MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD: source_count,
+        MOCK_ORCHESTRATION_ERROR_COUNT_FIELD: error_count,
+    }
 
 
 __all__ = [
@@ -97,6 +155,19 @@ __all__ = [
     "MOCK_ORCHESTRATION_STARTED_MESSAGE",
     "MOCK_ORCHESTRATION_STARTED_METRIC",
     "MOCK_ORCHESTRATION_START_EVENT",
+    "MOCK_ORCHESTRATION_AGENT_COUNT_FIELD",
+    "MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD",
+    "MOCK_ORCHESTRATION_ERROR_COUNT_FIELD",
+    "MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD",
+    "MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD",
+    "MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD",
+    "MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD",
+    "MOCK_ORCHESTRATION_STATUS_FIELD",
+    "MOCK_ORCHESTRATION_TASK_ID_FIELD",
     "MOCK_SYNTHESIS_EMPTY_OUTPUTS",
     "MOCK_SYNTHESIS_SEPARATOR",
+    "mock_orchestration_completed_fields",
+    "mock_orchestration_completed_metric_tags",
+    "mock_orchestration_started_fields",
+    "mock_orchestration_started_metric_tags",
 ]

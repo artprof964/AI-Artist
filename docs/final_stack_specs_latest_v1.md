@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 473 passed, 1 skipped, 1 warning
+Final validation: 475 passed, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -101,7 +101,7 @@ tests/path_helpers.py: shared test project root, checked-in project text reads, 
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path.
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
-backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
+backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result score cutoff/precision, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, embedding, vector-search, and result-score boundaries.
@@ -244,8 +244,9 @@ SubAgentOutput construction and model coercion must flow through
 backend/subagent_output_contracts.py before Knowledge retrieval, mock
 orchestration, or future sub-agent adapters return structured agent outputs.
 Mock sub-agent names, artifact types, output text, error text, synthesis text,
-and orchestration telemetry must flow through backend/mock_agent_contracts.py
-before orchestration-specific agent fixtures are changed.
+orchestration telemetry events/messages/metrics, and orchestration telemetry
+field/tag shapes must flow through backend/mock_agent_contracts.py before
+orchestration-specific agent fixtures or telemetry are changed.
 Knowledge Agent names, retrieval artifact metadata, approved-source payload
 flags, collection defaults, embedding defaults, stable token-index hashing,
 vector-search limit/sort behavior, result score cutoff/precision, policy notes,

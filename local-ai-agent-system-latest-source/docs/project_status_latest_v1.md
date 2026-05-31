@@ -56,7 +56,7 @@ Source ingestion contracts and registry metadata payloads: centralized in backen
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
-Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, and orchestration telemetry
+Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes
 Knowledge Agent contracts, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, and result-score cutoff/precision: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and pass/fail helpers: centralized in backend/critic_rubric.py
@@ -161,7 +161,7 @@ Source freshness contracts: shared across schema defaults, unchanged-source chec
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
-Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry, and tests
+Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry events/messages/metrics, telemetry field/tag shapes, and tests
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, approved-hit filtering, artifact metadata, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary and scoring contracts: shared across Critic/Curator scoring, score conversion, pass/fail decisions, and rubric tests
@@ -217,7 +217,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 473 passed, 1 skipped, 1 warning
+final pytest: 475 passed, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
