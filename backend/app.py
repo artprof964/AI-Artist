@@ -2,6 +2,7 @@ from uuid import UUID
 
 from fastapi import FastAPI
 
+from backend.health_contracts import health_response_payload
 from backend.schemas import (
     AuditEventRequest,
     AuditEventResponse,
@@ -34,7 +35,7 @@ app = FastAPI(
 
 @app.get("/health", response_model=HealthResponse)
 def health() -> HealthResponse:
-    return HealthResponse(status="ok", service="ai-artist-safety-service")
+    return HealthResponse(**health_response_payload())
 
 
 @app.post("/v1/requests/canonicalize", response_model=CanonicalizeResponse)

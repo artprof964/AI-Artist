@@ -1,6 +1,7 @@
 from fastapi.testclient import TestClient
 
 from backend.app import app
+from backend.health_contracts import health_response_payload
 
 
 client = TestClient(app)
@@ -10,10 +11,7 @@ def test_health_endpoint() -> None:
     response = client.get("/health")
 
     assert response.status_code == 200
-    assert response.json() == {
-        "status": "ok",
-        "service": "ai-artist-safety-service",
-    }
+    assert response.json() == health_response_payload()
 
 
 def test_canonicalize_endpoint_returns_stable_fingerprint() -> None:

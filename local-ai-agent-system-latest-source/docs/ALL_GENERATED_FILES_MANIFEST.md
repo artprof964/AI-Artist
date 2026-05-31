@@ -131,8 +131,11 @@
 - `../../tests/test_http_methods.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
+- `../../validation_reports/health_contract_standardization_2026-05-31.md`
 - `../../validation_reports/response_fields_standardization_2026-05-31.md`
+- `../../backend/health_contracts.py`
 - `../../backend/response_fields.py`
+- `../../tests/test_health_contracts.py`
 - `../../tests/test_response_fields.py`
 - `../../tests/test_safety_service_units.py`
 - `../../.github/workflows/t24-safety-unit-ci.yml`

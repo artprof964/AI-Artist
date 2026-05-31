@@ -22,6 +22,7 @@ Validation tests: 28 defined
 Validation passed: 28
 Validation pending: 0
 Interface contracts: 28 defined
+Safety Service health contract: centralized in backend/health_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry and runtime env resolution: centralized in backend/connection_settings.py
 Execution gates: centralized in backend/execution_gate.py
@@ -111,6 +112,7 @@ Security model: aligned with default-deny, redaction, and execution-envelope rul
 Query tracking: aligned with Safety Service-owned persistence and source freshness
 Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
+Safety Service health: shared health response and readiness expected-signal contract
 Connection registry and runtime env resolution: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, docs, and tracker
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
@@ -162,7 +164,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 349 passed, 1 skipped, 1 warning
+final pytest: 352 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

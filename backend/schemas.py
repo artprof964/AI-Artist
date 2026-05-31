@@ -1,7 +1,8 @@
 from datetime import datetime
-from typing import Any, Literal
+from typing import Any
 from uuid import UUID
 
+from backend.health_contracts import HealthStatus
 from backend.interface_types import AuditEventType, Channel, Operation, RequestKind
 from backend.runtime_ids import runtime_uuid
 from backend.subagent_status import SubAgentStatus
@@ -10,7 +11,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class HealthResponse(BaseModel):
-    status: Literal["ok"]
+    status: HealthStatus
     service: str
 
 

@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from backend.connection_settings import CONNECTION_ENV_VARS
+from backend.health_contracts import health_expected_signal
 from backend.markdown_utils import markdown_heading_text
 
 
@@ -118,7 +119,7 @@ HEALTH_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
         slug="safety_service",
         target="Safety Service",
         command="curl.exe -fsS http://localhost:8000/health",
-        expected_signal='JSON includes "status":"ok" and "service":"ai-artist-safety-service"',
+        expected_signal=health_expected_signal(),
     ),
 )
 

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 349 passed, 1 skipped, 1 warning
+Final validation: 352 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,6 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
+backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
 backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
@@ -124,6 +125,9 @@ External publish/write paths require human approval.
 OpenClaw agents, prompts, logs, audit payloads, and memory files must not
 contain raw API keys, OAuth tokens, Slack tokens, GitHub tokens, signing keys, or
 private webhook secrets.
+Safety Service health status, service name, response payload, and readiness
+expected-signal text must flow through backend/health_contracts.py before
+endpoint, schema, or runbook readiness health-check logic is changed.
 Connection names, defaults, secret aliases, target setting fields, and runtime env resolution must be changed through
 backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as

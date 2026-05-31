@@ -13,46 +13,47 @@ can be marked done.
 1. OpenClaw owns agent runtime and tool hooks.
 2. The provider-neutral LLM API owns reasoning only; it never receives raw secrets.
 3. FastAPI Safety Service owns deterministic safety decisions.
-4. OPA owns policy authorization.
-5. PostgreSQL owns request, source, cache, and audit records.
-6. Qdrant owns vector retrieval.
-7. MinIO owns generated files and source snapshots.
-8. Redis/Celery/Dagster own background execution state.
-9. ComfyUI owns image workflow execution.
-10. External write actions require a signed execution envelope.
-11. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, and security-review serialization are produced through `backend/canonical_hash.py`.
-12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
-13. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
-14. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
-15. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
-16. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
-17. Mock sub-agent names and artifact types use `backend/mock_agent_contracts.py`.
-18. Generated-image review status vocabulary and checks use `backend/review_status.py`.
-19. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
-20. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
-21. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
-22. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-23. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
-24. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-25. Provider response object/dict field access, first-choice message content extraction, and shape validation use `backend/response_fields.py`.
-26. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-27. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
-28. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-29. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-30. Telemetry stages and log levels use `backend/observability.py`.
-31. Publishing outcome statuses use `backend/publishing_status.py`.
-32. Pydantic model/dict coercion at service, adapter, and domain boundaries calls `backend/model_coercion.py` directly.
-33. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
-34. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
-35. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
-36. Source registry missing-row messages use `backend/source_registry_contracts.py`.
-37. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
-38. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
-39. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
-40. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
-41. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
-42. Publishing side-effect audit operation values use `backend/operations.py`.
-43. Gated adapter operation values use `backend/operations.py` directly.
+4. Safety Service health status, service name, response payload, and readiness expected-signal text use `backend/health_contracts.py`.
+5. OPA owns policy authorization.
+6. PostgreSQL owns request, source, cache, and audit records.
+7. Qdrant owns vector retrieval.
+8. MinIO owns generated files and source snapshots.
+9. Redis/Celery/Dagster own background execution state.
+10. ComfyUI owns image workflow execution.
+11. External write actions require a signed execution envelope.
+12. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, and security-review serialization are produced through `backend/canonical_hash.py`.
+13. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
+14. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
+15. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
+16. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
+17. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
+18. Mock sub-agent names and artifact types use `backend/mock_agent_contracts.py`.
+19. Generated-image review status vocabulary and checks use `backend/review_status.py`.
+20. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
+21. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
+22. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
+23. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+24. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
+25. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+26. Provider response object/dict field access, first-choice message content extraction, and shape validation use `backend/response_fields.py`.
+27. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+28. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
+29. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+30. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+31. Telemetry stages and log levels use `backend/observability.py`.
+32. Publishing outcome statuses use `backend/publishing_status.py`.
+33. Pydantic model/dict coercion at service, adapter, and domain boundaries calls `backend/model_coercion.py` directly.
+34. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
+35. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
+36. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
+37. Source registry missing-row messages use `backend/source_registry_contracts.py`.
+38. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
+39. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
+40. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
+41. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
+42. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
+43. Publishing side-effect audit operation values use `backend/operations.py`.
+44. Gated adapter operation values use `backend/operations.py` directly.
 ```
 
 ## Standard Request Envelope
@@ -208,6 +209,7 @@ Output:
 
 2. Normalize
    - Safety Service canonicalizes request text and builds a stable fingerprint.
+   - Safety Service health responses and readiness expectations use the shared health contract.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, and secret redaction call the shared helpers directly at the adapter boundary.
