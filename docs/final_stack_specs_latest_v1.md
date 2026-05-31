@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 506 passed, 1 warning
+Final validation: 508 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -60,7 +60,7 @@ backend/request_identity.py: request text normalization, direct Safety Service c
 backend/request_metadata_contracts.py: shared request metadata defaults, default request channel, request envelope field names, and fingerprint field names.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape using request metadata contracts.
 backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
-backend/runtime_field_contracts.py: shared operation, target, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, audit responses, and side-effect audit payloads.
+backend/runtime_field_contracts.py: shared operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, adapter results, audit responses, Slack local requests, and side-effect audit payloads.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -81,8 +81,8 @@ backend/file_scanning.py: shared reviewable text-file suffixes and recursive sca
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
-backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping.
-backend/audit_contracts.py: shared audit scope payload field names, correlation-id field, accepted response flag, and audit response payload shape.
+backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping with generic request/operation/target fields reused from runtime field contracts.
+backend/audit_contracts.py: shared audit scope payload field names, runtime request/correlation-id fields, accepted response flag, and audit response payload shape.
 backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
@@ -90,7 +90,7 @@ backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, res
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
 backend/source_freshness_contracts.py: shared source-freshness schema defaults and unchanged-source predicate for fresh source snapshots and cache replay.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, registry metadata key contracts, and registry metadata payload shape.
-backend/slack_contracts.py: shared Slack source label, event field names, scope, local-request payload, outbound payload, post-result payload, validation message contracts, and token-purpose text.
+backend/slack_contracts.py: shared Slack source label, event field names, scope, runtime request-id field for local-request payloads, outbound payload, post-result payload, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
 backend/audit.py: in-memory audit repository, recursive secret redaction, redacted mapping helper for telemetry/audit payloads, and audit response construction through shared audit contracts.
 backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
@@ -207,12 +207,14 @@ Gated adapter action and target labels must flow through
 backend/adapter_gate_contracts.py before execution-envelope message construction.
 Gated adapter result envelope IDs, request IDs, operation, target, client
 response field vocabulary, and result field mapping must flow through
-backend/adapter_results.py before adapter-specific return dataclasses or
-side-effect audit payloads add result fields.
-Audit scope payload field names, audit correlation-id field names, and audit response payload shapes must flow
-through backend/audit_contracts.py before audit records, audit responses, or
-side-effect audit payloads extract actor/policy scopes or change accepted-event
-shape.
+backend/adapter_results.py and backend/runtime_field_contracts.py before
+adapter-specific return dataclasses or side-effect audit payloads add result
+fields.
+Audit scope payload field names, audit request-id/correlation-id field names,
+and audit response payload shapes must flow through backend/audit_contracts.py
+and backend/runtime_field_contracts.py before audit records, audit responses,
+or side-effect audit payloads extract actor/policy scopes or change
+accepted-event shape.
 Side-effect audit payload field names and event types must flow through
 backend/audit_contracts.py, backend/runtime_field_contracts.py,
 backend/adapter_results.py, backend/side_effect_audit_contracts.py,
@@ -235,10 +237,11 @@ structured observability fields are built.
 Safety Service canonicalization, classification, and policy observability event,
 message, tag, and field shapes must flow through
 backend/service_observability_contracts.py before service telemetry is emitted.
-Operation, target, correlation-id, status, request-kind, requester/policy scope, allow,
+Operation, target, request-id, correlation-id, status, request-kind, requester/policy scope, allow,
 human-approval, reason, and policy-version field names must flow through
 backend/runtime_field_contracts.py before service observability, OpenClaw tool
-telemetry, publishing response contracts, side-effect audit payloads, or future policy context field shapes are
+telemetry, adapter results, audit responses, Slack local request payloads,
+publishing response contracts, side-effect audit payloads, or future policy context field shapes are
 changed.
 Default requester, policy, publishing actor, and publishing policy scopes must
 flow through backend/request_scope_contracts.py before schemas, mock

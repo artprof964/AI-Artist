@@ -6,10 +6,11 @@ from backend.audit_contracts import (
     AUDIT_ACTOR_SCOPE_FIELD,
     AUDIT_CORRELATION_ID_FIELD,
     AUDIT_POLICY_SCOPE_FIELD,
+    AUDIT_REQUEST_ID_FIELD,
     AUDIT_RESPONSE_ACCEPTED,
     audit_response_payload,
 )
-from backend.runtime_field_contracts import CORRELATION_ID_FIELD
+from backend.runtime_field_contracts import CORRELATION_ID_FIELD, REQUEST_ID_FIELD
 from path_helpers import read_backend_source
 
 
@@ -124,6 +125,7 @@ def test_audit_scope_payload_fields_are_centralized() -> None:
     assert AUDIT_ACTOR_SCOPE_FIELD == "actor_scope"
     assert AUDIT_POLICY_SCOPE_FIELD == "policy_scope"
     assert AUDIT_CORRELATION_ID_FIELD == CORRELATION_ID_FIELD
+    assert AUDIT_REQUEST_ID_FIELD == REQUEST_ID_FIELD
     assert AUDIT_RESPONSE_ACCEPTED is True
     assert 'string_field_or_none(redacted_payload, "actor_scope")' not in source
     assert 'string_field_or_none(redacted_payload, "policy_scope")' not in source
@@ -144,7 +146,7 @@ def test_audit_response_shape_is_centralized() -> None:
     ) == {
         "event_id": "event-1",
         "event_type": "request",
-        "request_id": "request-1",
+        AUDIT_REQUEST_ID_FIELD: "request-1",
         AUDIT_CORRELATION_ID_FIELD: "correlation-1",
         "accepted": AUDIT_RESPONSE_ACCEPTED,
         "occurred_at": "2026-05-31T10:00:00Z",
@@ -153,4 +155,6 @@ def test_audit_response_shape_is_centralized() -> None:
 
     source = read_backend_source("audit_contracts.py")
     assert '"correlation_id": correlation_id' not in source
+    assert '"request_id": request_id' not in source
     assert "AUDIT_CORRELATION_ID_FIELD" in source
+    assert "AUDIT_REQUEST_ID_FIELD" in source

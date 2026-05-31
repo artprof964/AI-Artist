@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
+from backend.runtime_field_contracts import REQUEST_ID_FIELD
+
 
 SLACK_SOURCE = "slack"
 SLACK_ADAPTER_EXECUTION_PURPOSE = "Slack adapter execution"
@@ -23,7 +25,7 @@ SLACK_EVENT_ID_FIELD = "event_id"
 SLACK_EVENT_TEAM_ID_FIELD = "team_id"
 SLACK_EVENT_TEAM_FIELD = "team"
 SLACK_EVENT_CHANNEL_TYPE_FIELD = "channel_type"
-SLACK_LOCAL_REQUEST_ID_FIELD = "request_id"
+SLACK_LOCAL_REQUEST_ID_FIELD = REQUEST_ID_FIELD
 SLACK_LOCAL_CHANNEL_FIELD = "channel"
 SLACK_LOCAL_REQUEST_TEXT_FIELD = "request_text"
 SLACK_LOCAL_REQUESTER_SCOPE_FIELD = "requester_scope"

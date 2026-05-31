@@ -46,6 +46,7 @@ from backend.slack_contracts import (
     slack_requester_scope,
     slack_response_text_required,
 )
+from backend.runtime_field_contracts import REQUEST_ID_FIELD
 from path_helpers import read_backend_source
 
 
@@ -114,6 +115,7 @@ def test_slack_scope_and_payload_shapes_are_centralized() -> None:
 
 
 def test_slack_field_names_and_post_result_shape_are_centralized() -> None:
+    assert SLACK_LOCAL_REQUEST_ID_FIELD == REQUEST_ID_FIELD
     assert SLACK_EVENT_OBJECT_FIELD == "event"
     assert SLACK_EVENT_CHANNEL_FIELD == "channel"
     assert SLACK_EVENT_USER_FIELD == "user"
@@ -167,6 +169,7 @@ def test_slack_adapter_uses_shared_contract_messages() -> None:
         'posted_payload["channel"]',
         'posted_payload["text"]',
         'posted_payload["thread_ts"]',
+        'SLACK_LOCAL_REQUEST_ID_FIELD = "request_id"',
     ]
     for literal in forbidden_literals:
         assert literal not in source
@@ -184,3 +187,10 @@ def test_slack_adapter_uses_shared_contract_messages() -> None:
     assert "SLACK_ADAPTER_EXECUTION_PURPOSE" in source
     assert "SLACK_EVENT_OBJECT_FIELD" in source
     assert "SLACK_RESPONSE_OK_FIELD" not in source
+
+
+def test_slack_local_request_id_uses_runtime_field_contract() -> None:
+    source = read_backend_source("slack_contracts.py")
+
+    assert "SLACK_LOCAL_REQUEST_ID_FIELD = REQUEST_ID_FIELD" in source
+    assert 'SLACK_LOCAL_REQUEST_ID_FIELD = "request_id"' not in source

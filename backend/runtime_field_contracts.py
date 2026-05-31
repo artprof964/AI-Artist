@@ -1,5 +1,6 @@
 OPERATION_FIELD = "operation"
 TARGET_FIELD = "target"
+REQUEST_ID_FIELD = "request_id"
 CORRELATION_ID_FIELD = "correlation_id"
 REQUEST_KIND_FIELD = "request_kind"
 REQUESTER_SCOPE_FIELD = "requester_scope"
@@ -18,6 +19,7 @@ __all__ = [
     "POLICY_SCOPE_FIELD",
     "POLICY_VERSION_FIELD",
     "REASON_FIELD",
+    "REQUEST_ID_FIELD",
     "REQUESTER_SCOPE_FIELD",
     "REQUEST_KIND_FIELD",
     "REQUIRES_HUMAN_APPROVAL_FIELD",
