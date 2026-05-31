@@ -54,12 +54,48 @@ def missing_command_result(args: Sequence[str], exc: FileNotFoundError) -> subpr
     )
 
 
+def parse_delimited_key_value_rows(output: str, *, delimiter: str = "|") -> list[tuple[str, str]]:
+    rows: list[tuple[str, str]] = []
+    for line in output.splitlines():
+        if delimiter not in line:
+            continue
+        key, value = line.split(delimiter, 1)
+        rows.append((key, value))
+    return rows
+
+
+def parse_delimited_int_values(output: str, *, delimiter: str = "|") -> dict[str, int]:
+    values: dict[str, int] = {}
+    for key, value in parse_delimited_key_value_rows(output, delimiter=delimiter):
+        try:
+            values[key] = int(value)
+        except ValueError:
+            continue
+    return values
+
+
+def parse_delimited_values_for_key(
+    output: str,
+    key_name: str,
+    *,
+    delimiter: str = "|",
+) -> set[str]:
+    return {
+        value
+        for key, value in parse_delimited_key_value_rows(output, delimiter=delimiter)
+        if key == key_name
+    }
+
+
 __all__ = [
     "curl_command",
     "docker_compose_command",
     "docker_compose_exec",
     "missing_command_result",
     "minio_command",
+    "parse_delimited_int_values",
+    "parse_delimited_key_value_rows",
+    "parse_delimited_values_for_key",
     "run_process",
     "shell_command",
 ]

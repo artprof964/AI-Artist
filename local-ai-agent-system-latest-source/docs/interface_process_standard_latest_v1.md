@@ -61,7 +61,7 @@ can be marked done.
 49. GitHub adapter action labels, validation messages, and token-purpose text use `backend/github_contracts.py`.
 50. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
 51. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
-52. Production readiness Docker Compose, curl, and MinIO command strings plus test process invocations use `backend/shell_commands.py`.
+52. Production readiness Docker Compose, curl, and MinIO command strings, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
 53. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
 54. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
 ```
@@ -111,8 +111,9 @@ Rules:
 - `.env.example` must match the shared connection settings registry rendering.
 - Readiness health, backup, and restore endpoint commands compose service URLs
   through the shared connection settings helper.
-- Readiness Docker Compose, curl, and MinIO command syntax plus test process
-  invocations are built or executed through the shared shell command helper.
+- Readiness Docker Compose, curl, and MinIO command syntax, test process
+  invocations, and delimited process-output parsers are built or executed
+  through the shared shell command helper.
 - Readiness backup directories, container dump paths, and MinIO aliases use the
   shared readiness path contract.
 - Repository artifact paths, repo-root resolution, workspace paths/text reads,

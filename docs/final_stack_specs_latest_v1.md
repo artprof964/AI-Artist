@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 392 passed, 1 skipped, 1 warning
+Final validation: 394 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -89,7 +89,7 @@ backend/response_cache.py: approved read-only response cache using shared reques
 backend/source_freshness.py: dependency snapshot, stale-source checks, and optional source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution and guards, endpoint URL composition, env-example rendering, and connection settings loader.
-backend/shell_commands.py: shared shell command construction for Docker Compose, curl, and MinIO command definitions plus subprocess execution defaults.
+backend/shell_commands.py: shared shell command construction for Docker Compose, curl, and MinIO command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
@@ -143,9 +143,9 @@ backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias.
 Shell command strings for Docker Compose, curl, and MinIO readiness commands,
-plus subprocess execution defaults, must flow through backend/shell_commands.py
-before production readiness command definitions or test process invocations are
-changed.
+subprocess execution defaults, and delimited process-output parsing must flow
+through backend/shell_commands.py before production readiness command
+definitions, test process invocations, or migration output parsers are changed.
 Production readiness backup directories, container dump paths, and MinIO source
 aliases must flow through backend/readiness_paths.py before runbook or command
 definitions are changed.

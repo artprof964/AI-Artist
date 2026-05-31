@@ -7,6 +7,9 @@ from backend.shell_commands import (
     docker_compose_exec,
     missing_command_result,
     minio_command,
+    parse_delimited_int_values,
+    parse_delimited_key_value_rows,
+    parse_delimited_values_for_key,
     run_process,
     shell_command,
 )
@@ -69,6 +72,30 @@ def test_missing_command_result_uses_shared_exit_contract() -> None:
     assert "missing" in result.stderr
 
 
+def test_delimited_process_output_parsers_share_psql_row_contract() -> None:
+    output = "\n".join(
+        [
+            "table_count|6",
+            "table_name|audit_event",
+            "ignored line",
+            "table_name|query_request_run",
+            "invalid_count|not-an-int",
+        ]
+    )
+
+    assert parse_delimited_key_value_rows(output) == [
+        ("table_count", "6"),
+        ("table_name", "audit_event"),
+        ("table_name", "query_request_run"),
+        ("invalid_count", "not-an-int"),
+    ]
+    assert parse_delimited_int_values(output) == {"table_count": 6}
+    assert parse_delimited_values_for_key(output, "table_name") == {
+        "audit_event",
+        "query_request_run",
+    }
+
+
 def test_tests_use_shared_process_runner_instead_of_subprocess_imports() -> None:
     repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
@@ -88,3 +115,13 @@ def test_tests_use_shared_process_runner_instead_of_subprocess_imports() -> None
             offenders.append(test_path.name)
 
     assert offenders == []
+
+
+def test_postgres_migration_tests_use_shared_delimited_output_parsers() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    source = read_repo_text(repo_root, Path("tests") / "test_postgres_migrations.py")
+
+    assert "def parse_psql_counts(" not in source
+    assert "def parse_psql_values(" not in source
+    assert "parse_delimited_int_values(" in source
+    assert "parse_delimited_values_for_key(" in source

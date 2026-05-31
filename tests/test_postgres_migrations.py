@@ -3,7 +3,11 @@ from pathlib import Path
 from uuid import uuid4
 
 from backend.repo_paths import POSTGRES_INIT_DIR, repo_path, repo_root_from
-from backend.shell_commands import run_process
+from backend.shell_commands import (
+    parse_delimited_int_values,
+    parse_delimited_values_for_key,
+    run_process,
+)
 
 
 REPO_ROOT = repo_root_from(Path(__file__))
@@ -119,30 +123,6 @@ WHERE schemaname = 'public'
     return script
 
 
-def parse_psql_counts(output: str) -> dict[str, int]:
-    counts: dict[str, int] = {}
-    for line in output.splitlines():
-        if "|" not in line:
-            continue
-        key, value = line.split("|", 1)
-        try:
-            counts[key] = int(value)
-        except ValueError:
-            continue
-    return counts
-
-
-def parse_psql_values(output: str, value_key: str) -> set[str]:
-    values: set[str] = set()
-    for line in output.splitlines():
-        if "|" not in line:
-            continue
-        key, value = line.split("|", 1)
-        if key == value_key:
-            values.add(value)
-    return values
-
-
 def test_query_tracking_migration_applies_and_rolls_back_cleanly() -> None:
     container_name = f"ai-artist-migration-test-{uuid4().hex[:12]}"
     script = write_migration_check_script()
@@ -190,9 +170,9 @@ def test_query_tracking_migration_applies_and_rolls_back_cleanly() -> None:
                 f"/checks/{script.name}",
             ]
         )
-        counts = parse_psql_counts(result.stdout)
-        table_names = parse_psql_values(result.stdout, "table_name")
-        index_names = parse_psql_values(result.stdout, "index_name")
+        counts = parse_delimited_int_values(result.stdout)
+        table_names = parse_delimited_values_for_key(result.stdout, "table_name")
+        index_names = parse_delimited_values_for_key(result.stdout, "index_name")
 
         assert counts["table_count"] == len(EXPECTED_TABLES)
         assert table_names == EXPECTED_TABLES
