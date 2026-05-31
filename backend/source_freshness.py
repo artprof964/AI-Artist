@@ -1,9 +1,10 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 from uuid import UUID, uuid4
 
 from backend.schemas import SourceFreshness
+from backend.time_utils import utc_now
 
 
 @dataclass(frozen=True)
@@ -80,7 +81,7 @@ class SourceFreshnessRegistry:
             content_hash=content_hash,
             version_tag=version_tag,
             last_modified_at=last_modified_at,
-            ingested_at=ingested_at or datetime.now(timezone.utc),
+            ingested_at=ingested_at or utc_now(),
             metadata=dict(metadata or {}),
         )
         self._store(entry)
@@ -97,7 +98,7 @@ class SourceFreshnessRegistry:
             source_owner=entry.source_owner,
             content_hash=entry.content_hash,
             version_tag=entry.version_tag,
-            last_modified_at=datetime.now(timezone.utc),
+            last_modified_at=utc_now(),
             ingested_at=entry.ingested_at,
             metadata=dict(entry.metadata or {}),
         )

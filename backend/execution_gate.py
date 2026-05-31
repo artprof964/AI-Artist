@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from backend.model_coercion import coerce_model
 from backend.schemas import ExecutionEnvelopeResponse
-from backend.time_utils import as_utc
+from backend.time_utils import as_utc, utc_now
 
 
 class ExecutionGateError(PermissionError):
@@ -89,7 +89,7 @@ def _validate_execution_envelope(
     if not envelope.signature:
         raise error_type("execution envelope must include a signature")
 
-    comparison_time = _as_aware_utc(now or datetime.now(timezone.utc))
+    comparison_time = _as_aware_utc(now or utc_now())
     expires_at = _as_aware_utc(envelope.expires_at)
     if expires_at <= comparison_time:
         raise error_type("execution envelope is expired")

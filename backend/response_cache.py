@@ -1,10 +1,10 @@
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.schemas import Operation, PolicyEvaluateRequest, PolicyEvaluateResponse, RequestKind
-from backend.time_utils import as_utc
+from backend.time_utils import as_utc, utc_now
 
 
 @dataclass(frozen=True)
@@ -38,7 +38,7 @@ def evaluate_cached_response_reuse(
     cache_entry: ApprovedResponseCacheEntry | None,
     now: datetime | None = None,
 ) -> CacheReplayDecision:
-    checked_at = _as_utc(now or datetime.now(timezone.utc))
+    checked_at = _as_utc(now or utc_now())
     trace_id = trace_id_from_request(policy_request.request_id, policy_request.metadata)
 
     def observed_decision(

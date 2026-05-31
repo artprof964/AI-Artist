@@ -1,13 +1,13 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime
 from threading import RLock
 from typing import Any, Literal, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
 from backend.model_coercion import coerce_model
 from backend.payload_fields import optional_string_field, required_string_field
-from backend.time_utils import as_utc
+from backend.time_utils import as_utc, utc_now
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -29,7 +29,7 @@ class ImageProvenanceInput(BaseModel):
     storage_uri: str = Field(min_length=1)
     review_status: ReviewStatus
     image_id: str | None = Field(default=None, min_length=1)
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=utc_now)
 
 
 class ImageProvenanceRecord(BaseModel):

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 238 passed, 1 skipped, 1 warning
+Final validation: 239 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -52,7 +52,7 @@ backend/service.py: canonicalization, classification, local policy gate, executi
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, deterministic ID helpers, and version tags.
 backend/request_identity.py: request text normalization, fingerprints, and stable request UUIDs.
-backend/time_utils.py: shared UTC datetime normalization.
+backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field extraction.
 backend/url_utils.py: shared URL domain and relative API path validation.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
@@ -121,8 +121,9 @@ hashes, source snapshot versions, signatures, or mocked external IDs are created
 Request text normalization, fingerprint wrappers, and stable channel request
 UUIDs must flow through backend/request_identity.py before service or adapter
 specific request identity logic is added.
-UTC datetime normalization must flow through backend/time_utils.py before cache,
-provenance, execution gate, or future persistence time comparisons are added.
+UTC datetime creation and normalization must flow through backend/time_utils.py
+before cache, provenance, execution gate, source freshness, observability, or
+future persistence time comparisons are added.
 Connector payload required/optional string extraction must flow through
 backend/payload_fields.py before adapter-specific payload parsing logic is added.
 URL/domain extraction and relative API path validation must flow through

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from threading import RLock
 from typing import Any, Literal
 from uuid import UUID
 
 from backend.audit import redact_audit_value
+from backend.time_utils import utc_now
 
 
 TelemetryStage = Literal["request", "policy", "cache", "orchestration", "tool"]
@@ -31,7 +32,7 @@ class MetricRecord:
     trace_id: str
     request_id: str | None
     tags: dict[str, Any] = field(default_factory=dict)
-    emitted_at: datetime = field(default_factory=lambda: datetime.now(timezone.utc))
+    emitted_at: datetime = field(default_factory=utc_now)
 
 
 @dataclass(frozen=True)
@@ -69,7 +70,7 @@ class InMemoryObservabilityCollector:
         message: str | None = None,
         fields: dict[str, Any] | None = None,
     ) -> None:
-        emitted_at = datetime.now(timezone.utc)
+        emitted_at = utc_now()
         normalized_request_id = str(request_id) if request_id is not None else None
         safe_fields = _safe_dict(fields)
         safe_tags = _safe_dict(metric_tags)

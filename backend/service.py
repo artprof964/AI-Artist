@@ -1,7 +1,7 @@
 import hashlib
 import hmac
 import re
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from uuid import uuid4
 
 from backend.audit import (
@@ -29,6 +29,7 @@ from backend.schemas import (
     PolicyEvaluateRequest,
     PolicyEvaluateResponse,
 )
+from backend.time_utils import utc_now
 
 POLICY_VERSION = "local-default-deny-v0"
 LOCAL_ENVELOPE_SIGNING_KEY = b"ai-artist-local-safety-service-dev-key"
@@ -177,7 +178,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
 def create_execution_envelope(
     payload: ExecutionEnvelopeRequest,
 ) -> ExecutionEnvelopeResponse:
-    issued_at = datetime.now(timezone.utc)
+    issued_at = utc_now()
     expires_at = issued_at + timedelta(minutes=15)
     needs_approval = is_sensitive_operation(payload.operation)
     freshness_ok = payload.source_freshness.all_required_sources_unchanged

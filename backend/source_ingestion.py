@@ -1,11 +1,12 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any
 
 from backend.canonical_hash import sha256_text, sha256_version_tag
 from backend.source_freshness import SourceFreshnessRegistry, SourceRegistryEntry
+from backend.time_utils import utc_now
 from backend.url_utils import http_url_domain
 
 
@@ -98,7 +99,7 @@ class SourceIngestionService:
         *,
         ingested_at: datetime | None = None,
     ) -> SourceIngestionResult:
-        captured_at = ingested_at or datetime.now(timezone.utc)
+        captured_at = ingested_at or utc_now()
         imported_snapshots: list[SourceSnapshot] = []
         registry_entries: list[SourceRegistryEntry] = []
         rejected_sources: list[RejectedSource] = []

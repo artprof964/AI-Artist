@@ -1,7 +1,8 @@
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID, uuid4
 
+from backend.time_utils import utc_now
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -45,7 +46,7 @@ class CanonicalizeRequest(BaseModel):
     requester_scope: str = "local-user"
     policy_scope: str = "default"
     channel: Channel = "cli"
-    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=utc_now)
     metadata: RequestMetadata = Field(default_factory=RequestMetadata)
 
 
@@ -136,7 +137,7 @@ class AuditEventRequest(BaseModel):
     event_type: AuditEventType
     request_id: UUID | None = None
     correlation_id: UUID
-    occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    occurred_at: datetime = Field(default_factory=utc_now)
     payload: dict[str, Any] = Field(default_factory=dict)
 
 

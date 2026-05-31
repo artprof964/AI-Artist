@@ -22,7 +22,7 @@ can be marked done.
 10. External write actions require a signed execution envelope.
 11. Canonical hashes, deterministic local IDs, and source version tags are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
-13. Cache, provenance, execution-envelope, and persistence timestamps use `backend/time_utils.py` for UTC normalization.
+13. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
 14. Connector payload string-field extraction uses `backend/payload_fields.py`.
 15. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 16. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
@@ -207,7 +207,7 @@ Output:
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
-   - Envelope expiry comparisons use shared UTC normalization.
+   - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use shared UTC creation and normalization.
    - Connector API paths are normalized and rejected for absolute URLs, traversal,
      backslashes, and control characters before token reads.
 

@@ -1,6 +1,13 @@
-from datetime import UTC, datetime, timezone, timedelta
+from datetime import UTC, datetime, timedelta, timezone
 
-from backend.time_utils import as_utc
+from backend.time_utils import as_utc, utc_now
+
+
+def test_utc_now_returns_timezone_aware_utc_datetime() -> None:
+    value = utc_now()
+
+    assert value.tzinfo is not None
+    assert value.utcoffset() == timedelta(0)
 
 
 def test_as_utc_treats_naive_datetimes_as_utc() -> None:
