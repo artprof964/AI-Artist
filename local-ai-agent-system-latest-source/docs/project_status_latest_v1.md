@@ -128,7 +128,7 @@ Connection registry, endpoint URL composition, env-example rendering/parsing, ru
 Shell command/process argument construction, process execution, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations and migration output parsing
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: shared across security review, scaffold, OPA, readiness validators, workspace validators, and contract guard tests
-Test path/source helpers: shared across repo-wide guard tests and checked-in source inspection tests for connection settings, canonical hashing, classification contracts, health contracts, request metadata, production readiness, tree shape, time utilities, shell commands, and repo path contracts
+Test path/source helpers: shared across repo-wide guard tests and checked-in source inspection tests for connection settings, canonical hashing, classification contracts, health contracts, request metadata, mapping utilities, model coercion, runtime IDs, Safety Service, security review, source ingestion, production readiness, tree shape, time utilities, shell commands, and repo path contracts
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, signature, and expiry failures
@@ -190,7 +190,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 10 passed; runbook, env schema rendering, shared service URL, shell command construction, backup paths, health checks, backup commands, restore checks, retention, and contacts validated
-repo path validation: 8 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, repo-root lookup, workspace file lookups, backend module discovery, backend module source reads, raw-open source-inspection guard tests, source-inspection guard tests, repo-root guard tests, migrated source-inspection guard tests, and test path/source helper usage centralized
+repo path validation: 8 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, repo-root lookup, workspace file lookups, backend module discovery, backend module source reads, raw-open source-inspection guard tests, source-inspection guard tests, repo-root guard tests, migrated backend/source-inspection guard tests, and test path/source helper usage centralized
 time utility validation: 6 focused files passed; direct test `datetime.now(timezone.utc)` calls guarded
 canonical JSON validation: 6 focused files passed; non-canonical-hash tests guarded against direct `json.dumps`
 test text-hash validation: 2 focused files passed; non-canonical-hash tests guarded against direct `hashlib` imports
@@ -202,7 +202,7 @@ image provenance hash validation: 2 focused files passed; image provenance guard
 runtime secret validation: LLM API smoke, GitHub, and Slack guarded against local runtime-token resolution
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
-test path helper validation: 6 focused files passed; repo-wide guard tests and migrated checked-in source inspections share test path/source helpers
+test path helper validation: 7 focused files passed; repo-wide guard tests and migrated checked-in backend/source inspections share test path/source helpers
 final pytest: 412 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art

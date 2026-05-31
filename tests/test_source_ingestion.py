@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 
@@ -14,12 +13,11 @@ from backend.source_ingestion_contracts import (
     DEFAULT_APPROVED_SOURCE_DOMAINS,
     SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
 )
-from backend.repo_paths import read_backend_module_text, repo_root_from
+from path_helpers import read_backend_source
 
 
 NOW = datetime(2026, 5, 31, 10, 30, tzinfo=timezone.utc)
 APPROVED_DOMAINS = set(DEFAULT_APPROVED_SOURCE_DOMAINS)
-PROJECT_ROOT = repo_root_from(Path(__file__))
 
 
 def approved_sample_sources() -> list[SourceIngestionCandidate]:
@@ -200,7 +198,7 @@ def test_ingestion_rejects_non_http_sources_before_snapshot_storage() -> None:
 
 
 def test_source_ingestion_uses_shared_canonical_hash_helpers_directly() -> None:
-    source = read_backend_module_text("source_ingestion.py", PROJECT_ROOT)
+    source = read_backend_source("source_ingestion.py")
 
     assert "from backend.canonical_hash import sha256_text, sha256_version_tag" in source
     assert "def _content_hash(" not in source
@@ -208,14 +206,14 @@ def test_source_ingestion_uses_shared_canonical_hash_helpers_directly() -> None:
 
 
 def test_source_ingestion_uses_shared_url_boundary_directly() -> None:
-    source = read_backend_module_text("source_ingestion.py", PROJECT_ROOT)
+    source = read_backend_source("source_ingestion.py")
 
     assert "def _domain_for_candidate(" not in source
     assert "http_url_domain(" in source
 
 
 def test_source_ingestion_uses_source_registry_optional_lookup_directly() -> None:
-    source = read_backend_module_text("source_ingestion.py", PROJECT_ROOT)
+    source = read_backend_source("source_ingestion.py")
 
     assert "def _existing_registry_entry(" not in source
     assert ".find_source(" in source

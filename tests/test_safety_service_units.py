@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from pathlib import Path
 
 import pytest
 
@@ -19,10 +18,7 @@ from backend.service import (
     evaluate_policy,
 )
 from backend.time_utils import as_utc
-from backend.repo_paths import read_backend_module_text, repo_root_from
-
-
-REPO_ROOT = repo_root_from(Path(__file__))
+from path_helpers import read_backend_source
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:
@@ -48,7 +44,7 @@ def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None
 
 
 def test_service_uses_shared_text_normalization_and_tokenization_directly() -> None:
-    source = read_backend_module_text("service.py", REPO_ROOT)
+    source = read_backend_source("service.py")
 
     assert "def normalize_text(" not in source
     assert "def normalized_terms(" not in source
@@ -142,7 +138,7 @@ def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
 
 
 def test_execution_envelope_signing_uses_shared_canonical_hmac_helper() -> None:
-    source = read_backend_module_text("service.py", REPO_ROOT)
+    source = read_backend_source("service.py")
     import_lines = [
         line.strip()
         for line in source.splitlines()

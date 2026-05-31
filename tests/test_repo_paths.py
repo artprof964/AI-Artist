@@ -114,8 +114,14 @@ def test_migrated_source_inspection_tests_use_shared_path_helpers() -> None:
     migrated_tests = {
         "test_classification_contracts.py",
         "test_health_contracts.py",
+        "test_mapping_utils.py",
+        "test_model_coercion.py",
         "test_production_readiness.py",
         "test_request_metadata.py",
+        "test_runtime_ids.py",
+        "test_safety_service_units.py",
+        "test_security_review.py",
+        "test_source_ingestion.py",
         "test_tree_shape.py",
     }
     offenders: list[str] = []

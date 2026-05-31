@@ -1,13 +1,12 @@
 from __future__ import annotations
 
-from pathlib import Path
 import shutil
 
 from backend.audit import REDACTED_SECRET_VALUE, redact_audit_value
 from backend.canonical_hash import canonical_json
 from backend.image_provenance import LocalImageProvenanceStore, record_generated_image_provenance
 from backend.observability import InMemoryObservabilityCollector
-from backend.repo_paths import read_backend_module_text, repo_root_from, repo_path, WORKSPACES_DIR
+from backend.repo_paths import repo_path, WORKSPACES_DIR
 from backend.security_review import (
     review_audit_payload_redaction,
     review_observability_redaction,
@@ -15,9 +14,10 @@ from backend.security_review import (
     review_provenance_metadata,
     scan_workspace_secret_files,
 )
+from path_helpers import PROJECT_ROOT, read_backend_source
 
 
-REPO_ROOT = repo_root_from(Path(__file__))
+REPO_ROOT = PROJECT_ROOT
 RAW_PROMPT = "paint a quiet studio scene with soft window light"
 
 
@@ -153,14 +153,14 @@ def test_artifact_provenance_review_flags_raw_prompt_metadata() -> None:
 
 
 def test_security_review_uses_canonical_json_for_backend_serialization() -> None:
-    source = read_backend_module_text("security_review.py", REPO_ROOT)
+    source = read_backend_source("security_review.py")
 
     assert "json.dumps" not in source
     assert "canonical_json" in source
 
 
 def test_security_review_uses_shared_secret_detection_boundary() -> None:
-    source = read_backend_module_text("security_review.py", REPO_ROOT)
+    source = read_backend_source("security_review.py")
 
     assert "SECRET_ASSIGNMENT_PATTERN" not in source
     assert "SECRET_VALUE_PATTERNS" not in source
@@ -169,7 +169,7 @@ def test_security_review_uses_shared_secret_detection_boundary() -> None:
 
 
 def test_security_review_uses_shared_text_file_scanner() -> None:
-    source = read_backend_module_text("security_review.py", REPO_ROOT)
+    source = read_backend_source("security_review.py")
 
     assert "TEXT_REVIEW_SUFFIXES" not in source
     assert "def _iter_text_review_files(" not in source

@@ -1,15 +1,6 @@
-from pathlib import Path
-
 from backend.mapping_utils import copy_mapping, merge_mappings
-from backend.repo_paths import (
-    backend_module_filenames,
-    backend_module_path,
-    read_backend_module_text,
-    repo_root_from,
-)
-
-
-REPO_ROOT = repo_root_from(Path(__file__))
+from backend.repo_paths import backend_module_filenames, backend_module_path
+from path_helpers import PROJECT_ROOT, read_backend_source
 
 
 def test_copy_mapping_returns_mutable_copy_without_aliasing() -> None:
@@ -43,8 +34,8 @@ def test_backend_metadata_copies_use_shared_mapping_helper() -> None:
         "dict(image)",
     )
     offenders: list[str] = []
-    for module_filename in backend_module_filenames(REPO_ROOT):
-        source = read_backend_module_text(module_filename, REPO_ROOT)
+    for module_filename in backend_module_filenames(PROJECT_ROOT):
+        source = read_backend_source(module_filename)
         if any(pattern in source for pattern in forbidden_patterns):
             offenders.append(str(backend_module_path(module_filename)))
 
