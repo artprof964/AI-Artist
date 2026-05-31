@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import ast
 from datetime import timedelta
-from pathlib import Path
 from typing import Any
 from uuid import UUID
 
@@ -18,12 +17,11 @@ from backend.github_adapter import (
 from backend.repo_paths import (
     backend_module_filenames,
     backend_module_path,
-    read_backend_module_text,
-    repo_root_from,
 )
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 from backend.time_utils import utc_now
+from path_helpers import PROJECT_ROOT, read_backend_source
 
 
 REQUEST_ID = UUID("23232323-2323-2323-2323-232323232323")
@@ -31,7 +29,6 @@ NOW = utc_now()
 GITHUB_TARGET = "github://artprof964/AI-Art/issues"
 GITHUB_PATH = "/repos/artprof964/AI-Art/issues"
 MOCK_GITHUB_TOKEN = "ghp_mocked_t23_secret_token_1234567890"
-PROJECT_ROOT = repo_root_from(Path(__file__))
 
 
 class MockGitHubAPI:
@@ -175,7 +172,7 @@ def test_github_token_env_var_is_owned_by_adapter_not_backend_agents() -> None:
 
         source_path = backend_module_path(module_filename)
         tree = ast.parse(
-            read_backend_module_text(module_filename, PROJECT_ROOT),
+            read_backend_source(module_filename),
             filename=str(source_path),
         )
         for node in ast.walk(tree):
@@ -329,14 +326,14 @@ def test_github_adapter_rejects_unsafe_paths_before_token_read(
 
 
 def test_github_adapter_uses_shared_url_boundary_directly() -> None:
-    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
+    source = read_backend_source("github_adapter.py")
 
     assert "def _normalize_api_path(" not in source
     assert "safe_relative_api_path(" in source
 
 
 def test_github_adapter_uses_shared_runtime_secret_resolver() -> None:
-    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
+    source = read_backend_source("github_adapter.py")
 
     assert "require_runtime_secret(" in source
     assert "load_connection_settings(" not in source
@@ -346,7 +343,7 @@ def test_github_adapter_uses_shared_runtime_secret_resolver() -> None:
 
 
 def test_github_adapter_uses_shared_operation_constant_directly() -> None:
-    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
+    source = read_backend_source("github_adapter.py")
 
     assert "GITHUB_WRITE_OPERATION =" not in source
     assert '"GITHUB_WRITE_OPERATION"' not in source
@@ -354,7 +351,7 @@ def test_github_adapter_uses_shared_operation_constant_directly() -> None:
 
 
 def test_github_adapter_uses_shared_missing_envelope_message() -> None:
-    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
+    source = read_backend_source("github_adapter.py")
 
     assert '"GitHub write requires an execution envelope"' not in source
     assert "execution_envelope_required(GITHUB_WRITE_ACTION_LABEL)" in source

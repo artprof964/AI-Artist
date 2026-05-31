@@ -120,6 +120,7 @@ def test_migrated_source_inspection_tests_use_shared_path_helpers() -> None:
         "test_health_contracts.py",
         "test_http_methods.py",
         "test_github_contracts.py",
+        "test_github_adapter.py",
         "test_image_provenance.py",
         "test_interface_types.py",
         "test_knowledge_agent.py",
