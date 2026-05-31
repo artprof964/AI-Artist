@@ -7,10 +7,11 @@ from uuid import UUID
 
 from backend.adapter_results import targeted_result_fields
 from backend.execution_gate import require_execution_envelope
+from backend.operations import OPERATION_PUBLISH
 from backend.schemas import ExecutionEnvelopeResponse
 
 
-PUBLISH_OPERATION = "publish"
+PUBLISH_OPERATION = OPERATION_PUBLISH
 
 
 class PublishingExecutionGateError(PermissionError):

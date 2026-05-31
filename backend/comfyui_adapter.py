@@ -7,10 +7,11 @@ from uuid import UUID
 
 from backend.adapter_results import gated_result_fields
 from backend.execution_gate import require_execution_envelope
+from backend.operations import OPERATION_IMAGE_GENERATE
 from backend.schemas import ExecutionEnvelopeResponse
 
 
-IMAGE_GENERATE_OPERATION = "image_generate"
+IMAGE_GENERATE_OPERATION = OPERATION_IMAGE_GENERATE
 
 
 class ComfyUIExecutionGateError(PermissionError):

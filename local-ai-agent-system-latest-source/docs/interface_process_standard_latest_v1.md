@@ -25,6 +25,7 @@ can be marked done.
 13. Cache, provenance, execution-envelope, and persistence timestamps use `backend/time_utils.py` for UTC normalization.
 14. Connector payload string-field extraction uses `backend/payload_fields.py`.
 15. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+16. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 ```
 
 ## Standard Request Envelope
@@ -183,9 +184,11 @@ Output:
 
 3. Classify
    - Safety Service classifies request as read, action, or mixed.
+   - Operation inference and read/action term maps come from the shared operation registry.
 
 4. Policy Check
    - Safety Service asks OPA whether processing may continue.
+   - Sensitive-operation checks come from the shared operation registry before envelopes are issued.
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.

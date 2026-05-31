@@ -10,12 +10,13 @@ from backend.adapter_results import targeted_result_fields
 from backend.audit import redact_audit_value
 from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
 from backend.execution_gate import require_execution_envelope
+from backend.operations import OPERATION_GITHUB_WRITE
 from backend.schemas import ExecutionEnvelopeResponse
 from backend.secret_redaction import redact_secret_value
 from backend.url_utils import safe_relative_api_path
 
 
-GITHUB_WRITE_OPERATION = "github_write"
+GITHUB_WRITE_OPERATION = OPERATION_GITHUB_WRITE
 
 
 class GitHubExecutionGateError(PermissionError):

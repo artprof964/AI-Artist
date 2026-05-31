@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 228 passed, 1 skipped, 1 warning
+Final validation: 233 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -55,6 +55,7 @@ backend/request_identity.py: request text normalization, fingerprints, and stabl
 backend/time_utils.py: shared UTC datetime normalization.
 backend/payload_fields.py: shared connector payload string-field extraction.
 backend/url_utils.py: shared URL domain and relative API path validation.
+backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
@@ -126,6 +127,9 @@ backend/payload_fields.py before adapter-specific payload parsing logic is added
 URL/domain extraction and relative API path validation must flow through
 backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.
+Operation constants, classifier term maps, and sensitive-operation rules must
+flow through backend/operations.py before service or adapter operation logic is
+added.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```

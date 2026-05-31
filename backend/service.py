@@ -10,6 +10,14 @@ from backend.audit import (
 )
 from backend.canonical_hash import canonical_json
 from backend.observability import record_observability_stage, trace_id_from_request
+from backend.operations import (
+    ACTION_TERMS,
+    READ_TERMS,
+    SENSITIVE_OPERATIONS,
+    classify_request_kind,
+    infer_operation,
+    is_sensitive_operation,
+)
 from backend.request_identity import normalize_request_text, request_fingerprint
 from backend.schemas import (
     CanonicalizeRequest,
@@ -18,32 +26,12 @@ from backend.schemas import (
     ClassifyResponse,
     ExecutionEnvelopeRequest,
     ExecutionEnvelopeResponse,
-    Operation,
     PolicyEvaluateRequest,
     PolicyEvaluateResponse,
-    RequestKind,
 )
 
 POLICY_VERSION = "local-default-deny-v0"
 LOCAL_ENVELOPE_SIGNING_KEY = b"ai-artist-local-safety-service-dev-key"
-SENSITIVE_OPERATIONS: set[Operation] = {
-    "write",
-    "publish",
-    "delete",
-    "github_write",
-    "image_generate",
-}
-ACTION_TERMS = {
-    "create",
-    "delete",
-    "generate",
-    "post",
-    "publish",
-    "send",
-    "update",
-    "write",
-}
-READ_TERMS = {"find", "get", "list", "read", "research", "show", "summarize"}
 
 
 def normalize_text(request_text: str) -> str:
@@ -98,28 +86,12 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
     terms = set(normalized_terms(text))
     has_action = bool(terms & ACTION_TERMS)
     has_read = bool(terms & READ_TERMS)
-
-    if payload.operation is not None:
-        operation = payload.operation
-    elif "publish" in terms or "post" in terms:
-        operation = "publish"
-    elif "delete" in terms:
-        operation = "delete"
-    elif "github" in terms and ({"write", "update", "create"} & terms):
-        operation = "github_write"
-    elif "image" in terms and ({"generate", "create"} & terms):
-        operation = "image_generate"
-    elif has_action:
-        operation = "write"
-    else:
-        operation = "read"
-
-    if operation in {"read", "reuse"}:
-        request_kind: RequestKind = "mixed" if has_action and has_read else "read"
-    elif has_read:
-        request_kind = "mixed"
-    else:
-        request_kind = "action"
+    operation = infer_operation(terms, payload.operation)
+    request_kind = classify_request_kind(
+        operation=operation,
+        has_action=has_action,
+        has_read=has_read,
+    )
 
     response = ClassifyResponse(
         request_id=payload.request_id,
@@ -150,7 +122,7 @@ def normalized_terms(value: str) -> set[str]:
 
 
 def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
-    if payload.operation in SENSITIVE_OPERATIONS:
+    if is_sensitive_operation(payload.operation):
         response = PolicyEvaluateResponse(
             allow=False,
             reason=f"{payload.operation} requires a later execution envelope and OPA approval",
@@ -207,7 +179,7 @@ def create_execution_envelope(
 ) -> ExecutionEnvelopeResponse:
     issued_at = datetime.now(timezone.utc)
     expires_at = issued_at + timedelta(minutes=15)
-    needs_approval = payload.operation in SENSITIVE_OPERATIONS
+    needs_approval = is_sensitive_operation(payload.operation)
     freshness_ok = payload.source_freshness.all_required_sources_unchanged
     approved = payload.human_approval.approved
     allow = freshness_ok and (not needs_approval or approved)
@@ -273,4 +245,5 @@ __all__ = [
     "normalize_text",
     "normalized_terms",
     "record_audit_event",
+    "SENSITIVE_OPERATIONS",
 ]

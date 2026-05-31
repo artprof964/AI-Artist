@@ -32,6 +32,7 @@ Request identity: centralized in backend/request_identity.py
 Time normalization: centralized in backend/time_utils.py
 Payload fields: centralized in backend/payload_fields.py
 URL validation: centralized in backend/url_utils.py
+Operations: centralized in backend/operations.py
 ```
 
 ## Completed
@@ -96,6 +97,7 @@ Request identity: shared across Safety Service canonicalization/classification a
 Time normalization: shared across cache expiry checks, image provenance timestamps, and execution-envelope expiry validation
 Payload fields: shared across Slack event parsing and generated image metadata parsing
 URL validation: shared across GitHub API path safety and source-ingestion domain allowlisting
+Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Deprecated architecture term scan: clean
 ```
 
@@ -107,7 +109,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 228 passed, 1 skipped, 1 warning
+final pytest: 233 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
