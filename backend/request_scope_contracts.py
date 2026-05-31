@@ -1,0 +1,8 @@
+DEFAULT_REQUESTER_SCOPE = "local-user"
+DEFAULT_POLICY_SCOPE = "default"
+
+
+__all__ = [
+    "DEFAULT_POLICY_SCOPE",
+    "DEFAULT_REQUESTER_SCOPE",
+]

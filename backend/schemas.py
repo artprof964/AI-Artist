@@ -4,6 +4,7 @@ from uuid import UUID
 
 from backend.health_contracts import HealthStatus
 from backend.interface_types import AuditEventType, Channel, Operation, RequestKind
+from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.runtime_ids import runtime_uuid
 from backend.subagent_status import SubAgentStatus
 from backend.time_utils import utc_now
@@ -25,8 +26,8 @@ class RequestMetadata(BaseModel):
 class CanonicalizeRequest(BaseModel):
     request_id: UUID = Field(default_factory=runtime_uuid)
     request_text: str = Field(min_length=1)
-    requester_scope: str = "local-user"
-    policy_scope: str = "default"
+    requester_scope: str = DEFAULT_REQUESTER_SCOPE
+    policy_scope: str = DEFAULT_POLICY_SCOPE
     channel: Channel = "cli"
     created_at: datetime = Field(default_factory=utc_now)
     metadata: RequestMetadata = Field(default_factory=RequestMetadata)

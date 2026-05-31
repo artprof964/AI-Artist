@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 439 passed, 1 skipped, 1 warning
+Final validation: 440 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -57,6 +57,7 @@ backend/interface_types.py: shared request kind, channel, operation, and audit e
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes.
 backend/request_identity.py: request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping for fingerprints and observability fields.
+backend/request_scope_contracts.py: shared default requester and policy scope contracts for schemas and mock orchestration.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache, source-freshness, policy, and execution-envelope reason strings.
@@ -199,6 +200,9 @@ backend/request_identity.py directly for request text normalization.
 RequestMetadata workspace/agent mapping must flow through
 backend/request_metadata.py before service fingerprinting, observability metric
 tags, or structured observability fields are built.
+Default requester and policy scopes must flow through
+backend/request_scope_contracts.py before schemas, mock orchestration, or future
+request envelopes change local scope defaults.
 Runtime UUIDs and prefixed runtime IDs must flow through
 backend/runtime_ids.py before service, schema, adapter, orchestration,
 freshness, retrieval, or review-specific runtime IDs are created.

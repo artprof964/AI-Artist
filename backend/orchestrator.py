@@ -44,6 +44,7 @@ from backend.observability import (
     trace_id_from_request,
 )
 from backend.review_status import REVIEW_STATUS_PENDING
+from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     SubAgentArtifact,
@@ -68,8 +69,8 @@ MockAgent = Callable[["MockAgentRequest"], SubAgentOutput]
 class MockAgentRequest(BaseModel):
     task_id: UUID = Field(default_factory=runtime_uuid)
     request_text: str = Field(min_length=1)
-    requester_scope: str = "local-user"
-    policy_scope: str = "default"
+    requester_scope: str = DEFAULT_REQUESTER_SCOPE
+    policy_scope: str = DEFAULT_POLICY_SCOPE
     metadata: dict[str, Any] = Field(default_factory=dict)
 
 
