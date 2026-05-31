@@ -87,6 +87,7 @@
 - `../../backend/source_registry_contracts.py`
 - `../../validation_reports/t15_audit_event_log_validation_2026-05-31.md`
 - `../../validation_reports/audit_scope_contract_standardization_2026-05-31.md`
+- `../../validation_reports/audit_response_contract_standardization_2026-06-01.md`
 - `../../backend/audit_contracts.py`
 - `../../validation_reports/t16_knowledge_agent_validation_2026-05-31.md`
 - `../../validation_reports/knowledge_contract_standardization_2026-05-31.md`

@@ -2,7 +2,12 @@ from fastapi.testclient import TestClient
 
 from backend.app import app
 from backend.audit import audit_event_repository
-from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_FIELD
+from backend.audit_contracts import (
+    AUDIT_ACTOR_SCOPE_FIELD,
+    AUDIT_POLICY_SCOPE_FIELD,
+    AUDIT_RESPONSE_ACCEPTED,
+    audit_response_payload,
+)
 from path_helpers import read_backend_source
 
 
@@ -116,7 +121,29 @@ def test_audit_scope_payload_fields_are_centralized() -> None:
 
     assert AUDIT_ACTOR_SCOPE_FIELD == "actor_scope"
     assert AUDIT_POLICY_SCOPE_FIELD == "policy_scope"
+    assert AUDIT_RESPONSE_ACCEPTED is True
     assert 'string_field_or_none(redacted_payload, "actor_scope")' not in source
     assert 'string_field_or_none(redacted_payload, "policy_scope")' not in source
+    assert "accepted=True" not in source
+    assert "audit_response_payload(" in source
     assert "AUDIT_ACTOR_SCOPE_FIELD" in source
     assert "AUDIT_POLICY_SCOPE_FIELD" in source
+
+
+def test_audit_response_shape_is_centralized() -> None:
+    assert audit_response_payload(
+        event_id="event-1",
+        event_type="request",
+        request_id="request-1",
+        correlation_id="correlation-1",
+        occurred_at="2026-05-31T10:00:00Z",
+        payload={AUDIT_ACTOR_SCOPE_FIELD: "user:local"},
+    ) == {
+        "event_id": "event-1",
+        "event_type": "request",
+        "request_id": "request-1",
+        "correlation_id": "correlation-1",
+        "accepted": AUDIT_RESPONSE_ACCEPTED,
+        "occurred_at": "2026-05-31T10:00:00Z",
+        "payload": {AUDIT_ACTOR_SCOPE_FIELD: "user:local"},
+    }

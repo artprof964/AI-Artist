@@ -7,7 +7,11 @@ from collections.abc import Mapping
 from typing import Any, Protocol
 from uuid import UUID
 
-from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_FIELD
+from backend.audit_contracts import (
+    AUDIT_ACTOR_SCOPE_FIELD,
+    AUDIT_POLICY_SCOPE_FIELD,
+    audit_response_payload,
+)
 from backend.interface_types import AuditEventType
 from backend.mapping_utils import copy_mapping
 from backend.payload_fields import string_field_or_none
@@ -95,13 +99,14 @@ def audit_record_from_request(payload: AuditEventRequest) -> AuditEventRecord:
 
 def audit_response_from_record(record: AuditEventRecord) -> AuditEventResponse:
     return AuditEventResponse(
-        event_id=record.audit_event_id,
-        event_type=record.event_type,
-        request_id=record.request_id,
-        correlation_id=record.correlation_id,
-        accepted=True,
-        occurred_at=record.created_at,
-        payload=record.payload,
+        **audit_response_payload(
+            event_id=record.audit_event_id,
+            event_type=record.event_type,
+            request_id=record.request_id,
+            correlation_id=record.correlation_id,
+            occurred_at=record.created_at,
+            payload=record.payload,
+        )
     )
 
 

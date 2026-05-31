@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 501 passed, 1 warning
+Final validation: 502 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -82,7 +82,7 @@ backend/operations.py: shared operation constants, classifier terms, and sensiti
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
 backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping.
-backend/audit_contracts.py: shared audit scope payload field names.
+backend/audit_contracts.py: shared audit scope payload field names, accepted response flag, and audit response payload shape.
 backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
@@ -92,7 +92,7 @@ backend/source_freshness_contracts.py: shared source-freshness schema defaults a
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, registry metadata key contracts, and registry metadata payload shape.
 backend/slack_contracts.py: shared Slack source label, scope, local-request payload, outbound payload, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
-backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
+backend/audit.py: in-memory audit repository, recursive secret redaction, redacted mapping helper for telemetry/audit payloads, and audit response construction through shared audit contracts.
 backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion, semantic validation, expiry validation, and signature verification for gated adapters.
 backend/response_cache_contracts.py: shared response-cache reuse telemetry event, message, metric-tag, and structured-field shapes.
@@ -209,8 +209,10 @@ Gated adapter result envelope IDs, request IDs, operation, target, client
 response field vocabulary, and result field mapping must flow through
 backend/adapter_results.py before adapter-specific return dataclasses or
 side-effect audit payloads add result fields.
-Audit scope payload field names must flow through backend/audit_contracts.py
-before audit records or side-effect audit payloads extract actor/policy scopes.
+Audit scope payload field names and audit response payload shapes must flow
+through backend/audit_contracts.py before audit records, audit responses, or
+side-effect audit payloads extract actor/policy scopes or change accepted-event
+shape.
 Side-effect audit payload field names and event types must flow through
 backend/audit_contracts.py, backend/runtime_field_contracts.py,
 backend/adapter_results.py, backend/side_effect_audit_contracts.py,
