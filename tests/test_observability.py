@@ -18,6 +18,10 @@ from backend.observability import (
     TELEMETRY_STAGE_TOOL,
     observability_collector,
 )
+from backend.service_observability_contracts import (
+    POLICY_EVALUATE_EVENT,
+    REQUEST_CANONICALIZE_EVENT,
+)
 from backend.openclaw_hook import (
     SafetyDecision,
     ToolCallRequest,
@@ -185,8 +189,8 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
     assert METRIC_TOOL_EXECUTED in metric_names
 
     log_events = {(record.stage, record.event) for record in logs}
-    assert (TELEMETRY_STAGE_REQUEST, "canonicalize") in log_events
-    assert (TELEMETRY_STAGE_POLICY, "evaluate") in log_events
+    assert (TELEMETRY_STAGE_REQUEST, REQUEST_CANONICALIZE_EVENT) in log_events
+    assert (TELEMETRY_STAGE_POLICY, POLICY_EVALUATE_EVENT) in log_events
     assert (TELEMETRY_STAGE_CACHE, "reuse_evaluate") in log_events
     assert (TELEMETRY_STAGE_ORCHESTRATION, "complete") in log_events
     assert (TELEMETRY_STAGE_TOOL, "executed") in log_events

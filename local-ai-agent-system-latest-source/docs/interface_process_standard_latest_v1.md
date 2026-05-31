@@ -25,6 +25,7 @@ can be marked done.
 13. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
 14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 15. RequestMetadata workspace/agent mapping, canonical request fingerprint fields, and canonicalization observability fields use `backend/request_metadata.py`.
+15a. Safety Service canonicalization, classification, and policy observability event/message/tag/field shapes use `backend/service_observability_contracts.py`.
 16. Default requester, policy, publishing actor, and publishing policy scopes use `backend/request_scope_contracts.py`.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
@@ -250,6 +251,7 @@ Output:
    - Safety Service canonicalizes request text and builds a stable fingerprint.
    - Safety Service health responses and readiness expectations use the shared health contract.
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
+   - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.

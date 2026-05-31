@@ -52,6 +52,18 @@ from backend.schemas import (
     PolicyEvaluateRequest,
     PolicyEvaluateResponse,
 )
+from backend.service_observability_contracts import (
+    POLICY_EVALUATE_EVENT,
+    POLICY_EVALUATED_MESSAGE,
+    REQUEST_CANONICALIZE_EVENT,
+    REQUEST_CANONICALIZED_MESSAGE,
+    REQUEST_CLASSIFIED_MESSAGE,
+    REQUEST_CLASSIFY_EVENT,
+    classification_metric_tags,
+    classification_observability_fields,
+    policy_metric_tags,
+    policy_observability_fields,
+)
 from backend.text_utils import identifier_tokens
 from backend.time_utils import utc_now
 
@@ -77,7 +89,7 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
     )
     record_observability_stage(
         stage=TELEMETRY_STAGE_REQUEST,
-        event="canonicalize",
+        event=REQUEST_CANONICALIZE_EVENT,
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
         metric_name=METRIC_REQUEST_CANONICALIZED,
@@ -85,7 +97,7 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
             channel=payload.channel,
             metadata=payload.metadata,
         ),
-        message="request canonicalized",
+        message=REQUEST_CANONICALIZED_MESSAGE,
         fields=request_observability_fields(
             channel=payload.channel,
             metadata=payload.metadata,
@@ -116,17 +128,20 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
     )
     record_observability_stage(
         stage=TELEMETRY_STAGE_REQUEST,
-        event="classify",
+        event=REQUEST_CLASSIFY_EVENT,
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
         metric_name=METRIC_REQUEST_CLASSIFIED,
-        metric_tags={"request_kind": request_kind, "operation": operation},
-        message="request classified",
-        fields={
-            "request_kind": request_kind,
-            "operation": operation,
-            "confidence": response.confidence,
-        },
+        metric_tags=classification_metric_tags(
+            request_kind=request_kind,
+            operation=operation,
+        ),
+        message=REQUEST_CLASSIFIED_MESSAGE,
+        fields=classification_observability_fields(
+            request_kind=request_kind,
+            operation=operation,
+            confidence=response.confidence,
+        ),
     )
     return response
 
@@ -156,30 +171,30 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
 
     record_observability_stage(
         stage=TELEMETRY_STAGE_POLICY,
-        event="evaluate",
+        event=POLICY_EVALUATE_EVENT,
         trace_id=trace_id_from_request(payload.request_id, payload.metadata),
         request_id=payload.request_id,
         metric_name=METRIC_POLICY_EVALUATED,
-        metric_tags={
-            "operation": payload.operation,
-            "request_kind": payload.request_kind,
-            "allow": response.allow,
-        },
+        metric_tags=policy_metric_tags(
+            operation=payload.operation,
+            request_kind=payload.request_kind,
+            allow=response.allow,
+        ),
         log_level=LOG_LEVEL_INFO if response.allow else LOG_LEVEL_WARNING,
-        message="policy evaluated",
-        fields={
-            "operation": payload.operation,
-            "request_kind": payload.request_kind,
-            "policy_scope": payload.policy_scope,
-            "allow": response.allow,
-            "requires_human_approval": response.requires_human_approval,
-            "reason": response.reason,
-            "policy_version": response.policy_version,
-            "all_required_sources_unchanged": (
+        message=POLICY_EVALUATED_MESSAGE,
+        fields=policy_observability_fields(
+            operation=payload.operation,
+            request_kind=payload.request_kind,
+            policy_scope=payload.policy_scope,
+            allow=response.allow,
+            requires_human_approval=response.requires_human_approval,
+            reason=response.reason,
+            policy_version=response.policy_version,
+            all_required_sources_unchanged=(
                 payload.source_freshness.all_required_sources_unchanged
             ),
-            "changed_source_count": payload.source_freshness.changed_source_count,
-        },
+            changed_source_count=payload.source_freshness.changed_source_count,
+        ),
     )
     return response
 

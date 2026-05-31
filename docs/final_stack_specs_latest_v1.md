@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 480 passed, 1 warning
+Final validation: 484 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -49,7 +49,7 @@ evaluation, execution-envelope signing, audit event recording.
 ```text
 backend/api_contracts.py: shared FastAPI app metadata and Safety Service route paths.
 backend/app.py: FastAPI endpoints using shared API contracts.
-backend/service.py: canonicalization, classification, local policy gate, execution envelope creation using shared signing contracts.
+backend/service.py: canonicalization, classification, local policy gate, execution envelope creation using shared signing and service-observability contracts.
 backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, signature prefix, signature payload/signing/verification helpers, and execution-envelope TTL contracts for policy responses and execution envelopes.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
@@ -58,6 +58,7 @@ backend/interface_types.py: shared request kind, channel, operation, and audit e
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes.
 backend/request_identity.py: request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape.
+backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -215,6 +216,9 @@ RequestMetadata workspace/agent mapping, canonical request fingerprint field
 shape, and canonicalization observability field shape must flow through
 backend/request_metadata.py before service fingerprinting, observability metric
 tags, or structured observability fields are built.
+Safety Service canonicalization, classification, and policy observability event,
+message, tag, and field shapes must flow through
+backend/service_observability_contracts.py before service telemetry is emitted.
 Default requester, policy, publishing actor, and publishing policy scopes must
 flow through backend/request_scope_contracts.py before schemas, mock
 orchestration, publishing audit context, or future request envelopes change
