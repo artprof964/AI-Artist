@@ -54,7 +54,7 @@ can be marked done.
 42. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
 43. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 44. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
-45. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
+45. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
 46. Publishing side-effect audit operation values use `backend/operations.py`.
 47. Gated adapter operation values use `backend/operations.py` directly.
 48. Slack source labels, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.

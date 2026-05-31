@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+from uuid import uuid4
 
 from backend.repo_paths import read_backend_module_text
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
@@ -99,6 +100,17 @@ def test_find_source_returns_optional_registry_entry_without_raising() -> None:
     assert registry.find_source("style-guide") == entry
 
 
+def test_find_source_by_id_returns_optional_registry_entry_without_raising() -> None:
+    registry = SourceFreshnessRegistry()
+
+    assert registry.find_source_by_id(uuid4()) is None
+
+    entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
+
+    assert registry.find_source_by_id(entry.source_id) == entry
+    assert registry.get_source_by_id(entry.source_id) == entry
+
+
 def test_stale_source_freshness_blocks_cached_response_replay() -> None:
     registry = SourceFreshnessRegistry()
     registry.upsert_source(source_key="reference-brief", source_type="document")
@@ -155,3 +167,10 @@ def test_source_freshness_uses_shared_missing_row_message_contract() -> None:
 
     assert "source_data_registry row not found:" not in contents
     assert "source_registry_row_not_found(" in contents
+
+
+def test_source_freshness_uses_public_source_id_lookup_boundary() -> None:
+    contents = read_backend_module_text("source_freshness.py")
+
+    assert "def _require_source_by_id(" not in contents
+    assert "self.get_source_by_id(dependency.source_id)" in contents

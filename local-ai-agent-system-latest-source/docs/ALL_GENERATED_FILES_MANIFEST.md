@@ -122,6 +122,7 @@
 - `../../validation_reports/source_ingestion_hash_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/source_ingestion_url_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/source_ingestion_contract_standardization_2026-05-31.md`
+- `../../validation_reports/source_registry_id_lookup_standardization_2026-05-31.md`
 - `../../backend/source_ingestion_contracts.py`
 - `../../backend/source_ingestion.py`
 - `../../tests/test_source_ingestion.py`

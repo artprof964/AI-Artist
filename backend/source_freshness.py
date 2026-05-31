@@ -138,7 +138,7 @@ class SourceFreshnessRegistry:
             1
             for dependency in dependencies
             if dependency.required_for_cache_reuse
-            and self._require_source_by_id(dependency.source_id).change_seq
+            and self.get_source_by_id(dependency.source_id).change_seq
             > dependency.source_change_seq_at_run
         )
         required_source_count = sum(
@@ -160,8 +160,17 @@ class SourceFreshnessRegistry:
     def get_source(self, source_key: str) -> SourceRegistryEntry:
         return self._require_source(source_key)
 
+    def get_source_by_id(self, source_id: UUID) -> SourceRegistryEntry:
+        try:
+            return self._sources_by_id[source_id]
+        except KeyError as exc:
+            raise KeyError(source_registry_row_not_found(source_id)) from exc
+
     def find_source(self, source_key: str) -> SourceRegistryEntry | None:
         return self._sources_by_key.get(source_key)
+
+    def find_source_by_id(self, source_id: UUID) -> SourceRegistryEntry | None:
+        return self._sources_by_id.get(source_id)
 
     def _store(self, entry: SourceRegistryEntry) -> None:
         self._sources_by_key[entry.source_key] = entry
@@ -172,9 +181,3 @@ class SourceFreshnessRegistry:
             return self._sources_by_key[source_key]
         except KeyError as exc:
             raise KeyError(source_registry_row_not_found(source_key)) from exc
-
-    def _require_source_by_id(self, source_id: UUID) -> SourceRegistryEntry:
-        try:
-            return self._sources_by_id[source_id]
-        except KeyError as exc:
-            raise KeyError(source_registry_row_not_found(source_id)) from exc

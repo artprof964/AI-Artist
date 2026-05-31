@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 405 passed, 1 skipped, 1 warning
+Final validation: 407 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -86,7 +86,7 @@ backend/audit.py: in-memory audit repository, recursive secret redaction, and re
 backend/execution_gate_messages.py: shared execution-envelope validation failure and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
-backend/source_freshness.py: dependency snapshot, stale-source checks, and optional source registry lookup.
+backend/source_freshness.py: dependency snapshot, stale-source checks, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution and guards, endpoint URL composition, env-example rendering, and connection settings loader.
 backend/shell_commands.py: shared shell command construction for Docker Compose, curl, and MinIO command definitions plus subprocess execution defaults and delimited process-output parsing.
@@ -196,7 +196,8 @@ Source registry missing-row messages must flow through
 backend/source_registry_contracts.py before source freshness or future
 persistence adapters raise missing-row errors.
 Existing source registry row checks must call SourceFreshnessRegistry.find_source
-before ingestion or future persistence code handles optional source rows.
+or SourceFreshnessRegistry.find_source_by_id before ingestion, stale-source
+checks, or future persistence code handles optional source rows.
 SubAgentOutput status vocabulary, priority, and aggregation must flow through
 backend/subagent_status.py before schema or orchestration-specific status
 logic is added.
