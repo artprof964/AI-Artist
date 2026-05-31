@@ -73,6 +73,7 @@
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`
 - `../../validation_reports/response_cache_boundary_standardization_2026-05-31.md`
+- `../../validation_reports/response_cache_observability_contract_standardization_2026-05-31.md`
 - `../../validation_reports/t14_source_freshness_validation_2026-05-31.md`
 - `../../validation_reports/source_registry_contract_standardization_2026-05-31.md`
 - `../../validation_reports/source_registry_default_contract_standardization_2026-05-31.md`

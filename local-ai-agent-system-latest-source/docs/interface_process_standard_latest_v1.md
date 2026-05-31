@@ -43,6 +43,7 @@ can be marked done.
 29. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 30. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 31. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.
+31a. Response-cache reuse telemetry event, message, metric tags, and structured fields use `backend/response_cache_contracts.py`.
 32. Connector URL/domain, relative API path validation, and URL validation messages use `backend/url_utils.py`.
 33. Connector HTTP method vocabulary, normalization, and validation messages use `backend/http_methods.py`.
 34. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
@@ -270,6 +271,7 @@ Output:
    - Fresh source snapshot defaults and unchanged-source checks come from the shared source-freshness contract.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay and OpenClaw pre-tool approval request-kind checks use shared interface and operation constants.
+   - Cache reuse telemetry event, message, metric tags, and structured fields use the shared response-cache contract helper.
    - OpenClaw tool policy metadata and redacted tool arguments use the shared OpenClaw contract helper.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use the shared source-ingestion contract.

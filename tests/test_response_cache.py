@@ -9,6 +9,19 @@ from backend.response_cache import (
     ApprovedResponseCacheEntry,
     evaluate_cached_response_reuse,
 )
+from backend.response_cache_contracts import (
+    CACHE_ENTRY_PRESENT_FIELD,
+    CACHE_KEY_FIELD,
+    CACHE_OPERATION_FIELD,
+    CACHE_POLICY_ALLOW_FIELD,
+    CACHE_REASON_FIELD,
+    CACHE_REPLAY_FIELD,
+    CACHE_REQUEST_KIND_FIELD,
+    CACHE_REUSE_EVALUATED_MESSAGE,
+    CACHE_REUSE_EVALUATE_EVENT,
+    cache_reuse_metric_tags,
+    cache_reuse_observability_fields,
+)
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
 from path_helpers import read_backend_source
 
@@ -246,3 +259,47 @@ def test_response_cache_uses_shared_request_kind_and_operation_constants() -> No
     assert 'operation != "reuse"' not in source
     assert 'request_kind != "read"' not in source
     assert 'operation != "read"' not in source
+
+
+def test_response_cache_observability_contract_shapes_are_centralized() -> None:
+    assert CACHE_REUSE_EVALUATE_EVENT == "reuse_evaluate"
+    assert CACHE_REUSE_EVALUATED_MESSAGE == "cache reuse evaluated"
+    assert cache_reuse_metric_tags(replay=True, reason="cache replay approved") == {
+        CACHE_REPLAY_FIELD: True,
+        CACHE_REASON_FIELD: "cache replay approved",
+    }
+    assert cache_reuse_observability_fields(
+        operation=OPERATION_REUSE,
+        request_kind=REQUEST_KIND_READ,
+        policy_allow=True,
+        replay=True,
+        reason="cache replay approved",
+        cache_key="cache:repeat-read-request",
+        cache_entry_present=True,
+    ) == {
+        CACHE_OPERATION_FIELD: OPERATION_REUSE,
+        CACHE_REQUEST_KIND_FIELD: REQUEST_KIND_READ,
+        CACHE_POLICY_ALLOW_FIELD: True,
+        CACHE_REPLAY_FIELD: True,
+        CACHE_REASON_FIELD: "cache replay approved",
+        CACHE_KEY_FIELD: "cache:repeat-read-request",
+        CACHE_ENTRY_PRESENT_FIELD: True,
+    }
+
+
+def test_response_cache_uses_shared_observability_contract_shapes() -> None:
+    source = read_backend_source("response_cache.py")
+
+    assert "CACHE_REUSE_EVALUATE_EVENT" in source
+    assert "CACHE_REUSE_EVALUATED_MESSAGE" in source
+    assert "cache_reuse_metric_tags(" in source
+    assert "cache_reuse_observability_fields(" in source
+    assert 'event="reuse_evaluate"' not in source
+    assert 'message="cache reuse evaluated"' not in source
+    assert '"replay": decision.replay' not in source
+    assert '"reason": decision.reason' not in source
+    assert '"operation": policy_request.operation' not in source
+    assert '"request_kind": policy_request.request_kind' not in source
+    assert '"policy_allow": policy_response.allow' not in source
+    assert '"cache_key": decision.cache_key' not in source
+    assert '"cache_entry_present": cache_entry is not None' not in source

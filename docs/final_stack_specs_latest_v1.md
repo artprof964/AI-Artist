@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 475 passed, 1 warning
+Final validation: 477 passed, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -89,7 +89,8 @@ backend/github_contracts.py: shared GitHub adapter action labels, validation mes
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion, semantic validation, expiry validation, and signature verification for gated adapters.
-backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
+backend/response_cache_contracts.py: shared response-cache reuse telemetry event, message, metric-tag, and structured-field shapes.
+backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, time, and cache observability boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, source registry role/change-sequence contracts, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version, URL-domain validation, registry metadata payload, and source-registry default boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution, connection error messages, and guards, endpoint URL composition, env-example rendering/parsing, and connection settings loader.
@@ -316,6 +317,9 @@ Telemetry stages, log levels, default metric values, metric-name constants/forma
 trace-id fallback formatting, and event-message formatting must flow through
 backend/observability.py constants before service, cache, orchestration, tool,
 or review-specific telemetry calls are added.
+Response-cache reuse telemetry event, message, metric-tag, and structured-field
+shapes must flow through backend/response_cache_contracts.py before cache reuse
+observability changes.
 Publishing outcome status values must flow through backend/publishing_status.py
 before publishing agent or side-effect audit status text is added.
 Pydantic model/dict coercion and validation messages at adapter and domain

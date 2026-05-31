@@ -28,6 +28,12 @@ from backend.reason_messages import (
     SOURCE_FRESHNESS_CHECK_FAILED,
 )
 from backend.operations import OPERATION_READ, OPERATION_REUSE
+from backend.response_cache_contracts import (
+    CACHE_REUSE_EVALUATE_EVENT,
+    CACHE_REUSE_EVALUATED_MESSAGE,
+    cache_reuse_metric_tags,
+    cache_reuse_observability_fields,
+)
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.source_freshness_contracts import source_freshness_is_unchanged
 from backend.time_utils import as_utc, utc_now
@@ -82,22 +88,25 @@ def evaluate_cached_response_reuse(
         )
         record_observability_stage(
             stage=TELEMETRY_STAGE_CACHE,
-            event="reuse_evaluate",
+            event=CACHE_REUSE_EVALUATE_EVENT,
             trace_id=trace_id,
             request_id=policy_request.request_id,
             metric_name=METRIC_CACHE_REUSE_EVALUATED,
-            metric_tags={"replay": decision.replay, "reason": decision.reason},
+            metric_tags=cache_reuse_metric_tags(
+                replay=decision.replay,
+                reason=decision.reason,
+            ),
             log_level=LOG_LEVEL_INFO if decision.replay else LOG_LEVEL_WARNING,
-            message="cache reuse evaluated",
-            fields={
-                "operation": policy_request.operation,
-                "request_kind": policy_request.request_kind,
-                "policy_allow": policy_response.allow,
-                "replay": decision.replay,
-                "reason": decision.reason,
-                "cache_key": decision.cache_key,
-                "cache_entry_present": cache_entry is not None,
-            },
+            message=CACHE_REUSE_EVALUATED_MESSAGE,
+            fields=cache_reuse_observability_fields(
+                operation=policy_request.operation,
+                request_kind=policy_request.request_kind,
+                policy_allow=policy_response.allow,
+                replay=decision.replay,
+                reason=decision.reason,
+                cache_key=decision.cache_key,
+                cache_entry_present=cache_entry is not None,
+            ),
         )
         return decision
 

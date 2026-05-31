@@ -66,6 +66,7 @@ Numeric scoring utilities, vector similarity, positive-integer checks, zero-magn
 Time creation/normalization: centralized in backend/time_utils.py for runtime code and tests
 Payload fields, nested payload objects, and payload validation messages: centralized in backend/payload_fields.py
 Response fields, first-choice message parsing, and response validation messages: centralized in backend/response_fields.py
+Response cache observability event/message/tag/field shapes: centralized in backend/response_cache_contracts.py
 URL validation and URL validation messages: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
 HTTP method vocabulary, normalization, and validation messages: centralized in backend/http_methods.py
 File scanning suffixes and discovery: centralized in backend/file_scanning.py
@@ -189,7 +190,7 @@ Publishing operation constants: shared directly across publishing adapter gates 
 Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, side-effect audit event typing, OpenClaw tool hook approval checks, and cache replay boundaries
 API route contracts: shared directly across FastAPI decorators and endpoint tests
-Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
+Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants; cache reuse telemetry event/message/tag/field shapes use response_cache_contracts.py
 Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric-name constants, trace fallback ids, default event messages, and security review probes
 Publishing statuses: shared across Publishing Agent result handling and side-effect audit payloads
@@ -217,7 +218,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 475 passed, 1 warning
+final pytest: 477 passed, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
