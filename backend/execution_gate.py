@@ -3,8 +3,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import Any
 
-from pydantic import ValidationError
-
+from backend.model_coercion import coerce_model
 from backend.schemas import ExecutionEnvelopeResponse
 from backend.time_utils import as_utc
 
@@ -48,13 +47,12 @@ def _coerce_envelope(
     if envelope is None:
         raise error_type(missing_message)
 
-    if isinstance(envelope, ExecutionEnvelopeResponse):
-        return envelope
-
-    try:
-        return ExecutionEnvelopeResponse.model_validate(envelope)
-    except ValidationError as exc:
-        raise error_type("execution envelope is invalid") from exc
+    return coerce_model(
+        envelope,
+        ExecutionEnvelopeResponse,
+        error_type=error_type,
+        message="execution envelope is invalid",
+    )
 
 
 def _validate_execution_envelope(

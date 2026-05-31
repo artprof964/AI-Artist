@@ -7,6 +7,7 @@ from typing import Literal
 from pydantic import BaseModel, ConfigDict, Field
 
 from backend.image_provenance import ImageProvenanceRecord
+from backend.model_coercion import coerce_model
 
 
 RubricCategory = Literal[
@@ -267,9 +268,7 @@ def _collect_improvement_notes(category_scores: list[RubricScore]) -> list[str]:
 
 
 def _coerce_metadata(metadata: ImageQualityMetadata | dict[str, object]) -> ImageQualityMetadata:
-    if isinstance(metadata, ImageQualityMetadata):
-        return metadata
-    return ImageQualityMetadata.model_validate(metadata)
+    return coerce_model(metadata, ImageQualityMetadata)
 
 
 def _token_set(value: str) -> set[str]:

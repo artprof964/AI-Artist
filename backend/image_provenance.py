@@ -5,6 +5,7 @@ from threading import RLock
 from typing import Any, Literal, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
+from backend.model_coercion import coerce_model
 from backend.payload_fields import optional_string_field, required_string_field
 from backend.time_utils import as_utc
 from pydantic import BaseModel, ConfigDict, Field
@@ -184,9 +185,7 @@ def deterministic_image_id(
 def _coerce_provenance_input(
     provenance: ImageProvenanceInput | dict[str, Any],
 ) -> ImageProvenanceInput:
-    if isinstance(provenance, ImageProvenanceInput):
-        return provenance
-    return ImageProvenanceInput.model_validate(provenance)
+    return coerce_model(provenance, ImageProvenanceInput)
 
 
 def _storage_uri_from_comfyui_image(image: dict[str, Any]) -> str:
