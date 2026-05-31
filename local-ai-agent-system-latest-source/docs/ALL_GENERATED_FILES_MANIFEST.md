@@ -254,3 +254,4 @@
 - `../../pyproject.toml`
 - `../../requirements.txt`
 - `../../validation_reports/context_handoff_2026-05-31.md`
+- `../../validation_reports/openclaw_request_kind_standardization_2026-05-31.md`

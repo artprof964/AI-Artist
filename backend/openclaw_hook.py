@@ -2,7 +2,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
-from backend.interface_types import Operation, RequestKind
+from backend.interface_types import REQUEST_KIND_READ, Operation, RequestKind
 from backend.observability import (
     LOG_LEVEL_WARNING,
     TELEMETRY_STAGE_TOOL,
@@ -72,7 +72,7 @@ def build_policy_evaluate_request(request: ToolCallRequest) -> PolicyEvaluateReq
         operation=request.operation,
         requester_scope=request.requester_scope,
         policy_scope=request.policy_scope,
-        requires_human_approval=request.request_kind != "read",
+        requires_human_approval=request.request_kind != REQUEST_KIND_READ,
         source_freshness=request.source_freshness,
         metadata=metadata,
     )

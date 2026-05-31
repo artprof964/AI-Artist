@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 440 passed, 1 skipped, 1 warning
+Final validation: 441 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -97,7 +97,7 @@ backend/readiness_paths.py: shared production readiness backup paths, container 
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path.
-backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared secret-redaction boundary.
+backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.

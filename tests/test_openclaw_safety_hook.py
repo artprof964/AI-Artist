@@ -286,3 +286,10 @@ def test_openclaw_hook_uses_shared_secret_redaction_boundary_directly() -> None:
     assert "def _redact_sensitive_value(" not in source
     assert "redact_secret_value(" in source
     assert "redact_string_values=False" in source
+
+
+def test_openclaw_hook_uses_shared_request_kind_constant() -> None:
+    source = read_backend_source("openclaw_hook.py")
+
+    assert "REQUEST_KIND_READ" in source
+    assert 'request.request_kind != "read"' not in source

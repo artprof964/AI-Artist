@@ -45,7 +45,7 @@ can be marked done.
 33. Connector HTTP method vocabulary, normalization, and validation messages use `backend/http_methods.py`.
 34. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 35. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
-36. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+36. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`, including OpenClaw pre-tool approval checks.
 37. Telemetry stages, log levels, and event-message formatting use `backend/observability.py`.
 38. Publishing outcome statuses use `backend/publishing_status.py`.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
@@ -264,7 +264,7 @@ Output:
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
-   - Cache replay request-kind and operation checks use shared interface and operation constants.
+   - Cache replay and OpenClaw pre-tool approval request-kind checks use shared interface and operation constants.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source ingestion approved-domain defaults, rejection messages, and registry metadata keys use the shared source-ingestion contract.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.

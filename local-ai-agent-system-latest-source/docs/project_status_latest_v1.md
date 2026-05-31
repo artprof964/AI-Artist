@@ -25,7 +25,7 @@ Interface contracts: 28 defined
 Safety Service health contract: centralized in backend/health_contracts.py
 Safety Service API metadata and route paths: centralized in backend/api_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
-Interface type contracts: centralized in backend/interface_types.py
+Interface type contracts and OpenClaw pre-tool request-kind checks: centralized in backend/interface_types.py
 Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
 Shell command/process argument construction, process execution defaults, compact process errors, and delimited process-output parsing: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
@@ -181,7 +181,7 @@ Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and exec
 Classification response contract: shared across Safety Service classifier confidence and reason fields
 Publishing operation constants: shared directly across publishing adapter gates and publishing audit records
 Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
-Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
+Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hook approval checks, and cache replay boundaries
 API route contracts: shared directly across FastAPI decorators and endpoint tests
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
 Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
@@ -211,7 +211,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 440 passed, 1 skipped, 1 warning
+final pytest: 441 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
