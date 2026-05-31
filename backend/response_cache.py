@@ -28,6 +28,7 @@ from backend.reason_messages import (
 )
 from backend.operations import OPERATION_READ, OPERATION_REUSE
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
+from backend.source_freshness_contracts import source_freshness_is_unchanged
 from backend.time_utils import as_utc, utc_now
 
 
@@ -114,7 +115,9 @@ def evaluate_cached_response_reuse(
     if not policy_request.source_freshness.all_required_sources_unchanged:
         return observed_decision(replay=False, reason=SOURCE_FRESHNESS_CHECK_FAILED)
 
-    if policy_request.source_freshness.changed_source_count != 0:
+    if not source_freshness_is_unchanged(
+        policy_request.source_freshness.changed_source_count
+    ):
         return observed_decision(replay=False, reason=SOURCE_FRESHNESS_CHECK_FAILED)
 
     if not policy_response.allow:

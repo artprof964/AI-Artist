@@ -6,6 +6,7 @@ from uuid import UUID
 from backend.mapping_utils import copy_mapping
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SourceFreshness
+from backend.source_freshness_contracts import source_freshness_is_unchanged
 from backend.source_registry_contracts import (
     SOURCE_DEPENDENCY_ROLE_READ,
     SOURCE_EMPTY_CHANGE_SEQ,
@@ -159,7 +160,9 @@ class SourceFreshnessRegistry:
             max_source_change_seq_at_run=max_change_seq,
             required_source_count=required_source_count,
             changed_source_count=changed_source_count,
-            all_required_sources_unchanged=changed_source_count == 0,
+            all_required_sources_unchanged=source_freshness_is_unchanged(
+                changed_source_count
+            ),
         )
 
     def get_source(self, source_key: str) -> SourceRegistryEntry:

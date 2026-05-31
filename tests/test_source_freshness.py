@@ -6,6 +6,7 @@ from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, Sourc
 from backend.source_freshness_contracts import (
     DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
     DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
+    source_freshness_is_unchanged,
 )
 from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import (
@@ -208,6 +209,18 @@ def test_source_freshness_schema_defaults_are_shared() -> None:
     assert "all_required_sources_unchanged: bool = True" not in schemas_source
     assert "changed_source_count: int = Field(default=0" not in schemas_source
     assert "DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT = 0" in contract_source
+
+
+def test_source_freshness_unchanged_predicate_is_shared() -> None:
+    freshness_source = read_backend_source("source_freshness.py")
+    cache_source = read_backend_source("response_cache.py")
+
+    assert source_freshness_is_unchanged(0) is True
+    assert source_freshness_is_unchanged(1) is False
+    assert "source_freshness_is_unchanged(" in freshness_source
+    assert "source_freshness_is_unchanged(" in cache_source
+    assert "changed_source_count == 0" not in freshness_source
+    assert "changed_source_count != 0" not in cache_source
 
 
 def test_source_freshness_uses_shared_missing_row_message_contract() -> None:

@@ -30,7 +30,7 @@ can be marked done.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
 19. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
 19a. Local default-deny policy versioning uses `backend/policy_contracts.py`.
-19b. Source freshness schema defaults use `backend/source_freshness_contracts.py`.
+19b. Source freshness schema defaults and unchanged-source checks use `backend/source_freshness_contracts.py`.
 20. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 21. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
 22. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
@@ -266,7 +266,7 @@ Output:
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
-   - Fresh source snapshot defaults come from the shared source-freshness contract.
+   - Fresh source snapshot defaults and unchanged-source checks come from the shared source-freshness contract.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay and OpenClaw pre-tool approval request-kind checks use shared interface and operation constants.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
