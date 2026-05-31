@@ -22,6 +22,7 @@ Validation tests: 28 defined
 Validation passed: 28
 Validation pending: 0
 Interface contracts: 28 defined
+Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry and runtime env resolution: centralized in backend/connection_settings.py
 Execution gates: centralized in backend/execution_gate.py
 Secret redaction: centralized in backend/secret_redaction.py
@@ -115,6 +116,7 @@ Payload fields: shared across Slack event parsing, nested event object validatio
 Response fields: shared across provider-neutral LLM API response parsing, ComfyUI image response parsing, and publishing audit status parsing
 URL validation: shared across GitHub API path safety and source-ingestion domain allowlisting
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
+Interface types: shared across API schemas, operation classification, and audit event records
 Model coercion: shared across execution-envelope validation, image provenance input, critic metadata scoring, Knowledge Agent output, and mock sub-agent output
 Deprecated architecture term scan: clean
 ```
@@ -127,7 +129,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 285 passed, 1 skipped, 1 warning
+final pytest: 289 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

@@ -33,13 +33,16 @@
 - `../../validation_reports/reason_messages_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_status_standardization_2026-05-31.md`
 - `../../validation_reports/review_status_standardization_2026-05-31.md`
+- `../../validation_reports/interface_types_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
+- `../../backend/interface_types.py`
 - `../../backend/runtime_ids.py`
 - `../../backend/mapping_utils.py`
 - `../../backend/reason_messages.py`
 - `../../backend/subagent_status.py`
 - `../../backend/review_status.py`
 - `../../tests/test_request_identity.py`
+- `../../tests/test_interface_types.py`
 - `../../tests/test_runtime_ids.py`
 - `../../tests/test_mapping_utils.py`
 - `../../tests/test_reason_messages.py`

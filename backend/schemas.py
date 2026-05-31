@@ -2,31 +2,11 @@ from datetime import datetime
 from typing import Any, Literal
 from uuid import UUID
 
+from backend.interface_types import AuditEventType, Channel, Operation, RequestKind
 from backend.runtime_ids import runtime_uuid
 from backend.subagent_status import SubAgentStatus
 from backend.time_utils import utc_now
 from pydantic import BaseModel, ConfigDict, Field
-
-
-RequestKind = Literal["read", "action", "mixed"]
-Channel = Literal["slack", "cli", "web", "job"]
-Operation = Literal[
-    "reuse",
-    "read",
-    "write",
-    "publish",
-    "delete",
-    "github_write",
-    "image_generate",
-]
-AuditEventType = Literal[
-    "request",
-    "policy_decision",
-    "reuse",
-    "execution_envelope",
-    "tool_call",
-    "artifact",
-]
 
 
 class HealthResponse(BaseModel):

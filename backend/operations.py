@@ -1,6 +1,12 @@
 from __future__ import annotations
 
-from backend.schemas import Operation, RequestKind
+from backend.interface_types import (
+    REQUEST_KIND_ACTION,
+    REQUEST_KIND_MIXED,
+    REQUEST_KIND_READ,
+    Operation,
+    RequestKind,
+)
 
 
 OPERATION_REUSE: Operation = "reuse"
@@ -61,10 +67,10 @@ def infer_operation(terms: set[str], explicit_operation: Operation | None = None
 
 def classify_request_kind(*, operation: Operation, has_action: bool, has_read: bool) -> RequestKind:
     if operation in READ_OPERATIONS:
-        return "mixed" if has_action and has_read else "read"
+        return REQUEST_KIND_MIXED if has_action and has_read else REQUEST_KIND_READ
     if has_read:
-        return "mixed"
-    return "action"
+        return REQUEST_KIND_MIXED
+    return REQUEST_KIND_ACTION
 
 
 __all__ = [

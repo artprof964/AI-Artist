@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 285 passed, 1 skipped, 1 warning
+Final validation: 289 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,6 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
+backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
@@ -163,6 +164,9 @@ logic is added.
 Operation constants, classifier term maps, and sensitive-operation rules must
 flow through backend/operations.py before service or adapter operation logic is
 added.
+Request kind, channel, operation, and audit event type contracts must flow
+through backend/interface_types.py before schema, classifier, or audit-specific
+literal types are added.
 Pydantic model/dict coercion at adapter and domain boundaries must flow through
 backend/model_coercion.py before direct model validation or one-off validation
 wrappers are added.
