@@ -11,6 +11,7 @@ from backend.connection_settings import (
     SLACK_BOT_TOKEN_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
     connection_endpoint_url,
+    env_example_text,
     env_example_values,
     load_connection_settings,
     require_env_value,
@@ -117,4 +118,29 @@ def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
 def test_connection_endpoint_url_normalizes_base_and_path_slashes() -> None:
     assert connection_endpoint_url("http://localhost:8000/", "/health") == (
         "http://localhost:8000/health"
+    )
+
+
+def test_env_example_text_renders_registry_values_with_section_breaks() -> None:
+    assert env_example_text() == (
+        "deepseek-open-art=\n"
+        "LLM_API_URL=https://api.deepseek.com\n"
+        "LLM_PRIMARY_MODEL=deepseek-v4-pro\n"
+        "LLM_FALLBACK_MODEL=provider-fallback-model\n"
+        "LLM_CLASSIFIER_MODEL=provider-classifier-model\n"
+        "LLM_EMBEDDING_MODEL=provider-embedding-model\n"
+        "\n"
+        "OPENCLAW_WORKSPACE_ROOT=./workspaces\n"
+        "OPENCLAW_GATEWAY_URL=http://localhost:18789\n"
+        "\n"
+        "DATABASE_URL=postgresql://ai_artist:ai_artist@localhost:5432/ai_artist\n"
+        "QDRANT_URL=http://localhost:6333\n"
+        "MINIO_ENDPOINT=http://localhost:9000\n"
+        "REDIS_URL=redis://localhost:6379/0\n"
+        "OPA_URL=http://localhost:8181\n"
+        "COMFYUI_URL=http://localhost:8188\n"
+        "SAFETY_SERVICE_URL=http://localhost:8000\n"
+        "\n"
+        "SLACK_BOT_TOKEN=\n"
+        "git_ai-artist_codex_token=\n"
     )

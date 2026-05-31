@@ -34,7 +34,7 @@ can be marked done.
 22. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
 23. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 24. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
-25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, and runtime env resolution use `backend/connection_settings.py`.
+25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering, and runtime env resolution use `backend/connection_settings.py`.
 26. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 27. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 28. Provider response object/dict field access, first-choice message content extraction, and shape validation use `backend/response_fields.py`.
@@ -60,7 +60,7 @@ can be marked done.
 48. Slack source labels and adapter validation messages use `backend/slack_contracts.py`.
 49. GitHub adapter action labels, validation messages, and token-purpose text use `backend/github_contracts.py`.
 50. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
-51. Production readiness service URLs and health/backup/restore endpoint commands use `backend/connection_settings.py`.
+51. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 ```
 
 ## Standard Request Envelope
@@ -104,6 +104,7 @@ Rules:
   webhooks to the configured LLM API.
 - Runtime env and connection settings are resolved through the shared
   connection settings helper before adapters read provider credentials.
+- `.env.example` must match the shared connection settings registry rendering.
 - Readiness health, backup, and restore endpoint commands compose service URLs
   through the shared connection settings helper.
 - Tool hooks must call `/v1/execution/envelope` before external writes.

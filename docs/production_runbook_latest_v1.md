@@ -38,8 +38,9 @@ docker compose down
 
 ## Environment Validation
 
-Use `.env.example` as the required environment schema. The file must document
-all required keys without requiring real secrets in source control.
+Use `.env.example` as the required environment schema. The file is validated
+against the shared connection settings registry rendering and must document all
+required keys without requiring real secrets in source control.
 
 Required secret keys may be blank in `.env.example`:
 

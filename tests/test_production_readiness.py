@@ -7,6 +7,7 @@ from backend.connection_settings import (
     DEFAULT_QDRANT_URL,
     DEFAULT_SAFETY_SERVICE_URL,
     connection_endpoint_url,
+    env_example_text,
 )
 from backend.readiness import (
     BACKUP_COMMANDS,
@@ -39,6 +40,10 @@ def test_env_example_documents_required_readiness_keys_without_real_secrets() ->
     assert DEEPSEEK_API_KEY_ENV_VAR not in parsed
     assert parsed["SLACK_BOT_TOKEN"] == ""
     assert parsed["git_ai-artist_codex_token"] == ""
+
+
+def test_env_example_matches_shared_connection_registry_rendering() -> None:
+    assert ENV_EXAMPLE_PATH.read_text(encoding="utf-8") == env_example_text()
 
 
 def test_runbook_contains_all_required_readiness_sections() -> None:

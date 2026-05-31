@@ -130,6 +130,13 @@ CONNECTION_ENV_VARS: tuple[EnvVarSpec, ...] = (
 )
 
 CONNECTION_SETTING_NAMES: frozenset[str] = frozenset(ConnectionSettings.__dataclass_fields__)
+ENV_EXAMPLE_SECTION_BREAK_AFTER: frozenset[str] = frozenset(
+    {
+        "LLM_EMBEDDING_MODEL",
+        "OPENCLAW_GATEWAY_URL",
+        "SAFETY_SERVICE_URL",
+    }
+)
 
 
 def env_value(
@@ -181,6 +188,16 @@ def env_example_values() -> dict[str, str]:
     return {spec.name: "" if spec.secret else spec.default for spec in CONNECTION_ENV_VARS}
 
 
+def env_example_text() -> str:
+    lines: list[str] = []
+    values = env_example_values()
+    for spec in CONNECTION_ENV_VARS:
+        lines.append(f"{spec.name}={values[spec.name]}")
+        if spec.name in ENV_EXAMPLE_SECTION_BREAK_AFTER:
+            lines.append("")
+    return "\n".join(lines).rstrip() + "\n"
+
+
 def connection_endpoint_url(base_url: str, path: str) -> str:
     return f"{base_url.rstrip('/')}/{path.lstrip('/')}"
 
@@ -204,12 +221,14 @@ __all__ = [
     "DEFAULT_QDRANT_URL",
     "DEFAULT_REDIS_URL",
     "DEFAULT_SAFETY_SERVICE_URL",
+    "ENV_EXAMPLE_SECTION_BREAK_AFTER",
     "EnvVarSpec",
     "GITHUB_TOKEN_ENV_VAR",
     "SLACK_BOT_TOKEN_ENV_VAR",
     "STANDARD_LLM_API_KEY_ENV_VAR",
     "ConnectionSettings",
     "connection_endpoint_url",
+    "env_example_text",
     "env_example_values",
     "env_value",
     "load_connection_settings",
