@@ -2,14 +2,13 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.interface_types import Operation, RequestKind
 from backend.observability import record_observability_stage
 from backend.request_identity import prefixed_trace_id
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
-    Operation,
     PolicyEvaluateRequest,
     PolicyEvaluateResponse,
-    RequestKind,
     SourceFreshness,
 )
 from backend.secret_redaction import redact_secret_value

@@ -6,8 +6,9 @@ from threading import RLock
 from typing import Any, Protocol
 from uuid import UUID
 
-from backend.schemas import AuditEventRequest, AuditEventResponse, AuditEventType
+from backend.interface_types import AuditEventType
 from backend.payload_fields import string_field_or_none
+from backend.schemas import AuditEventRequest, AuditEventResponse
 from backend.secret_redaction import (
     REDACTED_SECRET_VALUE,
     redact_secret_value,

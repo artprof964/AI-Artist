@@ -56,3 +56,17 @@ def test_schema_and_operations_import_shared_interface_types() -> None:
     assert "from backend.interface_types import" in operations_source
     assert 'RequestKind = Literal["read", "action", "mixed"]' not in schemas_source
     assert "from backend.schemas import Operation" not in operations_source
+
+
+def test_runtime_modules_import_interface_types_directly() -> None:
+    for module_path in (
+        Path("backend/audit.py"),
+        Path("backend/openclaw_hook.py"),
+        Path("backend/response_cache.py"),
+    ):
+        source = module_path.read_text(encoding="utf-8")
+
+        assert "from backend.interface_types import" in source
+        assert "from backend.schemas import Operation" not in source
+        assert "from backend.schemas import AuditEventType" not in source
+        assert "from backend.schemas import RequestKind" not in source

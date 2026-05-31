@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 289 passed, 1 skipped, 1 warning
+Final validation: 290 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,7 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
-backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts.
+backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.

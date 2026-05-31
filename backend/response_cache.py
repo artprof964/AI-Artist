@@ -2,6 +2,7 @@ from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
+from backend.interface_types import Operation, RequestKind
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.reason_messages import (
     CACHE_ENTRY_EXPIRED,
@@ -19,7 +20,7 @@ from backend.reason_messages import (
     CACHE_SOURCES_STALE,
     SOURCE_FRESHNESS_CHECK_FAILED,
 )
-from backend.schemas import Operation, PolicyEvaluateRequest, PolicyEvaluateResponse, RequestKind
+from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.time_utils import as_utc, utc_now
 
 

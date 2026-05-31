@@ -4,19 +4,19 @@
 
 `backend/interface_types.py` centralizes request kind, channel, operation, and
 audit event type contracts. `backend/schemas.py` imports those shared type
-contracts, and `backend/operations.py` now imports `Operation` and `RequestKind`
-from the same boundary instead of importing API schemas.
+contracts, and runtime modules now import interface types directly instead of
+using API schemas as an indirect type boundary.
 
 ## Focused Validation
 
 ```powershell
-.\.venv\Scripts\python.exe -m pytest tests\test_interface_types.py tests\test_operations.py tests\test_safety_service_units.py tests\test_safety_service_endpoints.py tests\test_response_cache.py -q -p no:cacheprovider
+.\.venv\Scripts\python.exe -m pytest tests\test_interface_types.py tests\test_audit_event_log.py tests\test_openclaw_safety_hook.py tests\test_response_cache.py -q -p no:cacheprovider
 ```
 
 Result:
 
 ```text
-45 passed, 1 warning
+28 passed, 1 warning
 ```
 
 ## Lint
@@ -40,7 +40,7 @@ All checks passed!
 Result:
 
 ```text
-289 passed, 1 skipped, 1 warning
+290 passed, 1 skipped, 1 warning
 ```
 
 The skipped test is the live provider-neutral LLM API smoke test, which requires
