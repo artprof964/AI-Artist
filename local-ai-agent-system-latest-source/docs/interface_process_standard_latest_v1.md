@@ -26,7 +26,7 @@ can be marked done.
 14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 15. Request metadata defaults, default request channel, request envelope field names, RequestMetadata workspace/agent mapping, canonical request fingerprint fields, and canonicalization observability fields use `backend/request_metadata_contracts.py` and `backend/request_metadata.py`.
 15a. Safety Service canonicalization, classification, and policy observability event/message/tag/field shapes use `backend/service_observability_contracts.py`.
-15b. Execution-envelope-id, operation, target, request-id, correlation-id, status, request-kind, requester/policy scope, allow, human-approval, reason, and policy-version field names use `backend/runtime_field_contracts.py` before service observability, OpenClaw tool telemetry, observability trace fallback metadata, execution-envelope signature payloads, adapter result payloads, audit response payloads, Slack local request payloads, publishing response payloads, or side-effect audit payload shapes are changed.
+15b. Execution-envelope-id, client-response, operation, target, request-id, correlation-id, status, request-kind, requester/policy scope, allow, human-approval, reason, and policy-version field names use `backend/runtime_field_contracts.py` before service observability, OpenClaw tool telemetry, observability trace fallback metadata, execution-envelope signature payloads, adapter result payloads, audit response payloads, Slack local request/result payloads, publishing response payloads, or side-effect audit payload shapes are changed.
 16. Default requester, policy, publishing actor, and publishing policy scopes use `backend/request_scope_contracts.py`.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
@@ -70,8 +70,8 @@ can be marked done.
 49a. Side-effect audit payload field names use `backend/runtime_field_contracts.py` and `backend/side_effect_audit_contracts.py`.
 50. Gated adapter operation values use `backend/operations.py` directly.
 51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
-51a. Gated adapter result envelope IDs, request IDs, operation, target, and client response field names use `backend/adapter_results.py`, with generic execution-envelope/request/operation/target field names reused from `backend/runtime_field_contracts.py`, before adapter return dataclasses or side-effect audit payloads change.
-51. Slack source labels, inbound event field names, requester/policy scopes, runtime-field-backed local request IDs, local-request payloads, outbound payloads, post-result payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
+51a. Gated adapter result envelope IDs, request IDs, operation, target, and client response field names use `backend/adapter_results.py`, with generic execution-envelope/client-response/request/operation/target field names reused from `backend/runtime_field_contracts.py`, before adapter return dataclasses or side-effect audit payloads change.
+51. Slack source labels, inbound event field names, requester/policy scopes, runtime-field-backed local request IDs and client-response fields, local-request payloads, outbound payloads, post-result payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
 52. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
 53. Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use `backend/source_ingestion_contracts.py`.
 54. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
@@ -258,11 +258,11 @@ Output:
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
    - Request metadata defaults, default channel, request envelope field names, and fingerprint field names use the shared metadata contract before schema or telemetry changes.
    - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
-   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, execution-envelope signature, adapter result, audit response, Slack local request, publishing response, or side-effect audit payload shapes are changed.
+   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, execution-envelope signature, adapter result, audit response, Slack local request/result, publishing response, or side-effect audit payload shapes are changed.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
-   - Slack source labels, inbound event fields, runtime-field-backed local request IDs, outbound payload fields, post-result payloads, and adapter validation messages use the shared Slack contract before adapter errors are raised.
+   - Slack source labels, inbound event fields, runtime-field-backed local request IDs and client-response fields, outbound payload fields, post-result payloads, and adapter validation messages use the shared Slack contract before adapter errors are raised.
    - Runtime UUID creation uses the shared runtime ID helper.
    - Metadata and payload copies use the shared mapping helper.
 

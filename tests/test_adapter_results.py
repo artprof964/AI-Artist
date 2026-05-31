@@ -11,6 +11,7 @@ from backend.adapter_results import (
     targeted_result_fields,
 )
 from backend.runtime_field_contracts import (
+    CLIENT_RESPONSE_FIELD,
     EXECUTION_ENVELOPE_ID_FIELD,
     OPERATION_FIELD,
     REQUEST_ID_FIELD,
@@ -76,7 +77,7 @@ def test_adapter_result_field_vocabulary_is_centralized() -> None:
     assert ADAPTER_RESULT_REQUEST_ID_FIELD == REQUEST_ID_FIELD
     assert ADAPTER_RESULT_OPERATION_FIELD == OPERATION_FIELD
     assert ADAPTER_RESULT_TARGET_FIELD == TARGET_FIELD
-    assert ADAPTER_RESULT_CLIENT_RESPONSE_FIELD == "client_response"
+    assert ADAPTER_RESULT_CLIENT_RESPONSE_FIELD == CLIENT_RESPONSE_FIELD
 
 
 def test_adapter_result_contracts_use_runtime_field_names() -> None:
@@ -86,7 +87,9 @@ def test_adapter_result_contracts_use_runtime_field_names() -> None:
     assert "ADAPTER_RESULT_REQUEST_ID_FIELD = REQUEST_ID_FIELD" in source
     assert "ADAPTER_RESULT_OPERATION_FIELD = OPERATION_FIELD" in source
     assert "ADAPTER_RESULT_TARGET_FIELD = TARGET_FIELD" in source
+    assert "ADAPTER_RESULT_CLIENT_RESPONSE_FIELD = CLIENT_RESPONSE_FIELD" in source
     assert 'ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"' not in source
     assert 'ADAPTER_RESULT_REQUEST_ID_FIELD = "request_id"' not in source
     assert 'ADAPTER_RESULT_OPERATION_FIELD = "operation"' not in source
     assert 'ADAPTER_RESULT_TARGET_FIELD = "target"' not in source
+    assert 'ADAPTER_RESULT_CLIENT_RESPONSE_FIELD = "client_response"' not in source

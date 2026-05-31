@@ -306,3 +306,4 @@
 - `../../validation_reports/publishing_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/request_id_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/execution_envelope_runtime_field_contract_standardization_2026-06-01.md`
+- `../../validation_reports/client_response_runtime_field_contract_standardization_2026-06-01.md`

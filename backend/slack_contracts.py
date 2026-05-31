@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from backend.runtime_field_contracts import REQUEST_ID_FIELD
+from backend.runtime_field_contracts import CLIENT_RESPONSE_FIELD, REQUEST_ID_FIELD
 
 
 SLACK_SOURCE = "slack"
@@ -40,7 +40,7 @@ SLACK_POST_RESULT_CHANNEL_FIELD = "channel"
 SLACK_POST_RESULT_TEXT_FIELD = "text"
 SLACK_POST_RESULT_THREAD_TS_FIELD = "thread_ts"
 SLACK_POST_RESULT_POSTED_PAYLOAD_FIELD = "posted_payload"
-SLACK_POST_RESULT_CLIENT_RESPONSE_FIELD = "client_response"
+SLACK_POST_RESULT_CLIENT_RESPONSE_FIELD = CLIENT_RESPONSE_FIELD
 
 
 def slack_event_object_required() -> str:
