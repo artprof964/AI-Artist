@@ -4,7 +4,7 @@ from datetime import datetime
 from threading import RLock
 from typing import Any, Protocol
 
-from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
+from backend.canonical_hash import sha256_json, sha256_text
 from backend.comfyui_contracts import (
     COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED,
     COMFYUI_RESPONSE_IMAGES_REQUIRED,
@@ -169,10 +169,6 @@ def record_comfyui_image_provenance(
     return records
 
 
-def sha256_text(value: str) -> str:
-    return canonical_sha256_text(value)
-
-
 def sha256_workflow(workflow: dict[str, Any]) -> str:
     return sha256_json(workflow, ensure_ascii=False)
 
@@ -206,6 +202,5 @@ __all__ = [
     "image_provenance_store",
     "record_comfyui_image_provenance",
     "record_generated_image_provenance",
-    "sha256_text",
     "sha256_workflow",
 ]

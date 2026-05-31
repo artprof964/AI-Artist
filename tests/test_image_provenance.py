@@ -196,3 +196,11 @@ def test_image_provenance_uses_shared_model_coercion_directly() -> None:
 
     assert "def _coerce_provenance_input(" not in source
     assert "coerce_model(provenance, ImageProvenanceInput)" in source
+
+
+def test_image_provenance_uses_canonical_text_hash_directly() -> None:
+    source = read_backend_module_text("image_provenance.py")
+
+    assert "def sha256_text(" not in source
+    assert "from backend.canonical_hash import sha256_json, sha256_text" in source
+    assert "prompt_hash = sha256_text(payload.prompt)" in source

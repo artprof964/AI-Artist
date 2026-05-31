@@ -38,7 +38,7 @@ Secret detection, redaction, and redacted audit mappings: centralized in backend
 ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
 Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py
-Canonical hashing, HMAC signatures, security-review serialization, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
+Canonical hashing, HMAC signatures, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
 Request identity, direct Safety Service request normalization, and trace IDs: centralized in backend/request_identity.py
 Request metadata mapping: centralized in backend/request_metadata.py
 Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
@@ -134,7 +134,7 @@ Secret detection and redaction: shared directly across audit, observability, LLM
 Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
-Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
+Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, direct image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
 Source ingestion contracts: shared approved-domain defaults and rejection messages before registry writes
 Source ingestion hashes: source snapshots call shared canonical hash/version helpers directly before registry writes
 Request identity: shared directly across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
@@ -195,7 +195,8 @@ test text-hash validation: 2 focused files passed; non-canonical-hash tests guar
 process execution validation: 2 focused files passed; tests guarded against direct `subprocess` imports and local PostgreSQL output parsers
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
-final pytest: 395 passed, 1 skipped, 1 warning
+image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
+final pytest: 396 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
