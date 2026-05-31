@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.adapter_gate_contracts import COMFYUI_IMAGE_GENERATION_ACTION_LABEL
 from backend.adapter_results import gated_result_fields
 from backend.execution_gate import require_execution_envelope
 from backend.execution_gate_messages import execution_envelope_required
@@ -50,7 +51,7 @@ class ComfyUIAdapter:
         envelope = require_execution_envelope(
             request.execution_envelope,
             operation=OPERATION_IMAGE_GENERATE,
-            missing_message=execution_envelope_required("image generation"),
+            missing_message=execution_envelope_required(COMFYUI_IMAGE_GENERATION_ACTION_LABEL),
             error_type=ComfyUIExecutionGateError,
             now=now,
         )

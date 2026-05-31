@@ -4,6 +4,7 @@ from uuid import UUID
 
 import pytest
 
+from backend.adapter_gate_contracts import COMFYUI_IMAGE_GENERATION_ACTION_LABEL
 from backend.comfyui_adapter import (
     ComfyUIAdapter,
     ComfyUIExecutionGateError,
@@ -156,4 +157,13 @@ def test_comfyui_adapter_uses_shared_missing_envelope_message() -> None:
     contents = read_backend_source("comfyui_adapter.py")
 
     assert '"image generation requires an execution envelope"' not in contents
-    assert 'execution_envelope_required("image generation")' in contents
+    assert 'execution_envelope_required("image generation")' not in contents
+    assert "execution_envelope_required(COMFYUI_IMAGE_GENERATION_ACTION_LABEL)" in contents
+
+
+def test_comfyui_adapter_gate_labels_are_centralized() -> None:
+    assert COMFYUI_IMAGE_GENERATION_ACTION_LABEL == "image generation"
+
+    contents = read_backend_source("comfyui_adapter.py")
+    assert '"image generation"' not in contents
+    assert "COMFYUI_IMAGE_GENERATION_ACTION_LABEL" in contents

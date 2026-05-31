@@ -64,6 +64,7 @@ can be marked done.
 48. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
 49. Publishing side-effect audit operation values use `backend/operations.py`, and side-effect audit event types use `backend/interface_types.py`.
 50. Gated adapter operation values use `backend/operations.py` directly.
+51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
 51. Slack source labels, requester/policy scopes, local-request payloads, outbound payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
 52. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
 53. Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use `backend/source_ingestion_contracts.py`.
@@ -302,7 +303,7 @@ Output:
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
-   - Gated adapters pass shared operation constants directly into the execution gate.
+   - Gated adapters pass shared operation constants and shared action/target labels directly into the execution gate.
    - Envelope validation and signature failure messages use the shared execution-gate message contract.
    - Execution-envelope signatures are created and verified through the shared policy contract, backed by the canonical HMAC helper.
    - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.

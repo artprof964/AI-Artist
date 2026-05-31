@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 477 passed, 1 warning
+Final validation: 479 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -77,6 +77,7 @@ backend/http_methods.py: shared HTTP method vocabulary, normalization, and valid
 backend/file_scanning.py: shared reviewable text-file suffixes and recursive scanner file discovery.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
+backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
@@ -194,6 +195,8 @@ Slack source labels, scope formatting, local-request payloads, outbound payloads
 and adapter validation messages must flow through
 backend/slack_contracts.py before Slack event parsing or response formatting
 raises adapter errors.
+Gated adapter action and target labels must flow through
+backend/adapter_gate_contracts.py before execution-envelope message construction.
 Gated adapter result envelope fields must flow through backend/adapter_results.py
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads and event types must flow through backend/side_effect_audit.py
@@ -309,7 +312,8 @@ emitted.
 Publishing side-effect audit operation values must call backend/operations.py
 directly before audit events are recorded.
 Gated adapter operation values must call backend/operations.py directly before
-execution-envelope validation.
+execution-envelope validation. Gated adapter action and target labels must call
+backend/adapter_gate_contracts.py directly.
 Request kind, channel, operation, and audit event type contracts must flow
 through backend/interface_types.py before schema, classifier, or audit-specific
 literal types are added.

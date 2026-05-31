@@ -4,6 +4,7 @@ from uuid import UUID
 
 import pytest
 
+from backend.adapter_gate_contracts import PUBLISHING_ACTION_LABEL, PUBLISHING_TARGET_LABEL
 from backend.publishing_adapter import (
     PublishingAdapter,
     PublishingExecutionGateError,
@@ -177,4 +178,16 @@ def test_publishing_adapter_uses_shared_missing_envelope_message() -> None:
     contents = read_backend_source("publishing_adapter.py")
 
     assert '"publishing requires an execution envelope"' not in contents
-    assert 'execution_envelope_required("publishing")' in contents
+    assert 'execution_envelope_required("publishing")' not in contents
+    assert "execution_envelope_required(PUBLISHING_ACTION_LABEL)" in contents
+
+
+def test_publishing_adapter_gate_labels_are_centralized() -> None:
+    assert PUBLISHING_ACTION_LABEL == "publishing"
+    assert PUBLISHING_TARGET_LABEL == "publish target"
+
+    contents = read_backend_source("publishing_adapter.py")
+    assert '"publishing"' not in contents
+    assert '"publish target"' not in contents
+    assert "PUBLISHING_ACTION_LABEL" in contents
+    assert "PUBLISHING_TARGET_LABEL" in contents

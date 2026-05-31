@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.adapter_gate_contracts import PUBLISHING_ACTION_LABEL, PUBLISHING_TARGET_LABEL
 from backend.adapter_results import targeted_result_fields
 from backend.execution_gate import require_execution_envelope
 from backend.execution_gate_messages import execution_envelope_required
@@ -50,10 +51,10 @@ class PublishingAdapter:
         envelope = require_execution_envelope(
             request.execution_envelope,
             operation=OPERATION_PUBLISH,
-            missing_message=execution_envelope_required("publishing"),
+            missing_message=execution_envelope_required(PUBLISHING_ACTION_LABEL),
             error_type=PublishingExecutionGateError,
             target=request.target,
-            target_label="publish target",
+            target_label=PUBLISHING_TARGET_LABEL,
             require_human_approval=True,
             now=now,
         )

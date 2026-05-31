@@ -40,6 +40,7 @@ GitHub adapter contracts and token-required message routing: centralized in back
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, structured unredacted-secret checks, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
 ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
+Gated adapter action and target labels: centralized in backend/adapter_gate_contracts.py
 Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py with shared audit event type contracts
 Canonical hashing, HMAC signatures, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
@@ -145,6 +146,7 @@ Execution gate messages: shared across invalid envelope, operation mismatch, tar
 Secret detection, structured unredacted-secret checks, and redaction: shared directly across audit, observability, LLM smoke request logging, OpenClaw hook, GitHub, Slack, and security review
 OpenClaw contracts: shared across tool policy metadata redaction, tool metric tags, preflight telemetry fields, policy decision telemetry fields, and executed telemetry fields
 Redacted audit mappings: shared directly by observability fields and metric tags
+Gated adapter action and target labels: shared across Publishing and ComfyUI execution-envelope message construction; GitHub labels remain in the GitHub contract boundary
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with tool-call audit event typing routed through interface contracts
 Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, direct image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
@@ -187,7 +189,7 @@ Operations: shared across Safety Service classification, policy/envelope sensiti
 Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and execution gate validation/signature errors
 Classification response contract: shared across Safety Service classifier confidence and reason fields
 Publishing operation constants: shared directly across publishing adapter gates and publishing audit records
-Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
+Gated adapter operation constants and action/target labels: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, side-effect audit event typing, OpenClaw tool hook approval checks, and cache replay boundaries
 API route contracts: shared directly across FastAPI decorators and endpoint tests
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants; cache reuse telemetry event/message/tag/field shapes use response_cache_contracts.py
@@ -218,7 +220,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 477 passed, 1 warning
+final pytest: 479 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```
