@@ -6,6 +6,7 @@ import pytest
 
 from backend.llm_api_smoke import (
     DEFAULT_LLM_API_URL,
+    DEEPSEEK_OPEN_ART_ENV_VAR,
     SECRET_REDACTION,
     build_smoke_request,
     load_llm_api_model_config,
@@ -43,7 +44,7 @@ class RecordingHTTPClient:
 
 
 def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
-    config = load_llm_api_model_config({"LLM_API_KEY": "llm-test-secret"})
+    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
 
     assert config.api_url == DEFAULT_LLM_API_URL
     assert config.primary_model == "provider-primary-model"
@@ -57,7 +58,7 @@ def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
 def test_llm_api_model_config_allows_provider_overrides() -> None:
     config = load_llm_api_model_config(
         {
-            "LLM_API_KEY": "llm-test-secret",
+            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
             "LLM_API_URL": "https://example.test/llm",
             "LLM_PRIMARY_MODEL": "primary-any-provider",
             "LLM_FALLBACK_MODEL": "fallback-any-provider",
@@ -74,12 +75,12 @@ def test_llm_api_model_config_allows_provider_overrides() -> None:
 
 
 def test_llm_api_model_config_requires_api_key() -> None:
-    with pytest.raises(RuntimeError, match="LLM_API_KEY"):
+    with pytest.raises(RuntimeError, match=DEEPSEEK_OPEN_ART_ENV_VAR):
         load_llm_api_model_config({})
 
 
 def test_smoke_request_targets_configured_llm_api_model() -> None:
-    config = load_llm_api_model_config({"LLM_API_KEY": "llm-test-secret"})
+    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
     request = build_smoke_request(config)
 
     assert request["model"] == "provider-primary-model"
@@ -110,7 +111,7 @@ def test_llm_api_smoke_test_uses_mocked_client_and_redacts_request() -> None:
 
     result = run_llm_api_smoke_test(
         {
-            "LLM_API_KEY": "llm-test-secret",
+            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
             "LLM_API_URL": "https://example.test/llm",
             "LLM_PRIMARY_MODEL": "test-model",
         },
@@ -134,8 +135,8 @@ def test_llm_api_smoke_test_uses_mocked_client_and_redacts_request() -> None:
 
 
 @pytest.mark.skipif(
-    not os.environ.get("LLM_API_KEY"),
-    reason="LLM_API_KEY is required for the live LLM API smoke test",
+    not os.environ.get(DEEPSEEK_OPEN_ART_ENV_VAR),
+    reason=f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test",
 )
 def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     result = run_llm_api_smoke_test()
@@ -144,4 +145,4 @@ def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     assert result["response_id"]
     assert result["model"]
     assert result["request"]["headers"]["Authorization"] == SECRET_REDACTION
-    assert os.environ["LLM_API_KEY"] not in repr(result)
+    assert os.environ[DEEPSEEK_OPEN_ART_ENV_VAR] not in repr(result)

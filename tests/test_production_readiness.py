@@ -27,7 +27,7 @@ def test_env_example_documents_required_readiness_keys_without_real_secrets() ->
 
     assert check.status == ReadinessStatus.PASS, check.detail
     assert {required.name for required in REQUIRED_ENV_VARS} <= set(parsed)
-    assert parsed["LLM_API_KEY"] == ""
+    assert parsed["deepseek-open-art"] == ""
     assert parsed["SLACK_BOT_TOKEN"] == ""
     assert parsed["git_ai-artist_codex_token"] == ""
 

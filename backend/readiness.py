@@ -53,7 +53,7 @@ class ReadinessReport:
 
 
 REQUIRED_ENV_VARS: tuple[RequiredEnvVar, ...] = (
-    RequiredEnvVar("LLM_API_KEY", "Provider-neutral LLM API access", True),
+    RequiredEnvVar("deepseek-open-art", "Provider-neutral LLM API access", True),
     RequiredEnvVar("LLM_API_URL", "Provider-neutral LLM API endpoint"),
     RequiredEnvVar("LLM_PRIMARY_MODEL", "Primary LLM model selection"),
     RequiredEnvVar("LLM_FALLBACK_MODEL", "Fallback LLM model selection"),

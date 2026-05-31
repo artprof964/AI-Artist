@@ -89,5 +89,5 @@ T27 security review: 7 passed; prompt/memory secrets, audit redaction, observabi
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
 final pytest: 169 passed, 1 skipped, 1 warning
 final ruff: all checks passed
-skipped test: live provider-neutral LLM API smoke test requires LLM_API_KEY
+skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

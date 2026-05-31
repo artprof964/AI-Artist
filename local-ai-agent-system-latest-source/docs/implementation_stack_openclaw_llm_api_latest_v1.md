@@ -217,7 +217,7 @@ mypy                        Python type checks where useful
 ## Environment Variables
 
 ```text
-LLM_API_KEY=...
+deepseek-open-art=...
 LLM_PRIMARY_MODEL=provider-primary-model
 LLM_FALLBACK_MODEL=provider-fallback-model
 LLM_CLASSIFIER_MODEL=provider-classifier-model

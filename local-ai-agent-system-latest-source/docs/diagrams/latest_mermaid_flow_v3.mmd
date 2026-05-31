@@ -98,7 +98,7 @@ flowchart TD
     subgraph SECURITY["Security And Secret Boundaries"]
         OPA --> RULES["Policy authority"]
         EPG --> APPROVAL["recheck privileged execution + route approval"]
-        HLLM --> LLMAPIENV["os.environ['LLM_API_KEY']"]
+        HLLM --> LLMAPIENV["os.environ['deepseek-open-art']"]
         GH --> GHENV["os.environ['git_ai-artist_codex_token']"]
         GHENV --> GHA["GitHub API"]
         OPENBAO["OpenBao runtime injection later"] --> LLMAPIENV

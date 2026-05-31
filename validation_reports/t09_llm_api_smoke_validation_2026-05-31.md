@@ -13,10 +13,10 @@ Validated the provider-neutral LLM API configuration smoke test:
 
 ```text
 .venv\Scripts\python -m pytest tests\test_llm_api_smoke.py -q -p no:cacheprovider
-6 passed, 1 skipped in 0.06s
+6 passed, 1 skipped
 
 .venv\Scripts\python -m pytest -q -p no:cacheprovider
-28 passed, 1 skipped, 1 warning in 40.72s
+169 passed, 1 skipped, 1 warning
 
 .venv\Scripts\python -m ruff check backend\llm_api_smoke.py tests\test_llm_api_smoke.py
 All checks passed!
@@ -31,7 +31,7 @@ Validation agent rerun on 2026-05-31:
 
 ```text
 .venv\Scripts\python.exe -m pytest tests\test_llm_api_smoke.py -q -p no:cacheprovider
-6 passed, 1 skipped in 0.04s
+6 passed, 1 skipped
 
 .venv\Scripts\python.exe -m ruff check backend\llm_api_smoke.py tests\test_llm_api_smoke.py
 All checks passed!
@@ -43,7 +43,7 @@ All checks passed!
 1 passed in 3.38s
 
 .venv\Scripts\python.exe -m pytest -q -p no:cacheprovider
-28 passed, 1 skipped, 1 warning in 44.54s
+169 passed, 1 skipped, 1 warning
 ```
 
 One earlier full-suite attempt failed outside T09 in
@@ -56,8 +56,8 @@ regression.
 
 ## Notes
 
-- `LLM_API_KEY`, primary, fallback, classifier, and embedding model env vars are loaded through `backend.llm_api_smoke.load_llm_api_model_config`.
+- `deepseek-open-art`, primary, fallback, classifier, and embedding model env vars are loaded through `backend.llm_api_smoke.load_llm_api_model_config`.
 - The smoke request targets the provider-neutral LLM API and uses the configured primary model.
 - Unit tests use a mocked HTTP client to verify the outbound URL, model, timeout, recorded request id, response id, and model.
 - The returned request record redacts the `Authorization` header, and tests assert that the test API key is absent from the result representation.
-- The live LLM API smoke test is present and automatically skipped when `LLM_API_KEY` is absent.
+- The live LLM API smoke test is present and automatically skipped when `deepseek-open-art` is absent.

@@ -6,6 +6,7 @@ import httpx
 
 
 DEFAULT_LLM_API_URL = "https://llm-provider.example/v1/responses"
+DEEPSEEK_OPEN_ART_ENV_VAR = "deepseek-open-art"
 SECRET_REDACTION = "[REDACTED]"
 SECRET_KEY_TERMS = {
     "api_key",
@@ -41,9 +42,11 @@ class LLMAPIHTTPClient(Protocol):
 
 def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelConfig:
     values = env if env is not None else os.environ
-    api_key = values.get("LLM_API_KEY", "")
+    api_key = values.get(DEEPSEEK_OPEN_ART_ENV_VAR, "")
     if not api_key:
-        raise RuntimeError("LLM_API_KEY is required for the live LLM API smoke test")
+        raise RuntimeError(
+            f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test"
+        )
 
     return LLMAPIModelConfig(
         api_key=api_key,
