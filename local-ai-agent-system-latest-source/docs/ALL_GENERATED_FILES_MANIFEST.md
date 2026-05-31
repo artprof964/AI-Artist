@@ -119,6 +119,7 @@
 - `../../validation_reports/t23_github_adapter_validation_2026-05-31.md`
 - `../../validation_reports/github_url_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/http_method_standardization_2026-05-31.md`
+- `../../validation_reports/gated_adapter_operation_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/connection_runtime_env_standardization_2026-05-31.md`
 - `../../validation_reports/connection_registry_loader_standardization_2026-05-31.md`
 - `../../validation_reports/llm_api_key_standard_2026-05-31.md`

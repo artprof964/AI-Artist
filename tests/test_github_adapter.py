@@ -322,3 +322,11 @@ def test_github_adapter_uses_shared_url_boundary_directly() -> None:
 
     assert "def _normalize_api_path(" not in source
     assert "safe_relative_api_path(" in source
+
+
+def test_github_adapter_uses_shared_operation_constant_directly() -> None:
+    source = (PROJECT_ROOT / "backend" / "github_adapter.py").read_text(encoding="utf-8")
+
+    assert "GITHUB_WRITE_OPERATION =" not in source
+    assert '"GITHUB_WRITE_OPERATION"' not in source
+    assert "operation=OPERATION_GITHUB_WRITE" in source

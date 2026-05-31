@@ -11,9 +11,6 @@ from backend.operations import OPERATION_IMAGE_GENERATE
 from backend.schemas import ExecutionEnvelopeResponse
 
 
-IMAGE_GENERATE_OPERATION = OPERATION_IMAGE_GENERATE
-
-
 class ComfyUIExecutionGateError(PermissionError):
     """Raised when ComfyUI execution is attempted without an approved envelope."""
 
@@ -51,7 +48,7 @@ class ComfyUIAdapter:
     ) -> ComfyUIImageGenerationResult:
         envelope = require_execution_envelope(
             request.execution_envelope,
-            operation=IMAGE_GENERATE_OPERATION,
+            operation=OPERATION_IMAGE_GENERATE,
             missing_message="image generation requires an execution envelope",
             error_type=ComfyUIExecutionGateError,
             now=now,

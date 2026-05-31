@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 344 passed, 1 skipped, 1 warning
+Final validation: 347 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -88,13 +88,13 @@ backend/mock_agent_contracts.py: shared mock sub-agent names and artifact-type v
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
-backend/comfyui_adapter.py: execution-envelope-gated image generation adapter.
+backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and numeric-clamp boundaries.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, and secret-redaction boundaries directly.
-backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using shared operation constants.
+backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
-backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared URL path validation.
+backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
 backend/observability.py: telemetry stage/log-level constants, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
 backend/security_review.py: deterministic security checklist helpers.
 backend/readiness.py: production readiness schema and runbook validators.
@@ -206,6 +206,8 @@ flow through backend/operations.py before service or adapter operation logic is
 added.
 Publishing side-effect audit operation values must call backend/operations.py
 directly before audit events are recorded.
+Gated adapter operation values must call backend/operations.py directly before
+execution-envelope validation.
 Request kind, channel, operation, and audit event type contracts must flow
 through backend/interface_types.py before schema, classifier, or audit-specific
 literal types are added.

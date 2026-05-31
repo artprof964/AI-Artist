@@ -11,9 +11,6 @@ from backend.operations import OPERATION_PUBLISH
 from backend.schemas import ExecutionEnvelopeResponse
 
 
-PUBLISH_OPERATION = OPERATION_PUBLISH
-
-
 class PublishingExecutionGateError(PermissionError):
     """Raised when publishing is attempted without an approved envelope."""
 
@@ -51,7 +48,7 @@ class PublishingAdapter:
     ) -> PublishingResult:
         envelope = require_execution_envelope(
             request.execution_envelope,
-            operation=PUBLISH_OPERATION,
+            operation=OPERATION_PUBLISH,
             missing_message="publishing requires an execution envelope",
             error_type=PublishingExecutionGateError,
             target=request.target,

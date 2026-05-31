@@ -21,9 +21,6 @@ from backend.secret_redaction import redact_secret_value
 from backend.url_utils import safe_relative_api_path
 
 
-GITHUB_WRITE_OPERATION = OPERATION_GITHUB_WRITE
-
-
 class GitHubExecutionGateError(PermissionError):
     """Raised when GitHub execution is attempted without an approved envelope."""
 
@@ -84,7 +81,7 @@ class GitHubAdapter:
     ) -> GitHubWriteResult:
         envelope = require_execution_envelope(
             request.execution_envelope,
-            operation=GITHUB_WRITE_OPERATION,
+            operation=OPERATION_GITHUB_WRITE,
             missing_message="GitHub write requires an execution envelope",
             error_type=GitHubExecutionGateError,
             target=request.target,
@@ -158,7 +155,6 @@ class GitHubAdapter:
 
 __all__ = [
     "GITHUB_TOKEN_ENV_VAR",
-    "GITHUB_WRITE_OPERATION",
     "GitHubAPIClient",
     "GitHubAdapter",
     "GitHubAdapterConfigurationError",

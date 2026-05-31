@@ -141,3 +141,12 @@ def test_image_generation_fails_without_valid_execution_envelope(
         )
 
     assert client.calls == []
+
+
+def test_comfyui_adapter_uses_shared_operation_constant_directly() -> None:
+    source = "backend/comfyui_adapter.py"
+    with open(source, encoding="utf-8") as handle:
+        contents = handle.read()
+
+    assert "IMAGE_GENERATE_OPERATION =" not in contents
+    assert "operation=OPERATION_IMAGE_GENERATE" in contents

@@ -162,3 +162,12 @@ def test_publishing_rejects_invalid_execution_envelopes_before_client_execution(
         )
 
     assert client.calls == []
+
+
+def test_publishing_adapter_uses_shared_operation_constant_directly() -> None:
+    source = "backend/publishing_adapter.py"
+    with open(source, encoding="utf-8") as handle:
+        contents = handle.read()
+
+    assert "PUBLISH_OPERATION =" not in contents
+    assert "operation=OPERATION_PUBLISH" in contents

@@ -53,6 +53,7 @@ HTTP method vocabulary and normalization: centralized in backend/http_methods.py
 File scanning suffixes and discovery: centralized in backend/file_scanning.py
 Operations: centralized in backend/operations.py
 Publishing audit operation value: uses backend/operations.py directly
+Gated adapter operation values: use backend/operations.py directly
 Model coercion: centralized in backend/model_coercion.py and called directly at domain boundaries
 Telemetry stages and log levels: centralized in backend/observability.py
 Publishing outcome statuses: centralized in backend/publishing_status.py
@@ -144,6 +145,7 @@ HTTP methods: shared across GitHub write method validation and future connector 
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Publishing operation constants: shared directly across publishing adapter gates and publishing audit records
+Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
 Model coercion: shared directly across execution-envelope validation, image provenance input, critic metadata scoring, Knowledge Agent output, and mock sub-agent output
@@ -160,7 +162,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 344 passed, 1 skipped, 1 warning
+final pytest: 347 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

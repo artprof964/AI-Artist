@@ -52,6 +52,7 @@ can be marked done.
 40. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
 41. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
 42. Publishing side-effect audit operation values use `backend/operations.py`.
+43. Gated adapter operation values use `backend/operations.py` directly.
 ```
 
 ## Standard Request Envelope
@@ -249,6 +250,7 @@ Output:
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
+   - Gated adapters pass shared operation constants directly into the execution gate.
    - Envelope validation failure messages use the shared execution-gate message contract.
    - Execution-envelope signatures use the shared canonical HMAC helper.
    - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.
