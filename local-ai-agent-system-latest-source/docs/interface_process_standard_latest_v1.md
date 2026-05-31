@@ -25,7 +25,7 @@ can be marked done.
 13. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
 14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 15. RequestMetadata workspace/agent mapping uses `backend/request_metadata.py`.
-16. Default requester and policy scopes use `backend/request_scope_contracts.py`.
+16. Default requester, policy, publishing actor, and publishing policy scopes use `backend/request_scope_contracts.py`.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
 19. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
@@ -313,6 +313,7 @@ Output:
    - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
    - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
    - Publishing side-effect audit events use the shared publish operation constant.
+   - Publishing audit actor and policy scopes use the shared request-scope contract.
 ```
 
 ## Definition Of Done

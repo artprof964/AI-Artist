@@ -18,6 +18,10 @@ from backend.publishing_status import (
     PUBLISHING_STATUS_PUBLISHED,
     PublishingStatus,
 )
+from backend.request_scope_contracts import (
+    DEFAULT_PUBLISHING_ACTOR_SCOPE,
+    DEFAULT_PUBLISHING_POLICY_SCOPE,
+)
 from backend.response_fields import field_value
 from backend.schemas import AuditEventResponse, ExecutionEnvelopeResponse
 from backend.side_effect_audit import SideEffectAuditContext, record_side_effect_audit_event
@@ -29,8 +33,8 @@ class PublishingAgentRequest:
     payload: dict[str, Any]
     execution_envelope: ExecutionEnvelopeResponse | dict[str, Any] | None
     correlation_id: UUID
-    actor_scope: str = "user:local"
-    policy_scope: str = "workspace:ai-artist-main"
+    actor_scope: str = DEFAULT_PUBLISHING_ACTOR_SCOPE
+    policy_scope: str = DEFAULT_PUBLISHING_POLICY_SCOPE
 
 
 @dataclass(frozen=True)

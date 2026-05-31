@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 444 passed, 1 skipped, 1 warning
+Final validation: 445 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -58,7 +58,7 @@ backend/interface_types.py: shared request kind, channel, operation, and audit e
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes.
 backend/request_identity.py: request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping for fingerprints and observability fields.
-backend/request_scope_contracts.py: shared default requester and policy scope contracts for schemas and mock orchestration.
+backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache, source-freshness, policy, and execution-envelope reason strings.
@@ -108,7 +108,7 @@ backend/comfyui_adapter.py: execution-envelope-gated image generation adapter us
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and numeric-clamp boundaries.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and adapter-secret boundaries directly.
-backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation constants.
+backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation and publishing scope constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
 backend/observability.py: telemetry stage/log-level constants, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
@@ -202,9 +202,10 @@ backend/request_identity.py directly for request text normalization.
 RequestMetadata workspace/agent mapping must flow through
 backend/request_metadata.py before service fingerprinting, observability metric
 tags, or structured observability fields are built.
-Default requester and policy scopes must flow through
-backend/request_scope_contracts.py before schemas, mock orchestration, or future
-request envelopes change local scope defaults.
+Default requester, policy, publishing actor, and publishing policy scopes must
+flow through backend/request_scope_contracts.py before schemas, mock
+orchestration, publishing audit context, or future request envelopes change
+local scope defaults.
 Runtime UUIDs and prefixed runtime IDs must flow through
 backend/runtime_ids.py before service, schema, adapter, orchestration,
 freshness, retrieval, or review-specific runtime IDs are created.

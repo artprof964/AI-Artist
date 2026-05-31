@@ -260,3 +260,4 @@
 - `../../tests/test_policy_contracts.py`
 - `../../validation_reports/source_freshness_default_contract_standardization_2026-05-31.md`
 - `../../backend/source_freshness_contracts.py`
+- `../../validation_reports/publishing_scope_default_standardization_2026-05-31.md`

@@ -8,6 +8,10 @@ from backend.audit import audit_event_repository, list_audit_events_by_correlati
 from backend.publishing import LocalPublishingClient, PublishingAgent, PublishingAgentRequest
 from backend.publishing_adapter import PublishingExecutionGateError
 from backend.publishing_status import PUBLISHING_STATUS_BLOCKED, PUBLISHING_STATUS_PUBLISHED
+from backend.request_scope_contracts import (
+    DEFAULT_PUBLISHING_ACTOR_SCOPE,
+    DEFAULT_PUBLISHING_POLICY_SCOPE,
+)
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 from path_helpers import read_backend_source
@@ -147,3 +151,20 @@ def test_publishing_agent_uses_shared_publish_operation_constant() -> None:
     assert "from backend.operations import OPERATION_PUBLISH" in source
     assert 'operation="publish"' not in source
     assert "operation=OPERATION_PUBLISH" in source
+
+
+def test_publishing_agent_uses_shared_scope_defaults() -> None:
+    request = PublishingAgentRequest(
+        target=PUBLISH_TARGET,
+        payload={"artifact_id": "image-001"},
+        execution_envelope=None,
+        correlation_id=CORRELATION_ID,
+    )
+    source = read_backend_source("publishing.py")
+
+    assert request.actor_scope == DEFAULT_PUBLISHING_ACTOR_SCOPE
+    assert request.policy_scope == DEFAULT_PUBLISHING_POLICY_SCOPE
+    assert "DEFAULT_PUBLISHING_ACTOR_SCOPE" in source
+    assert "DEFAULT_PUBLISHING_POLICY_SCOPE" in source
+    assert 'actor_scope: str = "user:local"' not in source
+    assert 'policy_scope: str = "workspace:ai-artist-main"' not in source
