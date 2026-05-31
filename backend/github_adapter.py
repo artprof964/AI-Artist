@@ -98,7 +98,16 @@ class GitHubAdapter:
             type_message="GitHub API method must be a string",
             allowed_message="GitHub adapter only permits write methods",
         )
-        path = _normalize_api_path(request.path)
+        path = safe_relative_api_path(
+            request.path,
+            error_type=GitHubExecutionGateError,
+            type_message="GitHub API path must be a string",
+            absolute_message="GitHub API path must not be an absolute URL",
+            relative_message="GitHub API path must be relative and start with /",
+            slash_message="GitHub API path must use forward slashes",
+            control_message="GitHub API path must not contain control characters",
+            traversal_message="GitHub API path must not contain traversal segments",
+        )
 
         token = self._read_runtime_token()
         client_response = self._client.request(
@@ -145,18 +154,6 @@ class GitHubAdapter:
             ).strip()
         except RuntimeError as exc:
             raise GitHubAdapterConfigurationError(str(exc)) from exc
-
-def _normalize_api_path(path: str) -> str:
-    return safe_relative_api_path(
-        path,
-        error_type=GitHubExecutionGateError,
-        type_message="GitHub API path must be a string",
-        absolute_message="GitHub API path must not be an absolute URL",
-        relative_message="GitHub API path must be relative and start with /",
-        slash_message="GitHub API path must use forward slashes",
-        control_message="GitHub API path must not contain control characters",
-        traversal_message="GitHub API path must not contain traversal segments",
-    )
 
 
 __all__ = [

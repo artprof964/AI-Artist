@@ -315,3 +315,10 @@ def test_github_adapter_rejects_unsafe_paths_before_token_read(
         )
 
     assert client.calls == []
+
+
+def test_github_adapter_uses_shared_url_boundary_directly() -> None:
+    source = (PROJECT_ROOT / "backend" / "github_adapter.py").read_text(encoding="utf-8")
+
+    assert "def _normalize_api_path(" not in source
+    assert "safe_relative_api_path(" in source
