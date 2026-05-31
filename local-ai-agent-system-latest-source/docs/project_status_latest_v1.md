@@ -34,6 +34,7 @@ Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
 Sub-agent statuses and aggregation: centralized in backend/subagent_status.py
+Mock sub-agent names and artifact types: centralized in backend/mock_agent_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories and decisions: centralized in backend/critic_rubric.py
 Text tokenization and labels: centralized in backend/text_utils.py
@@ -113,6 +114,7 @@ Runtime IDs: shared across schema defaults, Safety Service execution envelopes, 
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
 Sub-agent statuses: shared across SubAgentOutput schemas and mock orchestration status synthesis
+Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests
 Text utilities: shared across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
@@ -140,7 +142,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 313 passed, 1 skipped, 1 warning
+final pytest: 315 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

@@ -33,6 +33,7 @@
 - `../../validation_reports/reason_messages_standardization_2026-05-31.md`
 - `../../validation_reports/policy_reason_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_status_standardization_2026-05-31.md`
+- `../../validation_reports/mock_agent_contract_standardization_2026-05-31.md`
 - `../../validation_reports/review_status_standardization_2026-05-31.md`
 - `../../validation_reports/interface_types_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
@@ -41,6 +42,7 @@
 - `../../backend/mapping_utils.py`
 - `../../backend/reason_messages.py`
 - `../../backend/subagent_status.py`
+- `../../backend/mock_agent_contracts.py`
 - `../../backend/review_status.py`
 - `../../tests/test_request_identity.py`
 - `../../tests/test_interface_types.py`

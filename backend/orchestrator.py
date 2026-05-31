@@ -4,6 +4,14 @@ from uuid import UUID
 
 from pydantic import BaseModel, Field
 
+from backend.mock_agent_contracts import (
+    MOCK_AGENT_CRITIC_CURATOR,
+    MOCK_AGENT_IMAGE_PLANNER,
+    MOCK_AGENT_KNOWLEDGE,
+    MOCK_ARTIFACT_CONTEXT_NOTE,
+    MOCK_ARTIFACT_IMAGE_PLAN,
+    MOCK_ARTIFACT_REVIEW_CHECKLIST,
+)
 from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_mean
 from backend.observability import (
@@ -63,31 +71,31 @@ def _should_simulate(request: MockAgentRequest, agent_name: str, status: SubAgen
 def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
     status: SubAgentStatus = (
         SUBAGENT_STATUS_BLOCKED
-        if _should_simulate(request, "knowledge", SUBAGENT_STATUS_BLOCKED)
+        if _should_simulate(request, MOCK_AGENT_KNOWLEDGE, SUBAGENT_STATUS_BLOCKED)
         else SUBAGENT_STATUS_OK
     )
     errors = []
     summary = "Collected local project context for the request."
-    if status == "blocked":
+    if status == SUBAGENT_STATUS_BLOCKED:
         summary = "Local project context was blocked by the mock simulation."
         errors = [
             {
                 "code": "mock_knowledge_blocked",
                 "message": "Knowledge agent was deterministically blocked by test metadata.",
                 "retryable": False,
-                "details": {"agent": "knowledge"},
+                "details": {"agent": MOCK_AGENT_KNOWLEDGE},
             }
         ]
 
     return coerce_model(
         {
             "task_id": request.task_id,
-            "agent_name": "knowledge",
+            "agent_name": MOCK_AGENT_KNOWLEDGE,
             "status": status,
             "summary": summary,
             "artifacts": [
                 {
-                    "artifact_type": "context_note",
+                    "artifact_type": MOCK_ARTIFACT_CONTEXT_NOTE,
                     "artifact_id": f"{request.task_id}:knowledge-note",
                     "metadata": {"request_excerpt": request.request_text[:80]},
                 }
@@ -111,31 +119,31 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
 def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
     status: SubAgentStatus = (
         SUBAGENT_STATUS_NEEDS_RETRY
-        if _should_simulate(request, "image_planner", SUBAGENT_STATUS_NEEDS_RETRY)
+        if _should_simulate(request, MOCK_AGENT_IMAGE_PLANNER, SUBAGENT_STATUS_NEEDS_RETRY)
         else SUBAGENT_STATUS_OK
     )
     errors = []
     summary = "Prepared a local image planning brief without running generation."
-    if status == "needs_retry":
+    if status == SUBAGENT_STATUS_NEEDS_RETRY:
         summary = "Image planning needs retry because required style details are incomplete."
         errors = [
             {
                 "code": "mock_style_detail_missing",
                 "message": "The mock planner requires one more deterministic style detail.",
                 "retryable": True,
-                "details": {"agent": "image_planner"},
+                "details": {"agent": MOCK_AGENT_IMAGE_PLANNER},
             }
         ]
 
     return coerce_model(
         {
             "task_id": request.task_id,
-            "agent_name": "image_planner",
+            "agent_name": MOCK_AGENT_IMAGE_PLANNER,
             "status": status,
             "summary": summary,
             "artifacts": [
                 {
-                    "artifact_type": "image_plan",
+                    "artifact_type": MOCK_ARTIFACT_IMAGE_PLAN,
                     "artifact_id": f"{request.task_id}:image-plan",
                     "metadata": {
                         "execution": "not_started",
@@ -155,31 +163,31 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
 def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
     status: SubAgentStatus = (
         SUBAGENT_STATUS_FAILED
-        if _should_simulate(request, "critic_curator", SUBAGENT_STATUS_FAILED)
+        if _should_simulate(request, MOCK_AGENT_CRITIC_CURATOR, SUBAGENT_STATUS_FAILED)
         else SUBAGENT_STATUS_OK
     )
     errors = []
     summary = "Created a deterministic review checklist for later artifact evaluation."
-    if status == "failed":
+    if status == SUBAGENT_STATUS_FAILED:
         summary = "Critic-curator mock failed during deterministic validation."
         errors = [
             {
                 "code": "mock_curator_failure",
                 "message": "Critic-curator failure was requested by test metadata.",
                 "retryable": False,
-                "details": {"agent": "critic_curator"},
+                "details": {"agent": MOCK_AGENT_CRITIC_CURATOR},
             }
         ]
 
     return coerce_model(
         {
             "task_id": request.task_id,
-            "agent_name": "critic_curator",
+            "agent_name": MOCK_AGENT_CRITIC_CURATOR,
             "status": status,
             "summary": summary,
             "artifacts": [
                 {
-                    "artifact_type": "review_checklist",
+                    "artifact_type": MOCK_ARTIFACT_REVIEW_CHECKLIST,
                     "artifact_id": f"{request.task_id}:review-checklist",
                     "metadata": {"review_status": REVIEW_STATUS_PENDING},
                 }
@@ -264,7 +272,7 @@ def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrat
         request_id=request.task_id,
         metric_name="ai_artist.orchestration.completed.total",
         metric_tags={"status": result.status, "agent_count": len(result.agent_outputs)},
-        log_level=LOG_LEVEL_INFO if result.status == "ok" else LOG_LEVEL_WARNING,
+        log_level=LOG_LEVEL_INFO if result.status == SUBAGENT_STATUS_OK else LOG_LEVEL_WARNING,
         message="orchestration completed",
         fields={
             "task_id": str(result.task_id),

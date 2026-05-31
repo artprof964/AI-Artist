@@ -26,21 +26,22 @@ can be marked done.
 14. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
 15. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
 16. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
-17. Generated-image review status vocabulary and checks use `backend/review_status.py`.
-18. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
-19. Text tokenization and label/tag normalization use `backend/text_utils.py`.
-20. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
-21. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-22. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
-23. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-24. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
-25. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-26. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
-27. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-28. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-29. Telemetry stages and log levels use `backend/observability.py`.
-30. Publishing outcome statuses use `backend/publishing_status.py`.
-31. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+17. Mock sub-agent names and artifact types use `backend/mock_agent_contracts.py`.
+18. Generated-image review status vocabulary and checks use `backend/review_status.py`.
+19. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
+20. Text tokenization and label/tag normalization use `backend/text_utils.py`.
+21. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
+22. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+23. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
+24. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+25. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+26. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+27. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
+28. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+29. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+30. Telemetry stages and log levels use `backend/observability.py`.
+31. Publishing outcome statuses use `backend/publishing_status.py`.
+32. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -221,6 +222,7 @@ Output:
 
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
+   - Mock orchestration agent names and artifact types use the shared mock-agent contract.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
    - Retrieval vector similarity, rubric scoring, and orchestration confidence use shared numeric helpers.
 

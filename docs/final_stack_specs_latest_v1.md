@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 313 passed, 1 skipped, 1 warning
+Final validation: 315 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -79,7 +79,8 @@ backend/source_ingestion.py: approved local source ingestion with direct canonic
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, and connection settings loader.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook.
-backend/orchestrator.py: mock sub-agent routing and synthesis.
+backend/mock_agent_contracts.py: shared mock sub-agent names and artifact-type vocabulary.
+backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter.
 backend/image_provenance.py: prompt/workflow hashing and provenance records.
@@ -147,6 +148,9 @@ added.
 SubAgentOutput status vocabulary, priority, and aggregation must flow through
 backend/subagent_status.py before schema or orchestration-specific status
 logic is added.
+Mock sub-agent names and artifact types must flow through
+backend/mock_agent_contracts.py before orchestration-specific agent fixtures are
+changed.
 Generated image review status vocabulary and checks must flow through
 backend/review_status.py before provenance, critic, or publishing-specific
 review status logic is added.
