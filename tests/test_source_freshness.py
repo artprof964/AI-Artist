@@ -1,7 +1,6 @@
 from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
-from backend.repo_paths import read_backend_module_text
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
 from backend.source_freshness import SourceFreshnessRegistry
@@ -9,6 +8,7 @@ from backend.source_registry_contracts import (
     SOURCE_REGISTRY_ROW_NOT_FOUND,
     source_registry_row_not_found,
 )
+from path_helpers import read_backend_source
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -163,14 +163,14 @@ def test_source_registry_missing_row_message_contract_is_shared() -> None:
 
 
 def test_source_freshness_uses_shared_missing_row_message_contract() -> None:
-    contents = read_backend_module_text("source_freshness.py")
+    contents = read_backend_source("source_freshness.py")
 
     assert "source_data_registry row not found:" not in contents
     assert "source_registry_row_not_found(" in contents
 
 
 def test_source_freshness_uses_public_source_id_lookup_boundary() -> None:
-    contents = read_backend_module_text("source_freshness.py")
+    contents = read_backend_source("source_freshness.py")
 
     assert "def _require_source_by_id(" not in contents
     assert "self.get_source_by_id(dependency.source_id)" in contents

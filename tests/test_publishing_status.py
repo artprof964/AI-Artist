@@ -4,7 +4,7 @@ from backend.publishing_status import (
     PUBLISHING_STATUSES,
     is_publishing_status,
 )
-from backend.repo_paths import read_backend_module_text
+from path_helpers import read_backend_source
 
 
 def test_publishing_status_vocabulary_is_centralized() -> None:
@@ -22,7 +22,7 @@ def test_is_publishing_status_accepts_only_known_values() -> None:
 
 
 def test_publishing_agent_uses_shared_status_constants() -> None:
-    source = read_backend_module_text("publishing.py")
+    source = read_backend_source("publishing.py")
 
     assert "PUBLISHING_STATUS_BLOCKED" in source
     assert "PUBLISHING_STATUS_PUBLISHED" in source

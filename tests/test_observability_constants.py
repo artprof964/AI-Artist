@@ -10,7 +10,7 @@ from backend.observability import (
     TELEMETRY_STAGE_TOOL,
     TELEMETRY_STAGES,
 )
-from backend.repo_paths import read_backend_module_text
+from path_helpers import read_backend_source
 
 
 def test_observability_stage_and_log_level_vocabulary_is_centralized() -> None:
@@ -35,7 +35,7 @@ def test_runtime_modules_use_observability_stage_constants() -> None:
         "openclaw_hook.py",
         "orchestrator.py",
     ):
-        source = read_backend_module_text(module_filename)
+        source = read_backend_source(module_filename)
 
         assert "TELEMETRY_STAGE_" in source
         assert 'stage="request"' not in source
