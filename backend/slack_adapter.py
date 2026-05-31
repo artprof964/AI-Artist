@@ -19,12 +19,23 @@ from backend.secret_redaction import (
 )
 from backend.slack_contracts import (
     SLACK_ADAPTER_EXECUTION_PURPOSE,
+    SLACK_EVENT_CHANNEL_FIELD,
+    SLACK_EVENT_CHANNEL_TYPE_FIELD,
+    SLACK_EVENT_ID_FIELD,
+    SLACK_EVENT_OBJECT_FIELD,
+    SLACK_EVENT_TEAM_FIELD,
+    SLACK_EVENT_TEAM_ID_FIELD,
+    SLACK_EVENT_TEXT_FIELD,
+    SLACK_EVENT_THREAD_TS_FIELD,
+    SLACK_EVENT_TS_FIELD,
+    SLACK_EVENT_USER_FIELD,
     SLACK_SOURCE,
     slack_event_object_required,
     slack_local_request_metadata,
     slack_local_request_payload,
     slack_optional_string_field,
     slack_outbound_message_payload,
+    slack_post_result_payload,
     slack_policy_scope,
     slack_required_string_field,
     slack_requester_scope,
@@ -111,70 +122,70 @@ class SlackAdapter:
         event = (
             required_mapping_field(
                 payload,
-                "event",
+                SLACK_EVENT_OBJECT_FIELD,
                 error_type=SlackAdapterError,
                 message=slack_event_object_required(),
             )
-            if "event" in payload
+            if SLACK_EVENT_OBJECT_FIELD in payload
             else payload
         )
 
         channel = required_string_field(
             event,
-            "channel",
+            SLACK_EVENT_CHANNEL_FIELD,
             error_type=SlackAdapterError,
-            message=slack_required_string_field("channel"),
+            message=slack_required_string_field(SLACK_EVENT_CHANNEL_FIELD),
         )
         user = required_string_field(
             event,
-            "user",
+            SLACK_EVENT_USER_FIELD,
             error_type=SlackAdapterError,
-            message=slack_required_string_field("user"),
+            message=slack_required_string_field(SLACK_EVENT_USER_FIELD),
         )
         text = required_string_field(
             event,
-            "text",
+            SLACK_EVENT_TEXT_FIELD,
             error_type=SlackAdapterError,
-            message=slack_required_string_field("text"),
+            message=slack_required_string_field(SLACK_EVENT_TEXT_FIELD),
         )
         normalized_text = normalize_request_text(text, lowercase=False)
         message_ts = required_string_field(
             event,
-            "ts",
+            SLACK_EVENT_TS_FIELD,
             error_type=SlackAdapterError,
-            message=slack_required_string_field("ts"),
+            message=slack_required_string_field(SLACK_EVENT_TS_FIELD),
         )
         thread_ts = (
             optional_string_field(
                 event,
-                "thread_ts",
+                SLACK_EVENT_THREAD_TS_FIELD,
                 error_type=SlackAdapterError,
-                message=slack_optional_string_field("thread_ts"),
+                message=slack_optional_string_field(SLACK_EVENT_THREAD_TS_FIELD),
             )
             or message_ts
         )
         event_id = optional_string_field(
             payload,
-            "event_id",
+            SLACK_EVENT_ID_FIELD,
             error_type=SlackAdapterError,
-            message=slack_optional_string_field("event_id"),
+            message=slack_optional_string_field(SLACK_EVENT_ID_FIELD),
         )
         team_id = optional_string_field(
             payload,
-            "team_id",
+            SLACK_EVENT_TEAM_ID_FIELD,
             error_type=SlackAdapterError,
-            message=slack_optional_string_field("team_id"),
+            message=slack_optional_string_field(SLACK_EVENT_TEAM_ID_FIELD),
         ) or optional_string_field(
             event,
-            "team",
+            SLACK_EVENT_TEAM_FIELD,
             error_type=SlackAdapterError,
-            message=slack_optional_string_field("team"),
+            message=slack_optional_string_field(SLACK_EVENT_TEAM_FIELD),
         )
         channel_type = optional_string_field(
             event,
-            "channel_type",
+            SLACK_EVENT_CHANNEL_TYPE_FIELD,
             error_type=SlackAdapterError,
-            message=slack_optional_string_field("channel_type"),
+            message=slack_optional_string_field(SLACK_EVENT_CHANNEL_TYPE_FIELD),
         )
 
         return SlackRequestEnvelope(
@@ -243,15 +254,12 @@ class SlackAdapter:
             explicit_secrets=(bot_token,),
             replacement=LOWER_REDACTED_SECRET_VALUE,
         )
-
-        return SlackPostResult(
-            ok=bool(sanitized_response.get("ok", False)),
-            channel=posted_payload["channel"],
-            text=posted_payload["text"],
-            thread_ts=posted_payload["thread_ts"],
+        post_result = slack_post_result_payload(
             posted_payload=posted_payload,
             client_response=sanitized_response,
         )
+
+        return SlackPostResult(**post_result)
 
 __all__ = [
     "SlackAdapter",

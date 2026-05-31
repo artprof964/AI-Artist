@@ -3,9 +3,9 @@
 ## Status
 
 ```text
-Date: 2026-05-31
+Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 502 passed, 1 warning
+Final validation: 503 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -90,7 +90,7 @@ backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, res
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
 backend/source_freshness_contracts.py: shared source-freshness schema defaults and unchanged-source predicate for fresh source snapshots and cache replay.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, registry metadata key contracts, and registry metadata payload shape.
-backend/slack_contracts.py: shared Slack source label, scope, local-request payload, outbound payload, validation message contracts, and token-purpose text.
+backend/slack_contracts.py: shared Slack source label, event field names, scope, local-request payload, outbound payload, post-result payload, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
 backend/audit.py: in-memory audit repository, recursive secret redaction, redacted mapping helper for telemetry/audit payloads, and audit response construction through shared audit contracts.
 backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
@@ -199,8 +199,8 @@ requests or tool telemetry.
 Slack payload parsing, request text normalization, stable request IDs, and
 response redaction must call the shared payload, request identity, and
 secret-redaction helpers directly at the adapter boundary.
-Slack source labels, scope formatting, local-request payloads, outbound payloads,
-and adapter validation messages must flow through
+Slack source labels, event field names, scope formatting, local-request payloads,
+outbound payloads, post-result payloads, and adapter validation messages must flow through
 backend/slack_contracts.py before Slack event parsing or response formatting
 raises adapter errors.
 Gated adapter action and target labels must flow through

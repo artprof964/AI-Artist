@@ -71,7 +71,7 @@ can be marked done.
 50. Gated adapter operation values use `backend/operations.py` directly.
 51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
 51a. Gated adapter result envelope IDs, request IDs, operation, target, and client response field names use `backend/adapter_results.py` before adapter return dataclasses or side-effect audit payloads change.
-51. Slack source labels, requester/policy scopes, local-request payloads, outbound payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
+51. Slack source labels, inbound event field names, requester/policy scopes, local-request payloads, outbound payloads, post-result payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
 52. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
 53. Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use `backend/source_ingestion_contracts.py`.
 54. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
@@ -262,7 +262,7 @@ Output:
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
-   - Slack source labels and adapter validation messages use the shared Slack contract before adapter errors are raised.
+   - Slack source labels, inbound event fields, outbound payload fields, post-result payloads, and adapter validation messages use the shared Slack contract before adapter errors are raised.
    - Runtime UUID creation uses the shared runtime ID helper.
    - Metadata and payload copies use the shared mapping helper.
 
