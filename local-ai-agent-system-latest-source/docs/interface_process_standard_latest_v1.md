@@ -70,6 +70,7 @@ can be marked done.
 49a. Side-effect audit payload field names use `backend/runtime_field_contracts.py` and `backend/side_effect_audit_contracts.py`.
 50. Gated adapter operation values use `backend/operations.py` directly.
 51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
+51a. Gated adapter result envelope IDs, request IDs, operation, target, and client response field names use `backend/adapter_results.py` before adapter return dataclasses or side-effect audit payloads change.
 51. Slack source labels, requester/policy scopes, local-request payloads, outbound payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
 52. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
 53. Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use `backend/source_ingestion_contracts.py`.
@@ -313,6 +314,7 @@ Output:
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
    - Gated adapters pass shared operation constants and shared action/target labels directly into the execution gate.
+   - Gated adapter result field vocabulary uses the shared adapter result contract before adapter return or side-effect audit payload fields are changed.
    - Envelope validation and signature failure messages use the shared execution-gate message contract.
    - Execution-envelope signatures are created and verified through the shared policy contract, backed by the canonical HMAC helper.
    - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.
@@ -332,6 +334,7 @@ Output:
    - Audit record actor/policy scope extraction and side-effect audit payload fields use the shared audit scope field-name constants.
    - Publishing side-effect audit events use the shared publish operation, payload field-name, and audit event type constants.
    - Side-effect audit operation, target, status, reason, and policy-scope payload fields use the shared runtime field contract.
+   - Side-effect audit execution-envelope and client-response payload fields use the shared adapter result field contract.
    - Publishing audit actor and policy scopes use the shared request-scope contract.
    - Local publishing dry-run responses and deterministic IDs use the shared publishing contract helper.
 ```

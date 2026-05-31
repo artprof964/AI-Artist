@@ -42,7 +42,7 @@ Secret detection, structured unredacted-secret checks, redaction, and redacted a
 Audit scope payload field names: centralized in backend/audit_contracts.py
 ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
 Gated adapter action and target labels: centralized in backend/adapter_gate_contracts.py
-Adapter results: centralized in backend/adapter_results.py
+Adapter result field vocabulary and mapping: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py with shared payload field and audit event type contracts
 Canonical hashing, HMAC signatures, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
 Request identity, direct Safety Service request normalization, and trace IDs: centralized in backend/request_identity.py
@@ -153,7 +153,7 @@ OpenClaw contracts: shared across tool policy metadata redaction, tool metric ta
 Redacted audit mappings: shared directly by observability fields and metric tags
 Audit scope contracts: shared by audit record scope extraction and side-effect audit payload scope field names
 Gated adapter action and target labels: shared across Publishing and ComfyUI execution-envelope message construction; GitHub labels remain in the GitHub contract boundary
-Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
+Adapter result field vocabulary and mapping: shared across GitHub, Publishing, ComfyUI gated adapters, and side-effect audit payload result fields
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with payload field names routed through side_effect_audit_contracts.py and tool-call audit event typing routed through interface contracts
 Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, direct image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
 Source ingestion contracts: shared approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape before registry writes
@@ -231,9 +231,10 @@ source registry lookup validation: 1 focused file passed; key/id optional lookup
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
+adapter result field validation: 48 focused tests passed; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 runtime field contract validation: 17 focused tests passed; service observability and OpenClaw policy telemetry field names share runtime_field_contracts.py
-final pytest: 493 passed, 1 warning
+final pytest: 494 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

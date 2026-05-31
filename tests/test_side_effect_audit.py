@@ -1,5 +1,9 @@
 from uuid import UUID
 
+from backend.adapter_results import (
+    ADAPTER_RESULT_CLIENT_RESPONSE_FIELD,
+    ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD,
+)
 from backend.audit import audit_event_repository, list_audit_events_by_correlation_id
 from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_FIELD
 from backend.interface_types import AUDIT_EVENT_TOOL_CALL
@@ -117,7 +121,9 @@ def test_side_effect_audit_payload_fields_are_centralized() -> None:
     assert SIDE_EFFECT_REASON_FIELD == "reason"
     assert SIDE_EFFECT_REASON_FIELD == REASON_FIELD
     assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == "execution_envelope_id"
+    assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD
     assert SIDE_EFFECT_CLIENT_RESPONSE_FIELD == "client_response"
+    assert SIDE_EFFECT_CLIENT_RESPONSE_FIELD == ADAPTER_RESULT_CLIENT_RESPONSE_FIELD
 
     for literal in (
         'SIDE_EFFECT_POLICY_SCOPE_FIELD = "policy_scope"',
@@ -125,6 +131,8 @@ def test_side_effect_audit_payload_fields_are_centralized() -> None:
         'SIDE_EFFECT_TARGET_FIELD = "target"',
         'SIDE_EFFECT_STATUS_FIELD = "status"',
         'SIDE_EFFECT_REASON_FIELD = "reason"',
+        'SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"',
+        'SIDE_EFFECT_CLIENT_RESPONSE_FIELD = "client_response"',
     ):
         assert literal not in contracts_source
 

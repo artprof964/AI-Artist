@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 493 passed, 1 warning
+Final validation: 494 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -81,7 +81,7 @@ backend/file_scanning.py: shared reviewable text-file suffixes and recursive sca
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
-backend/adapter_results.py: shared gated adapter result field mapping.
+backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping.
 backend/audit_contracts.py: shared audit scope payload field names.
 backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
@@ -204,15 +204,17 @@ backend/slack_contracts.py before Slack event parsing or response formatting
 raises adapter errors.
 Gated adapter action and target labels must flow through
 backend/adapter_gate_contracts.py before execution-envelope message construction.
-Gated adapter result envelope fields must flow through backend/adapter_results.py
-before adapter-specific return dataclasses add extra fields.
+Gated adapter result envelope IDs, request IDs, operation, target, client
+response field vocabulary, and result field mapping must flow through
+backend/adapter_results.py before adapter-specific return dataclasses or
+side-effect audit payloads add result fields.
 Audit scope payload field names must flow through backend/audit_contracts.py
 before audit records or side-effect audit payloads extract actor/policy scopes.
 Side-effect audit payload field names and event types must flow through
 backend/audit_contracts.py, backend/runtime_field_contracts.py,
-backend/side_effect_audit_contracts.py, backend/side_effect_audit.py, and
-backend/interface_types.py before adapter-specific agents persist tool-call
-audit events.
+backend/adapter_results.py, backend/side_effect_audit_contracts.py,
+backend/side_effect_audit.py, and backend/interface_types.py before
+adapter-specific agents persist tool-call audit events.
 Canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic local IDs, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes must
 flow through backend/canonical_hash.py before request fingerprints, artifact
 hashes, image provenance hashes, source snapshot versions, signatures, mocked external IDs, security-review scans, deterministic test serializations, or deterministic test text hashes are created.

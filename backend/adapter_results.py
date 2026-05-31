@@ -6,6 +6,12 @@ from uuid import UUID
 
 from backend.schemas import ExecutionEnvelopeResponse
 
+ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"
+ADAPTER_RESULT_REQUEST_ID_FIELD = "request_id"
+ADAPTER_RESULT_OPERATION_FIELD = "operation"
+ADAPTER_RESULT_TARGET_FIELD = "target"
+ADAPTER_RESULT_CLIENT_RESPONSE_FIELD = "client_response"
+
 
 @dataclass(frozen=True)
 class GatedAdapterResultFields:
@@ -49,6 +55,11 @@ def targeted_result_fields(
 
 
 __all__ = [
+    "ADAPTER_RESULT_CLIENT_RESPONSE_FIELD",
+    "ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD",
+    "ADAPTER_RESULT_OPERATION_FIELD",
+    "ADAPTER_RESULT_REQUEST_ID_FIELD",
+    "ADAPTER_RESULT_TARGET_FIELD",
     "GatedAdapterResultFields",
     "TargetedAdapterResultFields",
     "gated_result_fields",

@@ -1,7 +1,16 @@
 from datetime import timedelta
 from uuid import UUID
 
-from backend.adapter_results import gated_result_fields, targeted_result_fields
+from backend.adapter_results import (
+    ADAPTER_RESULT_CLIENT_RESPONSE_FIELD,
+    ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD,
+    ADAPTER_RESULT_OPERATION_FIELD,
+    ADAPTER_RESULT_REQUEST_ID_FIELD,
+    ADAPTER_RESULT_TARGET_FIELD,
+    gated_result_fields,
+    targeted_result_fields,
+)
+from backend.runtime_field_contracts import OPERATION_FIELD, TARGET_FIELD
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
 from backend.time_utils import utc_now
 
@@ -54,3 +63,11 @@ def test_targeted_result_fields_add_target_to_common_fields() -> None:
     assert fields.operation == "publish"
     assert fields.target == "channel:main"
     assert fields.client_response == {"status": "published"}
+
+
+def test_adapter_result_field_vocabulary_is_centralized() -> None:
+    assert ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD == "execution_envelope_id"
+    assert ADAPTER_RESULT_REQUEST_ID_FIELD == "request_id"
+    assert ADAPTER_RESULT_OPERATION_FIELD == OPERATION_FIELD
+    assert ADAPTER_RESULT_TARGET_FIELD == TARGET_FIELD
+    assert ADAPTER_RESULT_CLIENT_RESPONSE_FIELD == "client_response"

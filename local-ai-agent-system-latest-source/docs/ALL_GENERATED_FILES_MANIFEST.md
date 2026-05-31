@@ -291,5 +291,6 @@
 - `../../validation_reports/source_freshness_predicate_standardization_2026-05-31.md`
 - `../../validation_reports/numeric_vector_helper_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_gate_contract_standardization_2026-05-31.md`
+- `../../validation_reports/adapter_result_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/side_effect_audit_payload_contract_standardization_2026-05-31.md`
 - `../../validation_reports/service_observability_contract_standardization_2026-05-31.md`
