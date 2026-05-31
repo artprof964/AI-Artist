@@ -27,7 +27,7 @@ can be marked done.
 15. Cache and source-freshness reason strings use `backend/reason_messages.py`.
 16. Text tokenization and label/tag normalization use `backend/text_utils.py`.
 17. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
-18. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+18. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
 19. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 20. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 21. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.

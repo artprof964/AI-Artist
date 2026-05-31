@@ -28,6 +28,7 @@ DEFAULT_COMFYUI_URL = "http://localhost:8188"
 @dataclass(frozen=True)
 class EnvVarSpec:
     name: str
+    setting_name: str
     purpose: str
     secret: bool = False
     default: str = ""
@@ -57,46 +58,69 @@ class ConnectionSettings:
 CONNECTION_ENV_VARS: tuple[EnvVarSpec, ...] = (
     EnvVarSpec(
         DEEPSEEK_OPEN_ART_ENV_VAR,
+        "llm_api_key",
         "DeepSeek LLM API access",
         secret=True,
         aliases=(DEEPSEEK_API_KEY_ENV_VAR,),
     ),
-    EnvVarSpec("LLM_API_URL", "Provider-neutral LLM API endpoint", default=DEFAULT_LLM_API_URL),
-    EnvVarSpec("LLM_PRIMARY_MODEL", "Primary LLM model selection", default=DEFAULT_LLM_PRIMARY_MODEL),
+    EnvVarSpec(
+        "LLM_API_URL",
+        "llm_api_url",
+        "Provider-neutral LLM API endpoint",
+        default=DEFAULT_LLM_API_URL,
+    ),
+    EnvVarSpec(
+        "LLM_PRIMARY_MODEL",
+        "llm_primary_model",
+        "Primary LLM model selection",
+        default=DEFAULT_LLM_PRIMARY_MODEL,
+    ),
     EnvVarSpec(
         "LLM_FALLBACK_MODEL",
+        "llm_fallback_model",
         "Fallback LLM model selection",
         default=DEFAULT_LLM_FALLBACK_MODEL,
     ),
     EnvVarSpec(
         "LLM_CLASSIFIER_MODEL",
+        "llm_classifier_model",
         "Request classifier model selection",
         default=DEFAULT_LLM_CLASSIFIER_MODEL,
     ),
     EnvVarSpec(
         "LLM_EMBEDDING_MODEL",
+        "llm_embedding_model",
         "Embedding model selection",
         default=DEFAULT_LLM_EMBEDDING_MODEL,
     ),
     EnvVarSpec(
         "OPENCLAW_WORKSPACE_ROOT",
+        "openclaw_workspace_root",
         "Local OpenClaw workspace root",
         default=DEFAULT_OPENCLAW_WORKSPACE_ROOT,
     ),
     EnvVarSpec(
         "OPENCLAW_GATEWAY_URL",
+        "openclaw_gateway_url",
         "Local OpenClaw gateway endpoint",
         default=DEFAULT_OPENCLAW_GATEWAY_URL,
     ),
-    EnvVarSpec("DATABASE_URL", "PostgreSQL application connection string", default=DEFAULT_DATABASE_URL),
-    EnvVarSpec("QDRANT_URL", "Qdrant vector store endpoint", default=DEFAULT_QDRANT_URL),
-    EnvVarSpec("MINIO_ENDPOINT", "MinIO object store endpoint", default=DEFAULT_MINIO_ENDPOINT),
-    EnvVarSpec("REDIS_URL", "Redis queue and transient state endpoint", default=DEFAULT_REDIS_URL),
-    EnvVarSpec("OPA_URL", "OPA policy service endpoint", default=DEFAULT_OPA_URL),
-    EnvVarSpec("COMFYUI_URL", "Local ComfyUI endpoint", default=DEFAULT_COMFYUI_URL),
-    EnvVarSpec(SLACK_BOT_TOKEN_ENV_VAR, "Slack adapter bot token", secret=True),
-    EnvVarSpec(GITHUB_TOKEN_ENV_VAR, "GitHub adapter token", secret=True),
+    EnvVarSpec(
+        "DATABASE_URL",
+        "database_url",
+        "PostgreSQL application connection string",
+        default=DEFAULT_DATABASE_URL,
+    ),
+    EnvVarSpec("QDRANT_URL", "qdrant_url", "Qdrant vector store endpoint", default=DEFAULT_QDRANT_URL),
+    EnvVarSpec("MINIO_ENDPOINT", "minio_endpoint", "MinIO object store endpoint", default=DEFAULT_MINIO_ENDPOINT),
+    EnvVarSpec("REDIS_URL", "redis_url", "Redis queue and transient state endpoint", default=DEFAULT_REDIS_URL),
+    EnvVarSpec("OPA_URL", "opa_url", "OPA policy service endpoint", default=DEFAULT_OPA_URL),
+    EnvVarSpec("COMFYUI_URL", "comfyui_url", "Local ComfyUI endpoint", default=DEFAULT_COMFYUI_URL),
+    EnvVarSpec(SLACK_BOT_TOKEN_ENV_VAR, "slack_bot_token", "Slack adapter bot token", secret=True),
+    EnvVarSpec(GITHUB_TOKEN_ENV_VAR, "github_token", "GitHub adapter token", secret=True),
 )
+
+CONNECTION_SETTING_NAMES: frozenset[str] = frozenset(ConnectionSettings.__dataclass_fields__)
 
 
 def env_value(
@@ -132,53 +156,16 @@ def runtime_env(env: Mapping[str, str] | None = None) -> Mapping[str, str]:
 
 def load_connection_settings(env: Mapping[str, str] | None = None) -> ConnectionSettings:
     values = runtime_env(env)
-
-    return ConnectionSettings(
-        llm_api_key=env_value(
+    settings = {
+        spec.setting_name: env_value(
             values,
-            DEEPSEEK_OPEN_ART_ENV_VAR,
-            aliases=(DEEPSEEK_API_KEY_ENV_VAR,),
-        ),
-        llm_api_url=env_value(values, "LLM_API_URL", default=DEFAULT_LLM_API_URL),
-        llm_primary_model=env_value(
-            values,
-            "LLM_PRIMARY_MODEL",
-            default=DEFAULT_LLM_PRIMARY_MODEL,
-        ),
-        llm_fallback_model=env_value(
-            values,
-            "LLM_FALLBACK_MODEL",
-            default=DEFAULT_LLM_FALLBACK_MODEL,
-        ),
-        llm_classifier_model=env_value(
-            values,
-            "LLM_CLASSIFIER_MODEL",
-            default=DEFAULT_LLM_CLASSIFIER_MODEL,
-        ),
-        llm_embedding_model=env_value(
-            values,
-            "LLM_EMBEDDING_MODEL",
-            default=DEFAULT_LLM_EMBEDDING_MODEL,
-        ),
-        openclaw_workspace_root=env_value(
-            values,
-            "OPENCLAW_WORKSPACE_ROOT",
-            default=DEFAULT_OPENCLAW_WORKSPACE_ROOT,
-        ),
-        openclaw_gateway_url=env_value(
-            values,
-            "OPENCLAW_GATEWAY_URL",
-            default=DEFAULT_OPENCLAW_GATEWAY_URL,
-        ),
-        database_url=env_value(values, "DATABASE_URL", default=DEFAULT_DATABASE_URL),
-        qdrant_url=env_value(values, "QDRANT_URL", default=DEFAULT_QDRANT_URL),
-        minio_endpoint=env_value(values, "MINIO_ENDPOINT", default=DEFAULT_MINIO_ENDPOINT),
-        redis_url=env_value(values, "REDIS_URL", default=DEFAULT_REDIS_URL),
-        opa_url=env_value(values, "OPA_URL", default=DEFAULT_OPA_URL),
-        comfyui_url=env_value(values, "COMFYUI_URL", default=DEFAULT_COMFYUI_URL),
-        slack_bot_token=env_value(values, SLACK_BOT_TOKEN_ENV_VAR),
-        github_token=env_value(values, GITHUB_TOKEN_ENV_VAR),
-    )
+            spec.name,
+            default=spec.default,
+            aliases=spec.aliases,
+        )
+        for spec in CONNECTION_ENV_VARS
+    }
+    return ConnectionSettings(**settings)
 
 
 def env_example_values() -> dict[str, str]:
@@ -187,6 +174,7 @@ def env_example_values() -> dict[str, str]:
 
 __all__ = [
     "CONNECTION_ENV_VARS",
+    "CONNECTION_SETTING_NAMES",
     "DEEPSEEK_API_KEY_ENV_VAR",
     "DEEPSEEK_OPEN_ART_ENV_VAR",
     "DEFAULT_COMFYUI_URL",

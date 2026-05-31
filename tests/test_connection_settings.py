@@ -1,5 +1,6 @@
 from backend.connection_settings import (
     CONNECTION_ENV_VARS,
+    CONNECTION_SETTING_NAMES,
     DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
     DEFAULT_COMFYUI_URL,
@@ -61,6 +62,31 @@ def test_required_env_registry_is_shared_with_readiness() -> None:
     assert example_values[SLACK_BOT_TOKEN_ENV_VAR] == ""
     assert example_values[GITHUB_TOKEN_ENV_VAR] == ""
     assert example_values["LLM_API_URL"] == DEFAULT_LLM_API_URL
+
+
+def test_connection_registry_maps_every_runtime_setting_once() -> None:
+    registry_setting_names = [spec.setting_name for spec in CONNECTION_ENV_VARS]
+
+    assert set(registry_setting_names) == CONNECTION_SETTING_NAMES
+    assert len(registry_setting_names) == len(set(registry_setting_names))
+
+
+def test_connection_settings_loader_uses_registry_defaults_and_aliases() -> None:
+    env = {
+        spec.name: f"value-for-{spec.setting_name}"
+        for spec in CONNECTION_ENV_VARS
+        if not spec.secret
+    }
+    env[DEEPSEEK_API_KEY_ENV_VAR] = "legacy-deepseek-secret"
+    settings = load_connection_settings(env)
+
+    for spec in CONNECTION_ENV_VARS:
+        expected = (
+            "legacy-deepseek-secret"
+            if spec.name == DEEPSEEK_OPEN_ART_ENV_VAR
+            else env.get(spec.name, "")
+        )
+        assert getattr(settings, spec.setting_name) == expected
 
 
 def test_require_env_value_reports_standard_name_when_missing() -> None:
