@@ -1,20 +1,19 @@
 import json
-from pathlib import Path
 from typing import Any
 
 import pytest
 
 from backend.canonical_hash import canonical_json
-from backend.repo_paths import OPA_POLICY_PATH, repo_path, repo_root_from
+from backend.repo_paths import OPA_POLICY_PATH, repo_path
 from backend.shell_commands import (
     docker_compose_exec_args,
     missing_command_result,
     run_process,
     shell_args,
 )
+from path_helpers import PROJECT_ROOT
 
-REPO_ROOT = repo_root_from(Path(__file__))
-OPA_POLICY = repo_path(REPO_ROOT, OPA_POLICY_PATH)
+OPA_POLICY = repo_path(PROJECT_ROOT, OPA_POLICY_PATH)
 _OPA_COMMAND: list[str] | None = None
 _OPA_SKIP_REASON: str | None = None
 
@@ -34,7 +33,7 @@ def _run_opa_eval(*, input_data: dict[str, Any], query: str) -> Any:
         check=True,
         capture_output=True,
         text=True,
-        cwd=REPO_ROOT,
+        cwd=PROJECT_ROOT,
     )
 
 
@@ -97,7 +96,7 @@ def _probe_opa_command(command: list[str]) -> Any:
             check=False,
             capture_output=True,
             text=True,
-            cwd=REPO_ROOT,
+            cwd=PROJECT_ROOT,
         )
     except FileNotFoundError as exc:
         return missing_command_result(command, exc)

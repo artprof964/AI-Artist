@@ -169,6 +169,7 @@
 - `../../validation_reports/remaining_contract_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/github_adapter_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/connection_settings_source_read_helper_standardization_2026-05-31.md`
+- `../../validation_reports/filesystem_process_repo_root_helper_standardization_2026-05-31.md`
 - `../../validation_reports/test_utc_now_standardization_2026-05-31.md`
 - `../../validation_reports/test_canonical_json_standardization_2026-05-31.md`
 - `../../validation_reports/test_hashlib_standardization_2026-05-31.md`

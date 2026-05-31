@@ -1,10 +1,7 @@
-from pathlib import Path
 import shutil
 
 from backend.file_scanning import TEXT_REVIEW_SUFFIXES, iter_review_text_files
-from backend.repo_paths import repo_root_from
-
-REPO_ROOT = repo_root_from(Path(__file__))
+from path_helpers import PROJECT_ROOT
 
 
 def test_review_text_suffix_contract_covers_project_text_sources() -> None:
@@ -12,7 +9,7 @@ def test_review_text_suffix_contract_covers_project_text_sources() -> None:
 
 
 def test_iter_review_text_files_returns_sorted_supported_files() -> None:
-    scratch_root = REPO_ROOT / ".codex_tmp" / "test_file_scanning"
+    scratch_root = PROJECT_ROOT / ".codex_tmp" / "test_file_scanning"
     try:
         scratch_root.mkdir(parents=True, exist_ok=True)
         (scratch_root / "b.md").write_text("b", encoding="utf-8")

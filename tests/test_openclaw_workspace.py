@@ -1,21 +1,18 @@
-from pathlib import Path
-
 from backend.repo_paths import (
     read_workspace_text,
     repo_path,
-    repo_root_from,
     workspace_path,
 )
+from path_helpers import PROJECT_ROOT
 
 
-REPO_ROOT = repo_root_from(Path(__file__))
 WORKSPACE_NAME = "ai-artist-main"
 
 
 def read_workspace_file(relative_path: str) -> str:
-    path = repo_path(REPO_ROOT, workspace_path(WORKSPACE_NAME, relative_path))
+    path = repo_path(PROJECT_ROOT, workspace_path(WORKSPACE_NAME, relative_path))
     assert path.is_file(), f"missing workspace file: {relative_path}"
-    content = read_workspace_text(REPO_ROOT, WORKSPACE_NAME, relative_path)
+    content = read_workspace_text(PROJECT_ROOT, WORKSPACE_NAME, relative_path)
     assert content.strip(), f"workspace file is empty: {relative_path}"
     return content
 
@@ -47,7 +44,7 @@ def test_ai_artist_main_workspace_declares_control_plane_and_policy_gate() -> No
 
 
 def test_ai_artist_main_workspace_has_memory_folder_and_seed_files() -> None:
-    memory_dir = repo_path(REPO_ROOT, workspace_path(WORKSPACE_NAME, "memory"))
+    memory_dir = repo_path(PROJECT_ROOT, workspace_path(WORKSPACE_NAME, "memory"))
     assert memory_dir.is_dir(), "missing ai-artist-main memory folder"
 
     for relative_path in [

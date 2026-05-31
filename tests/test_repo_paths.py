@@ -78,7 +78,10 @@ def test_tests_use_shared_repo_root_helper() -> None:
     for test_filename, source in iter_test_module_sources(
         exclude=("test_repo_paths.py",)
     ):
-        if "Path(__file__).resolve().parents[1]" in source:
+        if (
+            "Path(__file__).resolve().parents[1]" in source
+            or "repo_root_from(Path(__file__))" in source
+        ):
             offenders.append(test_filename)
 
     assert offenders == []
