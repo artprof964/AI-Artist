@@ -59,4 +59,4 @@ def test_github_adapter_uses_shared_contract_messages() -> None:
     assert "GITHUB_API_METHOD_ALLOWED_MESSAGE" in source
     assert "GITHUB_API_PATH_TYPE_MESSAGE" in source
     assert "GITHUB_ADAPTER_EXECUTION_PURPOSE" in source
-    assert "require_runtime_secret(" in source
+    assert "adapter_runtime_secret(" in source

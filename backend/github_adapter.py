@@ -5,12 +5,10 @@ from datetime import datetime
 from typing import Any, Mapping, Protocol
 from uuid import UUID
 
+from backend.adapter_secrets import adapter_runtime_secret
 from backend.adapter_results import targeted_result_fields
 from backend.audit import redact_audit_value
-from backend.connection_settings import (
-    GITHUB_TOKEN_ENV_VAR,
-    require_runtime_secret,
-)
+from backend.connection_settings import GITHUB_TOKEN_ENV_VAR
 from backend.execution_gate import require_execution_envelope
 from backend.execution_gate_messages import execution_envelope_required
 from backend.github_contracts import (
@@ -118,7 +116,14 @@ class GitHubAdapter:
             traversal_message=GITHUB_API_PATH_TRAVERSAL_MESSAGE,
         )
 
-        token = self._read_runtime_token()
+        token = adapter_runtime_secret(
+            env=self._env,
+            env_var=self._token_env_var,
+            purpose=GITHUB_ADAPTER_EXECUTION_PURPOSE,
+            standard_env_var=GITHUB_TOKEN_ENV_VAR,
+            setting_name="github_token",
+            error_type=GitHubAdapterConfigurationError,
+        )
         client_response = self._client.request(
             method=method,
             path=path,
@@ -144,22 +149,6 @@ class GitHubAdapter:
             path=path,
             client_response=result_fields.client_response,
         )
-
-    def _read_runtime_token(self) -> str:
-        try:
-            return require_runtime_secret(
-                self._env,
-                self._token_env_var,
-                purpose=GITHUB_ADAPTER_EXECUTION_PURPOSE,
-                setting_name=(
-                    "github_token"
-                    if self._token_env_var == GITHUB_TOKEN_ENV_VAR
-                    else None
-                ),
-            )
-        except RuntimeError as exc:
-            raise GitHubAdapterConfigurationError(str(exc)) from exc
-
 
 __all__ = [
     "GITHUB_TOKEN_ENV_VAR",

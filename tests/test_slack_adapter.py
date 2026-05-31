@@ -208,7 +208,8 @@ def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
     assert "from backend.payload_fields import" in source
     assert "from backend.request_identity import" in source
     assert "from backend.secret_redaction import" in source
-    assert "require_runtime_secret(" in source
+    assert "adapter_runtime_secret(" in source
+    assert "require_runtime_secret(" not in source
     assert "load_connection_settings(" not in source
     assert "require_env_value(" not in source
     assert "runtime_env(" not in source
@@ -218,3 +219,4 @@ def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
     assert "def _stable_request_id(" not in source
     assert "def _redact_secret(" not in source
     assert "def _redact_secret_text(" not in source
+    assert "def _read_runtime_token(" not in source

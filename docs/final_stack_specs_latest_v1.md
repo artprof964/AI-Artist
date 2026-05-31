@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 415 passed, 1 skipped, 1 warning
+Final validation: 419 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -89,6 +89,7 @@ backend/response_cache.py: approved read-only response cache using shared reques
 backend/source_freshness.py: dependency snapshot, stale-source checks, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution and guards, endpoint URL composition, env-example rendering/parsing, and connection settings loader.
+backend/adapter_secrets.py: shared adapter secret lookup that maps standard env vars to connection settings, supports custom env names and explicit injected secrets, and wraps adapter-specific configuration errors.
 backend/shell_commands.py: shared shell command and process argument construction for Docker Compose, curl, MinIO, and OPA command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
@@ -102,7 +103,7 @@ backend/knowledge.py: deterministic source-cited retrieval using shared Knowledg
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and numeric-clamp boundaries.
-backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and runtime secret boundaries directly.
+backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, secret-redaction, and adapter-secret boundaries directly.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.

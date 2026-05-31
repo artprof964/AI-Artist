@@ -150,6 +150,7 @@
 - `../../validation_reports/connection_env_parser_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_env_access_guard_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_resolution_standardization_2026-05-31.md`
+- `../../validation_reports/adapter_secret_lookup_standardization_2026-05-31.md`
 - `../../validation_reports/shell_command_standardization_2026-05-31.md`
 - `../../validation_reports/process_argument_builder_standardization_2026-05-31.md`
 - `../../validation_reports/process_execution_standardization_2026-05-31.md`
@@ -179,6 +180,7 @@
 - `../../validation_reports/llm_runtime_secret_standardization_2026-05-31.md`
 - `../../validation_reports/llm_secret_redaction_boundary_standardization_2026-05-31.md`
 - `../../backend/connection_settings.py`
+- `../../backend/adapter_secrets.py`
 - `../../backend/shell_commands.py`
 - `../../backend/readiness_paths.py`
 - `../../backend/repo_paths.py`
@@ -186,6 +188,7 @@
 - `../../backend/github_adapter.py`
 - `../../backend/github_contracts.py`
 - `../../tests/test_github_adapter.py`
+- `../../tests/test_adapter_secrets.py`
 - `../../tests/test_github_contracts.py`
 - `../../tests/test_http_methods.py`
 - `../../tests/test_shell_commands.py`

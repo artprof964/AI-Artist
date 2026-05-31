@@ -4,7 +4,8 @@ from dataclasses import dataclass, field
 from typing import Any, Mapping, Protocol
 from uuid import UUID
 
-from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR, require_runtime_secret
+from backend.adapter_secrets import adapter_runtime_secret
+from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR
 from backend.payload_fields import (
     optional_string_field,
     required_mapping_field,
@@ -196,7 +197,15 @@ class SlackAdapter:
         if not normalized_text:
             raise SlackAdapterError(slack_response_text_required())
 
-        bot_token = self._read_runtime_token()
+        bot_token = adapter_runtime_secret(
+            env=self._env,
+            env_var=self._token_env_var,
+            purpose=SLACK_ADAPTER_EXECUTION_PURPOSE,
+            standard_env_var=SLACK_BOT_TOKEN_ENV_VAR,
+            setting_name="slack_bot_token",
+            error_type=SlackAdapterConfigurationError,
+            explicit_secret=self._bot_token,
+        )
         text = redact_secret_text(
             normalized_text,
             explicit_secrets=(bot_token,),
@@ -215,7 +224,15 @@ class SlackAdapter:
         response_text: str,
     ) -> SlackPostResult:
         posted_payload = self.format_outbound_response(envelope, response_text)
-        bot_token = self._read_runtime_token()
+        bot_token = adapter_runtime_secret(
+            env=self._env,
+            env_var=self._token_env_var,
+            purpose=SLACK_ADAPTER_EXECUTION_PURPOSE,
+            standard_env_var=SLACK_BOT_TOKEN_ENV_VAR,
+            setting_name="slack_bot_token",
+            error_type=SlackAdapterConfigurationError,
+            explicit_secret=self._bot_token,
+        )
         client_response = self._client.chat_postMessage(**posted_payload)
         sanitized_response = redact_secret_value(
             client_response,
@@ -231,27 +248,6 @@ class SlackAdapter:
             posted_payload=posted_payload,
             client_response=sanitized_response,
         )
-
-    def _read_runtime_token(self) -> str:
-        if self._bot_token is not None:
-            normalized = self._bot_token.strip()
-            if normalized:
-                return normalized
-
-        try:
-            return require_runtime_secret(
-                self._env,
-                self._token_env_var,
-                purpose=SLACK_ADAPTER_EXECUTION_PURPOSE,
-                setting_name=(
-                    "slack_bot_token"
-                    if self._token_env_var == SLACK_BOT_TOKEN_ENV_VAR
-                    else None
-                ),
-            )
-        except RuntimeError as exc:
-            raise SlackAdapterConfigurationError(str(exc)) from exc
-
 
 __all__ = [
     "SlackAdapter",

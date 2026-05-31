@@ -335,11 +335,13 @@ def test_github_adapter_uses_shared_url_boundary_directly() -> None:
 def test_github_adapter_uses_shared_runtime_secret_resolver() -> None:
     source = read_backend_source("github_adapter.py")
 
-    assert "require_runtime_secret(" in source
+    assert "adapter_runtime_secret(" in source
+    assert "require_runtime_secret(" not in source
     assert "load_connection_settings(" not in source
     assert "require_env_value(" not in source
     assert "runtime_env(" not in source
     assert "github_token_required(" not in source
+    assert "def _read_runtime_token(" not in source
 
 
 def test_github_adapter_uses_shared_operation_constant_directly() -> None:
