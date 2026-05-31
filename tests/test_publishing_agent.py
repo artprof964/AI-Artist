@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 from typing import Any
 from uuid import UUID
 
@@ -138,3 +139,13 @@ def test_publishing_agent_redacts_sensitive_client_response_in_audit_event() -> 
     assert audit_payload["client_response"]["debug"]["api_key"] == "[REDACTED]"
     assert "secret-publish-token" not in repr(audit_payload)
     assert "sk-publish-secret-value" not in repr(audit_payload)
+
+
+def test_publishing_agent_uses_shared_publish_operation_constant() -> None:
+    source = (Path(__file__).resolve().parents[1] / "backend" / "publishing.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "from backend.operations import OPERATION_PUBLISH" in source
+    assert 'operation="publish"' not in source
+    assert "operation=OPERATION_PUBLISH" in source

@@ -51,6 +51,7 @@ can be marked done.
 39. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 40. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
 41. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
+42. Publishing side-effect audit operation values use `backend/operations.py`.
 ```
 
 ## Standard Request Envelope
@@ -262,6 +263,7 @@ Output:
      and artifact is recorded.
    - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
    - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
+   - Publishing side-effect audit events use the shared publish operation constant.
 ```
 
 ## Definition Of Done

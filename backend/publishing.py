@@ -6,6 +6,7 @@ from typing import Any
 from uuid import UUID
 
 from backend.canonical_hash import deterministic_prefixed_id
+from backend.operations import OPERATION_PUBLISH
 from backend.publishing_adapter import (
     PublishingAdapter,
     PublishingClient,
@@ -120,7 +121,7 @@ class PublishingAgent:
                 correlation_id=request.correlation_id,
                 actor_scope=request.actor_scope,
                 policy_scope=request.policy_scope,
-                operation="publish",
+                operation=OPERATION_PUBLISH,
                 target=request.target,
             ),
             status=status,
