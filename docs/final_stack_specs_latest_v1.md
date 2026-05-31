@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 309 passed, 1 skipped, 1 warning
+Final validation: 310 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -75,7 +75,7 @@ backend/audit.py: in-memory audit repository and recursive secret redaction.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache.
 backend/source_freshness.py: dependency snapshot and stale-source checks.
-backend/source_ingestion.py: approved local source ingestion and domain/scheme rejection.
+backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL validation boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, and connection settings loader.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook.

@@ -118,7 +118,7 @@ class SourceIngestionService:
                 )
                 continue
 
-            content_hash = _content_hash(candidate.content)
+            content_hash = sha256_text(candidate.content)
             version_tag = sha256_version_tag(candidate.content)
             existing_entry = _existing_registry_entry(self.registry, candidate.source_key)
             changed = (
@@ -172,10 +172,6 @@ class SourceIngestionService:
             error_type=lambda reason: SourceIngestionError(candidate.source_key, reason),
             message="source ingestion requires an absolute http(s) URL",
         )
-
-
-def _content_hash(content: str) -> str:
-    return sha256_text(content)
 
 
 def _existing_registry_entry(

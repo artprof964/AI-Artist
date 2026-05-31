@@ -1,4 +1,5 @@
 from datetime import datetime, timezone
+from pathlib import Path
 
 import pytest
 
@@ -13,6 +14,7 @@ from backend.source_ingestion import (
 
 NOW = datetime(2026, 5, 31, 10, 30, tzinfo=timezone.utc)
 APPROVED_DOMAINS = {"art.example", "fashion.example", "trends.example"}
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def approved_sample_sources() -> list[SourceIngestionCandidate]:
@@ -192,3 +194,11 @@ def test_ingestion_rejects_non_http_sources_before_snapshot_storage() -> None:
             ],
             ingested_at=NOW,
         )
+
+
+def test_source_ingestion_uses_shared_canonical_hash_helpers_directly() -> None:
+    source = (PROJECT_ROOT / "backend" / "source_ingestion.py").read_text(encoding="utf-8")
+
+    assert "from backend.canonical_hash import sha256_text, sha256_version_tag" in source
+    assert "def _content_hash(" not in source
+    assert "hashlib.sha256" not in source

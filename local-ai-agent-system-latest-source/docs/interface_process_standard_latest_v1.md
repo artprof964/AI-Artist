@@ -216,6 +216,7 @@ Output:
    - Cache and source-freshness decision text uses the shared reason-message helper.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
+   - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.
 
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
