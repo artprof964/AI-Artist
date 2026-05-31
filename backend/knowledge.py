@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.mapping_utils import copy_mapping
 from backend.model_coercion import coerce_model
 from backend.schemas import SubAgentOutput
 from backend.numeric_utils import cosine_similarity
@@ -181,7 +182,7 @@ class InMemoryQdrantVectorStore:
             VectorSearchHit(
                 point_id=point.point_id,
                 score=cosine_similarity(query_vector, point.vector),
-                payload=dict(point.payload),
+                payload=copy_mapping(point.payload),
             )
             for point in collection.values()
         ]
@@ -221,7 +222,7 @@ class KnowledgeAgent:
                 uri=document.uri,
                 content=document.content,
                 vector=self.embedding_model.embed(document.content),
-                metadata=dict(document.metadata),
+                metadata=copy_mapping(document.metadata),
             )
             for document in approved_documents
         ]
@@ -288,7 +289,7 @@ class KnowledgeAgent:
                 title=str(payload["title"]),
                 uri=str(payload["uri"]),
             ),
-            metadata=dict(payload.get("metadata") or {}),
+            metadata=copy_mapping(payload.get("metadata") or {}),
         )
 
     def _is_approved_hit(self, hit: VectorSearchHit) -> bool:

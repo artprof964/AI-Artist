@@ -8,6 +8,7 @@ from typing import Any, Iterable
 from backend.audit import redact_audit_value
 from backend.canonical_hash import canonical_json
 from backend.image_provenance import ImageProvenanceRecord
+from backend.mapping_utils import copy_mapping
 from backend.observability import InMemoryObservabilityCollector
 from backend.schemas import (
     ExecutionEnvelopeRequest,
@@ -155,7 +156,7 @@ def review_provenance_metadata(
     payload = (
         metadata.model_dump(mode="json")
         if isinstance(metadata, ImageProvenanceRecord)
-        else dict(metadata)
+        else copy_mapping(metadata)
     )
     serialized = canonical_json(payload)
     findings: list[SecurityReviewFinding] = []

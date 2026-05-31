@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any
 from uuid import UUID
 
+from backend.mapping_utils import copy_mapping
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SourceFreshness
 from backend.time_utils import utc_now
@@ -83,7 +84,7 @@ class SourceFreshnessRegistry:
             version_tag=version_tag,
             last_modified_at=last_modified_at,
             ingested_at=ingested_at or utc_now(),
-            metadata=dict(metadata or {}),
+            metadata=copy_mapping(metadata),
         )
         self._store(entry)
         return entry
@@ -101,7 +102,7 @@ class SourceFreshnessRegistry:
             version_tag=entry.version_tag,
             last_modified_at=utc_now(),
             ingested_at=entry.ingested_at,
-            metadata=dict(entry.metadata or {}),
+            metadata=copy_mapping(entry.metadata),
         )
         self._store(changed)
         return changed

@@ -23,15 +23,16 @@ can be marked done.
 11. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, and security-review serialization are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 13. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
-14. Text tokenization and label/tag normalization use `backend/text_utils.py`.
-15. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
-16. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
-17. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
-18. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-19. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
-20. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-21. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-22. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+14. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
+15. Text tokenization and label/tag normalization use `backend/text_utils.py`.
+16. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py`.
+17. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
+18. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
+19. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+20. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+21. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+22. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+23. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -190,6 +191,7 @@ Output:
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Runtime UUID creation uses the shared runtime ID helper.
+   - Metadata and payload copies use the shared mapping helper.
 
 3. Classify
    - Safety Service classifies request as read, action, or mixed.

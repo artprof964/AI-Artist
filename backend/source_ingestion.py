@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any
 
 from backend.canonical_hash import sha256_text, sha256_version_tag
+from backend.mapping_utils import copy_mapping, merge_mappings
 from backend.source_freshness import SourceFreshnessRegistry, SourceRegistryEntry
 from backend.time_utils import utc_now
 from backend.url_utils import http_url_domain
@@ -135,11 +136,10 @@ class SourceIngestionService:
                 content_hash=content_hash,
                 version_tag=version_tag,
                 ingested_at=captured_at,
-                metadata={
-                    "title": candidate.title,
-                    "source_domain": domain,
-                    **dict(candidate.metadata),
-                },
+                metadata=merge_mappings(
+                    {"title": candidate.title, "source_domain": domain},
+                    candidate.metadata,
+                ),
             )
             if changed:
                 registry_entry = self.registry.increment_change_seq(candidate.source_key)
@@ -153,7 +153,7 @@ class SourceIngestionService:
                 version_tag=version_tag,
                 change_seq=registry_entry.change_seq,
                 content=candidate.content,
-                metadata=dict(candidate.metadata),
+                metadata=copy_mapping(candidate.metadata),
                 captured_at=captured_at,
             )
             self.snapshot_repository.store_snapshot(snapshot)

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 269 passed, 1 skipped, 1 warning
+Final validation: 273 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -53,6 +53,7 @@ backend/schemas.py: API and SubAgentOutput schemas.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
+backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/text_utils.py: shared text tokenization and label normalization.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
 backend/time_utils.py: shared UTC datetime creation and normalization.
@@ -128,6 +129,8 @@ before service or adapter specific request identity logic is added.
 Runtime UUIDs and prefixed runtime IDs must flow through
 backend/runtime_ids.py before service, schema, adapter, orchestration,
 freshness, retrieval, or review-specific runtime IDs are created.
+Mapping copies and metadata/payload merges must flow through
+backend/mapping_utils.py before domain-specific copy or merge logic is added.
 Text tokenization and label/tag normalization must flow through
 backend/text_utils.py before classifier, retrieval, or rubric-specific token
 parsing logic is added.

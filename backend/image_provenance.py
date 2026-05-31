@@ -5,6 +5,7 @@ from threading import RLock
 from typing import Any, Literal, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
+from backend.mapping_utils import copy_mapping
 from backend.model_coercion import coerce_model
 from backend.payload_fields import optional_string_field, required_string_field
 from backend.response_fields import field_value, required_response_list, require_response_mapping
@@ -197,7 +198,7 @@ def _coerce_provenance_input(
 
 
 def _storage_uri_from_comfyui_image(image: dict[str, Any] | Any) -> str:
-    image_payload = dict(image)
+    image_payload = copy_mapping(image)
     filename = required_string_field(
         image_payload,
         "filename",
