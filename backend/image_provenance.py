@@ -5,6 +5,7 @@ from threading import RLock
 from typing import Any, Literal, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
+from backend.payload_fields import optional_string_field, required_string_field
 from backend.time_utils import as_utc
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -189,16 +190,27 @@ def _coerce_provenance_input(
 
 
 def _storage_uri_from_comfyui_image(image: dict[str, Any]) -> str:
-    filename = image.get("filename")
-    if not isinstance(filename, str) or not filename:
-        raise ImageProvenanceError("generated image must include filename or storage_uri")
-
-    image_type = image.get("type", "output")
-    subfolder = image.get("subfolder", "")
-    if not isinstance(image_type, str) or not image_type:
-        raise ImageProvenanceError("generated image type must be a non-empty string")
-    if not isinstance(subfolder, str):
-        raise ImageProvenanceError("generated image subfolder must be a string")
+    filename = required_string_field(
+        image,
+        "filename",
+        error_type=ImageProvenanceError,
+        message="generated image must include filename or storage_uri",
+    )
+    image_type = required_string_field(
+        {"type": image.get("type", "output")},
+        "type",
+        error_type=ImageProvenanceError,
+        message="generated image type must be a non-empty string",
+    )
+    subfolder = (
+        optional_string_field(
+            image,
+            "subfolder",
+            error_type=ImageProvenanceError,
+            message="generated image subfolder must be a string",
+        )
+        or ""
+    )
 
     normalized_subfolder = subfolder.strip("/")
     if normalized_subfolder:

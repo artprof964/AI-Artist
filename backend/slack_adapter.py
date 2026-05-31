@@ -4,6 +4,7 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.payload_fields import optional_string_field, required_string_field
 from backend.request_identity import normalize_request_text, stable_request_uuid
 from backend.secret_redaction import (
     LOWER_REDACTED_SECRET_VALUE,
@@ -144,19 +145,21 @@ class SlackAdapter:
 
 
 def _required_string(payload: dict[str, Any], key: str) -> str:
-    value = payload.get(key)
-    if not isinstance(value, str) or not value.strip():
-        raise SlackAdapterError(f"Slack event field {key!r} must be a non-empty string")
-    return value
+    return required_string_field(
+        payload,
+        key,
+        error_type=SlackAdapterError,
+        message=f"Slack event field {key!r} must be a non-empty string",
+    )
 
 
 def _optional_string(payload: dict[str, Any], key: str) -> str | None:
-    value = payload.get(key)
-    if value is None:
-        return None
-    if not isinstance(value, str):
-        raise SlackAdapterError(f"Slack event field {key!r} must be a string when present")
-    return value or None
+    return optional_string_field(
+        payload,
+        key,
+        error_type=SlackAdapterError,
+        message=f"Slack event field {key!r} must be a string when present",
+    )
 
 
 def _normalize_text(text: str) -> str:

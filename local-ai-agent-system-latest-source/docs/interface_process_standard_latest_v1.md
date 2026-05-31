@@ -23,6 +23,7 @@ can be marked done.
 11. Canonical hashes and deterministic local IDs are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
 13. Cache, provenance, execution-envelope, and persistence timestamps use `backend/time_utils.py` for UTC normalization.
+14. Connector payload string-field extraction uses `backend/payload_fields.py`.
 ```
 
 ## Standard Request Envelope
@@ -172,6 +173,7 @@ Output:
 ```text
 1. Intake
    - OpenClaw receives the request and loads workspace context.
+   - Channel adapters validate required and optional connector string fields through the shared payload-field helper.
 
 2. Normalize
    - Safety Service canonicalizes request text and builds a stable fingerprint.

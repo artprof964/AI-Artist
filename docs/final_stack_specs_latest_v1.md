@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 206 passed, 1 skipped, 1 warning
+Final validation: 215 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -53,6 +53,7 @@ backend/schemas.py: API and SubAgentOutput schemas.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, and deterministic ID helpers.
 backend/request_identity.py: request text normalization, fingerprints, and stable request UUIDs.
 backend/time_utils.py: shared UTC datetime normalization.
+backend/payload_fields.py: shared connector payload string-field extraction.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
@@ -119,6 +120,8 @@ UUIDs must flow through backend/request_identity.py before service or adapter
 specific request identity logic is added.
 UTC datetime normalization must flow through backend/time_utils.py before cache,
 provenance, execution gate, or future persistence time comparisons are added.
+Connector payload required/optional string extraction must flow through
+backend/payload_fields.py before adapter-specific payload parsing logic is added.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```
