@@ -150,3 +150,12 @@ def test_comfyui_adapter_uses_shared_operation_constant_directly() -> None:
 
     assert "IMAGE_GENERATE_OPERATION =" not in contents
     assert "operation=OPERATION_IMAGE_GENERATE" in contents
+
+
+def test_comfyui_adapter_uses_shared_missing_envelope_message() -> None:
+    source = "backend/comfyui_adapter.py"
+    with open(source, encoding="utf-8") as handle:
+        contents = handle.read()
+
+    assert '"image generation requires an execution envelope"' not in contents
+    assert 'execution_envelope_required("image generation")' in contents

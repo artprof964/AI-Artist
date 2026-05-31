@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 360 passed, 1 skipped, 1 warning
+Final validation: 363 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -80,7 +80,7 @@ backend/secret_redaction.py: shared secret-key detection, token-shape detection,
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
-backend/execution_gate_messages.py: shared execution-envelope validation failure message contracts.
+backend/execution_gate_messages.py: shared execution-envelope validation failure and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, and optional source registry lookup.
@@ -137,7 +137,7 @@ API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias.
 Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
-Execution-envelope validation failure messages must flow through
+Execution-envelope validation failure and required-envelope messages must flow through
 backend/execution_gate_messages.py before gated adapters expose envelope errors.
 Secret detection patterns, assignment scanning, and replacement behavior must
 flow through backend/secret_redaction.py before adapter-specific logging,

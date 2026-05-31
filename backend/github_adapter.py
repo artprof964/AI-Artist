@@ -14,6 +14,7 @@ from backend.connection_settings import (
     runtime_env,
 )
 from backend.execution_gate import require_execution_envelope
+from backend.execution_gate_messages import execution_envelope_required
 from backend.http_methods import normalize_http_write_method
 from backend.operations import OPERATION_GITHUB_WRITE
 from backend.schemas import ExecutionEnvelopeResponse
@@ -82,7 +83,7 @@ class GitHubAdapter:
         envelope = require_execution_envelope(
             request.execution_envelope,
             operation=OPERATION_GITHUB_WRITE,
-            missing_message="GitHub write requires an execution envelope",
+            missing_message=execution_envelope_required("GitHub write"),
             error_type=GitHubExecutionGateError,
             target=request.target,
             target_label="GitHub target",

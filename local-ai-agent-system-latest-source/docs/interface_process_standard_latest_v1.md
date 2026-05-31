@@ -50,7 +50,7 @@ can be marked done.
 38. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 39. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
 40. Source registry missing-row messages use `backend/source_registry_contracts.py`.
-41. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
+41. Execution-envelope validation failure and required-envelope messages use `backend/execution_gate_messages.py`.
 42. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
 43. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 44. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.

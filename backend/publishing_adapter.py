@@ -7,6 +7,7 @@ from uuid import UUID
 
 from backend.adapter_results import targeted_result_fields
 from backend.execution_gate import require_execution_envelope
+from backend.execution_gate_messages import execution_envelope_required
 from backend.operations import OPERATION_PUBLISH
 from backend.schemas import ExecutionEnvelopeResponse
 
@@ -49,7 +50,7 @@ class PublishingAdapter:
         envelope = require_execution_envelope(
             request.execution_envelope,
             operation=OPERATION_PUBLISH,
-            missing_message="publishing requires an execution envelope",
+            missing_message=execution_envelope_required("publishing"),
             error_type=PublishingExecutionGateError,
             target=request.target,
             target_label="publish target",

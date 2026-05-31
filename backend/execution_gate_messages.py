@@ -6,6 +6,10 @@ EXECUTION_ENVELOPE_MISSING_SIGNATURE = "execution envelope must include a signat
 EXECUTION_ENVELOPE_EXPIRED = "execution envelope is expired"
 
 
+def execution_envelope_required(action_label: str) -> str:
+    return f"{action_label} requires an execution envelope"
+
+
 def execution_envelope_operation_mismatch(operation: str) -> str:
     return f"execution envelope operation must be {operation}"
 

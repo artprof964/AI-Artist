@@ -7,6 +7,7 @@ from uuid import UUID
 
 from backend.adapter_results import gated_result_fields
 from backend.execution_gate import require_execution_envelope
+from backend.execution_gate_messages import execution_envelope_required
 from backend.operations import OPERATION_IMAGE_GENERATE
 from backend.schemas import ExecutionEnvelopeResponse
 
@@ -49,7 +50,7 @@ class ComfyUIAdapter:
         envelope = require_execution_envelope(
             request.execution_envelope,
             operation=OPERATION_IMAGE_GENERATE,
-            missing_message="image generation requires an execution envelope",
+            missing_message=execution_envelope_required("image generation"),
             error_type=ComfyUIExecutionGateError,
             now=now,
         )

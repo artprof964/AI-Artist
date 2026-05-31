@@ -171,3 +171,12 @@ def test_publishing_adapter_uses_shared_operation_constant_directly() -> None:
 
     assert "PUBLISH_OPERATION =" not in contents
     assert "operation=OPERATION_PUBLISH" in contents
+
+
+def test_publishing_adapter_uses_shared_missing_envelope_message() -> None:
+    source = "backend/publishing_adapter.py"
+    with open(source, encoding="utf-8") as handle:
+        contents = handle.read()
+
+    assert '"publishing requires an execution envelope"' not in contents
+    assert 'execution_envelope_required("publishing")' in contents

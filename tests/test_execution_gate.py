@@ -11,6 +11,7 @@ from backend.execution_gate_messages import (
     EXECUTION_ENVELOPE_NOT_ALLOWED,
     EXECUTION_ENVELOPE_NOT_VALID,
     EXECUTION_ENVELOPE_REQUIRES_HUMAN_APPROVAL,
+    execution_envelope_required,
     execution_envelope_operation_mismatch,
     execution_envelope_target_mismatch,
     operation_requires_human_approval,
@@ -150,6 +151,7 @@ def test_execution_gate_error_message_contracts_are_shared() -> None:
         execution_envelope_target_mismatch("publish target")
         == "execution envelope target does not match publish target"
     )
+    assert execution_envelope_required("publishing") == "publishing requires an execution envelope"
     assert operation_requires_human_approval("publish") == "publish requires human approval"
 
 

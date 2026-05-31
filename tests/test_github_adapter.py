@@ -330,3 +330,10 @@ def test_github_adapter_uses_shared_operation_constant_directly() -> None:
     assert "GITHUB_WRITE_OPERATION =" not in source
     assert '"GITHUB_WRITE_OPERATION"' not in source
     assert "operation=OPERATION_GITHUB_WRITE" in source
+
+
+def test_github_adapter_uses_shared_missing_envelope_message() -> None:
+    source = (PROJECT_ROOT / "backend" / "github_adapter.py").read_text(encoding="utf-8")
+
+    assert '"GitHub write requires an execution envelope"' not in source
+    assert 'execution_envelope_required("GitHub write")' in source
