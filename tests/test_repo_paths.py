@@ -18,6 +18,7 @@ from backend.repo_paths import (
     repo_root_from,
     workspace_path,
 )
+from path_helpers import iter_test_module_sources
 
 
 def test_repo_path_contracts_preserve_current_artifact_locations() -> None:
@@ -60,42 +61,50 @@ def test_backend_module_path_and_text_reader_use_repo_path_contract() -> None:
 
 
 def test_backend_source_inspection_tests_use_shared_reader() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        if test_path.name == "test_repo_paths.py":
-            continue
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources(
+        exclude=("test_repo_paths.py",)
+    ):
         if 'Path("backend/' in source or ' / "backend" / ' in source:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []
 
 
 def test_tests_use_shared_repo_root_helper() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        if test_path.name == "test_repo_paths.py":
-            continue
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources(
+        exclude=("test_repo_paths.py",)
+    ):
         if "Path(__file__).resolve().parents[1]" in source:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []
 
 
 def test_backend_source_inspection_tests_do_not_use_raw_open() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        if test_path.name == "test_repo_paths.py":
-            continue
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources(
+        exclude=("test_repo_paths.py",)
+    ):
         if "open(source, encoding=" in source:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []
+
+
+def test_repo_wide_guard_tests_use_shared_test_path_helpers() -> None:
+    offenders: list[str] = []
+
+    for test_filename, source in iter_test_module_sources(
+        exclude=("test_repo_paths.py",)
+    ):
+        if 'glob("test_*.py")' in source and "iter_test_module_sources(" not in source:
+            offenders.append(test_filename)
+        if 'Path("tests") /' in source and "read_test_source(" not in source:
+            offenders.append(test_filename)
+
+    assert sorted(set(offenders)) == []

@@ -1,16 +1,8 @@
 from datetime import UTC, datetime, timedelta, timezone
-from pathlib import Path
 
-from backend.repo_paths import (
-    backend_module_filenames,
-    read_backend_module_text,
-    read_repo_text,
-    repo_root_from,
-)
+from backend.repo_paths import backend_module_filenames
 from backend.time_utils import as_utc, utc_now
-
-
-PROJECT_ROOT = repo_root_from(Path(__file__))
+from path_helpers import PROJECT_ROOT, iter_test_module_sources, read_backend_source
 
 
 def test_utc_now_returns_timezone_aware_utc_datetime() -> None:
@@ -41,7 +33,7 @@ def test_as_utc_converts_aware_offsets_to_utc() -> None:
 def test_backend_modules_do_not_wrap_shared_utc_normalization() -> None:
     offenders = []
     for module_filename in backend_module_filenames(PROJECT_ROOT):
-        text = read_backend_module_text(module_filename, PROJECT_ROOT)
+        text = read_backend_source(module_filename)
         if "def _as_utc(" in text or "def _as_aware_utc(" in text:
             offenders.append(module_filename)
 
@@ -51,11 +43,8 @@ def test_backend_modules_do_not_wrap_shared_utc_normalization() -> None:
 def test_tests_use_shared_utc_now_helper_for_current_time() -> None:
     offenders: list[str] = []
 
-    for test_path in sorted((PROJECT_ROOT / "tests").glob("test_*.py")):
-        if test_path.name == "test_time_utils.py":
-            continue
-        source = read_repo_text(PROJECT_ROOT, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources(exclude=("test_time_utils.py",)):
         if "datetime.now(timezone.utc)" in source:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []

@@ -1,5 +1,4 @@
 import ast
-from pathlib import Path
 
 from backend.shell_commands import (
     curl_command,
@@ -16,7 +15,7 @@ from backend.shell_commands import (
     shell_args,
     shell_command,
 )
-from backend.repo_paths import read_repo_text, repo_root_from
+from path_helpers import iter_test_module_sources, read_test_source
 
 
 def test_shell_command_helpers_build_expected_command_lines() -> None:
@@ -126,11 +125,9 @@ def test_delimited_process_output_parsers_share_psql_row_contract() -> None:
 
 
 def test_tests_use_shared_process_runner_instead_of_subprocess_imports() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources():
         tree = ast.parse(source)
         imports_subprocess = any(
             (
@@ -141,14 +138,13 @@ def test_tests_use_shared_process_runner_instead_of_subprocess_imports() -> None
             for node in ast.walk(tree)
         )
         if imports_subprocess:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []
 
 
 def test_postgres_migration_tests_use_shared_delimited_output_parsers() -> None:
-    repo_root = repo_root_from(Path(__file__))
-    source = read_repo_text(repo_root, Path("tests") / "test_postgres_migrations.py")
+    source = read_test_source("test_postgres_migrations.py")
 
     assert "def parse_psql_counts(" not in source
     assert "def parse_psql_values(" not in source
@@ -157,8 +153,7 @@ def test_postgres_migration_tests_use_shared_delimited_output_parsers() -> None:
 
 
 def test_opa_policy_tests_use_shared_process_argument_builders() -> None:
-    repo_root = repo_root_from(Path(__file__))
-    source = read_repo_text(repo_root, Path("tests") / "test_opa_policy.py")
+    source = read_test_source("test_opa_policy.py")
 
     assert "docker_compose_exec_args(" in source
     assert "shell_args(" in source

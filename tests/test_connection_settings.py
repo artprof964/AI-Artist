@@ -1,5 +1,4 @@
 import ast
-from pathlib import Path
 
 import pytest
 
@@ -25,12 +24,8 @@ from backend.connection_settings import (
     runtime_env,
 )
 from backend.readiness import REQUIRED_ENV_VARS
-from backend.repo_paths import (
-    backend_module_filenames,
-    read_backend_module_text,
-    read_repo_text,
-    repo_root_from,
-)
+from backend.repo_paths import backend_module_filenames, read_backend_module_text
+from path_helpers import iter_test_module_sources
 
 
 def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
@@ -175,11 +170,9 @@ def test_runtime_env_access_is_centralized_in_connection_settings() -> None:
 
 
 def test_tests_do_not_import_os_for_environment_access() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources():
         tree = ast.parse(source)
         imports_os = any(
             (
@@ -190,7 +183,7 @@ def test_tests_do_not_import_os_for_environment_access() -> None:
             for node in ast.walk(tree)
         )
         if imports_os:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []
 

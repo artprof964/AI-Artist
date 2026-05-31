@@ -3,7 +3,6 @@ from datetime import datetime, timezone
 import hashlib
 import hmac
 import json
-from pathlib import Path
 
 from backend.canonical_hash import (
     canonical_json,
@@ -13,7 +12,7 @@ from backend.canonical_hash import (
     sha256_text,
     sha256_version_tag,
 )
-from backend.repo_paths import read_repo_text, repo_root_from
+from path_helpers import iter_test_module_sources
 
 
 def test_canonical_json_sorts_keys_and_removes_whitespace() -> None:
@@ -85,27 +84,19 @@ def test_sha256_version_tag_uses_digest_prefix() -> None:
 
 
 def test_non_canonical_hash_tests_do_not_use_json_dumps_directly() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        if test_path.name == "test_canonical_hash.py":
-            continue
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources(exclude=("test_canonical_hash.py",)):
         if "json.dumps(" in source:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []
 
 
 def test_non_canonical_hash_tests_do_not_import_hashlib_directly() -> None:
-    repo_root = repo_root_from(Path(__file__))
     offenders: list[str] = []
 
-    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
-        if test_path.name == "test_canonical_hash.py":
-            continue
-        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+    for test_filename, source in iter_test_module_sources(exclude=("test_canonical_hash.py",)):
         tree = ast.parse(source)
         imports_hashlib = any(
             (
@@ -116,6 +107,6 @@ def test_non_canonical_hash_tests_do_not_import_hashlib_directly() -> None:
             for node in ast.walk(tree)
         )
         if imports_hashlib:
-            offenders.append(test_path.name)
+            offenders.append(test_filename)
 
     assert offenders == []

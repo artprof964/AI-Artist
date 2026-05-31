@@ -160,6 +160,7 @@
 - `../../validation_reports/backend_source_inspection_standardization_2026-05-31.md`
 - `../../validation_reports/repo_root_workspace_path_standardization_2026-05-31.md`
 - `../../validation_reports/repo_source_open_standardization_2026-05-31.md`
+- `../../validation_reports/test_path_helper_standardization_2026-05-31.md`
 - `../../validation_reports/test_utc_now_standardization_2026-05-31.md`
 - `../../validation_reports/test_canonical_json_standardization_2026-05-31.md`
 - `../../validation_reports/test_hashlib_standardization_2026-05-31.md`
@@ -179,6 +180,7 @@
 - `../../tests/test_shell_commands.py`
 - `../../tests/test_readiness_paths.py`
 - `../../tests/test_repo_paths.py`
+- `../../tests/path_helpers.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
 - `../../validation_reports/health_contract_standardization_2026-05-31.md`

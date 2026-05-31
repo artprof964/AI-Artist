@@ -64,6 +64,7 @@ can be marked done.
 52. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
 53. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
 54. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
+55. Repo-wide validation tests that scan backend or test sources use `tests/path_helpers.py` for project-root resolution and source iteration.
 ```
 
 ## Standard Request Envelope
@@ -120,6 +121,8 @@ Rules:
   backend module discovery, source-text reads, and source-inspection file reads
   use the shared repo path contract before runtime review checks, scaffold
   validators, or contract guards read checked-in files.
+- Repo-wide validation tests that scan backend or test sources use shared test
+  path helpers instead of local root resolution or test-module glob loops.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA
