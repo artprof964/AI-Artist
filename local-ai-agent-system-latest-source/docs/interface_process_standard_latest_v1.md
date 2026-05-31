@@ -41,7 +41,7 @@ can be marked done.
 25. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 26. Numeric clamps, rounded averages, vector similarity, positive-integer checks, and zero-magnitude checks use `backend/numeric_utils.py` directly at scoring boundaries.
 27. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
-28. LLM smoke request prompts, reasoning effort, thinking mode, timeout, request payload construction, runtime secret lookup, and redacted request recording use `backend/llm_api_smoke.py`.
+28. LLM smoke request prompts, reasoning effort, thinking mode, timeout, chat request field names, role vocabulary, request/result payload construction, runtime secret lookup, and redacted request recording use `backend/llm_api_contracts.py` and `backend/llm_api_smoke.py`.
 29. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 30. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 31. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.

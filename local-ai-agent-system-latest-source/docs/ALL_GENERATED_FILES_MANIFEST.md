@@ -213,6 +213,7 @@
 - `../../validation_reports/llm_runtime_secret_standardization_2026-05-31.md`
 - `../../validation_reports/llm_secret_redaction_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/llm_smoke_request_standardization_2026-05-31.md`
+- `../../validation_reports/llm_api_request_contract_standardization_2026-06-01.md`
 - `../../validation_reports/llm_smoke_timeout_standardization_2026-05-31.md`
 - `../../validation_reports/llm_slack_connection_message_standardization_2026-05-31.md`
 - `../../backend/connection_settings.py`

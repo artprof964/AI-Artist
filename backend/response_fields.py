@@ -9,6 +9,11 @@ class ResponseFieldError(ValueError):
 
 
 RESPONSE_ENTRY_OBJECT_MESSAGE = "response entry must be an object"
+RESPONSE_ID_FIELD = "id"
+RESPONSE_MODEL_FIELD = "model"
+RESPONSE_CHOICES_FIELD = "choices"
+RESPONSE_MESSAGE_FIELD = "message"
+RESPONSE_CONTENT_FIELD = "content"
 
 
 def required_response_list_message(key: str) -> str:
@@ -46,17 +51,22 @@ def require_response_mapping(
 
 
 def first_choice_message_content(response: Any) -> str | None:
-    choices = field_value(response, "choices", [])
+    choices = field_value(response, RESPONSE_CHOICES_FIELD, [])
     if not choices:
         return None
     first_choice = choices[0]
-    message = field_value(first_choice, "message", {})
-    return field_value(message, "content")
+    message = field_value(first_choice, RESPONSE_MESSAGE_FIELD, {})
+    return field_value(message, RESPONSE_CONTENT_FIELD)
 
 
 __all__ = [
     "ResponseFieldError",
+    "RESPONSE_CHOICES_FIELD",
+    "RESPONSE_CONTENT_FIELD",
     "RESPONSE_ENTRY_OBJECT_MESSAGE",
+    "RESPONSE_ID_FIELD",
+    "RESPONSE_MESSAGE_FIELD",
+    "RESPONSE_MODEL_FIELD",
     "field_value",
     "first_choice_message_content",
     "required_response_list_message",

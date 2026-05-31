@@ -1,7 +1,12 @@
 import pytest
 
 from backend.response_fields import (
+    RESPONSE_CHOICES_FIELD,
+    RESPONSE_CONTENT_FIELD,
     RESPONSE_ENTRY_OBJECT_MESSAGE,
+    RESPONSE_ID_FIELD,
+    RESPONSE_MESSAGE_FIELD,
+    RESPONSE_MODEL_FIELD,
     ResponseFieldError,
     field_value,
     first_choice_message_content,
@@ -49,3 +54,11 @@ def test_require_response_mapping_rejects_non_objects() -> None:
 def test_response_validation_messages_are_centralized() -> None:
     assert required_response_list_message("images") == "response field 'images' must be a non-empty list"
     assert RESPONSE_ENTRY_OBJECT_MESSAGE == "response entry must be an object"
+
+
+def test_provider_response_field_names_are_centralized() -> None:
+    assert RESPONSE_ID_FIELD == "id"
+    assert RESPONSE_MODEL_FIELD == "model"
+    assert RESPONSE_CHOICES_FIELD == "choices"
+    assert RESPONSE_MESSAGE_FIELD == "message"
+    assert RESPONSE_CONTENT_FIELD == "content"

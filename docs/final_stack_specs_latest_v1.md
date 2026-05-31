@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 496 passed, 1 warning
+Final validation: 499 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -74,7 +74,7 @@ backend/markdown_utils.py: shared Markdown heading extraction for documentation 
 backend/numeric_utils.py: shared numeric clamps, averages, vector similarity, positive-integer checks, zero-magnitude checks, and numeric/vector validation messages.
 backend/time_utils.py: shared UTC datetime creation and normalization for runtime code and tests.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction plus payload validation messages.
-backend/response_fields.py: shared provider response field access, first-choice message parsing, shape validation, and response validation messages.
+backend/response_fields.py: shared provider response field names/access, first-choice message parsing, shape validation, and response validation messages.
 backend/url_utils.py: shared URL domain and relative API path validation plus URL validation messages.
 backend/http_methods.py: shared HTTP method vocabulary, normalization, and validation messages for connector boundaries.
 backend/file_scanning.py: shared reviewable text-file suffixes and recursive scanner file discovery.
@@ -105,7 +105,8 @@ backend/shell_commands.py: shared shell command and process argument constructio
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
-backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path.
+backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
+backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path using shared LLM request/result contracts.
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes.

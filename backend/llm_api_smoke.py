@@ -8,7 +8,17 @@ from backend.connection_settings import (
     load_connection_settings,
     require_runtime_secret,
 )
-from backend.response_fields import field_value, first_choice_message_content
+from backend.llm_api_contracts import (
+    llm_smoke_request_body,
+    llm_smoke_request_log_payload,
+    llm_smoke_result_payload,
+)
+from backend.response_fields import (
+    RESPONSE_ID_FIELD,
+    RESPONSE_MODEL_FIELD,
+    field_value,
+    first_choice_message_content,
+)
 from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
 
 
@@ -62,16 +72,13 @@ def build_smoke_request(
     reasoning_effort: str = LLM_SMOKE_REASONING_EFFORT,
     thinking_type: str = LLM_SMOKE_THINKING_TYPE,
 ) -> dict[str, Any]:
-    return {
-        "model": config.primary_model,
-        "messages": [
-            {"role": "system", "content": system_prompt},
-            {"role": "user", "content": user_prompt},
-        ],
-        "stream": False,
-        "reasoning_effort": reasoning_effort,
-        "extra_body": {"thinking": {"type": thinking_type}},
-    }
+    return llm_smoke_request_body(
+        model=config.primary_model,
+        system_prompt=system_prompt,
+        user_prompt=user_prompt,
+        reasoning_effort=reasoning_effort,
+        thinking_type=thinking_type,
+    )
 
 
 def create_llm_api_client(config: LLMAPIModelConfig) -> OpenAI:
@@ -91,16 +98,16 @@ def run_llm_api_smoke_test(
         timeout=timeout_seconds,
     )
 
-    return {
-        "request": redact_secret_value(
-            {
-                "api_key": config.api_key,
-                "base_url": config.api_url,
-                "json": request_body,
-            },
+    return llm_smoke_result_payload(
+        redacted_request=redact_secret_value(
+            llm_smoke_request_log_payload(
+                api_key=config.api_key,
+                base_url=config.api_url,
+                request_body=request_body,
+            ),
             redact_string_values=False,
         ),
-        "response_id": field_value(response, "id"),
-        "model": field_value(response, "model", config.primary_model),
-        "content": first_choice_message_content(response),
-    }
+        response_id=field_value(response, RESPONSE_ID_FIELD),
+        model=field_value(response, RESPONSE_MODEL_FIELD, config.primary_model),
+        content=first_choice_message_content(response),
+    )
