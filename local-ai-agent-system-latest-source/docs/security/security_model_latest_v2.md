@@ -25,6 +25,7 @@ Human approval required for external write, GitHub write, publishing, deletion, 
 OpenClaw tools must call the execution policy gate before external writes.
 Validation tests must prove write, publish, delete, GitHub write, and cache
 replay are denied by default.
+```
 
 ## Process Checks
 
@@ -33,5 +34,4 @@ docs-consistency -> no deprecated architecture terms
 unit -> policy, classifier, cache, freshness, audit
 integration -> OpenClaw hook, Safety Service, mock agents
 security -> secret redaction and execution-envelope enforcement
-```
 ```

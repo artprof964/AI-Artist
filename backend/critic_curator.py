@@ -1,0 +1,302 @@
+from __future__ import annotations
+
+import re
+from statistics import mean
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field
+
+from backend.image_provenance import ImageProvenanceRecord
+
+
+RubricCategory = Literal[
+    "prompt adherence",
+    "composition",
+    "visual originality",
+    "artifact severity",
+    "source/provenance completeness",
+    "publication readiness",
+]
+
+CriticDecision = Literal["pass", "fail"]
+
+RUBRIC_CATEGORIES: tuple[RubricCategory, ...] = (
+    "prompt adherence",
+    "composition",
+    "visual originality",
+    "artifact severity",
+    "source/provenance completeness",
+    "publication readiness",
+)
+
+PASSING_CATEGORY_SCORE = 3.5
+PASSING_OVERALL_SCORE = 3.7
+
+_STOP_WORDS = {
+    "a",
+    "an",
+    "and",
+    "as",
+    "at",
+    "by",
+    "for",
+    "from",
+    "in",
+    "of",
+    "on",
+    "or",
+    "the",
+    "to",
+    "with",
+}
+_STRONG_COMPOSITION_TAGS = {
+    "balanced",
+    "clear focal point",
+    "cohesive palette",
+    "depth",
+    "intentional lighting",
+    "readable silhouette",
+    "rule of thirds",
+    "strong contrast",
+}
+_WEAK_COMPOSITION_TAGS = {
+    "awkward framing",
+    "cluttered",
+    "cropped subject",
+    "flat lighting",
+    "low contrast",
+    "tangent",
+}
+_WEAK_ORIGINALITY_MARKERS = {"derivative", "generic", "stock-like", "style copy"}
+_CRITICAL_ARTIFACT_FLAGS = {"bad anatomy", "distorted face", "extra limbs", "text artifacts"}
+
+
+class ImageQualityMetadata(BaseModel):
+    """Local metadata used by the Critic/Curator rubric scorer."""
+
+    model_config = ConfigDict(extra="forbid")
+
+    image_id: str = Field(min_length=1)
+    prompt: str | None = Field(default=None, min_length=1)
+    expected_terms: list[str] = Field(default_factory=list)
+    observed_terms: list[str] = Field(default_factory=list)
+    prompt_match_score: float | None = Field(default=None, ge=0.0, le=1.0)
+    composition_tags: list[str] = Field(default_factory=list)
+    originality_markers: list[str] = Field(default_factory=list)
+    artifact_flags: list[str] = Field(default_factory=list)
+    artifact_severity: int = Field(default=0, ge=0, le=5)
+    width: int | None = Field(default=None, gt=0)
+    height: int | None = Field(default=None, gt=0)
+    content_warnings: list[str] = Field(default_factory=list)
+    provenance: ImageProvenanceRecord | None = None
+
+
+class RubricScore(BaseModel):
+    category: RubricCategory
+    score: float = Field(ge=0.0, le=5.0)
+    passed: bool
+    critique: str
+    improvement_notes: list[str] = Field(default_factory=list)
+
+
+class CriticCuratorResult(BaseModel):
+    image_id: str
+    overall_score: float = Field(ge=0.0, le=5.0)
+    decision: CriticDecision
+    category_scores: list[RubricScore]
+    improvement_notes: list[str]
+
+
+def score_image_quality(metadata: ImageQualityMetadata | dict[str, object]) -> CriticCuratorResult:
+    """Score one image against the local Critic/Curator quality rubric."""
+
+    image_metadata = _coerce_metadata(metadata)
+    category_scores = [
+        _score_prompt_adherence(image_metadata),
+        _score_composition(image_metadata),
+        _score_visual_originality(image_metadata),
+        _score_artifact_severity(image_metadata),
+        _score_provenance_completeness(image_metadata),
+    ]
+    category_scores.append(_score_publication_readiness(image_metadata, category_scores))
+
+    overall_score = round(mean(score.score for score in category_scores), 2)
+    passed = overall_score >= PASSING_OVERALL_SCORE and all(score.passed for score in category_scores)
+    return CriticCuratorResult(
+        image_id=image_metadata.image_id,
+        overall_score=overall_score,
+        decision="pass" if passed else "fail",
+        category_scores=category_scores,
+        improvement_notes=_collect_improvement_notes(category_scores),
+    )
+
+
+def score_image_batch(
+    images: list[ImageQualityMetadata | dict[str, object]],
+) -> list[CriticCuratorResult]:
+    return [score_image_quality(image) for image in images]
+
+
+def _score_prompt_adherence(metadata: ImageQualityMetadata) -> RubricScore:
+    if metadata.prompt_match_score is not None:
+        score = round(metadata.prompt_match_score * 5, 2)
+        critique = "Prompt adherence scored from supplied deterministic match score."
+    else:
+        expected = _token_set(" ".join(metadata.expected_terms) or (metadata.prompt or ""))
+        observed = _token_set(" ".join(metadata.observed_terms))
+        if expected and observed:
+            overlap = len(expected & observed) / len(expected)
+            score = round(overlap * 5, 2)
+            critique = f"Observed metadata covers {len(expected & observed)} of {len(expected)} prompt terms."
+        else:
+            score = 2.0
+            critique = "Prompt adherence could not be verified from available metadata."
+
+    notes = [] if score >= PASSING_CATEGORY_SCORE else ["Add visible subject/style terms that match the prompt."]
+    return _rubric_score("prompt adherence", score, critique, notes)
+
+
+def _score_composition(metadata: ImageQualityMetadata) -> RubricScore:
+    tags = {_normalize_tag(tag) for tag in metadata.composition_tags}
+    strong_count = len(tags & _STRONG_COMPOSITION_TAGS)
+    weak_count = len(tags & _WEAK_COMPOSITION_TAGS)
+    score = 2.5 + (strong_count * 0.65) - (weak_count * 0.85)
+    if metadata.width and metadata.height:
+        score += 0.25 if min(metadata.width, metadata.height) >= 1024 else -0.35
+    score = _clamp_score(score)
+
+    critique = f"Composition has {strong_count} strong signals and {weak_count} weak signals."
+    notes = [] if score >= PASSING_CATEGORY_SCORE else ["Improve framing, focal hierarchy, lighting, or visual balance."]
+    return _rubric_score("composition", score, critique, notes)
+
+
+def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
+    markers = {_normalize_tag(marker) for marker in metadata.originality_markers}
+    weak_count = len(markers & _WEAK_ORIGINALITY_MARKERS)
+    positive_count = max(len(markers) - weak_count, 0)
+    score = _clamp_score(2.0 + (positive_count * 0.75) - (weak_count * 1.0))
+
+    critique = f"Originality has {positive_count} positive markers and {weak_count} weak markers."
+    notes = [] if score >= PASSING_CATEGORY_SCORE else ["Add a clearer concept twist, material treatment, or viewpoint."]
+    return _rubric_score("visual originality", score, critique, notes)
+
+
+def _score_artifact_severity(metadata: ImageQualityMetadata) -> RubricScore:
+    flags = {_normalize_tag(flag) for flag in metadata.artifact_flags}
+    critical_count = len(flags & _CRITICAL_ARTIFACT_FLAGS)
+    score = _clamp_score(5.0 - (metadata.artifact_severity * 0.85) - (len(flags) * 0.25) - critical_count)
+
+    critique = (
+        f"Artifact severity is {metadata.artifact_severity}/5 with {len(flags)} flags "
+        f"and {critical_count} critical flags."
+    )
+    notes = [] if score >= PASSING_CATEGORY_SCORE else ["Regenerate or repair visible artifacts before review."]
+    return _rubric_score("artifact severity", score, critique, notes)
+
+
+def _score_provenance_completeness(metadata: ImageQualityMetadata) -> RubricScore:
+    provenance = metadata.provenance
+    if provenance is None:
+        return _rubric_score(
+            "source/provenance completeness",
+            0.0,
+            "No ImageProvenanceRecord is attached.",
+            ["Attach ImageProvenanceRecord metadata before curation."],
+        )
+
+    checks = [
+        bool(provenance.image_id),
+        bool(provenance.prompt_hash),
+        bool(provenance.workflow_hash),
+        bool(provenance.model),
+        provenance.seed is not None,
+        bool(provenance.storage_uri),
+        bool(provenance.source_refs),
+        provenance.review_status in {"pending", "approved", "rejected"},
+    ]
+    score = round((sum(checks) / len(checks)) * 5, 2)
+    critique = f"Provenance includes {sum(checks)} of {len(checks)} required metadata signals."
+    notes = [] if score >= PASSING_CATEGORY_SCORE else ["Record prompt/workflow hashes, source refs, model, seed, and storage URI."]
+    return _rubric_score("source/provenance completeness", score, critique, notes)
+
+
+def _score_publication_readiness(
+    metadata: ImageQualityMetadata,
+    earlier_scores: list[RubricScore],
+) -> RubricScore:
+    base_score = mean(score.score for score in earlier_scores)
+    if metadata.content_warnings:
+        base_score -= 1.5
+    if metadata.provenance and metadata.provenance.review_status == "rejected":
+        base_score -= 1.0
+    score = _clamp_score(base_score)
+
+    blocker_count = len(metadata.content_warnings)
+    critique = f"Publication readiness reflects rubric average with {blocker_count} content blockers."
+    notes = []
+    if score < PASSING_CATEGORY_SCORE:
+        notes.append("Resolve failed rubric categories before publication review.")
+    if metadata.content_warnings:
+        notes.append("Clear content warnings through human review before publishing.")
+    return _rubric_score("publication readiness", score, critique, notes)
+
+
+def _rubric_score(
+    category: RubricCategory,
+    score: float,
+    critique: str,
+    improvement_notes: list[str],
+) -> RubricScore:
+    rounded_score = _clamp_score(score)
+    return RubricScore(
+        category=category,
+        score=rounded_score,
+        passed=rounded_score >= PASSING_CATEGORY_SCORE,
+        critique=critique,
+        improvement_notes=improvement_notes,
+    )
+
+
+def _collect_improvement_notes(category_scores: list[RubricScore]) -> list[str]:
+    notes: list[str] = []
+    for score in category_scores:
+        for note in score.improvement_notes:
+            if note not in notes:
+                notes.append(note)
+    return notes
+
+
+def _coerce_metadata(metadata: ImageQualityMetadata | dict[str, object]) -> ImageQualityMetadata:
+    if isinstance(metadata, ImageQualityMetadata):
+        return metadata
+    return ImageQualityMetadata.model_validate(metadata)
+
+
+def _token_set(value: str) -> set[str]:
+    return {
+        token
+        for token in re.findall(r"[a-z0-9]+", value.lower())
+        if len(token) > 2 and token not in _STOP_WORDS
+    }
+
+
+def _normalize_tag(value: str) -> str:
+    return " ".join(value.strip().lower().replace("_", " ").replace("-", " ").split())
+
+
+def _clamp_score(value: float) -> float:
+    return round(min(5.0, max(0.0, value)), 2)
+
+
+__all__ = [
+    "CriticCuratorResult",
+    "CriticDecision",
+    "ImageQualityMetadata",
+    "PASSING_CATEGORY_SCORE",
+    "PASSING_OVERALL_SCORE",
+    "RUBRIC_CATEGORIES",
+    "RubricCategory",
+    "RubricScore",
+    "score_image_batch",
+    "score_image_quality",
+]

@@ -144,6 +144,6 @@ integration, and security gates before production hardening.
 
 ```text
 See project_status_latest_v1.md for the latest status snapshot.
-Current implementation state: blueprint aligned, implementation scaffold pending.
-Next task: T03 repository scaffold.
+Current implementation state: all tracker tasks T01 through T28 passed.
+Next task: operate from the production runbook and maintain validation gates.
 ```

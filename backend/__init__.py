@@ -1,0 +1,1 @@
+"""AI-Artist backend package."""

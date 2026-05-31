@@ -71,22 +71,21 @@ External Request
 
 ## Delivery Readiness
 
-The system is still a blueprint rather than running code. Current status is
-tracked in `docs/project_status_latest_v1.md`. The next implementation targets
-are:
+The system has a complete validated local backend implementation. Current
+status is tracked in `docs/project_status_latest_v1.md`.
 
-- OpenClaw workspace skeleton for AI-Artist
-- hosted OpenAI configuration and smoke test
-- FastAPI safety service
-- standardized OpenClaw-to-Safety-Service interfaces
-- task-level validation tests and CI gates
-- canonical request normalization
-- policy context building and OPA evaluation
-- source registry with monotonic change index
-- repeated-query reuse gate with read-only cache policy
-- OpenClaw agent contracts and workspace files
-- execution gate for tool and write actions
-- audit and observability around both cache reuse and fresh execution
+The OPA default-deny policy tests, PostgreSQL migration validation,
+OpenClaw AI-Artist workspace validation, hosted OpenAI smoke validation,
+OpenClaw safety-service hook validation, SubAgentOutput schema validation, and
+mock sub-agent orchestration validation, approved read-only response cache
+validation, source freshness validation, audit event log validation,
+Knowledge Agent retrieval validation, ComfyUI adapter execution-gate validation,
+image provenance validation, Critic/Curator rubric validation, Slack development
+channel validation, source ingestion validation, publishing approval validation,
+GitHub adapter validation, unit CI coverage gate validation, OpenClaw-to-safety
+integration validation, observability validation, security review validation,
+and production readiness validation are implemented and passed as T06 through
+T28.
 
 ## Standard Process
 

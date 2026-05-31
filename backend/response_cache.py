@@ -1,0 +1,139 @@
+from dataclasses import dataclass
+from datetime import datetime, timezone
+from typing import Any
+
+from backend.observability import record_observability_stage, trace_id_from_request
+from backend.schemas import Operation, PolicyEvaluateRequest, PolicyEvaluateResponse, RequestKind
+
+
+@dataclass(frozen=True)
+class ApprovedResponseCacheEntry:
+    cache_key: str
+    request_fingerprint: str
+    requester_scope: str
+    policy_scope: str
+    request_kind: RequestKind
+    operation: Operation
+    response_body: dict[str, Any]
+    approved_for_reuse: bool
+    all_sources_unchanged: bool
+    cached_at: datetime
+    expires_at: datetime
+
+
+@dataclass(frozen=True)
+class CacheReplayDecision:
+    replay: bool
+    reason: str
+    cache_key: str | None = None
+    response_body: dict[str, Any] | None = None
+
+
+def evaluate_cached_response_reuse(
+    *,
+    policy_request: PolicyEvaluateRequest,
+    policy_response: PolicyEvaluateResponse,
+    request_fingerprint: str,
+    cache_entry: ApprovedResponseCacheEntry | None,
+    now: datetime | None = None,
+) -> CacheReplayDecision:
+    checked_at = _as_utc(now or datetime.now(timezone.utc))
+    trace_id = trace_id_from_request(policy_request.request_id, policy_request.metadata)
+
+    def observed_decision(
+        *,
+        replay: bool,
+        reason: str,
+        cache_key: str | None = None,
+        response_body: dict[str, Any] | None = None,
+    ) -> CacheReplayDecision:
+        decision = CacheReplayDecision(
+            replay=replay,
+            reason=reason,
+            cache_key=cache_key,
+            response_body=response_body,
+        )
+        record_observability_stage(
+            stage="cache",
+            event="reuse_evaluate",
+            trace_id=trace_id,
+            request_id=policy_request.request_id,
+            metric_name="ai_artist.cache.reuse_evaluated.total",
+            metric_tags={"replay": decision.replay, "reason": decision.reason},
+            log_level="info" if decision.replay else "warning",
+            message="cache reuse evaluated",
+            fields={
+                "operation": policy_request.operation,
+                "request_kind": policy_request.request_kind,
+                "policy_allow": policy_response.allow,
+                "replay": decision.replay,
+                "reason": decision.reason,
+                "cache_key": decision.cache_key,
+                "cache_entry_present": cache_entry is not None,
+            },
+        )
+        return decision
+
+    if cache_entry is None:
+        return observed_decision(replay=False, reason="cache entry not found")
+
+    if policy_request.operation != "reuse":
+        return observed_decision(
+            replay=False,
+            reason="cache replay requires reuse operation",
+        )
+
+    if policy_request.request_kind != "read":
+        return observed_decision(replay=False, reason="cache replay requires read request")
+
+    if not policy_request.source_freshness.all_required_sources_unchanged:
+        return observed_decision(replay=False, reason="source freshness check failed")
+
+    if policy_request.source_freshness.changed_source_count != 0:
+        return observed_decision(replay=False, reason="source freshness check failed")
+
+    if not policy_response.allow:
+        return observed_decision(replay=False, reason="policy denied cache replay")
+
+    if policy_response.requires_human_approval:
+        return observed_decision(
+            replay=False,
+            reason="cache replay must not require human approval",
+        )
+
+    if cache_entry.request_kind != "read" or cache_entry.operation != "read":
+        return observed_decision(replay=False, reason="cached response is not read-only")
+
+    if cache_entry.request_fingerprint != request_fingerprint:
+        return observed_decision(replay=False, reason="request fingerprint mismatch")
+
+    if cache_entry.requester_scope != policy_request.requester_scope:
+        return observed_decision(replay=False, reason="requester scope mismatch")
+
+    if cache_entry.policy_scope != policy_request.policy_scope:
+        return observed_decision(replay=False, reason="policy scope mismatch")
+
+    if not cache_entry.approved_for_reuse:
+        return observed_decision(
+            replay=False,
+            reason="cache entry is not approved for reuse",
+        )
+
+    if not cache_entry.all_sources_unchanged:
+        return observed_decision(replay=False, reason="cache entry sources are stale")
+
+    if _as_utc(cache_entry.expires_at) <= checked_at:
+        return observed_decision(replay=False, reason="cache entry expired")
+
+    return observed_decision(
+        replay=True,
+        reason="approved read-only cached response replayed",
+        cache_key=cache_entry.cache_key,
+        response_body=cache_entry.response_body,
+    )
+
+
+def _as_utc(value: datetime) -> datetime:
+    if value.tzinfo is None:
+        return value.replace(tzinfo=timezone.utc)
+    return value.astimezone(timezone.utc)

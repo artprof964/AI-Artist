@@ -1,0 +1,189 @@
+from datetime import datetime, timezone
+from typing import Any, Literal
+from uuid import UUID, uuid4
+
+from pydantic import BaseModel, ConfigDict, Field
+
+
+RequestKind = Literal["read", "action", "mixed"]
+Channel = Literal["slack", "cli", "web", "job"]
+Operation = Literal[
+    "reuse",
+    "read",
+    "write",
+    "publish",
+    "delete",
+    "github_write",
+    "image_generate",
+]
+AuditEventType = Literal[
+    "request",
+    "policy_decision",
+    "reuse",
+    "execution_envelope",
+    "tool_call",
+    "artifact",
+]
+SubAgentStatus = Literal["ok", "needs_retry", "blocked", "failed"]
+
+
+class HealthResponse(BaseModel):
+    status: Literal["ok"]
+    service: str
+
+
+class RequestMetadata(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    workspace: str = "ai-artist-main"
+    agent: str = "ai-artist-main"
+
+
+class CanonicalizeRequest(BaseModel):
+    request_id: UUID = Field(default_factory=uuid4)
+    request_text: str = Field(min_length=1)
+    requester_scope: str = "local-user"
+    policy_scope: str = "default"
+    channel: Channel = "cli"
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    metadata: RequestMetadata = Field(default_factory=RequestMetadata)
+
+
+class CanonicalizeResponse(BaseModel):
+    request_id: UUID
+    canonical_text: str
+    request_fingerprint: str
+    requester_scope: str
+    policy_scope: str
+    channel: Channel
+    created_at: datetime
+    metadata: RequestMetadata
+
+
+class ClassifyRequest(BaseModel):
+    request_id: UUID = Field(default_factory=uuid4)
+    request_text: str = Field(min_length=1)
+    operation: Operation | None = None
+
+
+class ClassifyResponse(BaseModel):
+    request_id: UUID
+    request_kind: RequestKind
+    operation: Operation
+    confidence: float = Field(ge=0.0, le=1.0)
+    reasons: list[str] = Field(default_factory=list)
+
+
+class SourceFreshness(BaseModel):
+    all_required_sources_unchanged: bool = True
+    changed_source_count: int = Field(default=0, ge=0)
+
+
+class PolicyEvaluateRequest(BaseModel):
+    request_id: UUID = Field(default_factory=uuid4)
+    request_kind: RequestKind
+    operation: Operation
+    requester_scope: str
+    policy_scope: str
+    requires_human_approval: bool = True
+    source_freshness: SourceFreshness = Field(default_factory=SourceFreshness)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class PolicyEvaluateResponse(BaseModel):
+    allow: bool
+    reason: str
+    requires_human_approval: bool
+    policy_version: str
+
+
+class HumanApproval(BaseModel):
+    approved: bool = False
+    approver_scope: str | None = None
+    approved_at: datetime | None = None
+
+
+class ExecutionEnvelopeRequest(BaseModel):
+    request_id: UUID
+    request_kind: RequestKind
+    operation: Operation
+    requester_scope: str
+    policy_scope: str
+    target: str = Field(min_length=1)
+    human_approval: HumanApproval = Field(default_factory=HumanApproval)
+    source_freshness: SourceFreshness = Field(default_factory=SourceFreshness)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class ExecutionEnvelopeResponse(BaseModel):
+    execution_envelope_id: UUID
+    request_id: UUID
+    operation: Operation
+    target: str
+    human_approval: HumanApproval
+    valid: bool
+    allow: bool
+    reason: str
+    requires_human_approval: bool
+    policy_version: str
+    issued_at: datetime
+    expires_at: datetime
+    signature: str
+
+
+class AuditEventRequest(BaseModel):
+    event_id: UUID = Field(default_factory=uuid4)
+    event_type: AuditEventType
+    request_id: UUID | None = None
+    correlation_id: UUID
+    occurred_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    payload: dict[str, Any] = Field(default_factory=dict)
+
+
+class AuditEventResponse(BaseModel):
+    event_id: UUID
+    event_type: AuditEventType
+    request_id: UUID | None = None
+    correlation_id: UUID
+    accepted: bool
+    occurred_at: datetime
+    payload: dict[str, Any]
+
+
+class SubAgentArtifact(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    artifact_type: str = Field(min_length=1, max_length=100)
+    artifact_id: str | None = Field(default=None, min_length=1, max_length=200)
+    uri: str | None = Field(default=None, min_length=1, max_length=500)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SubAgentSource(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    source_id: str | None = Field(default=None, min_length=1, max_length=200)
+    title: str | None = Field(default=None, min_length=1, max_length=300)
+    uri: str | None = Field(default=None, min_length=1, max_length=500)
+    metadata: dict[str, Any] = Field(default_factory=dict)
+
+
+class SubAgentError(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    code: str = Field(min_length=1, max_length=120)
+    message: str = Field(min_length=1)
+    retryable: bool = False
+    details: dict[str, Any] = Field(default_factory=dict)
+
+
+class SubAgentOutput(BaseModel):
+    task_id: UUID
+    agent_name: str = Field(min_length=1, max_length=100)
+    status: SubAgentStatus
+    summary: str = Field(min_length=1)
+    artifacts: list[SubAgentArtifact] = Field(default_factory=list)
+    sources: list[SubAgentSource] = Field(default_factory=list)
+    policy_notes: list[str] = Field(default_factory=list)
+    confidence: float = Field(ge=0.0, le=1.0)
+    errors: list[SubAgentError] = Field(default_factory=list)

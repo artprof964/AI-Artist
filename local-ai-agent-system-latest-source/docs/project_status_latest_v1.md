@@ -3,25 +3,25 @@
 ## Status Date
 
 ```text
-2026-05-30
+2026-05-31
 ```
 
 ## Current State
 
 ```text
-Overall status: Blueprint aligned; implementation not yet scaffolded
+Overall status: All 28 implementation tasks are complete and locally validated.
 Selected control plane: OpenClaw
 Selected LLM backend: hosted OpenAI Responses API
 Safety layer: FastAPI Safety Service + OPA + PostgreSQL
 Image layer: ComfyUI behind execution policy gate
 Tracker tasks: 28 total
-Completed tasks: 2
-In-progress tasks: 2
-Open tasks: 24
+Completed tasks: 28
+In-progress tasks: 0
+Open tasks: 0
 Validation tests: 28 defined
-Validation passed: 2
-Validation pending: 26
-Interface contracts: 10 defined
+Validation passed: 28
+Validation pending: 0
+Interface contracts: 28 defined
 ```
 
 ## Completed
@@ -29,23 +29,41 @@ Interface contracts: 10 defined
 ```text
 T01 - Stack decision: OpenClaw + hosted OpenAI LLM
 T02 - Project documentation and tracker alignment
-```
-
-## In Progress
-
-```text
 T03 - Repository scaffold: backend, workspaces, policies, tests, docker
 T04 - Docker Compose for PostgreSQL, Qdrant, MinIO, Redis, OPA
+T05 - FastAPI Safety Service endpoints
+T06 - OPA default-deny policies
+T07 - PostgreSQL migrations
+T08 - OpenClaw AI-Artist workspace
+T09 - Hosted OpenAI configuration smoke test
+T10 - OpenClaw safety-service tool hook
+T11 - SubAgentOutput schema validation
+T12 - Mock sub-agent orchestration
+T13 - Approved read-only response cache
+T14 - Source freshness check
+T15 - Audit event log persistence
+T16 - Knowledge Agent retrieval
+T17 - ComfyUI adapter behind execution gate
+T18 - Image provenance
+T19 - Critic/Curator rubrics
+T20 - Slack development channel
+T21 - Source ingestion
+T22 - Publishing Agent with human approval
+T23 - GitHub adapter
+T24 - Unit tests for safety service and policies
+T25 - OpenClaw-to-safety integration tests
+T26 - Observability
+T27 - Security review
+T28 - Production hardening and runbooks
 ```
 
-## Next Implementation Slice
+## Final Implementation State
 
 ```text
-1. Create repository scaffold.
-2. Add Docker Compose service definitions.
-3. Add OpenClaw workspace skeleton.
-4. Add FastAPI Safety Service health endpoint.
-5. Add first docs-consistency and tree-shape tests.
+The backend stack is implemented as a deterministic local development system.
+External publishing, GitHub writes, Slack delivery, hosted OpenAI, and ComfyUI
+paths are represented with mocked or gated adapters unless a valid execution
+envelope, required configuration, and human approval are present.
 ```
 
 ## Alignment Check
@@ -54,16 +72,22 @@ T04 - Docker Compose for PostgreSQL, Qdrant, MinIO, Redis, OPA
 Architecture docs: aligned to OpenClaw + hosted OpenAI
 Diagrams: aligned to OpenClaw Gateway, FastAPI Safety Service, task validation, execution gate
 Tracker: aligned with 28 tasks, validation tests, interface contracts, Status, Finished
-Security model: aligned with default-deny and execution-envelope rules
+Security model: aligned with default-deny, redaction, and execution-envelope rules
 Query tracking: aligned with Safety Service-owned persistence and source freshness
-Hardware: aligned with hosted LLM; GPU needed only for ComfyUI path
+Hardware: aligned with hosted LLM; GPU needed only for real ComfyUI path
+Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Deprecated architecture term scan: clean
 ```
 
-## Implementation Readiness
+## Latest Validation Evidence
 
 ```text
-Ready for T03.
-Do not integrate social APIs, publishing, or real ComfyUI execution before the
-Safety Service, OPA default-deny policies, and execution-envelope tests exist.
+docker compose config: passed
+docker compose up -d postgres redis qdrant minio opa: passed
+service health: docker compose ps reports all five services healthy
+T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
+T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
+final pytest: 169 passed, 1 skipped, 1 warning
+final ruff: all checks passed
+skipped test: live hosted OpenAI smoke test requires OPENAI_API_KEY
 ```
