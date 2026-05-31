@@ -9,17 +9,17 @@ from backend.knowledge_contracts import (
     DEFAULT_KNOWLEDGE_EMBEDDING_DIMENSIONS,
     DEFAULT_KNOWLEDGE_COLLECTION_NAME,
     KNOWLEDGE_AGENT_NAME,
-    KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
-    KNOWLEDGE_CONTENT_PAYLOAD_FIELD,
-    KNOWLEDGE_METADATA_PAYLOAD_FIELD,
     KNOWLEDGE_NO_APPROVED_RESULTS_SUMMARY,
     KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_SUFFIX,
     KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
-    KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD,
-    KNOWLEDGE_TITLE_PAYLOAD_FIELD,
-    KNOWLEDGE_URI_PAYLOAD_FIELD,
     knowledge_hit_is_positive,
+    knowledge_payload_content,
+    knowledge_payload_is_approved,
+    knowledge_payload_metadata,
+    knowledge_payload_source_id,
+    knowledge_payload_title,
+    knowledge_payload_uri,
     knowledge_results_summary,
     knowledge_search_hit_sort_key,
     knowledge_search_limit_is_valid,
@@ -296,25 +296,28 @@ class KnowledgeAgent:
 
     def _hit_to_result(self, hit: VectorSearchHit, query: str) -> KnowledgeSearchResult:
         payload = hit.payload
-        content = str(payload[KNOWLEDGE_CONTENT_PAYLOAD_FIELD])
+        source_id = knowledge_payload_source_id(payload)
+        title = knowledge_payload_title(payload)
+        uri = knowledge_payload_uri(payload)
+        content = knowledge_payload_content(payload)
         return KnowledgeSearchResult(
-            source_id=str(payload[KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD]),
-            title=str(payload[KNOWLEDGE_TITLE_PAYLOAD_FIELD]),
-            uri=str(payload[KNOWLEDGE_URI_PAYLOAD_FIELD]),
+            source_id=source_id,
+            title=title,
+            uri=uri,
             snippet=contextual_snippet(content, query),
             score=round_knowledge_score(hit.score),
             citation=KnowledgeCitation(
-                source_id=str(payload[KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD]),
-                title=str(payload[KNOWLEDGE_TITLE_PAYLOAD_FIELD]),
-                uri=str(payload[KNOWLEDGE_URI_PAYLOAD_FIELD]),
+                source_id=source_id,
+                title=title,
+                uri=uri,
             ),
-            metadata=copy_mapping(payload.get(KNOWLEDGE_METADATA_PAYLOAD_FIELD) or {}),
+            metadata=knowledge_payload_metadata(payload),
         )
 
     def _is_approved_hit(self, hit: VectorSearchHit) -> bool:
-        source_id = str(hit.payload.get(KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD, ""))
+        source_id = knowledge_payload_source_id(hit.payload)
         if source_id in self._disapproved_source_ids:
             return False
         if self._approved_source_ids:
             return source_id in self._approved_source_ids
-        return hit.payload.get(KNOWLEDGE_APPROVED_PAYLOAD_FIELD) is True
+        return knowledge_payload_is_approved(hit.payload)

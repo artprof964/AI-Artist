@@ -110,9 +110,9 @@ backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-te
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes.
-backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, vector payload fields/shape, approved payload flag, collection default, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result score cutoff/precision, policy note, and summary vocabulary.
+backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, vector payload fields/shape, vector payload read helpers, approved payload flag, collection default, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result score cutoff/precision, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
-backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, embedding, vector-search, and result-score boundaries.
+backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, vector payload writes/reads, embedding, vector-search, and result-score boundaries.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter using direct shared operation constants.
 backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image response/storage contracts and direct model-coercion boundary.
 backend/critic_curator.py: deterministic image critique rubric using direct model-coercion and shared rubric scoring boundaries.
@@ -279,7 +279,7 @@ orchestration telemetry events/messages/metrics, and orchestration telemetry
 field/tag shapes must flow through backend/mock_agent_contracts.py before
 orchestration-specific agent fixtures or telemetry are changed.
 Knowledge Agent names, retrieval artifact metadata, vector payload fields/shape,
-approved-source payload flags, collection defaults, embedding defaults, stable
+vector payload write/read helpers, approved-source payload flags, collection defaults, embedding defaults, stable
 token-index hashing, vector-search limit/sort behavior, result score
 cutoff/precision, policy notes, and summary vocabulary must flow through
 backend/knowledge_contracts.py before retrieval-specific behavior is changed.

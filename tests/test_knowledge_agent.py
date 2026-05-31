@@ -19,6 +19,12 @@ from backend.knowledge_contracts import (
     KNOWLEDGE_TITLE_PAYLOAD_FIELD,
     KNOWLEDGE_URI_PAYLOAD_FIELD,
     knowledge_hit_is_positive,
+    knowledge_payload_content,
+    knowledge_payload_is_approved,
+    knowledge_payload_metadata,
+    knowledge_payload_source_id,
+    knowledge_payload_title,
+    knowledge_payload_uri,
     knowledge_vector_payload,
     round_knowledge_score,
     knowledge_search_hit_sort_key,
@@ -225,18 +231,20 @@ def test_knowledge_vector_search_contracts_are_centralized() -> None:
 
 
 def test_knowledge_vector_payload_shape_is_centralized() -> None:
-    assert KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD == "source_id"
-    assert KNOWLEDGE_TITLE_PAYLOAD_FIELD == "title"
-    assert KNOWLEDGE_URI_PAYLOAD_FIELD == "uri"
-    assert KNOWLEDGE_CONTENT_PAYLOAD_FIELD == "content"
-    assert KNOWLEDGE_METADATA_PAYLOAD_FIELD == "metadata"
-    assert knowledge_vector_payload(
+    payload = knowledge_vector_payload(
         source_id="source-a",
         title="Source A",
         uri="workspace://source-a",
         content="local content",
         metadata={"sample": True},
-    ) == {
+    )
+
+    assert KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD == "source_id"
+    assert KNOWLEDGE_TITLE_PAYLOAD_FIELD == "title"
+    assert KNOWLEDGE_URI_PAYLOAD_FIELD == "uri"
+    assert KNOWLEDGE_CONTENT_PAYLOAD_FIELD == "content"
+    assert KNOWLEDGE_METADATA_PAYLOAD_FIELD == "metadata"
+    assert payload == {
         KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD: "source-a",
         KNOWLEDGE_TITLE_PAYLOAD_FIELD: "Source A",
         KNOWLEDGE_URI_PAYLOAD_FIELD: "workspace://source-a",
@@ -244,6 +252,12 @@ def test_knowledge_vector_payload_shape_is_centralized() -> None:
         KNOWLEDGE_APPROVED_PAYLOAD_FIELD: True,
         KNOWLEDGE_METADATA_PAYLOAD_FIELD: {"sample": True},
     }
+    assert knowledge_payload_source_id(payload) == "source-a"
+    assert knowledge_payload_title(payload) == "Source A"
+    assert knowledge_payload_uri(payload) == "workspace://source-a"
+    assert knowledge_payload_content(payload) == "local content"
+    assert knowledge_payload_metadata(payload) == {"sample": True}
+    assert knowledge_payload_is_approved(payload) is True
 
 
 def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
@@ -256,6 +270,12 @@ def test_knowledge_agent_uses_shared_embedding_and_score_contracts() -> None:
     assert "knowledge_search_limit_is_valid(" in source
     assert "knowledge_search_hit_sort_key(" in source
     assert "knowledge_vector_payload(" in source
+    assert "knowledge_payload_source_id(" in source
+    assert "knowledge_payload_title(" in source
+    assert "knowledge_payload_uri(" in source
+    assert "knowledge_payload_content(" in source
+    assert "knowledge_payload_metadata(" in source
+    assert "knowledge_payload_is_approved(" in source
     assert "dimensions: int = 64" not in source
     assert "total = 0" not in source
     assert "total * 33" not in source
@@ -280,10 +300,16 @@ def test_knowledge_agent_uses_shared_vector_payload_fields() -> None:
         'payload["content"]',
         'payload.get("metadata")',
         'hit.payload.get("source_id"',
+        "KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD,",
+        "KNOWLEDGE_TITLE_PAYLOAD_FIELD,",
+        "KNOWLEDGE_URI_PAYLOAD_FIELD,",
+        "KNOWLEDGE_CONTENT_PAYLOAD_FIELD,",
+        "KNOWLEDGE_METADATA_PAYLOAD_FIELD,",
+        "KNOWLEDGE_APPROVED_PAYLOAD_FIELD,",
     ):
         assert literal not in source
     assert "knowledge_vector_payload(" in source
-    assert "KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD" in source
+    assert "knowledge_payload_source_id(" in source
 
 
 def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:
