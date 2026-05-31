@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 327 passed, 1 skipped, 1 warning
+Final validation: 329 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -85,8 +85,8 @@ backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact,
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter.
-backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts.
-backend/critic_curator.py: deterministic image critique rubric.
+backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts and direct model-coercion boundary.
+backend/critic_curator.py: deterministic image critique rubric using direct model-coercion boundary.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, and secret-redaction boundaries directly.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.

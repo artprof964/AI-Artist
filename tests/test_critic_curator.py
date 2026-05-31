@@ -171,3 +171,10 @@ def test_batch_scoring_is_deterministic_and_preserves_order() -> None:
         CRITIC_DECISION_PASS,
         CRITIC_DECISION_FAIL,
     ]
+
+
+def test_critic_curator_uses_shared_model_coercion_directly() -> None:
+    source = Path("backend/critic_curator.py").read_text(encoding="utf-8")
+
+    assert "def _coerce_metadata(" not in source
+    assert "coerce_model(metadata, ImageQualityMetadata)" in source

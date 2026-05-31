@@ -77,6 +77,7 @@
 - `../../backend/comfyui_adapter.py`
 - `../../tests/test_comfyui_adapter.py`
 - `../../validation_reports/t18_image_provenance_validation_2026-05-31.md`
+- `../../validation_reports/direct_model_coercion_boundary_standardization_2026-05-31.md`
 - `../../backend/image_provenance.py`
 - `../../tests/test_image_provenance.py`
 - `../../validation_reports/t19_critic_curator_validation_2026-05-31.md`

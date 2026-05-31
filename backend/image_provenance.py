@@ -66,7 +66,7 @@ class LocalImageProvenanceStore:
         self._lock = RLock()
 
     def record(self, provenance: ImageProvenanceInput | dict[str, Any]) -> ImageProvenanceRecord:
-        payload = _coerce_provenance_input(provenance)
+        payload = coerce_model(provenance, ImageProvenanceInput)
         prompt_hash = sha256_text(payload.prompt)
         workflow_hash = sha256_workflow(payload.workflow)
         image_id = payload.image_id or deterministic_image_id(
@@ -189,12 +189,6 @@ def deterministic_image_id(
         "workflow_hash": workflow_hash,
     }
     return sha256_json(material, ensure_ascii=False)
-
-
-def _coerce_provenance_input(
-    provenance: ImageProvenanceInput | dict[str, Any],
-) -> ImageProvenanceInput:
-    return coerce_model(provenance, ImageProvenanceInput)
 
 
 __all__ = [

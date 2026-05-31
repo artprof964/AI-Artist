@@ -41,7 +41,7 @@ can be marked done.
 29. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
 30. Telemetry stages and log levels use `backend/observability.py`.
 31. Publishing outcome statuses use `backend/publishing_status.py`.
-32. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+32. Pydantic model/dict coercion at service, adapter, and domain boundaries calls `backend/model_coercion.py` directly.
 33. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 34. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
 35. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.

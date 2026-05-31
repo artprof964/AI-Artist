@@ -193,3 +193,10 @@ def test_image_provenance_uses_shared_comfyui_storage_uri_contract() -> None:
 
     assert "def _storage_uri_from_comfyui_image(" not in source
     assert "comfyui_image_storage_uri(" in source
+
+
+def test_image_provenance_uses_shared_model_coercion_directly() -> None:
+    source = Path("backend/image_provenance.py").read_text(encoding="utf-8")
+
+    assert "def _coerce_provenance_input(" not in source
+    assert "coerce_model(provenance, ImageProvenanceInput)" in source

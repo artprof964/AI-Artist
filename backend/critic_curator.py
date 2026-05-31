@@ -102,7 +102,7 @@ class CriticCuratorResult(BaseModel):
 def score_image_quality(metadata: ImageQualityMetadata | dict[str, object]) -> CriticCuratorResult:
     """Score one image against the local Critic/Curator quality rubric."""
 
-    image_metadata = _coerce_metadata(metadata)
+    image_metadata = coerce_model(metadata, ImageQualityMetadata)
     category_scores = [
         _score_prompt_adherence(image_metadata),
         _score_composition(image_metadata),
@@ -264,10 +264,6 @@ def _collect_improvement_notes(category_scores: list[RubricScore]) -> list[str]:
             if note not in notes:
                 notes.append(note)
     return notes
-
-
-def _coerce_metadata(metadata: ImageQualityMetadata | dict[str, object]) -> ImageQualityMetadata:
-    return coerce_model(metadata, ImageQualityMetadata)
 
 
 def _clamp_score(value: float) -> float:
