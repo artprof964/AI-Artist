@@ -48,7 +48,7 @@ Cache, source-freshness, policy, and execution-envelope reason strings: centrali
 Source registry missing-row messages: centralized in backend/source_registry_contracts.py
 Source ingestion contracts: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
-Sub-agent statuses and aggregation: centralized in backend/subagent_status.py
+Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
 Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, and orchestration telemetry
 Knowledge Agent contracts: centralized in backend/knowledge_contracts.py
@@ -146,7 +146,7 @@ Mapping utilities: shared across source ingestion, source freshness, Knowledge A
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
 Source registry messages: shared across source-key and source-id freshness lookup failures
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
-Sub-agent statuses: shared across SubAgentOutput schemas and mock orchestration status synthesis
+Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
 Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry, and tests
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, approved-hit filtering, artifact metadata, and tests
@@ -203,7 +203,7 @@ runtime secret validation: LLM API smoke uses shared runtime-token resolution; G
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 421 passed, 1 skipped, 1 warning
+final pytest: 422 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

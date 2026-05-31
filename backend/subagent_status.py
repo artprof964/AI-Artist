@@ -24,6 +24,7 @@ SUBAGENT_STATUS_PRIORITY: dict[SubAgentStatus, int] = {
     SUBAGENT_STATUS_BLOCKED: 2,
     SUBAGENT_STATUS_FAILED: 3,
 }
+SUBAGENT_STATUS_REQUIRED_MESSAGE = "at least one sub-agent status is required"
 
 
 def subagent_status_priority(status: SubAgentStatus) -> int:
@@ -33,7 +34,7 @@ def subagent_status_priority(status: SubAgentStatus) -> int:
 def dominant_subagent_status(statuses: Iterable[SubAgentStatus]) -> SubAgentStatus:
     status_list = list(statuses)
     if not status_list:
-        raise ValueError("at least one sub-agent status is required")
+        raise ValueError(SUBAGENT_STATUS_REQUIRED_MESSAGE)
     return max(status_list, key=subagent_status_priority)
 
 
@@ -48,6 +49,7 @@ __all__ = [
     "SUBAGENT_STATUS_OK",
     "SUBAGENT_STATUSES",
     "SUBAGENT_STATUS_PRIORITY",
+    "SUBAGENT_STATUS_REQUIRED_MESSAGE",
     "SubAgentStatus",
     "count_subagent_statuses",
     "dominant_subagent_status",
