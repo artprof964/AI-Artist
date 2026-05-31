@@ -26,6 +26,7 @@ Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry and runtime env resolution: centralized in backend/connection_settings.py
 Execution gates: centralized in backend/execution_gate.py
 Secret redaction and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
+ComfyUI generated-image URI contracts: centralized in backend/comfyui_contracts.py
 Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py
 Canonical hashing, HMAC signatures, and security-review serialization: centralized in backend/canonical_hash.py
@@ -127,6 +128,7 @@ Time creation/normalization: shared directly across cache expiry checks, image p
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
 Slack adapter boundaries: shared payload, request identity, and secret-redaction helpers are called directly without local wrapper functions
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, ComfyUI image response parsing, and publishing audit status parsing
+ComfyUI contracts: shared across image provenance storage URI construction and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety and source-ingestion domain allowlisting
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
@@ -146,7 +148,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 323 passed, 1 skipped, 1 warning
+final pytest: 327 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

@@ -44,6 +44,7 @@ can be marked done.
 32. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
 33. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 34. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
+35. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
 ```
 
 ## Standard Request Envelope

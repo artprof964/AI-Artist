@@ -1,6 +1,7 @@
 from datetime import datetime, timezone
 import hashlib
 import json
+from pathlib import Path
 
 import pytest
 from pydantic import ValidationError
@@ -185,3 +186,10 @@ def test_rejects_comfyui_image_without_storage_reference() -> None:
             review_status="pending",
             store=LocalImageProvenanceStore(),
         )
+
+
+def test_image_provenance_uses_shared_comfyui_storage_uri_contract() -> None:
+    source = Path("backend/image_provenance.py").read_text(encoding="utf-8")
+
+    assert "def _storage_uri_from_comfyui_image(" not in source
+    assert "comfyui_image_storage_uri(" in source

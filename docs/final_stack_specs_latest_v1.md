@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 323 passed, 1 skipped, 1 warning
+Final validation: 327 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -71,6 +71,7 @@ backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and d
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
+backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention and response-image storage reference helper.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
@@ -84,7 +85,7 @@ backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact,
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter.
-backend/image_provenance.py: prompt/workflow hashing and provenance records.
+backend/image_provenance.py: prompt/workflow hashing and provenance records using shared ComfyUI image URI contracts.
 backend/critic_curator.py: deterministic image critique rubric.
 backend/slack_adapter.py: mocked Slack request/response adapter using shared payload, request identity, and secret-redaction boundaries directly.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path.

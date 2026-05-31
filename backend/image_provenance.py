@@ -5,9 +5,8 @@ from threading import RLock
 from typing import Any, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
-from backend.mapping_utils import copy_mapping
+from backend.comfyui_contracts import comfyui_image_storage_uri
 from backend.model_coercion import coerce_model
-from backend.payload_fields import optional_string_field, required_string_field
 from backend.response_fields import field_value, required_response_list, require_response_mapping
 from backend.review_status import ReviewStatus
 from backend.time_utils import as_utc, utc_now
@@ -155,7 +154,10 @@ def record_comfyui_image_provenance(
                     "seed": seed,
                     "source_refs": source_refs,
                     "storage_uri": field_value(image_response, "storage_uri")
-                    or _storage_uri_from_comfyui_image(image_response),
+                    or comfyui_image_storage_uri(
+                        image_response,
+                        error_type=ImageProvenanceError,
+                    ),
                     "review_status": review_status,
                 }
             )
@@ -193,36 +195,6 @@ def _coerce_provenance_input(
     provenance: ImageProvenanceInput | dict[str, Any],
 ) -> ImageProvenanceInput:
     return coerce_model(provenance, ImageProvenanceInput)
-
-
-def _storage_uri_from_comfyui_image(image: dict[str, Any] | Any) -> str:
-    image_payload = copy_mapping(image)
-    filename = required_string_field(
-        image_payload,
-        "filename",
-        error_type=ImageProvenanceError,
-        message="generated image must include filename or storage_uri",
-    )
-    image_type = required_string_field(
-        {"type": field_value(image_payload, "type", "output")},
-        "type",
-        error_type=ImageProvenanceError,
-        message="generated image type must be a non-empty string",
-    )
-    subfolder = (
-        optional_string_field(
-            image_payload,
-            "subfolder",
-            error_type=ImageProvenanceError,
-            message="generated image subfolder must be a string",
-        )
-        or ""
-    )
-
-    normalized_subfolder = subfolder.strip("/")
-    if normalized_subfolder:
-        return f"comfyui://{image_type}/{normalized_subfolder}/{filename}"
-    return f"comfyui://{image_type}/{filename}"
 
 
 __all__ = [

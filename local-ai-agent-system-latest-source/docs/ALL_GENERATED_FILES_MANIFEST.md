@@ -71,6 +71,9 @@
 - `../../tests/test_text_utils.py`
 - `../../tests/test_numeric_utils.py`
 - `../../validation_reports/t17_comfyui_adapter_validation_2026-05-31.md`
+- `../../validation_reports/comfyui_contract_standardization_2026-05-31.md`
+- `../../backend/comfyui_contracts.py`
+- `../../tests/test_comfyui_contracts.py`
 - `../../backend/comfyui_adapter.py`
 - `../../tests/test_comfyui_adapter.py`
 - `../../validation_reports/t18_image_provenance_validation_2026-05-31.md`
