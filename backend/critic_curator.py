@@ -163,7 +163,7 @@ def _score_composition(metadata: ImageQualityMetadata) -> RubricScore:
     score = 2.5 + (strong_count * 0.65) - (weak_count * 0.85)
     if metadata.width and metadata.height:
         score += 0.25 if min(metadata.width, metadata.height) >= 1024 else -0.35
-    score = _clamp_score(score)
+    score = rounded_clamp(score, minimum=0.0, maximum=5.0, digits=2)
 
     critique = f"Composition has {strong_count} strong signals and {weak_count} weak signals."
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Improve framing, focal hierarchy, lighting, or visual balance."]
@@ -174,7 +174,12 @@ def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
     markers = {normalize_label(marker) for marker in metadata.originality_markers}
     weak_count = len(markers & _WEAK_ORIGINALITY_MARKERS)
     positive_count = max(len(markers) - weak_count, 0)
-    score = _clamp_score(2.0 + (positive_count * 0.75) - (weak_count * 1.0))
+    score = rounded_clamp(
+        2.0 + (positive_count * 0.75) - (weak_count * 1.0),
+        minimum=0.0,
+        maximum=5.0,
+        digits=2,
+    )
 
     critique = f"Originality has {positive_count} positive markers and {weak_count} weak markers."
     notes = [] if score >= PASSING_CATEGORY_SCORE else ["Add a clearer concept twist, material treatment, or viewpoint."]
@@ -184,7 +189,12 @@ def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
 def _score_artifact_severity(metadata: ImageQualityMetadata) -> RubricScore:
     flags = {normalize_label(flag) for flag in metadata.artifact_flags}
     critical_count = len(flags & _CRITICAL_ARTIFACT_FLAGS)
-    score = _clamp_score(5.0 - (metadata.artifact_severity * 0.85) - (len(flags) * 0.25) - critical_count)
+    score = rounded_clamp(
+        5.0 - (metadata.artifact_severity * 0.85) - (len(flags) * 0.25) - critical_count,
+        minimum=0.0,
+        maximum=5.0,
+        digits=2,
+    )
 
     critique = (
         f"Artifact severity is {metadata.artifact_severity}/5 with {len(flags)} flags "
@@ -229,7 +239,7 @@ def _score_publication_readiness(
         base_score -= 1.5
     if metadata.provenance and metadata.provenance.review_status == REVIEW_STATUS_REJECTED:
         base_score -= 1.0
-    score = _clamp_score(base_score)
+    score = rounded_clamp(base_score, minimum=0.0, maximum=5.0, digits=2)
 
     blocker_count = len(metadata.content_warnings)
     critique = f"Publication readiness reflects rubric average with {blocker_count} content blockers."
@@ -247,7 +257,7 @@ def _rubric_score(
     critique: str,
     improvement_notes: list[str],
 ) -> RubricScore:
-    rounded_score = _clamp_score(score)
+    rounded_score = rounded_clamp(score, minimum=0.0, maximum=5.0, digits=2)
     return RubricScore(
         category=category,
         score=rounded_score,
@@ -264,11 +274,6 @@ def _collect_improvement_notes(category_scores: list[RubricScore]) -> list[str]:
             if note not in notes:
                 notes.append(note)
     return notes
-
-
-def _clamp_score(value: float) -> float:
-    return rounded_clamp(value, minimum=0.0, maximum=5.0, digits=2)
-
 
 __all__ = [
     "CriticCuratorResult",

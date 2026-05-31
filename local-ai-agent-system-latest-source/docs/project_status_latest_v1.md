@@ -42,7 +42,7 @@ Knowledge Agent contracts: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories and decisions: centralized in backend/critic_rubric.py
 Text tokenization and labels: centralized in backend/text_utils.py
-Numeric scoring utilities: centralized in backend/numeric_utils.py
+Numeric scoring utilities and direct rubric clamps: centralized in backend/numeric_utils.py
 Time creation/normalization: centralized in backend/time_utils.py
 Payload fields and nested payload objects: centralized in backend/payload_fields.py
 Response fields and first-choice message parsing: centralized in backend/response_fields.py
@@ -127,7 +127,7 @@ Knowledge Agent contracts: shared across Knowledge retrieval output conversion, 
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests
 Text utilities: shared across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
-Numeric utilities: shared across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
+Numeric utilities: shared directly across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
 Slack adapter boundaries: shared payload, request identity, and secret-redaction helpers are called directly without local wrapper functions
@@ -152,7 +152,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 333 passed, 1 skipped, 1 warning
+final pytest: 334 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

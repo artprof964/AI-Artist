@@ -178,3 +178,10 @@ def test_critic_curator_uses_shared_model_coercion_directly() -> None:
 
     assert "def _coerce_metadata(" not in source
     assert "coerce_model(metadata, ImageQualityMetadata)" in source
+
+
+def test_critic_curator_uses_shared_numeric_clamp_directly() -> None:
+    source = Path("backend/critic_curator.py").read_text(encoding="utf-8")
+
+    assert "def _clamp_score(" not in source
+    assert "rounded_clamp(" in source
