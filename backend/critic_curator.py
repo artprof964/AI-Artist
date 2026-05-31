@@ -1,6 +1,5 @@
 from __future__ import annotations
 
-import re
 from statistics import mean
 from typing import Literal
 
@@ -8,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 from backend.image_provenance import ImageProvenanceRecord
 from backend.model_coercion import coerce_model
+from backend.text_utils import normalize_label, token_set
 
 
 RubricCategory = Literal[
@@ -143,8 +143,16 @@ def _score_prompt_adherence(metadata: ImageQualityMetadata) -> RubricScore:
         score = round(metadata.prompt_match_score * 5, 2)
         critique = "Prompt adherence scored from supplied deterministic match score."
     else:
-        expected = _token_set(" ".join(metadata.expected_terms) or (metadata.prompt or ""))
-        observed = _token_set(" ".join(metadata.observed_terms))
+        expected = token_set(
+            " ".join(metadata.expected_terms) or (metadata.prompt or ""),
+            min_length=3,
+            stop_words=_STOP_WORDS,
+        )
+        observed = token_set(
+            " ".join(metadata.observed_terms),
+            min_length=3,
+            stop_words=_STOP_WORDS,
+        )
         if expected and observed:
             overlap = len(expected & observed) / len(expected)
             score = round(overlap * 5, 2)
@@ -158,7 +166,7 @@ def _score_prompt_adherence(metadata: ImageQualityMetadata) -> RubricScore:
 
 
 def _score_composition(metadata: ImageQualityMetadata) -> RubricScore:
-    tags = {_normalize_tag(tag) for tag in metadata.composition_tags}
+    tags = {normalize_label(tag) for tag in metadata.composition_tags}
     strong_count = len(tags & _STRONG_COMPOSITION_TAGS)
     weak_count = len(tags & _WEAK_COMPOSITION_TAGS)
     score = 2.5 + (strong_count * 0.65) - (weak_count * 0.85)
@@ -172,7 +180,7 @@ def _score_composition(metadata: ImageQualityMetadata) -> RubricScore:
 
 
 def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
-    markers = {_normalize_tag(marker) for marker in metadata.originality_markers}
+    markers = {normalize_label(marker) for marker in metadata.originality_markers}
     weak_count = len(markers & _WEAK_ORIGINALITY_MARKERS)
     positive_count = max(len(markers) - weak_count, 0)
     score = _clamp_score(2.0 + (positive_count * 0.75) - (weak_count * 1.0))
@@ -183,7 +191,7 @@ def _score_visual_originality(metadata: ImageQualityMetadata) -> RubricScore:
 
 
 def _score_artifact_severity(metadata: ImageQualityMetadata) -> RubricScore:
-    flags = {_normalize_tag(flag) for flag in metadata.artifact_flags}
+    flags = {normalize_label(flag) for flag in metadata.artifact_flags}
     critical_count = len(flags & _CRITICAL_ARTIFACT_FLAGS)
     score = _clamp_score(5.0 - (metadata.artifact_severity * 0.85) - (len(flags) * 0.25) - critical_count)
 
@@ -269,18 +277,6 @@ def _collect_improvement_notes(category_scores: list[RubricScore]) -> list[str]:
 
 def _coerce_metadata(metadata: ImageQualityMetadata | dict[str, object]) -> ImageQualityMetadata:
     return coerce_model(metadata, ImageQualityMetadata)
-
-
-def _token_set(value: str) -> set[str]:
-    return {
-        token
-        for token in re.findall(r"[a-z0-9]+", value.lower())
-        if len(token) > 2 and token not in _STOP_WORDS
-    }
-
-
-def _normalize_tag(value: str) -> str:
-    return " ".join(value.strip().lower().replace("_", " ").replace("-", " ").split())
 
 
 def _clamp_score(value: float) -> float:

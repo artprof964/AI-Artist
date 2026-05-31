@@ -1,6 +1,5 @@
 import hashlib
 import hmac
-import re
 from datetime import timedelta
 from uuid import uuid4
 
@@ -29,6 +28,7 @@ from backend.schemas import (
     PolicyEvaluateRequest,
     PolicyEvaluateResponse,
 )
+from backend.text_utils import identifier_tokens
 from backend.time_utils import utc_now
 
 POLICY_VERSION = "local-default-deny-v0"
@@ -119,7 +119,7 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
 
 
 def normalized_terms(value: str) -> set[str]:
-    return set(re.findall(r"[a-z0-9_]+", normalize_text(value)))
+    return set(identifier_tokens(normalize_text(value)))
 
 
 def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:

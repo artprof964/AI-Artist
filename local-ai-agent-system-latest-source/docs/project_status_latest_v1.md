@@ -29,6 +29,7 @@ Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py
 Canonical hashing: centralized in backend/canonical_hash.py
 Request identity and trace IDs: centralized in backend/request_identity.py
+Text tokenization and labels: centralized in backend/text_utils.py
 Time creation/normalization: centralized in backend/time_utils.py
 Payload fields and nested payload objects: centralized in backend/payload_fields.py
 Response fields: centralized in backend/response_fields.py
@@ -96,6 +97,7 @@ Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
 Canonical hashing: shared across Safety Service request fingerprints, execution-envelope signatures, publishing IDs, image provenance hashes, and source snapshot version tags
 Request identity: shared across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
+Text utilities: shared across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
 Time creation/normalization: shared across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
 Response fields: shared across provider-neutral LLM API response parsing, ComfyUI image response parsing, and publishing audit status parsing
@@ -113,7 +115,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 251 passed, 1 skipped, 1 warning
+final pytest: 255 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

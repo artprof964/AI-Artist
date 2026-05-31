@@ -1,15 +1,12 @@
 from __future__ import annotations
 
 import math
-import re
 from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from backend.schemas import SubAgentOutput
-
-
-TOKEN_PATTERN = re.compile(r"[a-z0-9]+")
+from backend.text_utils import alnum_tokens
 
 
 @dataclass(frozen=True)
@@ -140,7 +137,7 @@ class DeterministicEmbeddingModel:
 
     def embed(self, text: str) -> tuple[float, ...]:
         vector = [0.0] * self.dimensions
-        for token in TOKEN_PATTERN.findall(text.lower()):
+        for token in alnum_tokens(text):
             index = self._stable_index(token)
             vector[index] += 1.0
         magnitude = math.sqrt(sum(value * value for value in vector))
@@ -307,7 +304,7 @@ def _cosine_similarity(left: tuple[float, ...], right: tuple[float, ...]) -> flo
 
 def _make_snippet(content: str, query: str, *, max_length: int = 180) -> str:
     lowered_content = content.lower()
-    query_tokens = TOKEN_PATTERN.findall(query.lower())
+    query_tokens = alnum_tokens(query)
     start = 0
     for token in query_tokens:
         index = lowered_content.find(token)

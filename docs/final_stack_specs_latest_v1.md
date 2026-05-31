@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 251 passed, 1 skipped, 1 warning
+Final validation: 255 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -52,6 +52,7 @@ backend/service.py: canonicalization, classification, local policy gate, executi
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, deterministic ID helpers, and version tags.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
+backend/text_utils.py: shared text tokenization and label normalization.
 backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction.
 backend/response_fields.py: shared provider response field access and shape validation.
@@ -122,6 +123,9 @@ hashes, source snapshot versions, signatures, or mocked external IDs are created
 Request text normalization, fingerprint wrappers, stable channel request UUIDs,
 and prefixed runtime trace IDs must flow through backend/request_identity.py
 before service or adapter specific request identity logic is added.
+Text tokenization and label/tag normalization must flow through
+backend/text_utils.py before classifier, retrieval, or rubric-specific token
+parsing logic is added.
 UTC datetime creation and normalization must flow through backend/time_utils.py
 before cache, provenance, execution gate, source freshness, observability, or
 future persistence time comparisons are added.
