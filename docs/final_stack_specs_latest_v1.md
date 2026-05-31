@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 357 passed, 1 skipped, 1 warning
+Final validation: 360 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -51,6 +51,7 @@ backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
+backend/classification_contracts.py: shared classifier confidence and reason formatting.
 backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
@@ -216,6 +217,9 @@ workspace files.
 Operation constants, classifier term maps, and sensitive-operation rules must
 flow through backend/operations.py before service or adapter operation logic is
 added.
+Classifier confidence and reason formatting must flow through
+backend/classification_contracts.py before `ClassifyResponse` fields are
+emitted.
 Publishing side-effect audit operation values must call backend/operations.py
 directly before audit events are recorded.
 Gated adapter operation values must call backend/operations.py directly before

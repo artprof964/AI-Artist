@@ -5,6 +5,10 @@ from backend.audit import (
     record_audit_event,
 )
 from backend.canonical_hash import hmac_sha256_json
+from backend.classification_contracts import (
+    classification_confidence,
+    classification_reasons,
+)
 from backend.observability import (
     LOG_LEVEL_INFO,
     LOG_LEVEL_WARNING,
@@ -110,8 +114,8 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
         request_id=payload.request_id,
         request_kind=request_kind,
         operation=operation,
-        confidence=0.7 if request_kind == "mixed" else 0.8,
-        reasons=[f"operation:{operation}", f"kind:{request_kind}"],
+        confidence=classification_confidence(request_kind),
+        reasons=classification_reasons(operation=operation, request_kind=request_kind),
     )
     record_observability_stage(
         stage=TELEMETRY_STAGE_REQUEST,

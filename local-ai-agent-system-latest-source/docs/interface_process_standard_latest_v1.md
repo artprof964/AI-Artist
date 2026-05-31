@@ -41,21 +41,22 @@ can be marked done.
 29. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 30. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
 31. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-32. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-33. Telemetry stages and log levels use `backend/observability.py`.
-34. Publishing outcome statuses use `backend/publishing_status.py`.
-35. Pydantic model/dict coercion at service, adapter, and domain boundaries calls `backend/model_coercion.py` directly.
-36. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
-37. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
-38. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
-39. Source registry missing-row messages use `backend/source_registry_contracts.py`.
-40. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
-41. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
-42. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
-43. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
-44. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
-45. Publishing side-effect audit operation values use `backend/operations.py`.
-46. Gated adapter operation values use `backend/operations.py` directly.
+32. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
+33. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+34. Telemetry stages and log levels use `backend/observability.py`.
+35. Publishing outcome statuses use `backend/publishing_status.py`.
+36. Pydantic model/dict coercion at service, adapter, and domain boundaries calls `backend/model_coercion.py` directly.
+37. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
+38. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
+39. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
+40. Source registry missing-row messages use `backend/source_registry_contracts.py`.
+41. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
+42. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
+43. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
+44. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
+45. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source`.
+46. Publishing side-effect audit operation values use `backend/operations.py`.
+47. Gated adapter operation values use `backend/operations.py` directly.
 ```
 
 ## Standard Request Envelope
@@ -222,6 +223,7 @@ Output:
 3. Classify
    - Safety Service classifies request as read, action, or mixed.
    - Operation inference and read/action term maps come from the shared operation registry.
+   - Classifier confidence and reasons use the shared classification response contract.
    - Classifier token parsing uses the shared text utility helper.
 
 4. Policy Check

@@ -23,6 +23,7 @@ Validation passed: 28
 Validation pending: 0
 Interface contracts: 28 defined
 Safety Service health contract: centralized in backend/health_contracts.py
+Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry and runtime env resolution: centralized in backend/connection_settings.py
 Execution gates: centralized in backend/execution_gate.py
@@ -150,6 +151,7 @@ URL validation: shared directly across GitHub API path safety and source-ingesti
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
+Classification response contract: shared across Safety Service classifier confidence and reason fields
 Publishing operation constants: shared directly across publishing adapter gates and publishing audit records
 Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
@@ -168,7 +170,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 357 passed, 1 skipped, 1 warning
+final pytest: 360 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

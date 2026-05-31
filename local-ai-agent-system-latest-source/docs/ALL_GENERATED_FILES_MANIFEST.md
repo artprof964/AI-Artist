@@ -39,12 +39,14 @@
 - `../../validation_reports/mock_agent_contract_standardization_2026-05-31.md`
 - `../../validation_reports/review_status_standardization_2026-05-31.md`
 - `../../validation_reports/interface_types_standardization_2026-05-31.md`
+- `../../validation_reports/classification_response_contract_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
 - `../../backend/request_metadata.py`
 - `../../backend/interface_types.py`
 - `../../backend/runtime_ids.py`
 - `../../backend/mapping_utils.py`
 - `../../backend/reason_messages.py`
+- `../../backend/classification_contracts.py`
 - `../../backend/subagent_status.py`
 - `../../backend/subagent_output_contracts.py`
 - `../../backend/mock_agent_contracts.py`
@@ -55,6 +57,7 @@
 - `../../tests/test_runtime_ids.py`
 - `../../tests/test_mapping_utils.py`
 - `../../tests/test_reason_messages.py`
+- `../../tests/test_classification_contracts.py`
 - `../../tests/test_subagent_status.py`
 - `../../tests/test_subagent_output_contracts.py`
 - `../../tests/test_review_status.py`
