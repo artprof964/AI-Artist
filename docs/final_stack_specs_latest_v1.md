@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 487 passed, 1 warning
+Final validation: 489 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -119,7 +119,8 @@ backend/publishing.py and backend/publishing_adapter.py: approval-gated publishi
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
 backend/observability.py: telemetry stage/log-level constants, default metric values, metric-name constants/formatting, trace-id fallback formatting, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
-backend/security_review.py: deterministic security checklist helpers.
+backend/security_review_contracts.py: shared security review finding surfaces, messages, probe event/trace, default-deny pattern, target formatting, and prompt-hash field contracts.
+backend/security_review.py: deterministic security checklist helpers using shared security-review contracts.
 backend/readiness.py: production readiness schema, centralized readiness detail messages, and runbook validators.
 ```
 
@@ -332,6 +333,9 @@ Telemetry stages, log levels, default metric values, metric-name constants/forma
 trace-id fallback formatting, and event-message formatting must flow through
 backend/observability.py constants before service, cache, orchestration, tool,
 or review-specific telemetry calls are added.
+Security review finding surfaces, messages, probe event/trace IDs, policy
+default-deny pattern, review targets, and prompt-hash field names must flow
+through backend/security_review_contracts.py before checklist logic changes.
 Response-cache reuse telemetry event, message, metric-tag, and structured-field
 shapes must flow through backend/response_cache_contracts.py before cache reuse
 observability changes.

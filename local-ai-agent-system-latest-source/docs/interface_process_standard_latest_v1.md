@@ -78,6 +78,7 @@ can be marked done.
 57. Production readiness env, runbook, and command validation detail messages use `backend/readiness.py`.
 58. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
 59. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
+60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 ```
 
 ## Standard Request Envelope
@@ -324,6 +325,7 @@ Output:
      and artifact is recorded.
    - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
    - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
+   - Security review finding surfaces, messages, probe event/trace IDs, policy default-deny checks, review target formatting, and prompt-hash field checks use the shared security-review contract boundary.
    - Audit record actor/policy scope extraction and side-effect audit payload fields use the shared audit scope field-name constants.
    - Publishing side-effect audit events use the shared publish operation, payload field-name, and audit event type constants.
    - Publishing audit actor and policy scopes use the shared request-scope contract.

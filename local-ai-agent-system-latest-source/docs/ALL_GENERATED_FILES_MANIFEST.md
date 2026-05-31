@@ -251,10 +251,12 @@
 - `../../tests/test_observability_constants.py`
 - `../../validation_reports/t27_security_review_validation_2026-05-31.md`
 - `../../validation_reports/security_review_canonical_json_standardization_2026-05-31.md`
+- `../../validation_reports/security_review_contract_standardization_2026-05-31.md`
 - `../../validation_reports/secret_detection_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/structured_secret_detection_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/file_scanning_boundary_standardization_2026-05-31.md`
 - `../../backend/file_scanning.py`
+- `../../backend/security_review_contracts.py`
 - `../../tests/test_file_scanning.py`
 - `../../backend/security_review.py`
 - `../../tests/test_security_review.py`

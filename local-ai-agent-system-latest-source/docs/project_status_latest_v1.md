@@ -80,6 +80,7 @@ Model coercion and validation messages: centralized in backend/model_coercion.py
 Telemetry stages, log levels, default metric values, metric-name constants/formatting, trace-id fallback formatting, and event-message formatting: centralized in backend/observability.py
 Publishing dry-run response fields and deterministic ID material: centralized in backend/publishing_contracts.py
 Publishing outcome statuses: centralized in backend/publishing_status.py
+Security review finding surfaces, messages, probe event/trace IDs, policy checks, review targets, and prompt-hash field names: centralized in backend/security_review_contracts.py
 ```
 
 ## Completed
@@ -202,6 +203,7 @@ Model coercion: shared directly across execution-envelope validation, validation
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric-name constants, trace fallback ids, default event messages, service observability shape contracts, and security review probes
 Publishing dry-run response contracts: shared across LocalPublishingClient response construction and deterministic local publishing IDs
 Publishing statuses: shared across Publishing Agent result handling, local publishing dry-run responses, and side-effect audit payloads
+Security review contracts: shared across workspace secret scanning, audit/observability redaction checks, policy bypass checks, and artifact prompt-hash review
 Deprecated architecture term scan: clean
 ```
 
@@ -211,7 +213,7 @@ Deprecated architecture term scan: clean
 docker compose config: passed
 docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
-T27 security review: 10 passed; prompt/memory secrets, audit redaction, structured unredacted-secret checks, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
+T27 security review: 12 passed; prompt/memory secrets, audit redaction, structured unredacted-secret checks, observability redaction, canonical JSON serialization, policy bypass controls, artifact prompt-hash handling, and centralized security review finding/probe/policy contracts validated
 T28 production readiness: 11 passed; runbook, env schema rendering, shared service URL, shell command construction, backup paths, centralized readiness detail messages, health checks, backup commands, restore checks, retention, and contacts validated
 repo path validation: 8 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, repo-root lookup, workspace file lookups, backend module discovery, backend module source reads, raw-open source-inspection guard tests, source-inspection guard tests, repo-root guard tests, migrated backend/source-inspection guard tests, filesystem/process fixture repo roots, and test path/source helper usage centralized
 time utility validation: 6 focused files passed; direct test `datetime.now(timezone.utc)` calls guarded
@@ -226,7 +228,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 487 passed, 1 warning
+final pytest: 489 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

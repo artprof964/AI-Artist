@@ -14,6 +14,26 @@ from backend.security_review import (
     review_provenance_metadata,
     scan_workspace_secret_files,
 )
+from backend.security_review_contracts import (
+    SECURITY_REVIEW_ARTIFACT_PROMPT_HASH_MESSAGE,
+    SECURITY_REVIEW_ARTIFACT_RAW_PROMPT_MESSAGE,
+    SECURITY_REVIEW_ARTIFACT_SURFACE,
+    SECURITY_REVIEW_AUDIT_SECRET_MESSAGE,
+    SECURITY_REVIEW_AUDIT_SURFACE,
+    SECURITY_REVIEW_OBSERVABILITY_SECRET_MESSAGE,
+    SECURITY_REVIEW_OBSERVABILITY_SURFACE,
+    SECURITY_REVIEW_POLICY_DEFAULT_DENY_MESSAGE,
+    SECURITY_REVIEW_POLICY_SURFACE,
+    SECURITY_REVIEW_PROBE_EVENT,
+    SECURITY_REVIEW_PROMPT_HASH_FIELD,
+    SECURITY_REVIEW_TARGET_PREFIX,
+    SECURITY_REVIEW_TRACE_ID,
+    SECURITY_REVIEW_WORKSPACE_SECRET_MESSAGE,
+    SECURITY_REVIEW_WORKSPACE_SURFACE,
+    policy_envelope_requires_approval_message,
+    policy_operation_denied_message,
+    security_review_target,
+)
 from path_helpers import PROJECT_ROOT, read_backend_source
 
 
@@ -49,7 +69,7 @@ def test_workspace_secret_scanner_flags_llm_api_github_slack_and_generic_assignm
         shutil.rmtree(scratch_root, ignore_errors=True)
 
     assert len(findings) == 4
-    assert {finding.surface for finding in findings} == {"workspace"}
+    assert {finding.surface for finding in findings} == {SECURITY_REVIEW_WORKSPACE_SURFACE}
 
 
 def test_audit_payload_review_catches_nested_secret_like_keys_and_values() -> None:
@@ -87,8 +107,8 @@ def test_observability_review_redacts_secret_like_fields_from_events() -> None:
 
     collector.record_stage(
         stage="tool",
-        event="security_review_probe",
-        trace_id="security-review",
+        event=SECURITY_REVIEW_PROBE_EVENT,
+        trace_id=SECURITY_REVIEW_TRACE_ID,
         fields=fields,
         metric_tags=fields,
     )
@@ -147,9 +167,40 @@ def test_artifact_provenance_review_flags_raw_prompt_metadata() -> None:
     )
 
     assert {finding.message for finding in findings} == {
-        "artifact provenance exposes raw prompt text",
-        "artifact provenance must use prompt_hash metadata",
+        SECURITY_REVIEW_ARTIFACT_RAW_PROMPT_MESSAGE,
+        SECURITY_REVIEW_ARTIFACT_PROMPT_HASH_MESSAGE,
     }
+
+
+def test_security_review_contract_vocabulary_is_centralized() -> None:
+    assert SECURITY_REVIEW_WORKSPACE_SURFACE == "workspace"
+    assert SECURITY_REVIEW_AUDIT_SURFACE == "audit"
+    assert SECURITY_REVIEW_OBSERVABILITY_SURFACE == "observability"
+    assert SECURITY_REVIEW_POLICY_SURFACE == "policy"
+    assert SECURITY_REVIEW_ARTIFACT_SURFACE == "artifact"
+    assert (
+        SECURITY_REVIEW_WORKSPACE_SECRET_MESSAGE
+        == "secret-like value found in workspace prompt or memory file"
+    )
+    assert SECURITY_REVIEW_AUDIT_SECRET_MESSAGE == "secret-like value survived redaction"
+    assert (
+        SECURITY_REVIEW_OBSERVABILITY_SECRET_MESSAGE
+        == "secret-like value survived structured telemetry redaction"
+    )
+    assert SECURITY_REVIEW_POLICY_DEFAULT_DENY_MESSAGE == (
+        "OPA policy must keep default allow set to false"
+    )
+    assert SECURITY_REVIEW_PROBE_EVENT == "security_review_probe"
+    assert SECURITY_REVIEW_TRACE_ID == "security-review"
+    assert SECURITY_REVIEW_TARGET_PREFIX == "security-review"
+    assert SECURITY_REVIEW_PROMPT_HASH_FIELD == "prompt_hash"
+    assert policy_operation_denied_message("publish") == (
+        "publish must be denied until approval and envelope checks pass"
+    )
+    assert policy_envelope_requires_approval_message("publish") == (
+        "publish envelope must require explicit human approval"
+    )
+    assert security_review_target("publish") == "security-review:publish"
 
 
 def test_security_review_uses_canonical_json_for_backend_serialization() -> None:
@@ -168,6 +219,34 @@ def test_security_review_uses_shared_secret_detection_boundary() -> None:
     assert "def _find_unredacted_secrets(" not in source
     assert "contains_secret_like_value(" in source
     assert "contains_unredacted_secret_value(" in source
+
+
+def test_security_review_uses_shared_contract_messages() -> None:
+    source = read_backend_source("security_review.py")
+    for literal in (
+        'surface="workspace"',
+        'surface="audit"',
+        'surface="observability"',
+        'surface="policy"',
+        'surface="artifact"',
+        '"secret-like value found in workspace prompt or memory file"',
+        '"secret-like value survived redaction"',
+        '"secret-like value survived structured telemetry redaction"',
+        '"OPA policy must keep default allow set to false"',
+        '"artifact provenance exposes raw prompt text"',
+        '"artifact provenance must use prompt_hash metadata"',
+        'event="security_review_probe"',
+        'trace_id="security-review"',
+        'target=f"security-review:{operation}"',
+        '"prompt_hash" not in payload',
+    ):
+        assert literal not in source
+    assert "SECURITY_REVIEW_WORKSPACE_SURFACE" in source
+    assert "SECURITY_REVIEW_AUDIT_SECRET_MESSAGE" in source
+    assert "SECURITY_REVIEW_OBSERVABILITY_SECRET_MESSAGE" in source
+    assert "SECURITY_REVIEW_POLICY_DEFAULT_DENY_MESSAGE" in source
+    assert "policy_operation_denied_message(" in source
+    assert "policy_envelope_requires_approval_message(" in source
 
 
 def test_security_review_uses_shared_text_file_scanner() -> None:
