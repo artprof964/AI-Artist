@@ -2,31 +2,14 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from datetime import datetime
-import re
 from threading import RLock
 from typing import Any, Protocol
 from uuid import UUID
 
 from backend.schemas import AuditEventRequest, AuditEventResponse, AuditEventType
-
-
-SECRET_KEY_TERMS = {
-    "api_key",
-    "authorization",
-    "oauth",
-    "password",
-    "private_key",
-    "secret",
-    "signing_key",
-    "token",
-    "webhook",
-}
-REDACTED_SECRET_VALUE = "[REDACTED]"
-SECRET_VALUE_PATTERNS = (
-    re.compile(r"\bsk-[A-Za-z0-9_-]{8,}\b"),
-    re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{8,}\b", re.IGNORECASE),
-    re.compile(r"\bgh[pousr]_[A-Za-z0-9_]{10,}\b"),
-    re.compile(r"\bBearer\s+[A-Za-z0-9._~+/=-]{8,}\b", re.IGNORECASE),
+from backend.secret_redaction import (
+    REDACTED_SECRET_VALUE,
+    redact_secret_value,
 )
 
 
@@ -80,24 +63,11 @@ audit_event_repository = InMemoryAuditEventRepository()
 
 
 def redact_audit_value(value: Any) -> Any:
-    if isinstance(value, dict):
-        redacted: dict[str, Any] = {}
-        for key, nested_value in value.items():
-            if any(term in key.lower() for term in SECRET_KEY_TERMS):
-                redacted[key] = REDACTED_SECRET_VALUE
-            else:
-                redacted[key] = redact_audit_value(nested_value)
-        return redacted
-
-    if isinstance(value, list):
-        return [redact_audit_value(item) for item in value]
-
-    if isinstance(value, str) and any(
-        pattern.search(value) for pattern in SECRET_VALUE_PATTERNS
-    ):
-        return REDACTED_SECRET_VALUE
-
-    return value
+    return redact_secret_value(
+        value,
+        replacement=REDACTED_SECRET_VALUE,
+        collapse_matching_strings=True,
+    )
 
 
 def audit_record_from_request(payload: AuditEventRequest) -> AuditEventRecord:

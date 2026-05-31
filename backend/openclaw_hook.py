@@ -2,7 +2,6 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID, uuid4
 
-from backend.audit import SECRET_KEY_TERMS
 from backend.observability import record_observability_stage
 from backend.schemas import (
     Operation,
@@ -11,9 +10,7 @@ from backend.schemas import (
     RequestKind,
     SourceFreshness,
 )
-
-
-REDACTED_SECRET_VALUE = "[REDACTED]"
+from backend.secret_redaction import redact_secret_value
 
 
 @dataclass(frozen=True)
@@ -57,24 +54,8 @@ class ToolAdapter(Protocol):
         """Run the actual tool adapter after safety approval."""
 
 
-def _contains_secret_key_term(key: str) -> bool:
-    return any(term in key.lower() for term in SECRET_KEY_TERMS)
-
-
 def _redact_sensitive_value(value: Any) -> Any:
-    if isinstance(value, dict):
-        redacted: dict[str, Any] = {}
-        for key, nested_value in value.items():
-            if _contains_secret_key_term(str(key)):
-                redacted[key] = REDACTED_SECRET_VALUE
-            else:
-                redacted[key] = _redact_sensitive_value(nested_value)
-        return redacted
-
-    if isinstance(value, list):
-        return [_redact_sensitive_value(item) for item in value]
-
-    return value
+    return redact_secret_value(value, redact_string_values=False)
 
 
 def build_policy_evaluate_request(request: ToolCallRequest) -> PolicyEvaluateRequest:

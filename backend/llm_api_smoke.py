@@ -8,16 +8,10 @@ from backend.connection_settings import (
     DEEPSEEK_OPEN_ART_ENV_VAR,
     load_connection_settings,
 )
-SECRET_REDACTION = "[REDACTED]"
-SECRET_KEY_TERMS = {
-    "api_key",
-    "authorization",
-    "bearer",
-    "key",
-    "password",
-    "secret",
-    "token",
-}
+from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
+
+
+SECRET_REDACTION = REDACTED_SECRET_VALUE
 
 
 @dataclass(frozen=True)
@@ -53,19 +47,7 @@ def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelC
 
 
 def redact_secrets(value: Any) -> Any:
-    if isinstance(value, dict):
-        redacted: dict[str, Any] = {}
-        for key, nested_value in value.items():
-            if any(term in key.lower() for term in SECRET_KEY_TERMS):
-                redacted[key] = SECRET_REDACTION
-            else:
-                redacted[key] = redact_secrets(nested_value)
-        return redacted
-
-    if isinstance(value, list):
-        return [redact_secrets(item) for item in value]
-
-    return value
+    return redact_secret_value(value, redact_string_values=False)
 
 
 def build_smoke_request(config: LLMAPIModelConfig) -> dict[str, Any]:

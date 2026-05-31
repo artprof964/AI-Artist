@@ -1,12 +1,14 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
-import re
 from typing import Any, Protocol
 from uuid import NAMESPACE_URL, UUID, uuid5
 
-
-_TOKEN_SHAPE_PATTERN = re.compile(r"\b(?:xox[a-z]?|xapp|xoxa)-[A-Za-z0-9-]{8,}\b")
+from backend.secret_redaction import (
+    LOWER_REDACTED_SECRET_VALUE,
+    redact_secret_text,
+    redact_secret_value,
+)
 
 
 class SlackAdapterError(ValueError):
@@ -183,26 +185,19 @@ def _stable_request_id(
 
 
 def _redact_secret(value: Any, secret: str | None) -> Any:
-    if isinstance(value, dict):
-        return {
-            key: "[redacted]" if _looks_secret_key(key) else _redact_secret(item, secret)
-            for key, item in value.items()
-        }
-    if isinstance(value, list):
-        return [_redact_secret(item, secret) for item in value]
-    if isinstance(value, str):
-        return _redact_secret_text(value, secret)
-    return value
+    return redact_secret_value(
+        value,
+        explicit_secrets=((secret,) if secret else ()),
+        replacement=LOWER_REDACTED_SECRET_VALUE,
+    )
 
 
 def _redact_secret_text(value: str, secret: str | None) -> str:
-    redacted = value.replace(secret, "[redacted]") if secret else value
-    return _TOKEN_SHAPE_PATTERN.sub("[redacted]", redacted)
-
-
-def _looks_secret_key(key: str) -> bool:
-    normalized = key.lower()
-    return "token" in normalized or "secret" in normalized
+    return redact_secret_text(
+        value,
+        explicit_secrets=((secret,) if secret else ()),
+        replacement=LOWER_REDACTED_SECRET_VALUE,
+    )
 
 
 __all__ = [

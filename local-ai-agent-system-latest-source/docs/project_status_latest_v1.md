@@ -24,6 +24,7 @@ Validation pending: 0
 Interface contracts: 28 defined
 Connection settings: centralized in backend/connection_settings.py
 Execution gates: centralized in backend/execution_gate.py
+Secret redaction: centralized in backend/secret_redaction.py
 ```
 
 ## Completed
@@ -80,6 +81,7 @@ Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Connection registry: shared across LLM smoke tests, GitHub adapter, readiness validation, docs, and tracker
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
+Secret redaction: shared across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
 Deprecated architecture term scan: clean
 ```
 
@@ -91,7 +93,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 186 passed, 1 skipped, 1 warning
+final pytest: 190 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

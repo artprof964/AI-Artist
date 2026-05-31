@@ -32,7 +32,7 @@ contract is satisfied.
 | T24 | Unit tests for safety service and policies | CI test suite runs canonicalizer, classifier, OPA, cache, freshness, and audit unit tests with `--cov-fail-under=90` over the safety service modules. | Bestanden | 2026-05-31 |
 | T25 | OpenClaw-to-safety integration tests | End-to-end test sends a request through OpenClaw hook, Safety Service, mock agents, validation, and final response synthesis. | Bestanden | 2026-05-31 |
 | T26 | Observability | Telemetry test verifies trace ids, metrics, and structured logs are emitted for request, policy, cache, orchestration, and tool stages. | Bestanden | 2026-05-31 |
-| T27 | Security review | Security checklist test scans logs, prompts, memory, audit payloads, and artifacts for secret patterns and policy bypasses. | Bestanden | 2026-05-31 |
+| T27 | Security review | Shared redaction tests and security checklist tests scan logs, prompts, memory, audit payloads, and artifacts for secret patterns and policy bypasses. | Bestanden | 2026-05-31 |
 | T28 | Production hardening and runbooks | Readiness test confirms runbooks, backups, restore check, env validation, health checks, retention policy, and incident contacts exist. | Bestanden | 2026-05-31 |
 
 ## Required CI Gates

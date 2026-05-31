@@ -11,6 +11,7 @@ from backend.audit import redact_audit_value
 from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
 from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
+from backend.secret_redaction import redact_secret_value
 
 
 GITHUB_WRITE_OPERATION = "github_write"
@@ -92,7 +93,10 @@ class GitHubAdapter:
             json=request.payload,
             token=token,
         )
-        safe_client_response = _redact_secret(redact_audit_value(client_response), token)
+        safe_client_response = redact_secret_value(
+            redact_audit_value(client_response),
+            explicit_secrets=(token,),
+        )
 
         return GitHubWriteResult(
             execution_envelope_id=envelope.execution_envelope_id,
@@ -142,18 +146,6 @@ def _normalize_api_path(path: str) -> str:
         raise GitHubExecutionGateError("GitHub API path must not contain traversal segments")
     return normalized
 
-
-def _redact_secret(value: Any, secret: str) -> Any:
-    if isinstance(value, dict):
-        return {key: _redact_secret(nested, secret) for key, nested in value.items()}
-
-    if isinstance(value, list):
-        return [_redact_secret(item, secret) for item in value]
-
-    if isinstance(value, str) and secret:
-        return value.replace(secret, "[REDACTED]")
-
-    return value
 
 __all__ = [
     "GITHUB_TOKEN_ENV_VAR",

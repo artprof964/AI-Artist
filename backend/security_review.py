@@ -17,15 +17,10 @@ from backend.schemas import (
     SourceFreshness,
 )
 from backend.service import SENSITIVE_OPERATIONS, create_execution_envelope, evaluate_policy
+from backend.secret_redaction import SECRET_VALUE_PATTERNS
 
 
 TEXT_REVIEW_SUFFIXES = {".json", ".md", ".txt", ".yaml", ".yml"}
-SECRET_VALUE_PATTERNS = (
-    re.compile(r"\bsk-[A-Za-z0-9_-]{8,}\b"),
-    re.compile(r"\bgh[pousr]_[A-Za-z0-9_]{10,}\b"),
-    re.compile(r"\bxox[baprs]-[A-Za-z0-9-]{8,}\b", re.IGNORECASE),
-    re.compile(r"\bBearer\s+[A-Za-z0-9._~+/=-]{8,}\b", re.IGNORECASE),
-)
 SECRET_ASSIGNMENT_PATTERN = re.compile(
     r"""(?ix)
     \b(api[_-]?key|token|password|secret)\b
