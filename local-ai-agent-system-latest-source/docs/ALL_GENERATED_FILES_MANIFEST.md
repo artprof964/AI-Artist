@@ -165,6 +165,7 @@
 - `../../validation_reports/backend_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_contract_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/domain_contract_source_read_helper_standardization_2026-05-31.md`
+- `../../validation_reports/core_contract_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/test_utc_now_standardization_2026-05-31.md`
 - `../../validation_reports/test_canonical_json_standardization_2026-05-31.md`
 - `../../validation_reports/test_hashlib_standardization_2026-05-31.md`

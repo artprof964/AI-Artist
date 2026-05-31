@@ -128,7 +128,7 @@ Connection registry, endpoint URL composition, env-example rendering/parsing, ru
 Shell command/process argument construction, process execution, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations and migration output parsing
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: shared across security review, scaffold, OPA, readiness validators, workspace validators, and contract guard tests
-Test path/source helpers: shared across repo-wide guard tests and checked-in source inspection tests for connection settings, canonical hashing, classification contracts, health contracts, request metadata, mapping utilities, model coercion, runtime IDs, Safety Service, security review, source ingestion, ComfyUI, Publishing, Slack, HTTP method, GitHub contract, image provenance, Critic/Curator, Knowledge Agent, mock sub-agents, sub-agent output/status, production readiness, tree shape, time utilities, shell commands, and repo path contracts
+Test path/source helpers: shared across repo-wide guard tests and checked-in source inspection tests for connection settings, canonical hashing, classification contracts, health contracts, request metadata, mapping utilities, model coercion, runtime IDs, Safety Service, security review, source ingestion, ComfyUI, Publishing, Slack, HTTP method, GitHub contract, image provenance, Critic/Curator, Knowledge Agent, mock sub-agents, sub-agent output/status, execution gate, interface types, LLM API smoke, observability, reason messages, review statuses, response cache, production readiness, tree shape, time utilities, shell commands, and repo path contracts
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, signature, and expiry failures
@@ -202,7 +202,7 @@ image provenance hash validation: 2 focused files passed; image provenance guard
 runtime secret validation: LLM API smoke, GitHub, and Slack guarded against local runtime-token resolution
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
-test path helper validation: adapter/connector and domain contract checks plus existing guard tests passed; migrated checked-in backend/source inspections share test path/source helpers
+test path helper validation: adapter/connector, domain, and core contract checks plus existing guard tests passed; migrated checked-in backend/source inspections share test path/source helpers
 final pytest: 412 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art

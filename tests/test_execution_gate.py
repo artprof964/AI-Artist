@@ -16,9 +16,9 @@ from backend.execution_gate_messages import (
     execution_envelope_target_mismatch,
     operation_requires_human_approval,
 )
-from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
 from backend.time_utils import utc_now
+from path_helpers import read_backend_source
 
 
 REQUEST_ID = UUID("42424242-4242-4242-4242-424242424242")
@@ -158,7 +158,7 @@ def test_execution_gate_error_message_contracts_are_shared() -> None:
 
 
 def test_execution_gate_uses_shared_error_message_contracts() -> None:
-    contents = read_backend_module_text("execution_gate.py")
+    contents = read_backend_source("execution_gate.py")
 
     forbidden_literals = [
         '"execution envelope is invalid"',

@@ -16,7 +16,7 @@ from backend.interface_types import (
     REQUEST_KIND_READ,
     REQUEST_KINDS,
 )
-from backend.repo_paths import read_backend_module_text
+from path_helpers import read_backend_source
 
 
 def test_request_kind_vocabulary_is_centralized() -> None:
@@ -48,8 +48,8 @@ def test_audit_event_type_vocabulary_is_centralized() -> None:
 
 
 def test_schema_and_operations_import_shared_interface_types() -> None:
-    schemas_source = read_backend_module_text("schemas.py")
-    operations_source = read_backend_module_text("operations.py")
+    schemas_source = read_backend_source("schemas.py")
+    operations_source = read_backend_source("operations.py")
 
     assert "from backend.interface_types import" in schemas_source
     assert "from backend.interface_types import" in operations_source
@@ -63,7 +63,7 @@ def test_runtime_modules_import_interface_types_directly() -> None:
         "openclaw_hook.py",
         "response_cache.py",
     ):
-        source = read_backend_module_text(module_filename)
+        source = read_backend_source(module_filename)
 
         assert "from backend.interface_types import" in source
         assert "from backend.schemas import Operation" not in source

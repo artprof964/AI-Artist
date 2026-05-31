@@ -9,8 +9,8 @@ from backend.response_cache import (
     ApprovedResponseCacheEntry,
     evaluate_cached_response_reuse,
 )
-from backend.repo_paths import read_backend_module_text
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
+from path_helpers import read_backend_source
 
 
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
@@ -238,7 +238,7 @@ def test_rejects_missing_cache_entry() -> None:
 
 
 def test_response_cache_uses_shared_request_kind_and_operation_constants() -> None:
-    source = read_backend_module_text("response_cache.py")
+    source = read_backend_source("response_cache.py")
 
     assert "REQUEST_KIND_READ" in source
     assert "OPERATION_READ" in source

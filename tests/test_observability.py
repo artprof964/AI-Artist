@@ -21,7 +21,6 @@ from backend.openclaw_hook import (
 )
 from backend.orchestrator import MockAgentRequest, run_mock_subagent_orchestration
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
-from backend.repo_paths import read_backend_module_text
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
@@ -31,6 +30,7 @@ from backend.schemas import (
     SourceFreshness,
 )
 from backend.service import canonicalize_request, classify_request, evaluate_policy
+from path_helpers import read_backend_source
 
 
 REQUEST_ID = UUID("26262626-2626-2626-2626-262626262626")
@@ -198,7 +198,7 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
 
 
 def test_observability_uses_shared_redacted_audit_mapping_boundary() -> None:
-    source = read_backend_module_text("observability.py")
+    source = read_backend_source("observability.py")
 
     assert "def _safe_dict(" not in source
     assert "redacted_audit_mapping(" in source
