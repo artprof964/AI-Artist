@@ -60,7 +60,7 @@ can be marked done.
 48. Gated adapter operation values use `backend/operations.py` directly.
 49. Slack source labels, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
 50. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
-51. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
+51. Source ingestion approved-domain defaults, rejection messages, and registry metadata keys use `backend/source_ingestion_contracts.py`.
 52. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 53. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
 54. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
@@ -264,7 +264,7 @@ Output:
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay request-kind and operation checks use shared interface and operation constants.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
-   - Source ingestion approved-domain defaults and rejection messages use the shared source-ingestion contract.
+   - Source ingestion approved-domain defaults, rejection messages, and registry metadata keys use the shared source-ingestion contract.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
    - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.
    - Source registry lookup failures, dependency roles, and initial change sequences use shared source registry contracts.

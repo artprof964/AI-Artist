@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 437 passed, 1 skipped, 1 warning
+Final validation: 438 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -79,7 +79,7 @@ backend/side_effect_audit.py: shared side-effect audit payload and event recordi
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, and initial change-sequence contracts.
-backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults and rejection message contracts.
+backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, and registry metadata key contracts.
 backend/slack_contracts.py: shared Slack source label, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
@@ -87,7 +87,7 @@ backend/execution_gate_messages.py: shared execution-envelope validation failure
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, source registry role/change-sequence contracts, and key/id source registry lookup.
-backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version and URL-domain validation boundaries.
+backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version, URL-domain validation, registry metadata-key, and source-registry default boundaries.
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution, connection error messages, and guards, endpoint URL composition, env-example rendering/parsing, and connection settings loader.
 backend/adapter_secrets.py: shared adapter secret lookup that maps standard env vars to connection settings, supports custom env names and explicit injected secrets, and wraps adapter-specific configuration errors.
 backend/shell_commands.py: shared shell command and process argument construction for Docker Compose, curl, MinIO, and OPA command definitions plus subprocess execution defaults and delimited process-output parsing.
@@ -249,9 +249,9 @@ backend/payload_fields.py before adapter-specific payload parsing logic is added
 Provider response object/dict field access, shape validation, and response validation
 messages must flow through backend/response_fields.py before adapter-specific SDK
 response parsing logic is added.
-Source ingestion approved-domain defaults and rejection text must flow through
-backend/source_ingestion_contracts.py before ingestion allowlists or rejection
-messages are changed.
+Source ingestion approved-domain defaults, rejection text, and registry metadata
+keys must flow through backend/source_ingestion_contracts.py before ingestion
+allowlists, rejection messages, or registry metadata writes are changed.
 URL/domain extraction, relative API path validation, and URL validation messages
 must flow through backend/url_utils.py before connector-specific URL allowlist or
 path-safety logic is added.

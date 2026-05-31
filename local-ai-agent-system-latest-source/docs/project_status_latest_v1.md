@@ -47,7 +47,7 @@ Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
 Source registry missing-row messages, dependency roles, and initial change-sequence defaults: centralized in backend/source_registry_contracts.py
-Source ingestion contracts: centralized in backend/source_ingestion_contracts.py
+Source ingestion contracts and registry metadata keys: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
@@ -140,7 +140,7 @@ Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
 Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, direct image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
-Source ingestion contracts: shared approved-domain defaults and rejection messages before registry writes
+Source ingestion contracts: shared approved-domain defaults, rejection messages, and registry metadata keys before registry writes
 Source ingestion hashes: source snapshots call shared canonical hash/version helpers directly before registry writes
 Request identity: shared directly across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
 Request metadata mapping: shared across Safety Service request fingerprints and observability fields
@@ -206,7 +206,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 437 passed, 1 skipped, 1 warning
+final pytest: 438 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

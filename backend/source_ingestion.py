@@ -11,6 +11,8 @@ from backend.source_ingestion_contracts import (
     DEFAULT_APPROVED_SOURCE_DOMAINS,
     SOURCE_INGESTION_ABSOLUTE_HTTP_URL_REQUIRED,
     SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
+    SOURCE_METADATA_DOMAIN_KEY,
+    SOURCE_METADATA_TITLE_KEY,
 )
 from backend.time_utils import utc_now
 from backend.url_utils import http_url_domain
@@ -140,7 +142,10 @@ class SourceIngestionService:
                 version_tag=version_tag,
                 ingested_at=captured_at,
                 metadata=merge_mappings(
-                    {"title": candidate.title, "source_domain": domain},
+                    {
+                        SOURCE_METADATA_TITLE_KEY: candidate.title,
+                        SOURCE_METADATA_DOMAIN_KEY: domain,
+                    },
                     candidate.metadata,
                 ),
             )

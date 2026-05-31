@@ -3,6 +3,7 @@ from datetime import datetime, timezone
 import pytest
 
 from backend.source_freshness import SourceFreshnessRegistry
+from backend.source_registry_contracts import SOURCE_INITIAL_CHANGE_SEQ
 from backend.source_ingestion import (
     InMemorySourceSnapshotRepository,
     SourceIngestionCandidate,
@@ -12,6 +13,8 @@ from backend.source_ingestion import (
 from backend.source_ingestion_contracts import (
     DEFAULT_APPROVED_SOURCE_DOMAINS,
     SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
+    SOURCE_METADATA_DOMAIN_KEY,
+    SOURCE_METADATA_TITLE_KEY,
 )
 from path_helpers import read_backend_source
 
@@ -88,7 +91,7 @@ def test_ingestion_imports_approved_sources_stores_snapshots_and_registry_rows()
     assert first_snapshot.source_domain == "art.example"
     assert len(first_snapshot.content_hash) == 64
     assert first_snapshot.version_tag == f"sha256:{first_snapshot.content_hash[:12]}"
-    assert first_snapshot.change_seq == 1
+    assert first_snapshot.change_seq == SOURCE_INITIAL_CHANGE_SEQ
     assert first_snapshot.captured_at == NOW
     assert first_snapshot.metadata["sample_category"] == "art"
 
@@ -98,11 +101,11 @@ def test_ingestion_imports_approved_sources_stores_snapshots_and_registry_rows()
     assert first_registry_entry.source_owner == "curation-team"
     assert first_registry_entry.content_hash == first_snapshot.content_hash
     assert first_registry_entry.version_tag == first_snapshot.version_tag
-    assert first_registry_entry.change_seq == 1
+    assert first_registry_entry.change_seq == SOURCE_INITIAL_CHANGE_SEQ
     assert first_registry_entry.ingested_at == NOW
     assert first_registry_entry.metadata == {
-        "title": "Museum Palette Report 2026",
-        "source_domain": "art.example",
+        SOURCE_METADATA_TITLE_KEY: "Museum Palette Report 2026",
+        SOURCE_METADATA_DOMAIN_KEY: "art.example",
         "sample_category": "art",
         "approved_scope": "local_fixture",
     }
@@ -135,16 +138,18 @@ def test_ingestion_reimport_preserves_or_increments_change_sequence_by_snapshot_
         ingested_at=NOW,
     )
 
-    assert first_result.imported_snapshots[0].change_seq == 1
+    assert first_result.imported_snapshots[0].change_seq == SOURCE_INITIAL_CHANGE_SEQ
     assert second_result.imported_snapshots[0].content_hash == (
         first_result.imported_snapshots[0].content_hash
     )
-    assert second_result.imported_snapshots[0].change_seq == 1
+    assert second_result.imported_snapshots[0].change_seq == SOURCE_INITIAL_CHANGE_SEQ
     assert changed_result.imported_snapshots[0].content_hash != (
         first_result.imported_snapshots[0].content_hash
     )
-    assert changed_result.imported_snapshots[0].change_seq == 2
-    assert registry.get_source(original_source.source_key).change_seq == 2
+    assert changed_result.imported_snapshots[0].change_seq == SOURCE_INITIAL_CHANGE_SEQ + 1
+    assert registry.get_source(original_source.source_key).change_seq == (
+        SOURCE_INITIAL_CHANGE_SEQ + 1
+    )
     assert registry.get_source(original_source.source_key).content_hash == (
         changed_result.imported_snapshots[0].content_hash
     )
@@ -217,3 +222,14 @@ def test_source_ingestion_uses_source_registry_optional_lookup_directly() -> Non
 
     assert "def _existing_registry_entry(" not in source
     assert ".find_source(" in source
+
+
+def test_source_ingestion_registry_metadata_keys_are_centralized() -> None:
+    source = read_backend_source("source_ingestion.py")
+
+    assert SOURCE_METADATA_TITLE_KEY == "title"
+    assert SOURCE_METADATA_DOMAIN_KEY == "source_domain"
+    assert "SOURCE_METADATA_TITLE_KEY" in source
+    assert "SOURCE_METADATA_DOMAIN_KEY" in source
+    assert '"title": candidate.title' not in source
+    assert '"source_domain": domain' not in source
