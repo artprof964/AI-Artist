@@ -4,6 +4,7 @@ from dataclasses import dataclass
 from enum import Enum
 
 from backend.connection_settings import CONNECTION_ENV_VARS
+from backend.markdown_utils import markdown_heading_text
 
 
 class ReadinessStatus(str, Enum):
@@ -218,7 +219,7 @@ def validate_env_example(env_text: str) -> ReadinessCheck:
 
 
 def validate_runbook(runbook_text: str) -> tuple[ReadinessCheck, ...]:
-    heading_text = _heading_text(runbook_text)
+    heading_text = markdown_heading_text(runbook_text)
     lower_text = runbook_text.lower()
     checks: list[ReadinessCheck] = []
     for requirement in RUNBOOK_REQUIREMENTS:
@@ -302,16 +303,6 @@ def build_readiness_report(runbook_text: str, env_example_text: str) -> Readines
             *validate_command_definitions(),
         )
     )
-
-
-def _heading_text(markdown_text: str) -> str:
-    headings = [
-        line.lstrip("#").strip().lower()
-        for line in markdown_text.splitlines()
-        if line.startswith("#")
-    ]
-    return "\n".join(headings)
-
 
 __all__ = [
     "BACKUP_COMMANDS",

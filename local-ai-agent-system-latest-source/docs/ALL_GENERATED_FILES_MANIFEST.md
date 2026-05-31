@@ -150,6 +150,9 @@
 - `../../backend/security_review.py`
 - `../../tests/test_security_review.py`
 - `../../validation_reports/t28_production_hardening_validation_2026-05-31.md`
+- `../../validation_reports/markdown_heading_boundary_standardization_2026-05-31.md`
+- `../../backend/markdown_utils.py`
+- `../../tests/test_markdown_utils.py`
 - `../../backend/readiness.py`
 - `../../tests/test_production_readiness.py`
 - `../../docs/production_runbook_latest_v1.md`

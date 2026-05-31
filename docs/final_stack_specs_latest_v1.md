@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 339 passed, 1 skipped, 1 warning
+Final validation: 341 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -60,6 +60,7 @@ backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, a
 backend/review_status.py: shared generated-image review status vocabulary and checks.
 backend/critic_rubric.py: shared Critic/Curator rubric categories and pass/fail decision vocabulary.
 backend/text_utils.py: shared text tokenization and label normalization.
+backend/markdown_utils.py: shared Markdown heading extraction for documentation validators.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
 backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction.
@@ -174,6 +175,8 @@ backend/critic_rubric.py before scorer-specific rubric logic is added.
 Text tokenization and label/tag normalization must flow through
 backend/text_utils.py before classifier, retrieval, or rubric-specific token
 parsing logic is added.
+Markdown heading extraction must flow through backend/markdown_utils.py before
+readiness or future documentation validators inspect section headings.
 Numeric clamps, rounded averages, and vector similarity must flow through
 backend/numeric_utils.py before orchestration, retrieval, or rubric-specific
 scoring logic is added.

@@ -49,6 +49,7 @@ can be marked done.
 37. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
 38. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
 39. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
+40. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
 ```
 
 ## Standard Request Envelope
@@ -273,6 +274,8 @@ A task is done only when:
 - the project tracker records the validation test and result.
 - `Status` is set to the final result and `Finished` contains the completion
   date for completed work.
+- documentation validators parse Markdown headings through the shared Markdown
+  utility boundary.
 
 ## Tracker Columns
 

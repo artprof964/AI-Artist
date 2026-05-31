@@ -72,3 +72,10 @@ def test_runbook_validator_fails_when_required_sections_are_missing() -> None:
 
     assert any(check.status == ReadinessStatus.FAIL for check in checks)
     assert any("Health Checks" in check.detail for check in checks)
+
+
+def test_readiness_uses_shared_markdown_heading_parser() -> None:
+    source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+
+    assert "def _heading_text(" not in source
+    assert "markdown_heading_text(" in source
