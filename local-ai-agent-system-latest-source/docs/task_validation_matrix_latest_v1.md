@@ -10,7 +10,7 @@ contract is satisfied.
 | T02 | Project documentation and tracker alignment | Manifest includes all new docs, tracker dashboard totals match detail-plan status counts, and validation matrix exists. | Bestanden | 2026-05-30 |
 | T03 | Repository scaffold | `pytest`, lint command, and a tree check confirm `backend/`, `workspaces/`, `policies/`, `tests/`, and `docker-compose.yml` exist. | Bestanden | 2026-05-31 |
 | T04 | Docker Compose services | `docker compose config` succeeds and service health checks pass for PostgreSQL, Qdrant, MinIO, Redis, and OPA. | Bestanden | 2026-05-31 |
-| T05 | FastAPI Safety Service endpoints | API tests call `/health`, `/v1/requests/canonicalize`, `/v1/requests/classify`, and `/v1/policy/evaluate` with expected schemas. | Bestanden | 2026-05-31 |
+| T05 | FastAPI Safety Service endpoints | API and request-identity tests call `/health`, `/v1/requests/canonicalize`, `/v1/requests/classify`, and `/v1/policy/evaluate` with expected schemas and stable fingerprints. | Bestanden | 2026-05-31 |
 | T06 | OPA default-deny policies | Policy tests prove write, publish, delete, GitHub write, and cache replay are denied by default and allowed only with valid policy inputs. | Bestanden | 2026-05-31 |
 | T07 | PostgreSQL migrations | Migration test applies schema from empty DB, verifies all query/source/cache/audit tables and indexes, then rolls back cleanly. | Bestanden | 2026-05-31 |
 | T08 | OpenClaw AI-Artist workspace | Workspace test confirms required `SOUL.md`, `IDENTITY.md`, `USER.md`, `AGENTS.md`, `TOOLS.md`, `MEMORY.md`, and memory folders exist. | Bestanden | 2026-05-31 |
@@ -25,11 +25,11 @@ contract is satisfied.
 | T17 | ComfyUI adapter behind execution gate | Shared execution-gate tests and adapter tests prove image generation fails without a valid execution envelope and succeeds with a mocked approved envelope. | Bestanden | 2026-05-31 |
 | T18 | Image provenance | Artifact and canonical-hash tests verify prompt hash, workflow hash, model, seed, source refs, storage uri, review status, and stable canonical JSON digests are stored for every image. | Bestanden | 2026-05-31 |
 | T19 | Critic/Curator rubrics | Rubric test scores sample images or mocked image metadata and returns structured critique, pass/fail, and improvement notes. | Bestanden | 2026-05-31 |
-| T20 | Slack development channel | Slack adapter test uses a mocked Slack API to confirm inbound request handling and outbound response formatting. | Bestanden | 2026-05-31 |
+| T20 | Slack development channel | Slack adapter and request-identity tests use a mocked Slack API to confirm inbound request normalization, stable request IDs, and outbound response formatting. | Bestanden | 2026-05-31 |
 | T21 | Source ingestion | Ingestion test imports approved sample sources, stores snapshots, records source registry rows, and rejects disallowed source domains. | Bestanden | 2026-05-31 |
 | T22 | Publishing Agent with human approval | Shared execution-gate, canonical ID, side-effect audit, and publishing tests prove external publishing remains blocked until human approval is attached to the execution envelope. | Bestanden | 2026-05-31 |
 | T23 | GitHub adapter | GitHub adapter and adapter-result tests use a mocked GitHub API and confirm `git_ai-artist_codex_token` is read only by the adapter, not agents. | Bestanden | 2026-05-31 |
-| T24 | Unit tests for safety service and policies | CI test suite runs canonicalizer, canonical hashing, classifier, OPA, cache, freshness, and audit unit tests with `--cov-fail-under=90` over the safety service modules. | Bestanden | 2026-05-31 |
+| T24 | Unit tests for safety service and policies | CI test suite runs canonicalizer, canonical hashing, request identity, classifier, OPA, cache, freshness, and audit unit tests with `--cov-fail-under=90` over the safety service modules. | Bestanden | 2026-05-31 |
 | T25 | OpenClaw-to-safety integration tests | End-to-end test sends a request through OpenClaw hook, Safety Service, mock agents, validation, and final response synthesis. | Bestanden | 2026-05-31 |
 | T26 | Observability | Telemetry test verifies trace ids, metrics, and structured logs are emitted for request, policy, cache, orchestration, and tool stages. | Bestanden | 2026-05-31 |
 | T27 | Security review | Shared redaction tests and security checklist tests scan logs, prompts, memory, audit payloads, and artifacts for secret patterns and policy bypasses. | Bestanden | 2026-05-31 |

@@ -8,8 +8,9 @@ from backend.audit import (
     list_audit_events_by_correlation_id,
     record_audit_event,
 )
-from backend.canonical_hash import canonical_json, sha256_json
+from backend.canonical_hash import canonical_json
 from backend.observability import record_observability_stage, trace_id_from_request
+from backend.request_identity import normalize_request_text, request_fingerprint
 from backend.schemas import (
     CanonicalizeRequest,
     CanonicalizeResponse,
@@ -46,7 +47,7 @@ READ_TERMS = {"find", "get", "list", "read", "research", "show", "summarize"}
 
 
 def normalize_text(request_text: str) -> str:
-    return re.sub(r"\s+", " ", request_text).strip().lower()
+    return normalize_request_text(request_text, lowercase=True)
 
 
 def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
@@ -59,11 +60,11 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
         "workspace": payload.metadata.workspace,
         "agent": payload.metadata.agent,
     }
-    digest = sha256_json(fingerprint_payload)
+    fingerprint = request_fingerprint(fingerprint_payload)
     response = CanonicalizeResponse(
         request_id=payload.request_id,
         canonical_text=canonical_text,
-        request_fingerprint=f"sha256:{digest}",
+        request_fingerprint=fingerprint,
         requester_scope=payload.requester_scope,
         policy_scope=payload.policy_scope,
         channel=payload.channel,
@@ -94,7 +95,7 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
 
 def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
     text = normalize_text(payload.request_text)
-    terms = set(re.findall(r"[a-z0-9_]+", text))
+    terms = set(normalized_terms(text))
     has_action = bool(terms & ACTION_TERMS)
     has_read = bool(terms & READ_TERMS)
 
@@ -142,6 +143,10 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
         },
     )
     return response
+
+
+def normalized_terms(value: str) -> set[str]:
+    return set(re.findall(r"[a-z0-9_]+", normalize_text(value)))
 
 
 def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
@@ -265,5 +270,7 @@ __all__ = [
     "create_execution_envelope",
     "evaluate_policy",
     "list_audit_events_by_correlation_id",
+    "normalize_text",
+    "normalized_terms",
     "record_audit_event",
 ]

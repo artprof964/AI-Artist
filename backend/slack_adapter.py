@@ -2,8 +2,9 @@ from __future__ import annotations
 
 from dataclasses import dataclass, field
 from typing import Any, Protocol
-from uuid import NAMESPACE_URL, UUID, uuid5
+from uuid import UUID
 
+from backend.request_identity import normalize_request_text, stable_request_uuid
 from backend.secret_redaction import (
     LOWER_REDACTED_SECRET_VALUE,
     redact_secret_text,
@@ -159,7 +160,7 @@ def _optional_string(payload: dict[str, Any], key: str) -> str | None:
 
 
 def _normalize_text(text: str) -> str:
-    return " ".join(text.split())
+    return normalize_request_text(text, lowercase=False)
 
 
 def _stable_request_id(
@@ -172,16 +173,18 @@ def _stable_request_id(
     message_ts: str,
     thread_ts: str,
 ) -> UUID:
-    stable_parts = [
-        event_id or "",
-        team_id or "",
-        channel,
-        user,
-        message_ts,
-        thread_ts,
-        text,
-    ]
-    return uuid5(NAMESPACE_URL, "slack:" + ":".join(stable_parts))
+    return stable_request_uuid(
+        "slack",
+        [
+            event_id,
+            team_id,
+            channel,
+            user,
+            message_ts,
+            thread_ts,
+            text,
+        ],
+    )
 
 
 def _redact_secret(value: Any, secret: str | None) -> Any:

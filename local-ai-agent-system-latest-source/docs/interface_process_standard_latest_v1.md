@@ -21,6 +21,7 @@ can be marked done.
 9. ComfyUI owns image workflow execution.
 10. External write actions require a signed execution envelope.
 11. Canonical hashes and deterministic local IDs are produced through `backend/canonical_hash.py`.
+12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
 ```
 
 ## Standard Request Envelope
@@ -174,6 +175,7 @@ Output:
 2. Normalize
    - Safety Service canonicalizes request text and builds a stable fingerprint.
    - Canonical JSON and SHA-256 digest creation flows through the shared hash helper.
+   - Channel adapters use the shared request identity helper for text normalization and stable event ids.
 
 3. Classify
    - Safety Service classifies request as read, action, or mixed.
