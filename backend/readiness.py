@@ -10,6 +10,8 @@ from backend.connection_settings import (
     DEFAULT_QDRANT_URL,
     DEFAULT_SAFETY_SERVICE_URL,
     connection_endpoint_url,
+    missing_env_keys,
+    non_placeholder_secret_keys,
     parse_env_text,
 )
 from backend.health_contracts import health_expected_signal
@@ -272,12 +274,8 @@ def command_incomplete_detail(incomplete: tuple[str, ...]) -> str:
 
 def validate_env_example(env_text: str) -> ReadinessCheck:
     env_values = parse_env_example(env_text)
-    missing = tuple(required.name for required in REQUIRED_ENV_VARS if required.name not in env_values)
-    non_placeholder_secrets = tuple(
-        required.name
-        for required in REQUIRED_ENV_VARS
-        if required.secret and env_values.get(required.name, "") and "example" not in env_values[required.name]
-    )
+    missing = missing_env_keys(env_values)
+    non_placeholder_secrets = non_placeholder_secret_keys(env_values)
 
     if missing:
         return ReadinessCheck(

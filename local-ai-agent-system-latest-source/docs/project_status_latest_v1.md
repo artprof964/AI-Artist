@@ -27,7 +27,7 @@ Safety Service API metadata and route paths: centralized in backend/api_contract
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts and OpenClaw pre-tool request-kind checks: centralized in backend/interface_types.py
 OpenClaw tool policy metadata and telemetry field shapes: centralized in backend/openclaw_contracts.py
-Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
+Connection settings registry, endpoint URL composition, env-example rendering/parsing/validation, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
 Shell command/process argument construction, process execution defaults, compact process errors, and delimited process-output parsing: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
 Readiness validation detail messages: centralized in backend/readiness.py
@@ -139,7 +139,7 @@ Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Safety Service health: shared health response and readiness expected-signal contract
 Safety Service API contracts: shared FastAPI metadata and route paths across app decorators and endpoint tests
-Connection registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: registry-driven across LLM smoke tests, Slack adapter, GitHub adapter, readiness validation, readiness commands, docs, and tracker
+Connection registry, endpoint URL composition, env-example rendering/parsing/validation, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: registry-driven across LLM smoke tests, Slack adapter, GitHub adapter, readiness validation, readiness commands, docs, and tracker
 LLM smoke request defaults, overrides, request/result payload contracts, and timeout: centralized in backend/llm_api_contracts.py and backend/llm_api_smoke.py
 Shell command/process argument construction, process execution, compact process error formatting, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations, OPA probe diagnostics, and migration output parsing
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
@@ -187,7 +187,7 @@ Slack adapter contracts: shared across source labels, inbound event field names,
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, provider response field names, response validation messages, ComfyUI image response parsing, and publishing audit status parsing
 ComfyUI contracts: shared across image provenance response-field lookup, response validation, storage URI construction, storage-reference fallback, and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety, URL validation messages, and source-ingestion domain allowlisting
-Connection endpoint URLs and env example rendering/parsing: shared across readiness health, backup, restore command definitions, `.env.example`, and readiness validation
+Connection endpoint URLs and env example rendering/parsing/validation: shared across readiness health, backup, restore command definitions, `.env.example`, and readiness validation
 Shell commands: shared across readiness health, backup, and restore command definitions
 Readiness paths: shared across local backup directories, container dump path, and MinIO source alias
 Repository paths: shared across Compose, env, runbook, OPA policy, PostgreSQL schema, repo-root lookup, workspace file lookups, backend module discovery, and backend module source lookups
@@ -234,14 +234,14 @@ Slack response contract validation: 51 focused tests passed; Slack inbound field
 runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
-env parser validation: 2 focused files passed; readiness guarded against local env parser logic
+connection env validation helper validation: 32 focused tests passed; readiness env example missing-key and placeholder-secret checks use shared connection settings helpers
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
 adapter result field validation: 48 focused tests passed; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 503 passed, 1 warning
+final pytest: 505 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

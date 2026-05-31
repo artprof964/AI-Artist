@@ -185,6 +185,7 @@
 - `../../validation_reports/connection_endpoint_readiness_standardization_2026-05-31.md`
 - `../../validation_reports/connection_env_example_rendering_standardization_2026-05-31.md`
 - `../../validation_reports/connection_env_parser_standardization_2026-05-31.md`
+- `../../validation_reports/connection_env_validation_helper_standardization_2026-06-01.md`
 - `../../validation_reports/runtime_env_access_guard_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_resolution_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_secret_lookup_standardization_2026-05-31.md`

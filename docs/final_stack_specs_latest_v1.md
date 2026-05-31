@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 503 passed, 1 warning
+Final validation: 505 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -99,7 +99,7 @@ backend/response_cache_contracts.py: shared response-cache reuse telemetry event
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, time, and cache observability boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, source registry role/change-sequence contracts, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version, URL-domain validation, registry metadata payload, and source-registry default boundaries.
-backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution, connection error messages, and guards, endpoint URL composition, env-example rendering/parsing, and connection settings loader.
+backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution, connection error messages, and guards, endpoint URL composition, env-example rendering/parsing, env-example validation helpers, and connection settings loader.
 backend/adapter_secrets.py: shared adapter secret lookup that maps standard env vars to connection settings, supports custom env names and explicit injected secrets, and wraps adapter-specific configuration errors.
 backend/shell_commands.py: shared shell command and process argument construction for Docker Compose, curl, MinIO, and OPA command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
@@ -159,7 +159,7 @@ Safety Service API metadata and route paths must flow through
 backend/api_contracts.py before FastAPI decorators, endpoint tests, or
 interface docs change.
 Connection names, defaults, secret aliases, target setting fields, endpoint URL
-composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards must be changed through
+composition, env-example rendering/parsing/validation, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards must be changed through
 backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias.

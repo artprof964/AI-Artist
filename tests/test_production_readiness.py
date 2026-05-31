@@ -6,6 +6,8 @@ from backend.connection_settings import (
     DEFAULT_SAFETY_SERVICE_URL,
     connection_endpoint_url,
     env_example_text,
+    missing_env_keys,
+    non_placeholder_secret_keys,
     parse_env_text,
 )
 from backend.readiness import (
@@ -67,6 +69,18 @@ def test_readiness_uses_shared_env_parser() -> None:
     assert parse_env_example is parse_env_text
     assert "def parse_env_example(" not in readiness_source
     assert "parse_env_example = parse_env_text" in readiness_source
+
+
+def test_readiness_env_validation_uses_shared_connection_helpers() -> None:
+    readiness_source = read_backend_source("readiness.py")
+    validator_source = readiness_source.split("def validate_env_example", 1)[1]
+
+    assert "missing_env_keys(" in validator_source
+    assert "non_placeholder_secret_keys(" in validator_source
+    assert "env_values.get(" not in validator_source
+    assert "required.name not in env_values" not in validator_source
+    assert missing_env_keys(parse_env_example(env_example_text())) == ()
+    assert non_placeholder_secret_keys(parse_env_example(env_example_text())) == ()
 
 
 def test_runbook_contains_all_required_readiness_sections() -> None:

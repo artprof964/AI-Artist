@@ -19,6 +19,8 @@ from backend.connection_settings import (
     env_example_text,
     env_example_values,
     load_connection_settings,
+    missing_env_keys,
+    non_placeholder_secret_keys,
     parse_env_text,
     require_env_value,
     require_runtime_secret,
@@ -83,6 +85,25 @@ def test_required_env_registry_is_shared_with_readiness() -> None:
     assert example_values[GITHUB_TOKEN_ENV_VAR] == ""
     assert example_values["LLM_API_URL"] == DEFAULT_LLM_API_URL
     assert example_values["SAFETY_SERVICE_URL"] == DEFAULT_SAFETY_SERVICE_URL
+
+
+def test_env_validation_helpers_share_connection_registry() -> None:
+    parsed_example = parse_env_text(env_example_text())
+
+    assert missing_env_keys(parsed_example) == ()
+    assert non_placeholder_secret_keys(parsed_example) == ()
+
+    incomplete_env = dict(parsed_example)
+    incomplete_env.pop(DEEPSEEK_OPEN_ART_ENV_VAR)
+    assert missing_env_keys(incomplete_env) == (DEEPSEEK_OPEN_ART_ENV_VAR,)
+
+    secret_env = dict(parsed_example)
+    secret_env[DEEPSEEK_OPEN_ART_ENV_VAR] = "sk-live-secret"
+    secret_env[SLACK_BOT_TOKEN_ENV_VAR] = "xoxb-live-secret"
+    assert non_placeholder_secret_keys(secret_env) == (
+        DEEPSEEK_OPEN_ART_ENV_VAR,
+        SLACK_BOT_TOKEN_ENV_VAR,
+    )
 
 
 def test_connection_registry_maps_every_runtime_setting_once() -> None:

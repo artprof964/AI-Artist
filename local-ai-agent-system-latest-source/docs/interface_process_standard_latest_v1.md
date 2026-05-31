@@ -40,7 +40,7 @@ can be marked done.
 24. Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and score helpers use `backend/critic_rubric.py`.
 25. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 26. Numeric clamps, rounded averages, vector similarity, positive-integer checks, and zero-magnitude checks use `backend/numeric_utils.py` directly at scoring boundaries.
-27. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
+27. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing/validation, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
 28. LLM smoke request prompts, reasoning effort, thinking mode, timeout, chat request field names, role vocabulary, request/result payload construction, runtime secret lookup, and redacted request recording use `backend/llm_api_contracts.py` and `backend/llm_api_smoke.py`.
 29. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 30. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
@@ -125,7 +125,7 @@ Rules:
 - Runtime env and connection settings are resolved through the shared
   connection settings helper before adapters or live tests read provider
   credentials.
-- `.env.example` must match the shared connection settings registry rendering and parsing.
+- `.env.example` must match the shared connection settings registry rendering, parsing, and validation helpers.
 - Readiness health, backup, and restore endpoint commands compose service URLs
   through the shared connection settings helper.
 - Readiness Docker Compose, curl, and MinIO command syntax, OPA/test process

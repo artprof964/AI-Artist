@@ -218,6 +218,26 @@ def env_example_values() -> dict[str, str]:
     return {spec.name: "" if spec.secret else spec.default for spec in CONNECTION_ENV_VARS}
 
 
+def missing_env_keys(
+    env_values: Mapping[str, str],
+    specs: tuple[EnvVarSpec, ...] = CONNECTION_ENV_VARS,
+) -> tuple[str, ...]:
+    return tuple(spec.name for spec in specs if spec.name not in env_values)
+
+
+def non_placeholder_secret_keys(
+    env_values: Mapping[str, str],
+    specs: tuple[EnvVarSpec, ...] = CONNECTION_ENV_VARS,
+) -> tuple[str, ...]:
+    return tuple(
+        spec.name
+        for spec in specs
+        if spec.secret
+        and env_values.get(spec.name, "")
+        and "example" not in env_values[spec.name]
+    )
+
+
 def env_example_text() -> str:
     lines: list[str] = []
     values = env_example_values()
@@ -274,6 +294,8 @@ __all__ = [
     "env_example_values",
     "env_value",
     "load_connection_settings",
+    "missing_env_keys",
+    "non_placeholder_secret_keys",
     "parse_env_text",
     "require_env_value",
     "require_runtime_secret",
