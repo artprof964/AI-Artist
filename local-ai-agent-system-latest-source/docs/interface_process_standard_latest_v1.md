@@ -29,7 +29,7 @@ can be marked done.
 17. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
 18. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 19. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
-20. Mock sub-agent names and artifact types use `backend/mock_agent_contracts.py`.
+20. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
 21. Generated-image review status vocabulary and checks use `backend/review_status.py`.
 22. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
 23. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.

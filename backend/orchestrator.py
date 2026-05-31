@@ -11,6 +11,29 @@ from backend.mock_agent_contracts import (
     MOCK_ARTIFACT_CONTEXT_NOTE,
     MOCK_ARTIFACT_IMAGE_PLAN,
     MOCK_ARTIFACT_REVIEW_CHECKLIST,
+    MOCK_CRITIC_CURATOR_ERROR_CODE_FAILURE,
+    MOCK_CRITIC_CURATOR_ERROR_MESSAGE_FAILURE,
+    MOCK_CRITIC_CURATOR_POLICY_NOTE,
+    MOCK_CRITIC_CURATOR_SUMMARY_FAILED,
+    MOCK_CRITIC_CURATOR_SUMMARY_OK,
+    MOCK_IMAGE_PLANNER_ERROR_CODE_STYLE_DETAIL,
+    MOCK_IMAGE_PLANNER_ERROR_MESSAGE_STYLE_DETAIL,
+    MOCK_IMAGE_PLANNER_POLICY_NOTE,
+    MOCK_IMAGE_PLANNER_SUMMARY_OK,
+    MOCK_IMAGE_PLANNER_SUMMARY_RETRY,
+    MOCK_KNOWLEDGE_ERROR_CODE_BLOCKED,
+    MOCK_KNOWLEDGE_ERROR_MESSAGE_BLOCKED,
+    MOCK_KNOWLEDGE_POLICY_NOTE,
+    MOCK_KNOWLEDGE_SUMMARY_BLOCKED,
+    MOCK_KNOWLEDGE_SUMMARY_OK,
+    MOCK_ORCHESTRATION_COMPLETED_MESSAGE,
+    MOCK_ORCHESTRATION_COMPLETED_METRIC,
+    MOCK_ORCHESTRATION_COMPLETE_EVENT,
+    MOCK_ORCHESTRATION_STARTED_MESSAGE,
+    MOCK_ORCHESTRATION_STARTED_METRIC,
+    MOCK_ORCHESTRATION_START_EVENT,
+    MOCK_SYNTHESIS_EMPTY_OUTPUTS,
+    MOCK_SYNTHESIS_SEPARATOR,
 )
 from backend.numeric_utils import rounded_mean
 from backend.observability import (
@@ -75,13 +98,13 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
         else SUBAGENT_STATUS_OK
     )
     errors = []
-    summary = "Collected local project context for the request."
+    summary = MOCK_KNOWLEDGE_SUMMARY_OK
     if status == SUBAGENT_STATUS_BLOCKED:
-        summary = "Local project context was blocked by the mock simulation."
+        summary = MOCK_KNOWLEDGE_SUMMARY_BLOCKED
         errors = [
             {
-                "code": "mock_knowledge_blocked",
-                "message": "Knowledge agent was deterministically blocked by test metadata.",
+                "code": MOCK_KNOWLEDGE_ERROR_CODE_BLOCKED,
+                "message": MOCK_KNOWLEDGE_ERROR_MESSAGE_BLOCKED,
                 "retryable": False,
                 "details": {"agent": MOCK_AGENT_KNOWLEDGE},
             }
@@ -107,7 +130,7 @@ def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:
                 "metadata": {"source_kind": "local_workspace"},
             }
         ],
-        policy_notes=["Read-only local context lookup; no external source access."],
+        policy_notes=[MOCK_KNOWLEDGE_POLICY_NOTE],
         confidence=0.86 if status == SUBAGENT_STATUS_OK else 0.35,
         errors=errors,
     )
@@ -120,13 +143,13 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
         else SUBAGENT_STATUS_OK
     )
     errors = []
-    summary = "Prepared a local image planning brief without running generation."
+    summary = MOCK_IMAGE_PLANNER_SUMMARY_OK
     if status == SUBAGENT_STATUS_NEEDS_RETRY:
-        summary = "Image planning needs retry because required style details are incomplete."
+        summary = MOCK_IMAGE_PLANNER_SUMMARY_RETRY
         errors = [
             {
-                "code": "mock_style_detail_missing",
-                "message": "The mock planner requires one more deterministic style detail.",
+                "code": MOCK_IMAGE_PLANNER_ERROR_CODE_STYLE_DETAIL,
+                "message": MOCK_IMAGE_PLANNER_ERROR_MESSAGE_STYLE_DETAIL,
                 "retryable": True,
                 "details": {"agent": MOCK_AGENT_IMAGE_PLANNER},
             }
@@ -147,7 +170,7 @@ def _image_planner_agent(request: MockAgentRequest) -> SubAgentOutput:
                 },
             }
         ],
-        policy_notes=["No ComfyUI execution or image generation was attempted."],
+        policy_notes=[MOCK_IMAGE_PLANNER_POLICY_NOTE],
         confidence=0.78 if status == SUBAGENT_STATUS_OK else 0.45,
         errors=errors,
     )
@@ -160,13 +183,13 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
         else SUBAGENT_STATUS_OK
     )
     errors = []
-    summary = "Created a deterministic review checklist for later artifact evaluation."
+    summary = MOCK_CRITIC_CURATOR_SUMMARY_OK
     if status == SUBAGENT_STATUS_FAILED:
-        summary = "Critic-curator mock failed during deterministic validation."
+        summary = MOCK_CRITIC_CURATOR_SUMMARY_FAILED
         errors = [
             {
-                "code": "mock_curator_failure",
-                "message": "Critic-curator failure was requested by test metadata.",
+                "code": MOCK_CRITIC_CURATOR_ERROR_CODE_FAILURE,
+                "message": MOCK_CRITIC_CURATOR_ERROR_MESSAGE_FAILURE,
                 "retryable": False,
                 "details": {"agent": MOCK_AGENT_CRITIC_CURATOR},
             }
@@ -192,7 +215,7 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
                 "metadata": {"source_kind": "local_workspace"},
             }
         ],
-        policy_notes=["Review only; publishing remains blocked until later approval tasks."],
+        policy_notes=[MOCK_CRITIC_CURATOR_POLICY_NOTE],
         confidence=0.81 if status == SUBAGENT_STATUS_OK else 0.2,
         errors=errors,
     )
@@ -210,7 +233,7 @@ def synthesize_subagent_outputs(
     outputs: list[SubAgentOutput],
 ) -> MockOrchestrationResult:
     if not outputs:
-        raise ValueError("At least one SubAgentOutput is required for synthesis.")
+        raise ValueError(MOCK_SYNTHESIS_EMPTY_OUTPUTS)
 
     statuses = [output.status for output in outputs]
     status = dominant_subagent_status(statuses)
@@ -225,7 +248,7 @@ def synthesize_subagent_outputs(
     return MockOrchestrationResult(
         task_id=task_id,
         status=status,
-        summary=" | ".join(summary_parts),
+        summary=MOCK_SYNTHESIS_SEPARATOR.join(summary_parts),
         agent_outputs=outputs,
         status_counts=dict(status_counts),
         artifacts=[artifact for output in outputs for artifact in output.artifacts],
@@ -240,12 +263,12 @@ def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrat
     trace_id = trace_id_from_request(request.task_id, request.metadata)
     record_observability_stage(
         stage=TELEMETRY_STAGE_ORCHESTRATION,
-        event="start",
+        event=MOCK_ORCHESTRATION_START_EVENT,
         trace_id=trace_id,
         request_id=request.task_id,
-        metric_name="ai_artist.orchestration.started.total",
+        metric_name=MOCK_ORCHESTRATION_STARTED_METRIC,
         metric_tags={"agent_count": len(MOCK_SUB_AGENTS)},
-        message="orchestration started",
+        message=MOCK_ORCHESTRATION_STARTED_MESSAGE,
         fields={
             "task_id": str(request.task_id),
             "requester_scope": request.requester_scope,
@@ -257,13 +280,13 @@ def run_mock_subagent_orchestration(request: MockAgentRequest) -> MockOrchestrat
     result = synthesize_subagent_outputs(request.task_id, outputs)
     record_observability_stage(
         stage=TELEMETRY_STAGE_ORCHESTRATION,
-        event="complete",
+        event=MOCK_ORCHESTRATION_COMPLETE_EVENT,
         trace_id=trace_id,
         request_id=request.task_id,
-        metric_name="ai_artist.orchestration.completed.total",
+        metric_name=MOCK_ORCHESTRATION_COMPLETED_METRIC,
         metric_tags={"status": result.status, "agent_count": len(result.agent_outputs)},
         log_level=LOG_LEVEL_INFO if result.status == SUBAGENT_STATUS_OK else LOG_LEVEL_WARNING,
-        message="orchestration completed",
+        message=MOCK_ORCHESTRATION_COMPLETED_MESSAGE,
         fields={
             "task_id": str(result.task_id),
             "status": result.status,

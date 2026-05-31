@@ -45,7 +45,7 @@ Source registry missing-row messages: centralized in backend/source_registry_con
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source
 Sub-agent statuses and aggregation: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
-Mock sub-agent names and artifact types: centralized in backend/mock_agent_contracts.py
+Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, and orchestration telemetry
 Knowledge Agent contracts: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories and decisions: centralized in backend/critic_rubric.py
@@ -138,7 +138,7 @@ Source registry messages: shared across source-key and source-id freshness looku
 Source registry lookup: shared by source freshness and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas and mock orchestration status synthesis
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
-Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, and tests
+Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry, and tests
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, approved-hit filtering, artifact metadata, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests

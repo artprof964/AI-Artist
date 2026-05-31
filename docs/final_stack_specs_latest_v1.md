@@ -90,7 +90,7 @@ backend/source_ingestion.py: approved local source ingestion with direct canonic
 backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, and connection settings loader.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared secret-redaction boundary.
-backend/mock_agent_contracts.py: shared mock sub-agent names and artifact-type vocabulary.
+backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
@@ -184,9 +184,9 @@ logic is added.
 SubAgentOutput construction and model coercion must flow through
 backend/subagent_output_contracts.py before Knowledge retrieval, mock
 orchestration, or future sub-agent adapters return structured agent outputs.
-Mock sub-agent names and artifact types must flow through
-backend/mock_agent_contracts.py before orchestration-specific agent fixtures are
-changed.
+Mock sub-agent names, artifact types, output text, error text, synthesis text,
+and orchestration telemetry must flow through backend/mock_agent_contracts.py
+before orchestration-specific agent fixtures are changed.
 Generated image review status vocabulary and checks must flow through
 backend/review_status.py before provenance, critic, or publishing-specific
 review status logic is added.

@@ -21,6 +21,46 @@ MOCK_ARTIFACT_TYPES: tuple[str, ...] = (
     MOCK_ARTIFACT_REVIEW_CHECKLIST,
 )
 
+MOCK_KNOWLEDGE_SUMMARY_OK = "Collected local project context for the request."
+MOCK_KNOWLEDGE_SUMMARY_BLOCKED = "Local project context was blocked by the mock simulation."
+MOCK_KNOWLEDGE_ERROR_CODE_BLOCKED = "mock_knowledge_blocked"
+MOCK_KNOWLEDGE_ERROR_MESSAGE_BLOCKED = (
+    "Knowledge agent was deterministically blocked by test metadata."
+)
+MOCK_KNOWLEDGE_POLICY_NOTE = "Read-only local context lookup; no external source access."
+
+MOCK_IMAGE_PLANNER_SUMMARY_OK = "Prepared a local image planning brief without running generation."
+MOCK_IMAGE_PLANNER_SUMMARY_RETRY = (
+    "Image planning needs retry because required style details are incomplete."
+)
+MOCK_IMAGE_PLANNER_ERROR_CODE_STYLE_DETAIL = "mock_style_detail_missing"
+MOCK_IMAGE_PLANNER_ERROR_MESSAGE_STYLE_DETAIL = (
+    "The mock planner requires one more deterministic style detail."
+)
+MOCK_IMAGE_PLANNER_POLICY_NOTE = "No ComfyUI execution or image generation was attempted."
+
+MOCK_CRITIC_CURATOR_SUMMARY_OK = (
+    "Created a deterministic review checklist for later artifact evaluation."
+)
+MOCK_CRITIC_CURATOR_SUMMARY_FAILED = "Critic-curator mock failed during deterministic validation."
+MOCK_CRITIC_CURATOR_ERROR_CODE_FAILURE = "mock_curator_failure"
+MOCK_CRITIC_CURATOR_ERROR_MESSAGE_FAILURE = (
+    "Critic-curator failure was requested by test metadata."
+)
+MOCK_CRITIC_CURATOR_POLICY_NOTE = (
+    "Review only; publishing remains blocked until later approval tasks."
+)
+
+MOCK_SYNTHESIS_EMPTY_OUTPUTS = "At least one SubAgentOutput is required for synthesis."
+MOCK_SYNTHESIS_SEPARATOR = " | "
+
+MOCK_ORCHESTRATION_START_EVENT = "start"
+MOCK_ORCHESTRATION_COMPLETE_EVENT = "complete"
+MOCK_ORCHESTRATION_STARTED_METRIC = "ai_artist.orchestration.started.total"
+MOCK_ORCHESTRATION_COMPLETED_METRIC = "ai_artist.orchestration.completed.total"
+MOCK_ORCHESTRATION_STARTED_MESSAGE = "orchestration started"
+MOCK_ORCHESTRATION_COMPLETED_MESSAGE = "orchestration completed"
+
 
 __all__ = [
     "MOCK_AGENT_CRITIC_CURATOR",
@@ -31,4 +71,27 @@ __all__ = [
     "MOCK_ARTIFACT_IMAGE_PLAN",
     "MOCK_ARTIFACT_REVIEW_CHECKLIST",
     "MOCK_ARTIFACT_TYPES",
+    "MOCK_CRITIC_CURATOR_ERROR_CODE_FAILURE",
+    "MOCK_CRITIC_CURATOR_ERROR_MESSAGE_FAILURE",
+    "MOCK_CRITIC_CURATOR_POLICY_NOTE",
+    "MOCK_CRITIC_CURATOR_SUMMARY_FAILED",
+    "MOCK_CRITIC_CURATOR_SUMMARY_OK",
+    "MOCK_IMAGE_PLANNER_ERROR_CODE_STYLE_DETAIL",
+    "MOCK_IMAGE_PLANNER_ERROR_MESSAGE_STYLE_DETAIL",
+    "MOCK_IMAGE_PLANNER_POLICY_NOTE",
+    "MOCK_IMAGE_PLANNER_SUMMARY_OK",
+    "MOCK_IMAGE_PLANNER_SUMMARY_RETRY",
+    "MOCK_KNOWLEDGE_ERROR_CODE_BLOCKED",
+    "MOCK_KNOWLEDGE_ERROR_MESSAGE_BLOCKED",
+    "MOCK_KNOWLEDGE_POLICY_NOTE",
+    "MOCK_KNOWLEDGE_SUMMARY_BLOCKED",
+    "MOCK_KNOWLEDGE_SUMMARY_OK",
+    "MOCK_ORCHESTRATION_COMPLETED_MESSAGE",
+    "MOCK_ORCHESTRATION_COMPLETED_METRIC",
+    "MOCK_ORCHESTRATION_COMPLETE_EVENT",
+    "MOCK_ORCHESTRATION_STARTED_MESSAGE",
+    "MOCK_ORCHESTRATION_STARTED_METRIC",
+    "MOCK_ORCHESTRATION_START_EVENT",
+    "MOCK_SYNTHESIS_EMPTY_OUTPUTS",
+    "MOCK_SYNTHESIS_SEPARATOR",
 ]

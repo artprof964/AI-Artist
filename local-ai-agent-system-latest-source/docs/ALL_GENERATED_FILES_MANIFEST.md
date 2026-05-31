@@ -37,6 +37,7 @@
 - `../../validation_reports/subagent_status_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_output_constructor_standardization_2026-05-31.md`
 - `../../validation_reports/mock_agent_contract_standardization_2026-05-31.md`
+- `../../validation_reports/mock_agent_output_contract_standardization_2026-05-31.md`
 - `../../validation_reports/review_status_standardization_2026-05-31.md`
 - `../../validation_reports/interface_types_standardization_2026-05-31.md`
 - `../../validation_reports/classification_response_contract_standardization_2026-05-31.md`
