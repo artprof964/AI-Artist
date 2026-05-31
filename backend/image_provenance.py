@@ -5,7 +5,11 @@ from threading import RLock
 from typing import Any, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
-from backend.comfyui_contracts import comfyui_image_storage_uri
+from backend.comfyui_contracts import (
+    COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED,
+    COMFYUI_RESPONSE_IMAGES_REQUIRED,
+    comfyui_image_storage_uri,
+)
 from backend.model_coercion import coerce_model
 from backend.response_fields import field_value, required_response_list, require_response_mapping
 from backend.review_status import ReviewStatus
@@ -134,7 +138,7 @@ def record_comfyui_image_provenance(
         client_response,
         "images",
         error_type=ImageProvenanceError,
-        message="client response must include generated images",
+        message=COMFYUI_RESPONSE_IMAGES_REQUIRED,
     )
 
     records: list[ImageProvenanceRecord] = []
@@ -142,7 +146,7 @@ def record_comfyui_image_provenance(
         image_response = require_response_mapping(
             image,
             error_type=ImageProvenanceError,
-            message="generated image entries must be objects",
+            message=COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED,
         )
 
         records.append(

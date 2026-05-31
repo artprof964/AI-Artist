@@ -193,6 +193,10 @@ def test_image_provenance_uses_shared_comfyui_storage_uri_contract() -> None:
 
     assert "def _storage_uri_from_comfyui_image(" not in source
     assert "comfyui_image_storage_uri(" in source
+    assert '"client response must include generated images"' not in source
+    assert '"generated image entries must be objects"' not in source
+    assert "COMFYUI_RESPONSE_IMAGES_REQUIRED" in source
+    assert "COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED" in source
 
 
 def test_image_provenance_uses_shared_model_coercion_directly() -> None:

@@ -32,7 +32,7 @@ Slack adapter contracts: centralized in backend/slack_contracts.py
 GitHub adapter contracts: centralized in backend/github_contracts.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
-ComfyUI generated-image URI contracts: centralized in backend/comfyui_contracts.py
+ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
 Adapter results: centralized in backend/adapter_results.py
 Side-effect audit: centralized in backend/side_effect_audit.py
 Canonical hashing, HMAC signatures, and security-review serialization: centralized in backend/canonical_hash.py
@@ -150,7 +150,7 @@ Payload fields: shared across Slack event parsing, nested event object validatio
 Slack adapter boundaries: shared payload, request identity, and secret-redaction helpers are called directly without local wrapper functions
 Slack adapter contracts: shared across source labels, inbound event validation messages, and outbound response validation messages
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, ComfyUI image response parsing, and publishing audit status parsing
-ComfyUI contracts: shared across image provenance storage URI construction and future ComfyUI adapter response handling
+ComfyUI contracts: shared across image provenance response validation, storage URI construction, and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety and source-ingestion domain allowlisting
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
 GitHub adapter contracts: shared across action labels, target labels, API validation messages, and token-purpose text

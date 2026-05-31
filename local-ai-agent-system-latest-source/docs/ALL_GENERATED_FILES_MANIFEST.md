@@ -89,6 +89,7 @@
 - `../../validation_reports/required_envelope_message_standardization_2026-05-31.md`
 - `../../backend/execution_gate_messages.py`
 - `../../validation_reports/comfyui_contract_standardization_2026-05-31.md`
+- `../../validation_reports/comfyui_response_contract_standardization_2026-05-31.md`
 - `../../backend/comfyui_contracts.py`
 - `../../tests/test_comfyui_contracts.py`
 - `../../backend/comfyui_adapter.py`

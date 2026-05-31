@@ -9,15 +9,20 @@ from backend.response_fields import field_value
 
 COMFYUI_URI_SCHEME = "comfyui"
 COMFYUI_DEFAULT_IMAGE_TYPE = "output"
+COMFYUI_IMAGE_FILENAME_MESSAGE = "generated image must include filename or storage_uri"
+COMFYUI_IMAGE_TYPE_MESSAGE = "generated image type must be a non-empty string"
+COMFYUI_IMAGE_SUBFOLDER_MESSAGE = "generated image subfolder must be a string"
+COMFYUI_RESPONSE_IMAGES_REQUIRED = "client response must include generated images"
+COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED = "generated image entries must be objects"
 
 
 def comfyui_image_storage_uri(
     image: Mapping[str, Any],
     *,
     error_type: type[Exception] = ValueError,
-    filename_message: str = "generated image must include filename or storage_uri",
-    type_message: str = "generated image type must be a non-empty string",
-    subfolder_message: str = "generated image subfolder must be a string",
+    filename_message: str = COMFYUI_IMAGE_FILENAME_MESSAGE,
+    type_message: str = COMFYUI_IMAGE_TYPE_MESSAGE,
+    subfolder_message: str = COMFYUI_IMAGE_SUBFOLDER_MESSAGE,
 ) -> str:
     filename = required_string_field(
         image,
@@ -49,6 +54,11 @@ def comfyui_image_storage_uri(
 
 __all__ = [
     "COMFYUI_DEFAULT_IMAGE_TYPE",
+    "COMFYUI_IMAGE_FILENAME_MESSAGE",
+    "COMFYUI_IMAGE_SUBFOLDER_MESSAGE",
+    "COMFYUI_IMAGE_TYPE_MESSAGE",
+    "COMFYUI_RESPONSE_IMAGE_ENTRY_REQUIRED",
+    "COMFYUI_RESPONSE_IMAGES_REQUIRED",
     "COMFYUI_URI_SCHEME",
     "comfyui_image_storage_uri",
 ]

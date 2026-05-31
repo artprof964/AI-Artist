@@ -77,7 +77,7 @@ backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and d
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
-backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention and response-image storage reference helper.
+backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
 backend/slack_contracts.py: shared Slack source label and validation message contracts.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, and token-purpose text.
