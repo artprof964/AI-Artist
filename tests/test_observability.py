@@ -1,9 +1,11 @@
 import json
 from datetime import datetime, timedelta, timezone
+from pathlib import Path
 from uuid import UUID
 
 import pytest
 
+from backend.audit import REDACTED_SECRET_VALUE, redacted_audit_mapping
 from backend.observability import (
     TELEMETRY_STAGE_CACHE,
     TELEMETRY_STAGE_ORCHESTRATION,
@@ -195,3 +197,23 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
     )
     assert "sk-observability-secret" not in serialized_telemetry
     assert "oauth-observability-secret" not in serialized_telemetry
+
+
+def test_observability_uses_shared_redacted_audit_mapping_boundary() -> None:
+    source = Path("backend/observability.py").read_text(encoding="utf-8")
+
+    assert "def _safe_dict(" not in source
+    assert "redacted_audit_mapping(" in source
+
+
+def test_redacted_audit_mapping_returns_dict_without_secret_values() -> None:
+    redacted = redacted_audit_mapping(
+        {
+            "metadata": {"api_key": "sk-observability-secret"},
+            "tag": "safe",
+        }
+    )
+
+    assert redacted["metadata"]["api_key"] == REDACTED_SECRET_VALUE
+    assert redacted["tag"] == "safe"
+    assert redacted_audit_mapping(None) == {}

@@ -6,7 +6,7 @@ from threading import RLock
 from typing import Any, Literal
 from uuid import UUID
 
-from backend.audit import redact_audit_value
+from backend.audit import redacted_audit_mapping
 from backend.time_utils import utc_now
 
 
@@ -95,8 +95,8 @@ class InMemoryObservabilityCollector:
     ) -> None:
         emitted_at = utc_now()
         normalized_request_id = str(request_id) if request_id is not None else None
-        safe_fields = _safe_dict(fields)
-        safe_tags = _safe_dict(metric_tags)
+        safe_fields = redacted_audit_mapping(fields)
+        safe_tags = redacted_audit_mapping(metric_tags)
         trace = TraceRecord(
             trace_id=trace_id,
             stage=stage,
@@ -189,13 +189,6 @@ def record_observability_stage(
         message=message,
         fields=fields,
     )
-
-
-def _safe_dict(value: dict[str, Any] | None) -> dict[str, Any]:
-    if value is None:
-        return {}
-    return dict(redact_audit_value(value))
-
 
 __all__ = [
     "InMemoryObservabilityCollector",

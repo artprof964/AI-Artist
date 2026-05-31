@@ -3,10 +3,12 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
 from threading import RLock
+from collections.abc import Mapping
 from typing import Any, Protocol
 from uuid import UUID
 
 from backend.interface_types import AuditEventType
+from backend.mapping_utils import copy_mapping
 from backend.payload_fields import string_field_or_none
 from backend.schemas import AuditEventRequest, AuditEventResponse
 from backend.secret_redaction import (
@@ -70,6 +72,10 @@ def redact_audit_value(value: Any) -> Any:
         replacement=REDACTED_SECRET_VALUE,
         collapse_matching_strings=True,
     )
+
+
+def redacted_audit_mapping(value: Mapping[str, Any] | None) -> dict[str, Any]:
+    return copy_mapping(redact_audit_value(value))
 
 
 def audit_record_from_request(payload: AuditEventRequest) -> AuditEventRecord:

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 318 passed, 1 skipped, 1 warning
+Final validation: 320 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -71,7 +71,7 @@ backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and d
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
-backend/audit.py: in-memory audit repository and recursive secret redaction.
+backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, and time boundaries.
 backend/source_freshness.py: dependency snapshot and stale-source checks.
@@ -90,7 +90,7 @@ backend/slack_adapter.py: mocked Slack request/response adapter using shared pay
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared URL path validation.
-backend/observability.py: telemetry stage/log-level constants, traces, metrics, structured logs, redaction.
+backend/observability.py: telemetry stage/log-level constants, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
 backend/security_review.py: deterministic security checklist helpers.
 backend/readiness.py: production readiness schema and runbook validators.
 ```
