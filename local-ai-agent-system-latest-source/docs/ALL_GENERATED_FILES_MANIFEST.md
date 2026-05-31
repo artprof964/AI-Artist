@@ -206,6 +206,7 @@
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
 - `../../validation_reports/health_contract_standardization_2026-05-31.md`
 - `../../validation_reports/response_fields_standardization_2026-05-31.md`
+- `../../validation_reports/response_field_message_standardization_2026-05-31.md`
 - `../../backend/health_contracts.py`
 - `../../backend/response_fields.py`
 - `../../tests/test_health_contracts.py`

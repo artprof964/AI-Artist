@@ -1,10 +1,12 @@
 import pytest
 
 from backend.response_fields import (
+    RESPONSE_ENTRY_OBJECT_MESSAGE,
     ResponseFieldError,
     field_value,
     first_choice_message_content,
     required_response_list,
+    required_response_list_message,
     require_response_mapping,
 )
 
@@ -35,10 +37,15 @@ def test_required_response_list_accepts_non_empty_lists() -> None:
 
 @pytest.mark.parametrize("value", [None, [], "not-list"])
 def test_required_response_list_rejects_missing_empty_or_wrong_shape(value: object) -> None:
-    with pytest.raises(ResponseFieldError, match="images"):
+    with pytest.raises(ResponseFieldError, match=required_response_list_message("images")):
         required_response_list({"images": value}, "images")
 
 
 def test_require_response_mapping_rejects_non_objects() -> None:
-    with pytest.raises(ResponseFieldError, match="object"):
+    with pytest.raises(ResponseFieldError, match=RESPONSE_ENTRY_OBJECT_MESSAGE):
         require_response_mapping("not-object")
+
+
+def test_response_validation_messages_are_centralized() -> None:
+    assert required_response_list_message("images") == "response field 'images' must be a non-empty list"
+    assert RESPONSE_ENTRY_OBJECT_MESSAGE == "response entry must be an object"

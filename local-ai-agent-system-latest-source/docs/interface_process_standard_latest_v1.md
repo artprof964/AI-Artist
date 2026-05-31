@@ -37,7 +37,7 @@ can be marked done.
 25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
 26. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 27. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-28. Provider response object/dict field access, first-choice message content extraction, and shape validation use `backend/response_fields.py`.
+28. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.
 29. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 30. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
 31. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.

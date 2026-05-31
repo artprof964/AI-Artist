@@ -8,6 +8,13 @@ class ResponseFieldError(ValueError):
     """Raised when a provider response field has the wrong shape."""
 
 
+RESPONSE_ENTRY_OBJECT_MESSAGE = "response entry must be an object"
+
+
+def required_response_list_message(key: str) -> str:
+    return f"response field {key!r} must be a non-empty list"
+
+
 def field_value(response: Any, key: str, default: Any = None) -> Any:
     if isinstance(response, Mapping):
         return response.get(key, default)
@@ -23,7 +30,7 @@ def required_response_list(
 ) -> list[Any]:
     value = field_value(response, key)
     if not isinstance(value, list) or not value:
-        raise error_type(message or f"response field {key!r} must be a non-empty list")
+        raise error_type(message or required_response_list_message(key))
     return value
 
 
@@ -31,7 +38,7 @@ def require_response_mapping(
     value: Any,
     *,
     error_type: type[Exception] = ResponseFieldError,
-    message: str = "response entry must be an object",
+    message: str = RESPONSE_ENTRY_OBJECT_MESSAGE,
 ) -> Mapping[str, Any]:
     if not isinstance(value, Mapping):
         raise error_type(message)
@@ -49,8 +56,10 @@ def first_choice_message_content(response: Any) -> str | None:
 
 __all__ = [
     "ResponseFieldError",
+    "RESPONSE_ENTRY_OBJECT_MESSAGE",
     "field_value",
     "first_choice_message_content",
+    "required_response_list_message",
     "required_response_list",
     "require_response_mapping",
 ]
