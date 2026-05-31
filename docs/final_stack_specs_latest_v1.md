@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 456 passed, 1 skipped, 1 warning
+Final validation: 458 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -111,7 +111,7 @@ backend/slack_adapter.py: mocked Slack request/response adapter using shared pay
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation and publishing scope constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
 backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
-backend/observability.py: telemetry stage/log-level constants, default metric values, metric-name formatting, trace-id fallback formatting, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
+backend/observability.py: telemetry stage/log-level constants, default metric values, metric-name constants/formatting, trace-id fallback formatting, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
 backend/security_review.py: deterministic security checklist helpers.
 backend/readiness.py: production readiness schema, centralized readiness detail messages, and runbook validators.
 ```
@@ -303,7 +303,7 @@ execution-envelope validation.
 Request kind, channel, operation, and audit event type contracts must flow
 through backend/interface_types.py before schema, classifier, or audit-specific
 literal types are added.
-Telemetry stages, log levels, default metric values, metric-name formatting,
+Telemetry stages, log levels, default metric values, metric-name constants/formatting,
 trace-id fallback formatting, and event-message formatting must flow through
 backend/observability.py constants before service, cache, orchestration, tool,
 or review-specific telemetry calls are added.

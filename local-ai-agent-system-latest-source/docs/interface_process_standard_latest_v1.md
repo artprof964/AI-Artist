@@ -48,7 +48,7 @@ can be marked done.
 34. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 35. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
 36. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`, including OpenClaw pre-tool approval checks.
-37. Telemetry stages, log levels, default metric values, metric-name formatting, trace-id fallback formatting, and event-message formatting use `backend/observability.py`.
+37. Telemetry stages, log levels, default metric values, metric-name constants/formatting, trace-id fallback formatting, and event-message formatting use `backend/observability.py`.
 38. Publishing outcome statuses use `backend/publishing_status.py`.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
 40. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.

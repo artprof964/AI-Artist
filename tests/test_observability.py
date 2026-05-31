@@ -6,6 +6,11 @@ import pytest
 from backend.audit import REDACTED_SECRET_VALUE, redacted_audit_mapping
 from backend.canonical_hash import canonical_json
 from backend.observability import (
+    METRIC_CACHE_REUSE_EVALUATED,
+    METRIC_ORCHESTRATION_COMPLETED,
+    METRIC_POLICY_EVALUATED,
+    METRIC_REQUEST_CANONICALIZED,
+    METRIC_TOOL_EXECUTED,
     TELEMETRY_STAGE_CACHE,
     TELEMETRY_STAGE_ORCHESTRATION,
     TELEMETRY_STAGE_POLICY,
@@ -172,11 +177,12 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
     assert all(record.trace_id == TRACE_ID for record in metrics)
     assert all(record.trace_id == TRACE_ID for record in logs)
 
-    assert "ai_artist.request.canonicalized.total" in {metric.name for metric in metrics}
-    assert "ai_artist.policy.evaluated.total" in {metric.name for metric in metrics}
-    assert "ai_artist.cache.reuse_evaluated.total" in {metric.name for metric in metrics}
-    assert "ai_artist.orchestration.completed.total" in {metric.name for metric in metrics}
-    assert "ai_artist.tool.executed.total" in {metric.name for metric in metrics}
+    metric_names = {metric.name for metric in metrics}
+    assert METRIC_REQUEST_CANONICALIZED in metric_names
+    assert METRIC_POLICY_EVALUATED in metric_names
+    assert METRIC_CACHE_REUSE_EVALUATED in metric_names
+    assert METRIC_ORCHESTRATION_COMPLETED in metric_names
+    assert METRIC_TOOL_EXECUTED in metric_names
 
     log_events = {(record.stage, record.event) for record in logs}
     assert (TELEMETRY_STAGE_REQUEST, "canonicalize") in log_events

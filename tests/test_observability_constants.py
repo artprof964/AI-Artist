@@ -4,6 +4,16 @@ from backend.observability import (
     LOG_LEVEL_INFO,
     LOG_LEVEL_WARNING,
     LOG_LEVELS,
+    METRIC_CACHE_REUSE_EVALUATED,
+    METRIC_ORCHESTRATION_COMPLETED,
+    METRIC_ORCHESTRATION_STARTED,
+    METRIC_POLICY_EVALUATED,
+    METRIC_REQUEST_CANONICALIZED,
+    METRIC_REQUEST_CLASSIFIED,
+    METRIC_TOOL_APPROVED,
+    METRIC_TOOL_DENIED,
+    METRIC_TOOL_EXECUTED,
+    METRIC_TOOL_PREFLIGHT,
     OBSERVABILITY_METRIC_PREFIX,
     REQUEST_TRACE_ID_PREFIX,
     TELEMETRY_STAGE_CACHE,
@@ -63,6 +73,19 @@ def test_observability_metric_and_trace_defaults_are_centralized() -> None:
     assert 'return "request:unknown"' not in source
 
 
+def test_observability_metric_names_are_centralized() -> None:
+    assert METRIC_REQUEST_CANONICALIZED == "ai_artist.request.canonicalized.total"
+    assert METRIC_REQUEST_CLASSIFIED == "ai_artist.request.classified.total"
+    assert METRIC_POLICY_EVALUATED == "ai_artist.policy.evaluated.total"
+    assert METRIC_CACHE_REUSE_EVALUATED == "ai_artist.cache.reuse_evaluated.total"
+    assert METRIC_ORCHESTRATION_STARTED == "ai_artist.orchestration.started.total"
+    assert METRIC_ORCHESTRATION_COMPLETED == "ai_artist.orchestration.completed.total"
+    assert METRIC_TOOL_PREFLIGHT == "ai_artist.tool.preflight.total"
+    assert METRIC_TOOL_DENIED == "ai_artist.tool.denied.total"
+    assert METRIC_TOOL_APPROVED == "ai_artist.tool.approved.total"
+    assert METRIC_TOOL_EXECUTED == "ai_artist.tool.executed.total"
+
+
 def test_runtime_modules_use_observability_stage_constants() -> None:
     for module_filename in (
         "service.py",
@@ -79,3 +102,27 @@ def test_runtime_modules_use_observability_stage_constants() -> None:
         assert 'stage="orchestration"' not in source
         assert 'stage="tool"' not in source
         assert 'log_level="warning"' not in source
+
+
+def test_runtime_modules_use_observability_metric_name_constants() -> None:
+    runtime_modules = (
+        "service.py",
+        "response_cache.py",
+        "openclaw_hook.py",
+        "mock_agent_contracts.py",
+    )
+
+    for module_filename in runtime_modules:
+        source = read_backend_source(module_filename)
+
+        assert "METRIC_" in source
+        assert '"ai_artist.request.canonicalized.total"' not in source
+        assert '"ai_artist.request.classified.total"' not in source
+        assert '"ai_artist.policy.evaluated.total"' not in source
+        assert '"ai_artist.cache.reuse_evaluated.total"' not in source
+        assert '"ai_artist.orchestration.started.total"' not in source
+        assert '"ai_artist.orchestration.completed.total"' not in source
+        assert '"ai_artist.tool.preflight.total"' not in source
+        assert '"ai_artist.tool.denied.total"' not in source
+        assert '"ai_artist.tool.approved.total"' not in source
+        assert '"ai_artist.tool.executed.total"' not in source

@@ -72,7 +72,7 @@ Operations: centralized in backend/operations.py
 Publishing audit operation value: uses backend/operations.py directly
 Gated adapter operation values: use backend/operations.py directly
 Model coercion and validation messages: centralized in backend/model_coercion.py and called directly at domain boundaries
-Telemetry stages, log levels, default metric values, metric-name formatting, trace-id fallback formatting, and event-message formatting: centralized in backend/observability.py
+Telemetry stages, log levels, default metric values, metric-name constants/formatting, trace-id fallback formatting, and event-message formatting: centralized in backend/observability.py
 Publishing outcome statuses: centralized in backend/publishing_status.py
 ```
 
@@ -189,7 +189,7 @@ Interface types: shared directly across API schemas, operation classification, a
 API route contracts: shared directly across FastAPI decorators and endpoint tests
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
 Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
-Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric names, trace fallback ids, default event messages, and security review probes
+Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric-name constants, trace fallback ids, default event messages, and security review probes
 Publishing statuses: shared across Publishing Agent result handling and side-effect audit payloads
 Deprecated architecture term scan: clean
 ```
@@ -215,7 +215,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 456 passed, 1 skipped, 1 warning
+final pytest: 458 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

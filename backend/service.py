@@ -10,6 +10,9 @@ from backend.classification_contracts import (
 from backend.observability import (
     LOG_LEVEL_INFO,
     LOG_LEVEL_WARNING,
+    METRIC_POLICY_EVALUATED,
+    METRIC_REQUEST_CANONICALIZED,
+    METRIC_REQUEST_CLASSIFIED,
     TELEMETRY_STAGE_POLICY,
     TELEMETRY_STAGE_REQUEST,
     record_observability_stage,
@@ -78,7 +81,7 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
         event="canonicalize",
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
-        metric_name="ai_artist.request.canonicalized.total",
+        metric_name=METRIC_REQUEST_CANONICALIZED,
         metric_tags={
             "channel": payload.channel,
             **metadata_fields,
@@ -117,7 +120,7 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
         event="classify",
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
-        metric_name="ai_artist.request.classified.total",
+        metric_name=METRIC_REQUEST_CLASSIFIED,
         metric_tags={"request_kind": request_kind, "operation": operation},
         message="request classified",
         fields={
@@ -157,7 +160,7 @@ def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
         event="evaluate",
         trace_id=trace_id_from_request(payload.request_id, payload.metadata),
         request_id=payload.request_id,
-        metric_name="ai_artist.policy.evaluated.total",
+        metric_name=METRIC_POLICY_EVALUATED,
         metric_tags={
             "operation": payload.operation,
             "request_kind": payload.request_kind,

@@ -49,6 +49,48 @@ def observability_metric_name(stage: TelemetryStage, event: str) -> str:
     return f"{OBSERVABILITY_METRIC_PREFIX}.{stage}.{event}.total"
 
 
+METRIC_REQUEST_CANONICALIZED = observability_metric_name(
+    TELEMETRY_STAGE_REQUEST,
+    "canonicalized",
+)
+METRIC_REQUEST_CLASSIFIED = observability_metric_name(
+    TELEMETRY_STAGE_REQUEST,
+    "classified",
+)
+METRIC_POLICY_EVALUATED = observability_metric_name(
+    TELEMETRY_STAGE_POLICY,
+    "evaluated",
+)
+METRIC_CACHE_REUSE_EVALUATED = observability_metric_name(
+    TELEMETRY_STAGE_CACHE,
+    "reuse_evaluated",
+)
+METRIC_ORCHESTRATION_STARTED = observability_metric_name(
+    TELEMETRY_STAGE_ORCHESTRATION,
+    "started",
+)
+METRIC_ORCHESTRATION_COMPLETED = observability_metric_name(
+    TELEMETRY_STAGE_ORCHESTRATION,
+    "completed",
+)
+METRIC_TOOL_PREFLIGHT = observability_metric_name(
+    TELEMETRY_STAGE_TOOL,
+    "preflight",
+)
+METRIC_TOOL_DENIED = observability_metric_name(
+    TELEMETRY_STAGE_TOOL,
+    "denied",
+)
+METRIC_TOOL_APPROVED = observability_metric_name(
+    TELEMETRY_STAGE_TOOL,
+    "approved",
+)
+METRIC_TOOL_EXECUTED = observability_metric_name(
+    TELEMETRY_STAGE_TOOL,
+    "executed",
+)
+
+
 def request_trace_id(request_id: UUID | str) -> str:
     return f"{REQUEST_TRACE_ID_PREFIX}:{request_id}"
 
@@ -214,6 +256,16 @@ __all__ = [
     "LOG_LEVEL_WARNING",
     "LOG_LEVELS",
     "LogLevel",
+    "METRIC_CACHE_REUSE_EVALUATED",
+    "METRIC_ORCHESTRATION_COMPLETED",
+    "METRIC_ORCHESTRATION_STARTED",
+    "METRIC_POLICY_EVALUATED",
+    "METRIC_REQUEST_CANONICALIZED",
+    "METRIC_REQUEST_CLASSIFIED",
+    "METRIC_TOOL_APPROVED",
+    "METRIC_TOOL_DENIED",
+    "METRIC_TOOL_EXECUTED",
+    "METRIC_TOOL_PREFLIGHT",
     "MetricRecord",
     "OBSERVABILITY_METRIC_PREFIX",
     "REQUEST_TRACE_ID_PREFIX",

@@ -6,6 +6,7 @@ from backend.interface_types import REQUEST_KIND_READ, Operation, RequestKind
 from backend.observability import (
     LOG_LEVEL_INFO,
     LOG_LEVEL_WARNING,
+    METRIC_CACHE_REUSE_EVALUATED,
     TELEMETRY_STAGE_CACHE,
     record_observability_stage,
     trace_id_from_request,
@@ -84,7 +85,7 @@ def evaluate_cached_response_reuse(
             event="reuse_evaluate",
             trace_id=trace_id,
             request_id=policy_request.request_id,
-            metric_name="ai_artist.cache.reuse_evaluated.total",
+            metric_name=METRIC_CACHE_REUSE_EVALUATED,
             metric_tags={"replay": decision.replay, "reason": decision.reason},
             log_level=LOG_LEVEL_INFO if decision.replay else LOG_LEVEL_WARNING,
             message="cache reuse evaluated",

@@ -5,6 +5,10 @@ from uuid import UUID
 from backend.interface_types import REQUEST_KIND_READ, Operation, RequestKind
 from backend.observability import (
     LOG_LEVEL_WARNING,
+    METRIC_TOOL_APPROVED,
+    METRIC_TOOL_DENIED,
+    METRIC_TOOL_EXECUTED,
+    METRIC_TOOL_PREFLIGHT,
     TELEMETRY_STAGE_TOOL,
     record_observability_stage,
 )
@@ -97,7 +101,7 @@ def execute_tool_call_with_safety(
         event="preflight",
         trace_id=request.correlation_id,
         request_id=request.request_id,
-        metric_name="ai_artist.tool.preflight.total",
+        metric_name=METRIC_TOOL_PREFLIGHT,
         metric_tags={"tool_name": request.tool_name, "operation": request.operation},
         message="tool preflight started",
         fields={
@@ -116,7 +120,7 @@ def execute_tool_call_with_safety(
             event="denied",
             trace_id=request.correlation_id,
             request_id=request.request_id,
-            metric_name="ai_artist.tool.denied.total",
+            metric_name=METRIC_TOOL_DENIED,
             metric_tags={"tool_name": request.tool_name, "operation": request.operation},
             log_level=LOG_LEVEL_WARNING,
             message="tool call denied",
@@ -140,7 +144,7 @@ def execute_tool_call_with_safety(
         event="approved",
         trace_id=request.correlation_id,
         request_id=request.request_id,
-        metric_name="ai_artist.tool.approved.total",
+        metric_name=METRIC_TOOL_APPROVED,
         metric_tags={"tool_name": request.tool_name, "operation": request.operation},
         message="tool call approved",
         fields={
@@ -156,7 +160,7 @@ def execute_tool_call_with_safety(
         event="executed",
         trace_id=request.correlation_id,
         request_id=request.request_id,
-        metric_name="ai_artist.tool.executed.total",
+        metric_name=METRIC_TOOL_EXECUTED,
         metric_tags={"tool_name": request.tool_name, "operation": request.operation},
         message="tool call executed",
         fields={

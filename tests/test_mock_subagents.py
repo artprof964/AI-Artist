@@ -35,6 +35,10 @@ from backend.mock_agent_contracts import (
     MOCK_SYNTHESIS_EMPTY_OUTPUTS,
     MOCK_SYNTHESIS_SEPARATOR,
 )
+from backend.observability import (
+    METRIC_ORCHESTRATION_COMPLETED,
+    METRIC_ORCHESTRATION_STARTED,
+)
 from backend.orchestrator import (
     MOCK_SUB_AGENTS,
     MockAgentRequest,
@@ -154,8 +158,8 @@ def test_mock_agent_contract_vocabulary_is_centralized() -> None:
     assert MOCK_SYNTHESIS_SEPARATOR == " | "
     assert MOCK_ORCHESTRATION_START_EVENT == "start"
     assert MOCK_ORCHESTRATION_COMPLETE_EVENT == "complete"
-    assert MOCK_ORCHESTRATION_STARTED_METRIC == "ai_artist.orchestration.started.total"
-    assert MOCK_ORCHESTRATION_COMPLETED_METRIC == "ai_artist.orchestration.completed.total"
+    assert MOCK_ORCHESTRATION_STARTED_METRIC == METRIC_ORCHESTRATION_STARTED
+    assert MOCK_ORCHESTRATION_COMPLETED_METRIC == METRIC_ORCHESTRATION_COMPLETED
     assert MOCK_ORCHESTRATION_STARTED_MESSAGE == "orchestration started"
     assert MOCK_ORCHESTRATION_COMPLETED_MESSAGE == "orchestration completed"
 
