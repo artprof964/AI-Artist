@@ -50,6 +50,7 @@ Mapping copies and metadata/payload merges: centralized in backend/mapping_utils
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
 Local default-deny policy version: centralized in backend/policy_contracts.py
 Source registry missing-row messages, dependency roles, and initial change-sequence defaults: centralized in backend/source_registry_contracts.py
+Source freshness schema defaults: centralized in backend/source_freshness_contracts.py
 Source ingestion contracts and registry metadata keys: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
@@ -154,6 +155,7 @@ Mapping utilities: shared across source ingestion, source freshness, Knowledge A
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
 Policy contracts: shared across Safety Service policy responses and execution-envelope policy version stamps
 Source registry contracts: shared across source-key/source-id freshness lookup failures, dependency roles, and initial change sequence defaults
+Source freshness contracts: shared across schema defaults, source dependency snapshots, policy requests, and execution envelopes
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
@@ -213,7 +215,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 443 passed, 1 skipped, 1 warning
+final pytest: 444 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

@@ -6,6 +6,10 @@ from backend.health_contracts import HealthStatus
 from backend.interface_types import AuditEventType, Channel, Operation, RequestKind
 from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.runtime_ids import runtime_uuid
+from backend.source_freshness_contracts import (
+    DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
+    DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
+)
 from backend.subagent_status import SubAgentStatus
 from backend.time_utils import utc_now
 from pydantic import BaseModel, ConfigDict, Field
@@ -59,8 +63,13 @@ class ClassifyResponse(BaseModel):
 
 
 class SourceFreshness(BaseModel):
-    all_required_sources_unchanged: bool = True
-    changed_source_count: int = Field(default=0, ge=0)
+    all_required_sources_unchanged: bool = (
+        DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED
+    )
+    changed_source_count: int = Field(
+        default=DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
+        ge=0,
+    )
 
 
 class PolicyEvaluateRequest(BaseModel):

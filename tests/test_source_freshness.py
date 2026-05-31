@@ -2,7 +2,11 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
-from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse
+from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
+from backend.source_freshness_contracts import (
+    DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
+    DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
+)
 from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import (
     SOURCE_DEPENDENCY_ROLE_READ,
@@ -180,6 +184,24 @@ def test_source_registry_contract_defaults_are_shared() -> None:
     assert 'source_role: str = "read"' not in source
     assert 'source_role: str = "read",' not in source
     assert "else 1" not in source
+
+
+def test_source_freshness_schema_defaults_are_shared() -> None:
+    freshness = SourceFreshness()
+    schemas_source = read_backend_source("schemas.py")
+    contract_source = read_backend_source("source_freshness_contracts.py")
+
+    assert DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED is True
+    assert DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT == 0
+    assert freshness.all_required_sources_unchanged == (
+        DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED
+    )
+    assert freshness.changed_source_count == DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT
+    assert "DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED" in schemas_source
+    assert "DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT" in schemas_source
+    assert "all_required_sources_unchanged: bool = True" not in schemas_source
+    assert "changed_source_count: int = Field(default=0" not in schemas_source
+    assert "DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT = 0" in contract_source
 
 
 def test_source_freshness_uses_shared_missing_row_message_contract() -> None:

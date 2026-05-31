@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 443 passed, 1 skipped, 1 warning
+Final validation: 444 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -82,6 +82,7 @@ backend/side_effect_audit.py: shared side-effect audit payload and event recordi
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, and initial change-sequence contracts.
+backend/source_freshness_contracts.py: shared source-freshness schema defaults for fresh source snapshots.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, and registry metadata key contracts.
 backend/slack_contracts.py: shared Slack source label, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
@@ -220,6 +221,8 @@ persistence adapters raise missing-row errors.
 Source dependency roles and initial source change sequence defaults must flow
 through backend/source_registry_contracts.py before freshness snapshots or
 registry writes change source semantics.
+SourceFreshness schema defaults must flow through
+backend/source_freshness_contracts.py before default freshness semantics change.
 Existing source registry row checks must call SourceFreshnessRegistry.find_source
 or SourceFreshnessRegistry.find_source_by_id before ingestion, stale-source
 checks, or future persistence code handles optional source rows.
