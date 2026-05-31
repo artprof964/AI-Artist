@@ -22,6 +22,7 @@ can be marked done.
 10. External write actions require a signed execution envelope.
 11. Canonical hashes and deterministic local IDs are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
+13. Cache, provenance, execution-envelope, and persistence timestamps use `backend/time_utils.py` for UTC normalization.
 ```
 
 ## Standard Request Envelope
@@ -196,6 +197,7 @@ Output:
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
+   - Envelope expiry comparisons use shared UTC normalization.
 
 9. Deliver
    - Output Tool Agent sends the response or executes the approved action.

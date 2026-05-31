@@ -18,12 +18,12 @@ contract is satisfied.
 | T10 | OpenClaw safety-service tool hook | Integration test attempts a tool call and confirms Safety Service receives the pre-execution request before any adapter runs. | Bestanden | 2026-05-31 |
 | T11 | `SubAgentOutput` schema | Schema tests accept valid agent outputs and reject missing status, malformed artifacts, invalid confidence, and unstructured errors. | Bestanden | 2026-05-31 |
 | T12 | Mock sub-agents | Orchestration test routes one request through all mock agents, collects structured outputs, and synthesizes a single result. | Bestanden | 2026-05-31 |
-| T13 | Approved read-only response cache | Cache tests verify only read responses with OPA approval and non-expired cache entries are replayed. | Bestanden | 2026-05-31 |
+| T13 | Approved read-only response cache | Cache and time-normalization tests verify only read responses with OPA approval and non-expired UTC-normalized cache entries are replayed. | Bestanden | 2026-05-31 |
 | T14 | Source freshness check | Freshness tests increment `source_data_registry.change_seq` and prove stale cached responses are blocked. | Bestanden | 2026-05-31 |
 | T15 | Audit event log | Audit tests verify request, policy, reuse, execution-envelope, tool-call, and artifact events are persisted with correlation ids. | Bestanden | 2026-05-31 |
 | T16 | Knowledge Agent retrieval | Retrieval test ingests sample source data, embeds it, queries Qdrant, returns source-cited results through the Knowledge Agent, and excludes unapproved sources. | Bestanden | 2026-05-31 |
-| T17 | ComfyUI adapter behind execution gate | Shared execution-gate tests and adapter tests prove image generation fails without a valid execution envelope and succeeds with a mocked approved envelope. | Bestanden | 2026-05-31 |
-| T18 | Image provenance | Artifact and canonical-hash tests verify prompt hash, workflow hash, model, seed, source refs, storage uri, review status, and stable canonical JSON digests are stored for every image. | Bestanden | 2026-05-31 |
+| T17 | ComfyUI adapter behind execution gate | Shared execution-gate and time-normalization tests plus adapter tests prove image generation fails without a non-expired valid execution envelope and succeeds with a mocked approved envelope. | Bestanden | 2026-05-31 |
+| T18 | Image provenance | Artifact, canonical-hash, and time-normalization tests verify prompt hash, workflow hash, model, seed, source refs, storage uri, review status, stable canonical JSON digests, and UTC timestamps are stored for every image. | Bestanden | 2026-05-31 |
 | T19 | Critic/Curator rubrics | Rubric test scores sample images or mocked image metadata and returns structured critique, pass/fail, and improvement notes. | Bestanden | 2026-05-31 |
 | T20 | Slack development channel | Slack adapter and request-identity tests use a mocked Slack API to confirm inbound request normalization, stable request IDs, and outbound response formatting. | Bestanden | 2026-05-31 |
 | T21 | Source ingestion | Ingestion test imports approved sample sources, stores snapshots, records source registry rows, and rejects disallowed source domains. | Bestanden | 2026-05-31 |

@@ -5,6 +5,7 @@ from threading import RLock
 from typing import Any, Literal, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
+from backend.time_utils import as_utc
 from pydantic import BaseModel, ConfigDict, Field
 
 
@@ -206,9 +207,7 @@ def _storage_uri_from_comfyui_image(image: dict[str, Any]) -> str:
 
 
 def _as_utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+    return as_utc(value)
 
 
 __all__ = [

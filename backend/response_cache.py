@@ -4,6 +4,7 @@ from typing import Any
 
 from backend.observability import record_observability_stage, trace_id_from_request
 from backend.schemas import Operation, PolicyEvaluateRequest, PolicyEvaluateResponse, RequestKind
+from backend.time_utils import as_utc
 
 
 @dataclass(frozen=True)
@@ -134,6 +135,4 @@ def evaluate_cached_response_reuse(
 
 
 def _as_utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+    return as_utc(value)

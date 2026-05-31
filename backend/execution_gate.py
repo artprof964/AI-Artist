@@ -6,6 +6,7 @@ from typing import Any
 from pydantic import ValidationError
 
 from backend.schemas import ExecutionEnvelopeResponse
+from backend.time_utils import as_utc
 
 
 class ExecutionGateError(PermissionError):
@@ -97,9 +98,7 @@ def _validate_execution_envelope(
 
 
 def _as_aware_utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
+    return as_utc(value)
 
 
 __all__ = [
