@@ -34,7 +34,7 @@ def test_workspace_secret_scanner_flags_llm_api_github_slack_and_generic_assignm
         (workspace / "MEMORY.md").write_text(
             "\n".join(
                 [
-                    "DEEPSEEK_API_KEY=sk-local-review-secret",
+                    "deepseek-open-art=sk-local-review-secret",
                     "github_token: ghp_localreviewsecret0000000000",
                     "slack = xoxb-local-review-secret",
                     "password = keepthissecret",

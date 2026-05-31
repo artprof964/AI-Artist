@@ -57,8 +57,8 @@ regression.
 
 ## Notes
 
-- `DEEPSEEK_API_KEY`, primary, fallback, classifier, and embedding model env vars are loaded through `backend.llm_api_smoke.load_llm_api_model_config`.
+- `deepseek-open-art`, primary, fallback, classifier, and embedding model env vars are loaded through `backend.llm_api_smoke.load_llm_api_model_config`.
 - The smoke request targets `https://api.deepseek.com` through the OpenAI SDK and uses `deepseek-v4-pro` by default.
 - Unit tests use a mocked OpenAI-compatible client to verify model, timeout, messages, reasoning effort, thinking options, response id, and content.
 - The returned request record redacts the API key, and tests assert that the test API key is absent from the result representation.
-- The live LLM API smoke test is present and automatically skipped when `DEEPSEEK_API_KEY` is absent.
+- The live LLM API smoke test is present and automatically skipped when `deepseek-open-art` is absent.

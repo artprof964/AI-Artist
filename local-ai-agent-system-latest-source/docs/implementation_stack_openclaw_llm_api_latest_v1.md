@@ -217,7 +217,7 @@ mypy                        Python type checks where useful
 ## Environment Variables
 
 ```text
-DEEPSEEK_API_KEY=...
+deepseek-open-art=...
 LLM_API_URL=https://api.deepseek.com
 LLM_PRIMARY_MODEL=deepseek-v4-pro
 LLM_FALLBACK_MODEL=provider-fallback-model

@@ -44,7 +44,7 @@ all required keys without requiring real secrets in source control.
 Required secret keys may be blank in `.env.example`:
 
 ```text
-DEEPSEEK_API_KEY
+deepseek-open-art
 SLACK_BOT_TOKEN
 git_ai-artist_codex_token
 ```
