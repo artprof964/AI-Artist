@@ -14,6 +14,10 @@ from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
 
 SECRET_REDACTION = REDACTED_SECRET_VALUE
 LLM_API_SMOKE_TEST_PURPOSE = "the live LLM API smoke test"
+LLM_SMOKE_SYSTEM_PROMPT = "You are a helpful assistant"
+LLM_SMOKE_USER_PROMPT = "Hello"
+LLM_SMOKE_REASONING_EFFORT = "high"
+LLM_SMOKE_THINKING_TYPE = "enabled"
 
 
 @dataclass(frozen=True)
@@ -49,16 +53,23 @@ def load_llm_api_model_config(env: Mapping[str, str] | None = None) -> LLMAPIMod
     )
 
 
-def build_smoke_request(config: LLMAPIModelConfig) -> dict[str, Any]:
+def build_smoke_request(
+    config: LLMAPIModelConfig,
+    *,
+    system_prompt: str = LLM_SMOKE_SYSTEM_PROMPT,
+    user_prompt: str = LLM_SMOKE_USER_PROMPT,
+    reasoning_effort: str = LLM_SMOKE_REASONING_EFFORT,
+    thinking_type: str = LLM_SMOKE_THINKING_TYPE,
+) -> dict[str, Any]:
     return {
         "model": config.primary_model,
         "messages": [
-            {"role": "system", "content": "You are a helpful assistant"},
-            {"role": "user", "content": "Hello"},
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt},
         ],
         "stream": False,
-        "reasoning_effort": "high",
-        "extra_body": {"thinking": {"type": "enabled"}},
+        "reasoning_effort": reasoning_effort,
+        "extra_body": {"thinking": {"type": thinking_type}},
     }
 
 

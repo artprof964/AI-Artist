@@ -14,6 +14,10 @@ from backend.connection_settings import (
 )
 from backend.llm_api_smoke import (
     LLM_API_SMOKE_TEST_PURPOSE,
+    LLM_SMOKE_REASONING_EFFORT,
+    LLM_SMOKE_SYSTEM_PROMPT,
+    LLM_SMOKE_THINKING_TYPE,
+    LLM_SMOKE_USER_PROMPT,
     SECRET_REDACTION,
     build_smoke_request,
     load_llm_api_model_config,
@@ -99,12 +103,43 @@ def test_smoke_request_targets_configured_llm_api_model() -> None:
 
     assert request["model"] == DEFAULT_LLM_PRIMARY_MODEL
     assert request["messages"] == [
-        {"role": "system", "content": "You are a helpful assistant"},
-        {"role": "user", "content": "Hello"},
+        {"role": "system", "content": LLM_SMOKE_SYSTEM_PROMPT},
+        {"role": "user", "content": LLM_SMOKE_USER_PROMPT},
     ]
     assert request["stream"] is False
-    assert request["reasoning_effort"] == "high"
-    assert request["extra_body"] == {"thinking": {"type": "enabled"}}
+    assert request["reasoning_effort"] == LLM_SMOKE_REASONING_EFFORT
+    assert request["extra_body"] == {"thinking": {"type": LLM_SMOKE_THINKING_TYPE}}
+
+
+def test_smoke_request_accepts_prompt_and_reasoning_overrides() -> None:
+    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
+    request = build_smoke_request(
+        config,
+        system_prompt="Use concise responses",
+        user_prompt="How is the weather?",
+        reasoning_effort="medium",
+        thinking_type="disabled",
+    )
+
+    assert request["messages"] == [
+        {"role": "system", "content": "Use concise responses"},
+        {"role": "user", "content": "How is the weather?"},
+    ]
+    assert request["reasoning_effort"] == "medium"
+    assert request["extra_body"] == {"thinking": {"type": "disabled"}}
+
+
+def test_smoke_request_defaults_are_centralized() -> None:
+    source = read_backend_source("llm_api_smoke.py")
+
+    assert "LLM_SMOKE_SYSTEM_PROMPT" in source
+    assert "LLM_SMOKE_USER_PROMPT" in source
+    assert "LLM_SMOKE_REASONING_EFFORT" in source
+    assert "LLM_SMOKE_THINKING_TYPE" in source
+    assert '"content": "You are a helpful assistant"' not in source
+    assert '"content": "Hello"' not in source
+    assert '"reasoning_effort": "high"' not in source
+    assert '"type": "enabled"' not in source
 
 
 def test_shared_redaction_removes_nested_sensitive_values() -> None:

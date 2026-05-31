@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 432 passed, 1 skipped, 1 warning
+Final validation: 434 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -94,7 +94,7 @@ backend/shell_commands.py: shared shell command and process argument constructio
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
-backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, shared runtime secret resolution, and redacted smoke request path.
+backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, shared runtime secret resolution, and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared secret-redaction boundary.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.
@@ -144,6 +144,9 @@ composition, env-example rendering/parsing, runtime env resolution, runtime secr
 backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias.
+LLM smoke-test prompts, reasoning effort, thinking mode, request payload
+construction, runtime secret lookup, and redacted request recording must flow
+through backend/llm_api_smoke.py before live-provider diagnostics are changed.
 Shell command strings and process argument lists for Docker Compose, curl,
 MinIO, and OPA commands, subprocess execution defaults, and delimited process-output parsing must flow
 through backend/shell_commands.py before production readiness command
