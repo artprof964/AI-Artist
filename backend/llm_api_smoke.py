@@ -1,12 +1,12 @@
 from dataclasses import dataclass
-from typing import Any, Protocol
+from typing import Any, Mapping, Protocol
 
 from openai import OpenAI
 
 from backend.connection_settings import (
     STANDARD_LLM_API_KEY_ENV_VAR,
     load_connection_settings,
-    runtime_env,
+    require_runtime_secret,
 )
 from backend.response_fields import field_value, first_choice_message_content
 from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
@@ -29,15 +29,17 @@ class LLMAPIHTTPClient(Protocol):
     chat: Any
 
 
-def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelConfig:
-    settings = load_connection_settings(runtime_env(env))
-    if not settings.llm_api_key:
-        raise RuntimeError(
-            f"{STANDARD_LLM_API_KEY_ENV_VAR} is required for the live LLM API smoke test"
-        )
+def load_llm_api_model_config(env: Mapping[str, str] | None = None) -> LLMAPIModelConfig:
+    settings = load_connection_settings(env)
+    api_key = require_runtime_secret(
+        env,
+        STANDARD_LLM_API_KEY_ENV_VAR,
+        purpose="the live LLM API smoke test",
+        setting_name="llm_api_key",
+    )
 
     return LLMAPIModelConfig(
-        api_key=settings.llm_api_key,
+        api_key=api_key,
         api_url=settings.llm_api_url,
         primary_model=settings.llm_primary_model,
         fallback_model=settings.llm_fallback_model,
@@ -68,7 +70,7 @@ def create_llm_api_client(config: LLMAPIModelConfig) -> OpenAI:
 
 
 def run_llm_api_smoke_test(
-    env: dict[str, str] | None = None,
+    env: Mapping[str, str] | None = None,
     timeout_seconds: float = 30.0,
     llm_client: LLMAPIHTTPClient | None = None,
 ) -> dict[str, Any]:

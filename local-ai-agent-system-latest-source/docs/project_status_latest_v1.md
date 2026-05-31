@@ -196,8 +196,8 @@ process execution validation: 2 focused files passed; tests guarded against dire
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
-runtime secret validation: GitHub and Slack adapters guarded against local runtime-token resolution
-final pytest: 404 passed, 1 skipped, 1 warning
+runtime secret validation: LLM API smoke, GitHub, and Slack guarded against local runtime-token resolution
+final pytest: 405 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

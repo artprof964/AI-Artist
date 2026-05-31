@@ -98,9 +98,9 @@ flowchart TD
     subgraph SECURITY["Security And Secret Boundaries"]
         OPA --> RULES["Policy authority"]
         EPG --> APPROVAL["recheck privileged execution + route approval"]
-        HLLM --> LLMAPIENV["connection_settings runtime_env -> deepseek-open-art"]
-        SLACK["Slack Adapter"] --> SLACKENV["connection_settings runtime_env -> SLACK_BOT_TOKEN"]
-        GH --> GHENV["connection_settings runtime_env -> git_ai-artist_codex_token"]
+        HLLM --> LLMAPIENV["connection_settings runtime secret -> deepseek-open-art"]
+        SLACK["Slack Adapter"] --> SLACKENV["connection_settings runtime secret -> SLACK_BOT_TOKEN"]
+        GH --> GHENV["connection_settings runtime secret -> git_ai-artist_codex_token"]
         SLACKENV --> SLACKAPI["Slack API"]
         GHENV --> GHA["GitHub API"]
         OPENBAO["OpenBao runtime injection later"] --> LLMAPIENV

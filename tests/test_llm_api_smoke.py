@@ -8,7 +8,7 @@ from backend.connection_settings import (
     DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
-    require_env_value,
+    require_runtime_secret,
     runtime_env,
 )
 from backend.llm_api_smoke import (
@@ -80,8 +80,10 @@ def test_llm_api_model_config_accepts_legacy_deepseek_api_key_env_var() -> None:
 
 
 def test_llm_api_model_config_requires_api_key() -> None:
-    with pytest.raises(RuntimeError, match=DEEPSEEK_OPEN_ART_ENV_VAR):
+    with pytest.raises(RuntimeError) as exc:
         load_llm_api_model_config({})
+
+    assert str(exc.value) == f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test"
 
 
 def test_smoke_request_targets_configured_llm_api_model() -> None:
@@ -152,6 +154,15 @@ def test_llm_api_smoke_uses_shared_response_choice_parser() -> None:
     assert "first_choice_message_content(" in source
 
 
+def test_llm_api_smoke_uses_shared_runtime_secret_resolver() -> None:
+    source = read_backend_module_text("llm_api_smoke.py")
+
+    assert "require_runtime_secret(" in source
+    assert "if not settings.llm_api_key" not in source
+    assert "require_env_value(" not in source
+    assert "runtime_env(" not in source
+
+
 @pytest.mark.skipif(
     not runtime_env().get(STANDARD_LLM_API_KEY_ENV_VAR),
     reason=f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test",
@@ -163,5 +174,10 @@ def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     assert result["model"]
     assert result["content"]
     assert result["request"]["api_key"] == SECRET_REDACTION
-    api_key = require_env_value(runtime_env(), STANDARD_LLM_API_KEY_ENV_VAR, purpose="LLM API smoke test")
+    api_key = require_runtime_secret(
+        runtime_env(),
+        STANDARD_LLM_API_KEY_ENV_VAR,
+        purpose="LLM API smoke test",
+        setting_name="llm_api_key",
+    )
     assert api_key not in repr(result)

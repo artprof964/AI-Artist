@@ -453,8 +453,9 @@ const stages = [
     ],
     links: ["GitHub Adapter", "File / Storage Adapter", "Channels / Platforms", "Persistent Data Storage"],
     controls: [
-      "Slack runtime token source: connection_settings runtime_env -> SLACK_BOT_TOKEN.",
-      "GitHub runtime token source: connection_settings runtime_env -> git_ai-artist_codex_token."
+      "LLM runtime secret source: connection_settings -> deepseek-open-art.",
+      "Slack runtime token source: connection_settings -> SLACK_BOT_TOKEN.",
+      "GitHub runtime token source: connection_settings -> git_ai-artist_codex_token."
     ]
   },
   {
