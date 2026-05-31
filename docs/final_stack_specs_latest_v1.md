@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 458 passed, 1 skipped, 1 warning
+Final validation: 461 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -79,7 +79,7 @@ backend/operations.py: shared operation constants, classifier terms, and sensiti
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
-backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
+backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
 backend/source_freshness_contracts.py: shared source-freshness schema defaults and unchanged-source predicate for fresh source snapshots and cache replay.
@@ -176,7 +176,7 @@ Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Execution-envelope validation failure and required-envelope messages must flow through
 backend/execution_gate_messages.py before gated adapters expose envelope errors.
-Secret detection patterns, assignment scanning, and replacement behavior must
+Secret detection patterns, assignment scanning, structured unredacted-secret checks, and replacement behavior must
 flow through backend/secret_redaction.py before adapter-specific logging,
 response shaping, security review, or future scanner logic.
 OpenClaw policy metadata redaction must call `backend/secret_redaction.py`

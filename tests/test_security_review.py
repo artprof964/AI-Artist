@@ -165,7 +165,9 @@ def test_security_review_uses_shared_secret_detection_boundary() -> None:
     assert "SECRET_ASSIGNMENT_PATTERN" not in source
     assert "SECRET_VALUE_PATTERNS" not in source
     assert "def _contains_secret_like_value(" not in source
+    assert "def _find_unredacted_secrets(" not in source
     assert "contains_secret_like_value(" in source
+    assert "contains_unredacted_secret_value(" in source
 
 
 def test_security_review_uses_shared_text_file_scanner() -> None:

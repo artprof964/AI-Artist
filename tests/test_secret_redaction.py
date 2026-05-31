@@ -2,9 +2,12 @@ from backend.secret_redaction import (
     LOWER_REDACTED_SECRET_VALUE,
     REDACTED_SECRET_VALUE,
     contains_secret_like_value,
+    contains_unredacted_secret_value,
+    is_redacted_secret_value,
     looks_secret_key,
     redact_secret_text,
     redact_secret_value,
+    secret_key_value_is_unredacted,
 )
 
 
@@ -64,3 +67,32 @@ def test_contains_secret_like_value_covers_tokens_and_assignments() -> None:
     assert contains_secret_like_value("Bearer nested-secret-token")
     assert contains_secret_like_value("github_token: ghp_localreviewsecret0000000000")
     assert not contains_secret_like_value("model: deepseek-v4-pro")
+
+
+def test_contains_unredacted_secret_value_covers_structured_payloads() -> None:
+    assert contains_unredacted_secret_value({"api_key": "plain-secret"})
+    assert contains_unredacted_secret_value({"metadata": {"token": "xoxb-local-secret-token"}})
+    assert contains_unredacted_secret_value(["message ghp_localreviewsecret0000000000"])
+    assert not contains_unredacted_secret_value(
+        {
+            "api_key": REDACTED_SECRET_VALUE,
+            "oauth_token": LOWER_REDACTED_SECRET_VALUE,
+            "optional_secret": "",
+            "missing_token": None,
+            "message": "model: deepseek-v4-pro",
+        }
+    )
+
+
+def test_secret_key_value_unredacted_check_ignores_empty_or_redacted_values() -> None:
+    assert secret_key_value_is_unredacted("plain-secret")
+    assert not secret_key_value_is_unredacted("")
+    assert not secret_key_value_is_unredacted(None)
+    assert not secret_key_value_is_unredacted(REDACTED_SECRET_VALUE)
+    assert not secret_key_value_is_unredacted(LOWER_REDACTED_SECRET_VALUE)
+
+
+def test_is_redacted_secret_value_accepts_standard_replacements() -> None:
+    assert is_redacted_secret_value(REDACTED_SECRET_VALUE)
+    assert is_redacted_secret_value(LOWER_REDACTED_SECRET_VALUE)
+    assert not is_redacted_secret_value("plain-secret")

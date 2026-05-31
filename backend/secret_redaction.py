@@ -49,6 +49,38 @@ def contains_secret_like_value(text: str) -> bool:
     )
 
 
+def is_redacted_secret_value(value: Any) -> bool:
+    return value in {REDACTED_SECRET_VALUE, LOWER_REDACTED_SECRET_VALUE}
+
+
+def contains_unredacted_secret_value(value: Any) -> bool:
+    if isinstance(value, dict):
+        for key, nested_value in value.items():
+            if looks_secret_key(str(key)) and secret_key_value_is_unredacted(nested_value):
+                return True
+            if contains_unredacted_secret_value(nested_value):
+                return True
+        return False
+
+    if isinstance(value, list):
+        return any(contains_unredacted_secret_value(item) for item in value)
+
+    if isinstance(value, str):
+        return contains_secret_like_value(value)
+
+    return False
+
+
+def secret_key_value_is_unredacted(value: Any) -> bool:
+    if value in (None, ""):
+        return False
+    if is_redacted_secret_value(value):
+        return False
+    if isinstance(value, dict | list):
+        return contains_unredacted_secret_value(value)
+    return True
+
+
 def redact_secret_text(
     value: str,
     *,
@@ -124,7 +156,10 @@ __all__ = [
     "SECRET_KEY_TERMS",
     "SECRET_VALUE_PATTERNS",
     "contains_secret_like_value",
+    "contains_unredacted_secret_value",
+    "is_redacted_secret_value",
     "looks_secret_key",
     "redact_secret_text",
     "redact_secret_value",
+    "secret_key_value_is_unredacted",
 ]

@@ -19,7 +19,10 @@ from backend.schemas import (
     SourceFreshness,
 )
 from backend.service import SENSITIVE_OPERATIONS, create_execution_envelope, evaluate_policy
-from backend.secret_redaction import contains_secret_like_value
+from backend.secret_redaction import (
+    contains_secret_like_value,
+    contains_unredacted_secret_value,
+)
 from backend.runtime_ids import runtime_uuid
 
 
@@ -48,7 +51,14 @@ def scan_workspace_secret_files(workspaces_root: Path) -> list[SecurityReviewFin
 
 def review_audit_payload_redaction(payload: dict[str, Any]) -> list[SecurityReviewFinding]:
     redacted = redact_audit_value(payload)
-    return _find_unredacted_secrets(redacted, surface="audit")
+    if contains_unredacted_secret_value(redacted):
+        return [
+            SecurityReviewFinding(
+                surface="audit",
+                message="secret-like value survived redaction",
+            )
+        ]
+    return []
 
 
 def review_observability_redaction(fields: dict[str, Any]) -> list[SecurityReviewFinding]:
@@ -166,18 +176,6 @@ def review_provenance_metadata(
             )
         )
     return findings
-
-
-def _find_unredacted_secrets(value: Any, *, surface: str) -> list[SecurityReviewFinding]:
-    serialized = canonical_json(value)
-    if not contains_secret_like_value(serialized):
-        return []
-    return [
-        SecurityReviewFinding(
-            surface=surface,
-            message="secret-like value survived redaction",
-        )
-    ]
 
 
 __all__ = [

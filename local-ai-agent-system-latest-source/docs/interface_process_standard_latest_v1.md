@@ -56,7 +56,7 @@ can be marked done.
 42. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
 43. Source registry missing-row messages, dependency-role defaults, empty change-sequence defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
 44. Execution-envelope validation failure and required-envelope messages use `backend/execution_gate_messages.py`.
-45. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
+45. Secret-like value detection, assignment scanning, structured unredacted-secret checks, and redaction use `backend/secret_redaction.py`.
 46. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
 47. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
 48. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
