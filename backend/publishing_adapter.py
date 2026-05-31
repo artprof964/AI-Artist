@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.adapter_results import targeted_result_fields
 from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
 
@@ -59,13 +60,18 @@ class PublishingAdapter:
         )
 
         client_response = self._client.publish(request.target, request.payload)
-
-        return PublishingResult(
-            execution_envelope_id=envelope.execution_envelope_id,
-            request_id=envelope.request_id,
-            operation=envelope.operation,
+        result_fields = targeted_result_fields(
+            envelope=envelope,
             target=request.target,
             client_response=client_response,
+        )
+
+        return PublishingResult(
+            execution_envelope_id=result_fields.execution_envelope_id,
+            request_id=result_fields.request_id,
+            operation=result_fields.operation,
+            target=result_fields.target,
+            client_response=result_fields.client_response,
         )
 
 __all__ = [

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 190 passed, 1 skipped, 1 warning
+Final validation: 192 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,6 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
+backend/adapter_results.py: shared gated adapter result field mapping.
 backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
 backend/audit.py: in-memory audit repository and recursive secret redaction.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
@@ -102,6 +103,8 @@ Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Secret redaction patterns and replacement behavior must flow through
 backend/secret_redaction.py before adapter-specific logging or response shaping.
+Gated adapter result envelope fields must flow through backend/adapter_results.py
+before adapter-specific return dataclasses add extra fields.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```

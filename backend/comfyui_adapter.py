@@ -5,6 +5,7 @@ from datetime import datetime
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.adapter_results import gated_result_fields
 from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
 
@@ -56,13 +57,17 @@ class ComfyUIAdapter:
         )
 
         client_response = self._client.submit_workflow(request.workflow)
+        result_fields = gated_result_fields(
+            envelope=envelope,
+            client_response=client_response,
+        )
 
         return ComfyUIImageGenerationResult(
-            execution_envelope_id=envelope.execution_envelope_id,
-            request_id=envelope.request_id,
-            operation=envelope.operation,
+            execution_envelope_id=result_fields.execution_envelope_id,
+            request_id=result_fields.request_id,
+            operation=result_fields.operation,
             prompt=request.prompt,
-            client_response=client_response,
+            client_response=result_fields.client_response,
         )
 
 __all__ = [

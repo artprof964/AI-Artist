@@ -7,6 +7,7 @@ from typing import Any, Protocol
 from urllib.parse import urlsplit
 from uuid import UUID
 
+from backend.adapter_results import targeted_result_fields
 from backend.audit import redact_audit_value
 from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
 from backend.execution_gate import require_execution_envelope
@@ -97,15 +98,20 @@ class GitHubAdapter:
             redact_audit_value(client_response),
             explicit_secrets=(token,),
         )
+        result_fields = targeted_result_fields(
+            envelope=envelope,
+            target=request.target,
+            client_response=safe_client_response,
+        )
 
         return GitHubWriteResult(
-            execution_envelope_id=envelope.execution_envelope_id,
-            request_id=envelope.request_id,
-            operation=envelope.operation,
-            target=request.target,
+            execution_envelope_id=result_fields.execution_envelope_id,
+            request_id=result_fields.request_id,
+            operation=result_fields.operation,
+            target=result_fields.target,
             method=method,
             path=path,
-            client_response=safe_client_response,
+            client_response=result_fields.client_response,
         )
 
     def _read_runtime_token(self) -> str:
