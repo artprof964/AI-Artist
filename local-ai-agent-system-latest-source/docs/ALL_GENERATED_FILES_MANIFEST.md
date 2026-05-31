@@ -106,11 +106,14 @@
 - `../../tests/test_critic_curator.py`
 - `../../validation_reports/t20_slack_adapter_validation_2026-05-31.md`
 - `../../validation_reports/slack_boundary_helper_standardization_2026-05-31.md`
+- `../../validation_reports/slack_contract_standardization_2026-05-31.md`
 - `../../validation_reports/payload_object_standardization_2026-05-31.md`
 - `../../backend/payload_fields.py`
 - `../../tests/test_payload_fields.py`
 - `../../backend/slack_adapter.py`
+- `../../backend/slack_contracts.py`
 - `../../tests/test_slack_adapter.py`
+- `../../tests/test_slack_contracts.py`
 - `../../validation_reports/t21_source_ingestion_validation_2026-05-31.md`
 - `../../validation_reports/source_ingestion_hash_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/source_ingestion_url_boundary_standardization_2026-05-31.md`

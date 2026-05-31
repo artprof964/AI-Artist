@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 363 passed, 1 skipped, 1 warning
+Final validation: 365 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -79,6 +79,7 @@ backend/side_effect_audit.py: shared side-effect audit payload and event recordi
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
+backend/slack_contracts.py: shared Slack source label and validation message contracts.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate_messages.py: shared execution-envelope validation failure and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
@@ -147,6 +148,9 @@ directly when preparing Safety Service policy requests.
 Slack payload parsing, request text normalization, stable request IDs, and
 response redaction must call the shared payload, request identity, and
 secret-redaction helpers directly at the adapter boundary.
+Slack source labels and adapter validation messages must flow through
+backend/slack_contracts.py before Slack event parsing or response formatting
+raises adapter errors.
 Gated adapter result envelope fields must flow through backend/adapter_results.py
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads must flow through backend/side_effect_audit.py before

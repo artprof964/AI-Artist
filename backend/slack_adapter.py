@@ -15,6 +15,13 @@ from backend.secret_redaction import (
     redact_secret_text,
     redact_secret_value,
 )
+from backend.slack_contracts import (
+    SLACK_SOURCE,
+    slack_event_object_required,
+    slack_optional_string_field,
+    slack_required_string_field,
+    slack_response_text_required,
+)
 
 
 class SlackAdapterError(ValueError):
@@ -37,7 +44,7 @@ class SlackRequestEnvelope:
     event_id: str | None = None
     team_id: str | None = None
     channel_type: str | None = None
-    source: str = "slack"
+    source: str = SLACK_SOURCE
     requester_scope: str = field(init=False)
     policy_scope: str = field(init=False)
 
@@ -86,7 +93,7 @@ class SlackAdapter:
                 payload,
                 "event",
                 error_type=SlackAdapterError,
-                message="Slack payload must include an event object",
+                message=slack_event_object_required(),
             )
             if "event" in payload
             else payload
@@ -96,33 +103,33 @@ class SlackAdapter:
             event,
             "channel",
             error_type=SlackAdapterError,
-            message="Slack event field 'channel' must be a non-empty string",
+            message=slack_required_string_field("channel"),
         )
         user = required_string_field(
             event,
             "user",
             error_type=SlackAdapterError,
-            message="Slack event field 'user' must be a non-empty string",
+            message=slack_required_string_field("user"),
         )
         text = required_string_field(
             event,
             "text",
             error_type=SlackAdapterError,
-            message="Slack event field 'text' must be a non-empty string",
+            message=slack_required_string_field("text"),
         )
         normalized_text = normalize_request_text(text, lowercase=False)
         message_ts = required_string_field(
             event,
             "ts",
             error_type=SlackAdapterError,
-            message="Slack event field 'ts' must be a non-empty string",
+            message=slack_required_string_field("ts"),
         )
         thread_ts = (
             optional_string_field(
                 event,
                 "thread_ts",
                 error_type=SlackAdapterError,
-                message="Slack event field 'thread_ts' must be a string when present",
+                message=slack_optional_string_field("thread_ts"),
             )
             or message_ts
         )
@@ -130,24 +137,24 @@ class SlackAdapter:
             payload,
             "event_id",
             error_type=SlackAdapterError,
-            message="Slack event field 'event_id' must be a string when present",
+            message=slack_optional_string_field("event_id"),
         )
         team_id = optional_string_field(
             payload,
             "team_id",
             error_type=SlackAdapterError,
-            message="Slack event field 'team_id' must be a string when present",
+            message=slack_optional_string_field("team_id"),
         ) or optional_string_field(
             event,
             "team",
             error_type=SlackAdapterError,
-            message="Slack event field 'team' must be a string when present",
+            message=slack_optional_string_field("team"),
         )
         channel_type = optional_string_field(
             event,
             "channel_type",
             error_type=SlackAdapterError,
-            message="Slack event field 'channel_type' must be a string when present",
+            message=slack_optional_string_field("channel_type"),
         )
 
         return SlackRequestEnvelope(
@@ -176,7 +183,7 @@ class SlackAdapter:
             replacement=LOWER_REDACTED_SECRET_VALUE,
         )
         if not text:
-            raise SlackAdapterError("Slack response text must be non-empty")
+            raise SlackAdapterError(slack_response_text_required())
 
         return {
             "channel": envelope.channel,
