@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from pathlib import Path
 import re
 from typing import Any, Iterable
-from uuid import uuid4
 
 from backend.audit import redact_audit_value
 from backend.canonical_hash import canonical_json
@@ -18,6 +17,7 @@ from backend.schemas import (
 )
 from backend.service import SENSITIVE_OPERATIONS, create_execution_envelope, evaluate_policy
 from backend.secret_redaction import SECRET_VALUE_PATTERNS
+from backend.runtime_ids import runtime_uuid
 
 
 TEXT_REVIEW_SUFFIXES = {".json", ".md", ".txt", ".yaml", ".yml"}
@@ -101,7 +101,7 @@ def review_policy_bypass_controls(repo_root: Path) -> list[SecurityReviewFinding
     for operation in sorted(SENSITIVE_OPERATIONS):
         policy_response = evaluate_policy(
             PolicyEvaluateRequest(
-                request_id=uuid4(),
+                request_id=runtime_uuid(),
                 request_kind="action",
                 operation=operation,
                 requester_scope="user:local",
@@ -123,7 +123,7 @@ def review_policy_bypass_controls(repo_root: Path) -> list[SecurityReviewFinding
 
         envelope = create_execution_envelope(
             ExecutionEnvelopeRequest(
-                request_id=uuid4(),
+                request_id=runtime_uuid(),
                 request_kind="action",
                 operation=operation,
                 requester_scope="user:local",

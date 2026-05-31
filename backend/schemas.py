@@ -1,7 +1,8 @@
 from datetime import datetime
 from typing import Any, Literal
-from uuid import UUID, uuid4
+from uuid import UUID
 
+from backend.runtime_ids import runtime_uuid
 from backend.time_utils import utc_now
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -41,7 +42,7 @@ class RequestMetadata(BaseModel):
 
 
 class CanonicalizeRequest(BaseModel):
-    request_id: UUID = Field(default_factory=uuid4)
+    request_id: UUID = Field(default_factory=runtime_uuid)
     request_text: str = Field(min_length=1)
     requester_scope: str = "local-user"
     policy_scope: str = "default"
@@ -62,7 +63,7 @@ class CanonicalizeResponse(BaseModel):
 
 
 class ClassifyRequest(BaseModel):
-    request_id: UUID = Field(default_factory=uuid4)
+    request_id: UUID = Field(default_factory=runtime_uuid)
     request_text: str = Field(min_length=1)
     operation: Operation | None = None
 
@@ -81,7 +82,7 @@ class SourceFreshness(BaseModel):
 
 
 class PolicyEvaluateRequest(BaseModel):
-    request_id: UUID = Field(default_factory=uuid4)
+    request_id: UUID = Field(default_factory=runtime_uuid)
     request_kind: RequestKind
     operation: Operation
     requester_scope: str
@@ -133,7 +134,7 @@ class ExecutionEnvelopeResponse(BaseModel):
 
 
 class AuditEventRequest(BaseModel):
-    event_id: UUID = Field(default_factory=uuid4)
+    event_id: UUID = Field(default_factory=runtime_uuid)
     event_type: AuditEventType
     request_id: UUID | None = None
     correlation_id: UUID

@@ -2,9 +2,10 @@ from __future__ import annotations
 
 import re
 from typing import Any
-from uuid import NAMESPACE_URL, UUID, uuid4, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from backend.canonical_hash import sha256_json
+from backend.runtime_ids import prefixed_runtime_id
 
 
 def normalize_request_text(value: str, *, lowercase: bool = True) -> str:
@@ -24,7 +25,7 @@ def stable_request_uuid(namespace: str, parts: list[str | None]) -> UUID:
 
 
 def prefixed_trace_id(prefix: str) -> str:
-    return f"{prefix}:{uuid4()}"
+    return prefixed_runtime_id(prefix)
 
 
 __all__ = [

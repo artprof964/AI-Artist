@@ -3,10 +3,11 @@ from __future__ import annotations
 import math
 from dataclasses import dataclass, field
 from typing import Any, Protocol
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from backend.schemas import SubAgentOutput
 from backend.numeric_utils import cosine_similarity
+from backend.runtime_ids import runtime_uuid
 from backend.text_utils import alnum_tokens
 
 
@@ -257,7 +258,7 @@ class KnowledgeAgent:
             if hit.score > 0.0 and self._is_approved_hit(hit)
         )
         return KnowledgeAgentResponse(
-            task_id=task_id or uuid4(),
+            task_id=task_id or runtime_uuid(),
             query=query,
             results=results,
         )

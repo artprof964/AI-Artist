@@ -1,8 +1,9 @@
 from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import UUID
 
+from backend.runtime_ids import runtime_uuid
 from backend.schemas import SourceFreshness
 from backend.time_utils import utc_now
 
@@ -70,7 +71,7 @@ class SourceFreshnessRegistry:
     ) -> SourceRegistryEntry:
         existing = self._sources_by_key.get(source_key)
         change_seq = existing.change_seq if existing is not None else 1
-        source_id = existing.source_id if existing is not None else uuid4()
+        source_id = existing.source_id if existing is not None else runtime_uuid()
         entry = SourceRegistryEntry(
             source_id=source_id,
             source_key=source_key,
@@ -123,7 +124,7 @@ class SourceFreshnessRegistry:
             )
             for source in (self._require_source(source_key) for source_key in source_keys)
         )
-        return self.evaluate_snapshot(run_id=run_id or uuid4(), dependencies=dependencies)
+        return self.evaluate_snapshot(run_id=run_id or runtime_uuid(), dependencies=dependencies)
 
     def evaluate_snapshot(
         self,
@@ -146,7 +147,7 @@ class SourceFreshnessRegistry:
             default=0,
         )
         return SourceDependencySnapshot(
-            run_id=run_id or uuid4(),
+            run_id=run_id or runtime_uuid(),
             dependencies=dependencies,
             max_source_change_seq_at_run=max_change_seq,
             required_source_count=required_source_count,

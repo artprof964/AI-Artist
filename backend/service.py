@@ -1,5 +1,4 @@
 from datetime import timedelta
-from uuid import uuid4
 
 from backend.audit import (
     list_audit_events_by_correlation_id,
@@ -16,6 +15,7 @@ from backend.operations import (
     is_sensitive_operation,
 )
 from backend.request_identity import normalize_request_text, request_fingerprint
+from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     CanonicalizeRequest,
     CanonicalizeResponse,
@@ -192,7 +192,7 @@ def create_execution_envelope(
     else:
         reason = "read-only operation does not require a privileged execution envelope"
 
-    envelope_id = uuid4()
+    envelope_id = runtime_uuid()
     signature_payload = {
         "execution_envelope_id": str(envelope_id),
         "human_approval": {

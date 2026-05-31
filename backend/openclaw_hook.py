@@ -1,9 +1,10 @@
 from dataclasses import dataclass, field
 from typing import Any, Protocol
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from backend.observability import record_observability_stage
 from backend.request_identity import prefixed_trace_id
+from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     Operation,
     PolicyEvaluateRequest,
@@ -24,7 +25,7 @@ class ToolCallRequest:
     arguments: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
     correlation_id: str = field(default_factory=lambda: prefixed_trace_id("tool-call"))
-    request_id: UUID = field(default_factory=uuid4)
+    request_id: UUID = field(default_factory=runtime_uuid)
     source_freshness: SourceFreshness = field(default_factory=SourceFreshness)
 
 

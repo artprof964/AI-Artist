@@ -28,8 +28,11 @@
 - `../../validation_reports/t10_openclaw_safety_hook_validation_2026-05-31.md`
 - `../../validation_reports/trace_identity_standardization_2026-05-31.md`
 - `../../validation_reports/canonical_hmac_signature_standardization_2026-05-31.md`
+- `../../validation_reports/runtime_id_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
+- `../../backend/runtime_ids.py`
 - `../../tests/test_request_identity.py`
+- `../../tests/test_runtime_ids.py`
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`

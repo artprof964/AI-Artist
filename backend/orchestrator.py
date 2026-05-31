@@ -1,12 +1,13 @@
 from collections import Counter
 from collections.abc import Callable
 from typing import Any
-from uuid import UUID, uuid4
+from uuid import UUID
 
 from pydantic import BaseModel, Field
 
 from backend.numeric_utils import rounded_mean
 from backend.observability import record_observability_stage, trace_id_from_request
+from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     SubAgentArtifact,
     SubAgentError,
@@ -27,7 +28,7 @@ STATUS_PRIORITY: dict[SubAgentStatus, int] = {
 
 
 class MockAgentRequest(BaseModel):
-    task_id: UUID = Field(default_factory=uuid4)
+    task_id: UUID = Field(default_factory=runtime_uuid)
     request_text: str = Field(min_length=1)
     requester_scope: str = "local-user"
     policy_scope: str = "default"
