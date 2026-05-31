@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 470 passed, 1 skipped, 1 warning
+Final validation: 473 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -99,6 +99,7 @@ backend/readiness_paths.py: shared production readiness backup paths, container 
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path.
+backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
 backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry contracts.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result score cutoff/precision, policy note, and summary vocabulary.
@@ -181,8 +182,10 @@ adapters expose envelope errors.
 Secret detection patterns, assignment scanning, structured unredacted-secret checks, and replacement behavior must
 flow through backend/secret_redaction.py before adapter-specific logging,
 response shaping, security review, or future scanner logic.
-OpenClaw policy metadata redaction must call `backend/secret_redaction.py`
-directly when preparing Safety Service policy requests.
+OpenClaw tool policy metadata, metadata redaction, tool metric tags, preflight
+fields, decision fields, and executed fields must flow through
+backend/openclaw_contracts.py before the hook prepares Safety Service policy
+requests or tool telemetry.
 Slack payload parsing, request text normalization, stable request IDs, and
 response redaction must call the shared payload, request identity, and
 secret-redaction helpers directly at the adapter boundary.

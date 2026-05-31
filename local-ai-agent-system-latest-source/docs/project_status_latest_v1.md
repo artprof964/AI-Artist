@@ -26,6 +26,7 @@ Safety Service health contract: centralized in backend/health_contracts.py
 Safety Service API metadata and route paths: centralized in backend/api_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts and OpenClaw pre-tool request-kind checks: centralized in backend/interface_types.py
+OpenClaw tool policy metadata and telemetry field shapes: centralized in backend/openclaw_contracts.py
 Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
 Shell command/process argument construction, process execution defaults, compact process errors, and delimited process-output parsing: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
@@ -141,6 +142,7 @@ Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and l
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters for semantic validation, expiry checks, and signature verification
 Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, missing/invalid signature, and expiry failures
 Secret detection, structured unredacted-secret checks, and redaction: shared directly across audit, observability, LLM smoke request logging, OpenClaw hook, GitHub, Slack, and security review
+OpenClaw contracts: shared across tool policy metadata redaction, tool metric tags, preflight telemetry fields, policy decision telemetry fields, and executed telemetry fields
 Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with tool-call audit event typing routed through interface contracts
@@ -215,7 +217,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 470 passed, 1 skipped, 1 warning
+final pytest: 473 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

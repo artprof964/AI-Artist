@@ -48,6 +48,7 @@ can be marked done.
 34. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 35. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
 36. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`, including OpenClaw pre-tool approval checks.
+36a. OpenClaw tool policy metadata, redaction, metric tags, and telemetry fields use `backend/openclaw_contracts.py`.
 37. Telemetry stages, log levels, default metric values, metric-name constants/formatting, trace-id fallback formatting, and event-message formatting use `backend/observability.py`.
 38. Publishing outcome statuses use `backend/publishing_status.py`.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
@@ -269,6 +270,7 @@ Output:
    - Fresh source snapshot defaults and unchanged-source checks come from the shared source-freshness contract.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay and OpenClaw pre-tool approval request-kind checks use shared interface and operation constants.
+   - OpenClaw tool policy metadata and redacted tool arguments use the shared OpenClaw contract helper.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use the shared source-ingestion contract.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
@@ -302,6 +304,7 @@ Output:
    - Envelope validation and signature failure messages use the shared execution-gate message contract.
    - Execution-envelope signatures are created and verified through the shared policy contract, backed by the canonical HMAC helper.
    - Envelope issue times, cache checks, source timestamps, telemetry timestamps, and expiry comparisons use direct shared UTC creation and normalization.
+   - OpenClaw tool metric tags, preflight fields, decision fields, and executed fields use the shared OpenClaw contract helper.
    - Connector API paths are normalized and rejected for absolute URLs, traversal,
      backslashes, and control characters before token reads.
 

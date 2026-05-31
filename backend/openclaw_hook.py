@@ -12,6 +12,13 @@ from backend.observability import (
     TELEMETRY_STAGE_TOOL,
     record_observability_stage,
 )
+from backend.openclaw_contracts import (
+    openclaw_policy_metadata,
+    openclaw_tool_decision_fields,
+    openclaw_tool_executed_fields,
+    openclaw_tool_metric_tags,
+    openclaw_tool_preflight_fields,
+)
 from backend.request_identity import prefixed_trace_id
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
@@ -19,7 +26,6 @@ from backend.schemas import (
     PolicyEvaluateResponse,
     SourceFreshness,
 )
-from backend.secret_redaction import redact_secret_value
 
 
 @dataclass(frozen=True)
@@ -64,12 +70,12 @@ class ToolAdapter(Protocol):
 
 
 def build_policy_evaluate_request(request: ToolCallRequest) -> PolicyEvaluateRequest:
-    metadata = {
-        **redact_secret_value(request.metadata, redact_string_values=False),
-        "correlation_id": request.correlation_id,
-        "tool_name": request.tool_name,
-        "tool_arguments": redact_secret_value(request.arguments, redact_string_values=False),
-    }
+    metadata = openclaw_policy_metadata(
+        metadata=request.metadata,
+        arguments=request.arguments,
+        correlation_id=request.correlation_id,
+        tool_name=request.tool_name,
+    )
     return PolicyEvaluateRequest(
         request_id=request.request_id,
         request_kind=request.request_kind,
@@ -102,15 +108,18 @@ def execute_tool_call_with_safety(
         trace_id=request.correlation_id,
         request_id=request.request_id,
         metric_name=METRIC_TOOL_PREFLIGHT,
-        metric_tags={"tool_name": request.tool_name, "operation": request.operation},
+        metric_tags=openclaw_tool_metric_tags(
+            tool_name=request.tool_name,
+            operation=request.operation,
+        ),
         message="tool preflight started",
-        fields={
-            "tool_name": request.tool_name,
-            "operation": request.operation,
-            "request_kind": request.request_kind,
-            "requester_scope": request.requester_scope,
-            "policy_scope": request.policy_scope,
-        },
+        fields=openclaw_tool_preflight_fields(
+            tool_name=request.tool_name,
+            operation=request.operation,
+            request_kind=request.request_kind,
+            requester_scope=request.requester_scope,
+            policy_scope=request.policy_scope,
+        ),
     )
     policy_request = build_policy_evaluate_request(request)
     decision = safety_client.evaluate_tool_call(policy_request)
@@ -121,16 +130,19 @@ def execute_tool_call_with_safety(
             trace_id=request.correlation_id,
             request_id=request.request_id,
             metric_name=METRIC_TOOL_DENIED,
-            metric_tags={"tool_name": request.tool_name, "operation": request.operation},
+            metric_tags=openclaw_tool_metric_tags(
+                tool_name=request.tool_name,
+                operation=request.operation,
+            ),
             log_level=LOG_LEVEL_WARNING,
             message="tool call denied",
-            fields={
-                "tool_name": request.tool_name,
-                "operation": request.operation,
-                "reason": decision.reason,
-                "policy_version": decision.policy_version,
-                "requires_human_approval": decision.requires_human_approval,
-            },
+            fields=openclaw_tool_decision_fields(
+                tool_name=request.tool_name,
+                operation=request.operation,
+                reason=decision.reason,
+                policy_version=decision.policy_version,
+                requires_human_approval=decision.requires_human_approval,
+            ),
         )
         return ToolCallResult(
             executed=False,
@@ -145,14 +157,17 @@ def execute_tool_call_with_safety(
         trace_id=request.correlation_id,
         request_id=request.request_id,
         metric_name=METRIC_TOOL_APPROVED,
-        metric_tags={"tool_name": request.tool_name, "operation": request.operation},
+        metric_tags=openclaw_tool_metric_tags(
+            tool_name=request.tool_name,
+            operation=request.operation,
+        ),
         message="tool call approved",
-        fields={
-            "tool_name": request.tool_name,
-            "operation": request.operation,
-            "policy_version": decision.policy_version,
-            "requires_human_approval": decision.requires_human_approval,
-        },
+        fields=openclaw_tool_decision_fields(
+            tool_name=request.tool_name,
+            operation=request.operation,
+            policy_version=decision.policy_version,
+            requires_human_approval=decision.requires_human_approval,
+        ),
     )
     adapter_result = adapter.run(request)
     record_observability_stage(
@@ -161,13 +176,16 @@ def execute_tool_call_with_safety(
         trace_id=request.correlation_id,
         request_id=request.request_id,
         metric_name=METRIC_TOOL_EXECUTED,
-        metric_tags={"tool_name": request.tool_name, "operation": request.operation},
+        metric_tags=openclaw_tool_metric_tags(
+            tool_name=request.tool_name,
+            operation=request.operation,
+        ),
         message="tool call executed",
-        fields={
-            "tool_name": request.tool_name,
-            "operation": request.operation,
-            "adapter_result_present": adapter_result is not None,
-        },
+        fields=openclaw_tool_executed_fields(
+            tool_name=request.tool_name,
+            operation=request.operation,
+            adapter_result_present=adapter_result is not None,
+        ),
     )
     return ToolCallResult(
         executed=True,
