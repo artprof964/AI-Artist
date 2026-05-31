@@ -7,17 +7,16 @@ from typing import Any
 from backend.canonical_hash import sha256_text, sha256_version_tag
 from backend.mapping_utils import copy_mapping, merge_mappings
 from backend.source_freshness import SourceFreshnessRegistry, SourceRegistryEntry
+from backend.source_ingestion_contracts import (
+    DEFAULT_APPROVED_SOURCE_DOMAINS,
+    SOURCE_INGESTION_ABSOLUTE_HTTP_URL_REQUIRED,
+    SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
+)
 from backend.time_utils import utc_now
 from backend.url_utils import http_url_domain
 
 
-DEFAULT_APPROVED_DOMAINS = frozenset(
-    {
-        "art.example",
-        "fashion.example",
-        "trends.example",
-    }
-)
+DEFAULT_APPROVED_DOMAINS = DEFAULT_APPROVED_SOURCE_DOMAINS
 
 
 @dataclass(frozen=True)
@@ -109,7 +108,7 @@ class SourceIngestionService:
             domain = http_url_domain(
                 candidate.uri,
                 error_type=lambda reason: SourceIngestionError(candidate.source_key, reason),
-                message="source ingestion requires an absolute http(s) URL",
+                message=SOURCE_INGESTION_ABSOLUTE_HTTP_URL_REQUIRED,
             )
             if domain not in self.approved_domains:
                 rejected_sources.append(
@@ -117,7 +116,7 @@ class SourceIngestionService:
                         source_key=candidate.source_key,
                         uri=candidate.uri,
                         domain=domain,
-                        reason="source domain is not in the approved ingestion allowlist",
+                        reason=SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
                     )
                 )
                 continue

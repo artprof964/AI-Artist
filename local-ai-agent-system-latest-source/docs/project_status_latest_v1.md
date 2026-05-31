@@ -42,6 +42,7 @@ Runtime UUIDs and prefixed IDs: centralized in backend/runtime_ids.py
 Mapping copies and metadata/payload merges: centralized in backend/mapping_utils.py
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
 Source registry missing-row messages: centralized in backend/source_registry_contracts.py
+Source ingestion contracts: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source
 Sub-agent statuses and aggregation: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
@@ -128,6 +129,7 @@ Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
 Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, image provenance hashes, source snapshot version tags, and security-review serialization
+Source ingestion contracts: shared approved-domain defaults and rejection messages before registry writes
 Source ingestion hashes: source snapshots call shared canonical hash/version helpers directly before registry writes
 Request identity: shared across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
 Request metadata mapping: shared across Safety Service request fingerprints and observability fields
@@ -176,7 +178,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 367 passed, 1 skipped, 1 warning
+final pytest: 369 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

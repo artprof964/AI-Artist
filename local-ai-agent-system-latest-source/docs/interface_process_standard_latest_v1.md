@@ -59,6 +59,7 @@ can be marked done.
 47. Gated adapter operation values use `backend/operations.py` directly.
 48. Slack source labels and adapter validation messages use `backend/slack_contracts.py`.
 49. GitHub adapter action labels, validation messages, and token-purpose text use `backend/github_contracts.py`.
+50. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
 ```
 
 ## Standard Request Envelope
@@ -238,6 +239,7 @@ Output:
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay request-kind and operation checks use shared interface and operation constants.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
+   - Source ingestion approved-domain defaults and rejection messages use the shared source-ingestion contract.
    - Source snapshot content hashes and version tags use the shared canonical hash helper.
    - Source ingestion calls shared hash/version helpers directly before registry and snapshot writes.
    - Source registry lookup failures format missing-row messages through the shared source registry contract helper.

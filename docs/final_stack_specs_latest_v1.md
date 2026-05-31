@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 367 passed, 1 skipped, 1 warning
+Final validation: 369 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -79,6 +79,7 @@ backend/side_effect_audit.py: shared side-effect audit payload and event recordi
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
+backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults and rejection message contracts.
 backend/slack_contracts.py: shared Slack source label and validation message contracts.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, and token-purpose text.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
@@ -211,6 +212,9 @@ backend/payload_fields.py before adapter-specific payload parsing logic is added
 Provider response object/dict field access and shape validation must flow through
 backend/response_fields.py before adapter-specific SDK response parsing logic is
 added.
+Source ingestion approved-domain defaults and rejection text must flow through
+backend/source_ingestion_contracts.py before ingestion allowlists or rejection
+messages are changed.
 URL/domain extraction and relative API path validation must flow through
 backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.

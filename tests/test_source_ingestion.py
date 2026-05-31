@@ -10,10 +10,14 @@ from backend.source_ingestion import (
     SourceIngestionError,
     SourceIngestionService,
 )
+from backend.source_ingestion_contracts import (
+    DEFAULT_APPROVED_SOURCE_DOMAINS,
+    SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
+)
 
 
 NOW = datetime(2026, 5, 31, 10, 30, tzinfo=timezone.utc)
-APPROVED_DOMAINS = {"art.example", "fashion.example", "trends.example"}
+APPROVED_DOMAINS = set(DEFAULT_APPROVED_SOURCE_DOMAINS)
 PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
@@ -170,9 +174,7 @@ def test_ingestion_rejects_disallowed_source_domains_without_registry_rows() -> 
     assert len(result.rejected_sources) == 1
     assert result.rejected_sources[0].source_key == "trend:unapproved-scrape"
     assert result.rejected_sources[0].domain == "unapproved.example"
-    assert result.rejected_sources[0].reason == (
-        "source domain is not in the approved ingestion allowlist"
-    )
+    assert result.rejected_sources[0].reason == SOURCE_INGESTION_DOMAIN_NOT_APPROVED
     assert snapshot_repository.list_snapshots() == []
     with pytest.raises(KeyError, match="source_data_registry row not found"):
         registry.get_source("trend:unapproved-scrape")
