@@ -1,6 +1,7 @@
 OPERATION_FIELD = "operation"
 TARGET_FIELD = "target"
 REQUEST_ID_FIELD = "request_id"
+EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"
 CORRELATION_ID_FIELD = "correlation_id"
 REQUEST_KIND_FIELD = "request_kind"
 REQUESTER_SCOPE_FIELD = "requester_scope"
@@ -15,6 +16,7 @@ POLICY_VERSION_FIELD = "policy_version"
 __all__ = [
     "ALLOW_FIELD",
     "CORRELATION_ID_FIELD",
+    "EXECUTION_ENVELOPE_ID_FIELD",
     "OPERATION_FIELD",
     "POLICY_SCOPE_FIELD",
     "POLICY_VERSION_FIELD",

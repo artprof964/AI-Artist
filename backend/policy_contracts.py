@@ -5,6 +5,16 @@ from typing import Any
 from uuid import UUID
 
 from backend.canonical_hash import hmac_sha256_json
+from backend.runtime_field_contracts import (
+    ALLOW_FIELD,
+    EXECUTION_ENVELOPE_ID_FIELD,
+    OPERATION_FIELD,
+    POLICY_VERSION_FIELD,
+    REASON_FIELD,
+    REQUEST_ID_FIELD,
+    REQUIRES_HUMAN_APPROVAL_FIELD,
+    TARGET_FIELD,
+)
 
 
 LOCAL_DEFAULT_DENY_POLICY_VERSION = "local-default-deny-v0"
@@ -33,8 +43,8 @@ def execution_envelope_signature_payload(
     expires_at: datetime,
 ) -> dict[str, Any]:
     return {
-        "allow": allow,
-        "execution_envelope_id": str(execution_envelope_id),
+        ALLOW_FIELD: allow,
+        EXECUTION_ENVELOPE_ID_FIELD: str(execution_envelope_id),
         "expires_at": expires_at.isoformat(),
         "human_approval": {
             "approved": human_approval.approved,
@@ -46,12 +56,12 @@ def execution_envelope_signature_payload(
             "approver_scope": human_approval.approver_scope,
         },
         "issued_at": issued_at.isoformat(),
-        "operation": operation,
-        "policy_version": policy_version,
-        "reason": reason,
-        "request_id": str(request_id),
-        "requires_human_approval": requires_human_approval,
-        "target": target,
+        OPERATION_FIELD: operation,
+        POLICY_VERSION_FIELD: policy_version,
+        REASON_FIELD: reason,
+        REQUEST_ID_FIELD: str(request_id),
+        REQUIRES_HUMAN_APPROVAL_FIELD: requires_human_approval,
+        TARGET_FIELD: target,
         "valid": valid,
     }
 

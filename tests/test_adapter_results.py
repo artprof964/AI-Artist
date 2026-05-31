@@ -10,7 +10,12 @@ from backend.adapter_results import (
     gated_result_fields,
     targeted_result_fields,
 )
-from backend.runtime_field_contracts import OPERATION_FIELD, REQUEST_ID_FIELD, TARGET_FIELD
+from backend.runtime_field_contracts import (
+    EXECUTION_ENVELOPE_ID_FIELD,
+    OPERATION_FIELD,
+    REQUEST_ID_FIELD,
+    TARGET_FIELD,
+)
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
 from backend.time_utils import utc_now
 from path_helpers import read_backend_source
@@ -67,7 +72,7 @@ def test_targeted_result_fields_add_target_to_common_fields() -> None:
 
 
 def test_adapter_result_field_vocabulary_is_centralized() -> None:
-    assert ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD == "execution_envelope_id"
+    assert ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD == EXECUTION_ENVELOPE_ID_FIELD
     assert ADAPTER_RESULT_REQUEST_ID_FIELD == REQUEST_ID_FIELD
     assert ADAPTER_RESULT_OPERATION_FIELD == OPERATION_FIELD
     assert ADAPTER_RESULT_TARGET_FIELD == TARGET_FIELD
@@ -77,9 +82,11 @@ def test_adapter_result_field_vocabulary_is_centralized() -> None:
 def test_adapter_result_contracts_use_runtime_field_names() -> None:
     source = read_backend_source("adapter_results.py")
 
+    assert "ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD = EXECUTION_ENVELOPE_ID_FIELD" in source
     assert "ADAPTER_RESULT_REQUEST_ID_FIELD = REQUEST_ID_FIELD" in source
     assert "ADAPTER_RESULT_OPERATION_FIELD = OPERATION_FIELD" in source
     assert "ADAPTER_RESULT_TARGET_FIELD = TARGET_FIELD" in source
+    assert 'ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"' not in source
     assert 'ADAPTER_RESULT_REQUEST_ID_FIELD = "request_id"' not in source
     assert 'ADAPTER_RESULT_OPERATION_FIELD = "operation"' not in source
     assert 'ADAPTER_RESULT_TARGET_FIELD = "target"' not in source

@@ -9,6 +9,7 @@ from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_
 from backend.interface_types import AUDIT_EVENT_TOOL_CALL
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from backend.runtime_field_contracts import (
+    EXECUTION_ENVELOPE_ID_FIELD,
     OPERATION_FIELD,
     POLICY_SCOPE_FIELD,
     REASON_FIELD,
@@ -120,7 +121,7 @@ def test_side_effect_audit_payload_fields_are_centralized() -> None:
     assert SIDE_EFFECT_STATUS_FIELD == STATUS_FIELD
     assert SIDE_EFFECT_REASON_FIELD == "reason"
     assert SIDE_EFFECT_REASON_FIELD == REASON_FIELD
-    assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == "execution_envelope_id"
+    assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == EXECUTION_ENVELOPE_ID_FIELD
     assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD
     assert SIDE_EFFECT_CLIENT_RESPONSE_FIELD == "client_response"
     assert SIDE_EFFECT_CLIENT_RESPONSE_FIELD == ADAPTER_RESULT_CLIENT_RESPONSE_FIELD

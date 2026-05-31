@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 508 passed, 1 warning
+Final validation: 509 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,7 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/api_contracts.py: shared FastAPI app metadata and Safety Service route paths.
 backend/app.py: FastAPI endpoints using shared API contracts.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope creation using shared signing and service-observability contracts.
-backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, signature prefix, signature payload/signing/verification helpers, and execution-envelope TTL contracts for policy responses and execution envelopes.
+backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, signature prefix, runtime-field-backed signature payload, signing/verification helpers, and execution-envelope TTL contracts for policy responses and execution envelopes.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
 backend/classification_contracts.py: shared classifier confidence and reason formatting.
@@ -60,7 +60,7 @@ backend/request_identity.py: request text normalization, direct Safety Service c
 backend/request_metadata_contracts.py: shared request metadata defaults, default request channel, request envelope field names, and fingerprint field names.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape using request metadata contracts.
 backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
-backend/runtime_field_contracts.py: shared operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, adapter results, audit responses, Slack local requests, and side-effect audit payloads.
+backend/runtime_field_contracts.py: shared execution-envelope-id, operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, execution-envelope signatures, adapter results, audit responses, Slack local requests, and side-effect audit payloads.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -81,7 +81,7 @@ backend/file_scanning.py: shared reviewable text-file suffixes and recursive sca
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
-backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping with generic request/operation/target fields reused from runtime field contracts.
+backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping with generic execution-envelope/request/operation/target fields reused from runtime field contracts.
 backend/audit_contracts.py: shared audit scope payload field names, runtime request/correlation-id fields, accepted response flag, and audit response payload shape.
 backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
@@ -237,11 +237,12 @@ structured observability fields are built.
 Safety Service canonicalization, classification, and policy observability event,
 message, tag, and field shapes must flow through
 backend/service_observability_contracts.py before service telemetry is emitted.
-Operation, target, request-id, correlation-id, status, request-kind, requester/policy scope, allow,
+Execution-envelope-id, operation, target, request-id, correlation-id, status, request-kind, requester/policy scope, allow,
 human-approval, reason, and policy-version field names must flow through
 backend/runtime_field_contracts.py before service observability, OpenClaw tool
-telemetry, adapter results, audit responses, Slack local request payloads,
-publishing response contracts, side-effect audit payloads, or future policy context field shapes are
+telemetry, execution-envelope signature payloads, adapter results, audit
+responses, Slack local request payloads, publishing response contracts,
+side-effect audit payloads, or future policy context field shapes are
 changed.
 Default requester, policy, publishing actor, and publishing policy scopes must
 flow through backend/request_scope_contracts.py before schemas, mock
@@ -256,9 +257,10 @@ Cache, source-freshness, policy, and execution-envelope reason strings must
 flow through backend/reason_messages.py before service or cache decision text is
 added.
 Policy response and execution-envelope policy versions, local execution-envelope
-signing key, signature prefix, signature payload/signing/verification helpers,
-and execution-envelope TTL must flow through backend/policy_contracts.py before
-local default-deny or envelope-signing contracts change.
+signing key, signature prefix, runtime-field-backed signature
+payload/signing/verification helpers, and execution-envelope TTL must flow
+through backend/policy_contracts.py and backend/runtime_field_contracts.py
+before local default-deny or envelope-signing contracts change.
 Source registry missing-row messages must flow through
 backend/source_registry_contracts.py before source freshness or future
 persistence adapters raise missing-row errors.

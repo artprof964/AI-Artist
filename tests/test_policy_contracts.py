@@ -9,6 +9,17 @@ from backend.policy_contracts import (
     execution_envelope_expires_at,
     execution_envelope_signature,
     execution_envelope_signature_is_valid,
+    execution_envelope_signature_payload,
+)
+from backend.runtime_field_contracts import (
+    ALLOW_FIELD,
+    EXECUTION_ENVELOPE_ID_FIELD,
+    OPERATION_FIELD,
+    POLICY_VERSION_FIELD,
+    REASON_FIELD,
+    REQUEST_ID_FIELD,
+    REQUIRES_HUMAN_APPROVAL_FIELD,
+    TARGET_FIELD,
 )
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, PolicyEvaluateRequest
 from backend.service import create_execution_envelope, evaluate_policy
@@ -117,6 +128,53 @@ def test_execution_envelope_signature_contract_covers_envelope_fields() -> None:
         issued_at=issued_at,
         expires_at=expires_at,
     )
+
+
+def test_execution_envelope_signature_payload_uses_runtime_field_contracts() -> None:
+    issued_at = datetime(2026, 5, 31, 10, 0, tzinfo=timezone.utc)
+    expires_at = execution_envelope_expires_at(issued_at)
+    human_approval = HumanApproval(
+        approved=True,
+        approver_scope="user:owner",
+        approved_at=issued_at,
+    )
+
+    payload = execution_envelope_signature_payload(
+        execution_envelope_id=UUID("bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"),
+        request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        operation="publish",
+        target="slack://workspace/channel",
+        human_approval=human_approval,
+        valid=True,
+        allow=True,
+        reason="publish approved with execution envelope",
+        requires_human_approval=True,
+        policy_version=LOCAL_DEFAULT_DENY_POLICY_VERSION,
+        issued_at=issued_at,
+        expires_at=expires_at,
+    )
+
+    assert payload[EXECUTION_ENVELOPE_ID_FIELD] == "bbbbbbbb-bbbb-bbbb-bbbb-bbbbbbbbbbbb"
+    assert payload[REQUEST_ID_FIELD] == "aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"
+    assert payload[OPERATION_FIELD] == "publish"
+    assert payload[TARGET_FIELD] == "slack://workspace/channel"
+    assert payload[ALLOW_FIELD] is True
+    assert payload[REASON_FIELD] == "publish approved with execution envelope"
+    assert payload[REQUIRES_HUMAN_APPROVAL_FIELD] is True
+    assert payload[POLICY_VERSION_FIELD] == LOCAL_DEFAULT_DENY_POLICY_VERSION
+
+    source = read_backend_source("policy_contracts.py")
+    for literal in (
+        '"allow": allow',
+        '"execution_envelope_id": str(execution_envelope_id)',
+        '"operation": operation',
+        '"policy_version": policy_version',
+        '"reason": reason',
+        '"request_id": str(request_id)',
+        '"requires_human_approval": requires_human_approval',
+        '"target": target',
+    ):
+        assert literal not in source
 
 
 def test_created_execution_envelope_signature_verifies_through_shared_contract() -> None:

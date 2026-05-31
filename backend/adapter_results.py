@@ -4,10 +4,15 @@ from dataclasses import dataclass
 from typing import Any
 from uuid import UUID
 
-from backend.runtime_field_contracts import OPERATION_FIELD, REQUEST_ID_FIELD, TARGET_FIELD
+from backend.runtime_field_contracts import (
+    EXECUTION_ENVELOPE_ID_FIELD,
+    OPERATION_FIELD,
+    REQUEST_ID_FIELD,
+    TARGET_FIELD,
+)
 from backend.schemas import ExecutionEnvelopeResponse
 
-ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"
+ADAPTER_RESULT_EXECUTION_ENVELOPE_ID_FIELD = EXECUTION_ENVELOPE_ID_FIELD
 ADAPTER_RESULT_REQUEST_ID_FIELD = REQUEST_ID_FIELD
 ADAPTER_RESULT_OPERATION_FIELD = OPERATION_FIELD
 ADAPTER_RESULT_TARGET_FIELD = TARGET_FIELD

@@ -305,3 +305,4 @@
 - `../../validation_reports/service_observability_contract_standardization_2026-05-31.md`
 - `../../validation_reports/publishing_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/request_id_runtime_field_contract_standardization_2026-06-01.md`
+- `../../validation_reports/execution_envelope_runtime_field_contract_standardization_2026-06-01.md`
