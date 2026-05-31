@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -18,6 +19,7 @@ from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, Sourc
 
 
 client = TestClient(app)
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class RecordingSafetyClient:
@@ -278,3 +280,11 @@ def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthes
     assert "critic_curator: Created a deterministic review checklist" in result.adapter_result[
         "summary"
     ]
+
+
+def test_openclaw_hook_uses_shared_secret_redaction_boundary_directly() -> None:
+    source = (PROJECT_ROOT / "backend" / "openclaw_hook.py").read_text(encoding="utf-8")
+
+    assert "def _redact_sensitive_value(" not in source
+    assert "redact_secret_value(" in source
+    assert "redact_string_values=False" in source

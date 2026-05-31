@@ -106,7 +106,7 @@ Production readiness: local runbook, env schema, health checks, backup/restore c
 Connection registry and runtime env resolution: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, docs, and tracker
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
-Secret redaction: shared across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
+Secret redaction: shared directly across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
 Redacted audit mappings: shared directly by observability fields and metric tags
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
@@ -146,7 +146,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 320 passed, 1 skipped, 1 warning
+final pytest: 321 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

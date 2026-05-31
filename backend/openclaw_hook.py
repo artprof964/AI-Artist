@@ -59,16 +59,12 @@ class ToolAdapter(Protocol):
         """Run the actual tool adapter after safety approval."""
 
 
-def _redact_sensitive_value(value: Any) -> Any:
-    return redact_secret_value(value, redact_string_values=False)
-
-
 def build_policy_evaluate_request(request: ToolCallRequest) -> PolicyEvaluateRequest:
     metadata = {
-        **_redact_sensitive_value(request.metadata),
+        **redact_secret_value(request.metadata, redact_string_values=False),
         "correlation_id": request.correlation_id,
         "tool_name": request.tool_name,
-        "tool_arguments": _redact_sensitive_value(request.arguments),
+        "tool_arguments": redact_secret_value(request.arguments, redact_string_values=False),
     }
     return PolicyEvaluateRequest(
         request_id=request.request_id,

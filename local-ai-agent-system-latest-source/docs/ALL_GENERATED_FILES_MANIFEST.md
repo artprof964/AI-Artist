@@ -26,6 +26,7 @@
 - `../../tests/test_llm_api_smoke.py`
 - `../../validation_reports/t10_openclaw_safety_hook_2026-05-31.md`
 - `../../validation_reports/t10_openclaw_safety_hook_validation_2026-05-31.md`
+- `../../validation_reports/openclaw_redaction_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/trace_identity_standardization_2026-05-31.md`
 - `../../validation_reports/canonical_hmac_signature_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_id_standardization_2026-05-31.md`
