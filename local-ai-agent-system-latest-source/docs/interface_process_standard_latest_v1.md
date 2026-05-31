@@ -42,6 +42,7 @@ can be marked done.
 30. Telemetry stages and log levels use `backend/observability.py`.
 31. Publishing outcome statuses use `backend/publishing_status.py`.
 32. Pydantic model/dict coercion at service, adapter, and domain boundaries uses `backend/model_coercion.py`.
+33. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 ```
 
 ## Standard Request Envelope

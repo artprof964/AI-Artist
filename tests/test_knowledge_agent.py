@@ -1,5 +1,12 @@
+from pathlib import Path
 from uuid import UUID
 
+from backend.knowledge_contracts import (
+    KNOWLEDGE_AGENT_NAME,
+    KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
+    KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
+    KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+)
 from backend.knowledge import (
     DeterministicEmbeddingModel,
     InMemoryQdrantVectorStore,
@@ -8,6 +15,7 @@ from backend.knowledge import (
     VectorPoint,
 )
 from backend.schemas import SubAgentOutput
+from backend.subagent_status import SUBAGENT_STATUS_OK
 
 
 TASK_ID = UUID("16161616-1616-1616-1616-161616161616")
@@ -75,14 +83,13 @@ def test_knowledge_agent_ingests_embeds_searches_and_returns_source_citations() 
         result.source_id for result in response.results
     }
     assert isinstance(subagent_output, SubAgentOutput)
-    assert subagent_output.agent_name == "knowledge"
-    assert subagent_output.status == "ok"
+    assert subagent_output.agent_name == KNOWLEDGE_AGENT_NAME
+    assert subagent_output.status == SUBAGENT_STATUS_OK
+    assert subagent_output.artifacts[0].artifact_type == KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE
     assert subagent_output.sources[0].source_id == "sample-safety-rules"
     assert subagent_output.sources[0].uri == "workspace://ai-artist-main/memory/safety_rules.md"
     assert subagent_output.sources[0].metadata["sample_data"] is True
-    assert subagent_output.policy_notes == [
-        "Read-only retrieval from approved local sample data."
-    ]
+    assert subagent_output.policy_notes == [KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL]
 
 
 def test_in_memory_qdrant_upsert_replaces_points_deterministically() -> None:
@@ -131,7 +138,7 @@ def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:
                     "title": "Approved Local Note",
                     "uri": "workspace://approved",
                     "content": "Approved local source for default-deny write actions.",
-                    "approved": True,
+                    KNOWLEDGE_APPROVED_PAYLOAD_FIELD: True,
                     "metadata": {"sample_data": True},
                 },
             ),
@@ -143,7 +150,7 @@ def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:
                     "title": "Unapproved Local Note",
                     "uri": "workspace://unapproved",
                     "content": "Unapproved source for default-deny write actions.",
-                    "approved": False,
+                    KNOWLEDGE_APPROVED_PAYLOAD_FIELD: False,
                     "metadata": {"sample_data": True},
                 },
             ),
@@ -153,3 +160,14 @@ def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:
     response = agent.retrieve("default-deny write actions", task_id=TASK_ID, limit=5)
 
     assert {result.source_id for result in response.results} == {"approved-local-note"}
+
+
+def test_knowledge_agent_contract_vocabulary_is_centralized() -> None:
+    source = Path("backend/knowledge.py").read_text(encoding="utf-8")
+
+    assert '"agent_name": "knowledge"' not in source
+    assert '"status": "ok"' not in source
+    assert '"artifact_type": "knowledge_retrieval"' not in source
+    assert '"approved": True' not in source
+    assert '"approved") is True' not in source
+    assert "Read-only retrieval from approved local sample data." not in source

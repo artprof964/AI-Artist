@@ -5,11 +5,22 @@ from dataclasses import dataclass, field
 from typing import Any, Protocol
 from uuid import UUID
 
+from backend.knowledge_contracts import (
+    DEFAULT_KNOWLEDGE_COLLECTION_NAME,
+    KNOWLEDGE_AGENT_NAME,
+    KNOWLEDGE_APPROVED_PAYLOAD_FIELD,
+    KNOWLEDGE_NO_APPROVED_RESULTS_SUMMARY,
+    KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL,
+    KNOWLEDGE_RETRIEVAL_ARTIFACT_SUFFIX,
+    KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+    knowledge_results_summary,
+)
 from backend.mapping_utils import copy_mapping
 from backend.model_coercion import coerce_model
-from backend.schemas import SubAgentOutput
 from backend.numeric_utils import cosine_similarity
 from backend.runtime_ids import runtime_uuid
+from backend.schemas import SubAgentOutput
+from backend.subagent_status import SUBAGENT_STATUS_OK
 from backend.text_utils import alnum_tokens
 
 
@@ -61,21 +72,21 @@ class KnowledgeAgentResponse:
     @property
     def summary(self) -> str:
         if not self.results:
-            return "No approved local knowledge sources matched the query."
-        citations = ", ".join(result.citation.source_id for result in self.results)
-        return f"Retrieved {len(self.results)} approved local result(s): {citations}."
+            return KNOWLEDGE_NO_APPROVED_RESULTS_SUMMARY
+        source_ids = [result.citation.source_id for result in self.results]
+        return knowledge_results_summary(len(self.results), source_ids)
 
     def to_subagent_output(self) -> SubAgentOutput:
         return coerce_model(
             {
                 "task_id": self.task_id,
-                "agent_name": "knowledge",
-                "status": "ok",
+                "agent_name": KNOWLEDGE_AGENT_NAME,
+                "status": SUBAGENT_STATUS_OK,
                 "summary": self.summary,
                 "artifacts": [
                     {
-                        "artifact_type": "knowledge_retrieval",
-                        "artifact_id": f"{self.task_id}:knowledge-retrieval",
+                        "artifact_type": KNOWLEDGE_RETRIEVAL_ARTIFACT_TYPE,
+                        "artifact_id": f"{self.task_id}:{KNOWLEDGE_RETRIEVAL_ARTIFACT_SUFFIX}",
                         "metadata": {
                             "query": self.query,
                             "result_count": len(self.results),
@@ -96,7 +107,7 @@ class KnowledgeAgentResponse:
                     }
                     for result in self.results
                 ],
-                "policy_notes": ["Read-only retrieval from approved local sample data."],
+                "policy_notes": [KNOWLEDGE_POLICY_NOTE_APPROVED_LOCAL_RETRIEVAL],
                 "confidence": 0.9 if self.results else 0.2,
                 "errors": [],
             },
@@ -196,7 +207,7 @@ class KnowledgeAgent:
         *,
         vector_store: VectorStore | None = None,
         embedding_model: DeterministicEmbeddingModel | None = None,
-        collection_name: str = "ai_artist_knowledge",
+        collection_name: str = DEFAULT_KNOWLEDGE_COLLECTION_NAME,
     ) -> None:
         self.vector_store = vector_store or InMemoryQdrantVectorStore()
         self.embedding_model = embedding_model or DeterministicEmbeddingModel()
@@ -237,7 +248,7 @@ class KnowledgeAgent:
                         "title": document.title,
                         "uri": document.uri,
                         "content": document.content,
-                        "approved": True,
+                        KNOWLEDGE_APPROVED_PAYLOAD_FIELD: True,
                         "metadata": document.metadata,
                     },
                 )
@@ -298,7 +309,7 @@ class KnowledgeAgent:
             return False
         if self._approved_source_ids:
             return source_id in self._approved_source_ids
-        return hit.payload.get("approved") is True
+        return hit.payload.get(KNOWLEDGE_APPROVED_PAYLOAD_FIELD) is True
 
 
 def _make_snippet(content: str, query: str, *, max_length: int = 180) -> str:

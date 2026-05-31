@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 315 passed, 1 skipped, 1 warning
+Final validation: 316 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -80,8 +80,9 @@ backend/connection_settings.py: registry-driven env var names, defaults, aliases
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook.
 backend/mock_agent_contracts.py: shared mock sub-agent names and artifact-type vocabulary.
+backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, approved payload flag, collection default, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
-backend/knowledge.py: deterministic source-cited retrieval.
+backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts.
 backend/comfyui_adapter.py: execution-envelope-gated image generation adapter.
 backend/image_provenance.py: prompt/workflow hashing and provenance records.
 backend/critic_curator.py: deterministic image critique rubric.

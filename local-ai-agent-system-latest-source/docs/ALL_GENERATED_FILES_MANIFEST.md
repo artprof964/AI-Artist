@@ -58,6 +58,8 @@
 - `../../validation_reports/t14_source_freshness_validation_2026-05-31.md`
 - `../../validation_reports/t15_audit_event_log_validation_2026-05-31.md`
 - `../../validation_reports/t16_knowledge_agent_validation_2026-05-31.md`
+- `../../validation_reports/knowledge_contract_standardization_2026-05-31.md`
+- `../../backend/knowledge_contracts.py`
 - `../../validation_reports/text_utils_standardization_2026-05-31.md`
 - `../../validation_reports/numeric_utils_standardization_2026-05-31.md`
 - `../../validation_reports/time_direct_usage_standardization_2026-05-31.md`
