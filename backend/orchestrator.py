@@ -7,6 +7,7 @@ from pydantic import BaseModel, Field
 from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_mean
 from backend.observability import record_observability_stage, trace_id_from_request
+from backend.review_status import REVIEW_STATUS_PENDING
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import (
     SubAgentArtifact,
@@ -174,7 +175,7 @@ def _critic_curator_agent(request: MockAgentRequest) -> SubAgentOutput:
                 {
                     "artifact_type": "review_checklist",
                     "artifact_id": f"{request.task_id}:review-checklist",
-                    "metadata": {"review_status": "pending"},
+                    "metadata": {"review_status": REVIEW_STATUS_PENDING},
                 }
             ],
             "sources": [

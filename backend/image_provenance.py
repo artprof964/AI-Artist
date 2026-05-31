@@ -2,18 +2,16 @@ from __future__ import annotations
 
 from datetime import datetime
 from threading import RLock
-from typing import Any, Literal, Protocol
+from typing import Any, Protocol
 
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
 from backend.mapping_utils import copy_mapping
 from backend.model_coercion import coerce_model
 from backend.payload_fields import optional_string_field, required_string_field
 from backend.response_fields import field_value, required_response_list, require_response_mapping
+from backend.review_status import ReviewStatus
 from backend.time_utils import as_utc, utc_now
 from pydantic import BaseModel, ConfigDict, Field
-
-
-ReviewStatus = Literal["pending", "approved", "rejected"]
 
 
 class ImageProvenanceError(ValueError):

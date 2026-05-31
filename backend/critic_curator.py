@@ -7,6 +7,7 @@ from pydantic import BaseModel, ConfigDict, Field
 from backend.image_provenance import ImageProvenanceRecord
 from backend.model_coercion import coerce_model
 from backend.numeric_utils import rounded_clamp, rounded_mean
+from backend.review_status import REVIEW_STATUS_REJECTED, is_review_status
 from backend.text_utils import normalize_label, token_set
 
 
@@ -221,7 +222,7 @@ def _score_provenance_completeness(metadata: ImageQualityMetadata) -> RubricScor
         provenance.seed is not None,
         bool(provenance.storage_uri),
         bool(provenance.source_refs),
-        provenance.review_status in {"pending", "approved", "rejected"},
+        is_review_status(provenance.review_status),
     ]
     score = round((sum(checks) / len(checks)) * 5, 2)
     critique = f"Provenance includes {sum(checks)} of {len(checks)} required metadata signals."
@@ -236,7 +237,7 @@ def _score_publication_readiness(
     base_score = rounded_mean((score.score for score in earlier_scores), digits=4)
     if metadata.content_warnings:
         base_score -= 1.5
-    if metadata.provenance and metadata.provenance.review_status == "rejected":
+    if metadata.provenance and metadata.provenance.review_status == REVIEW_STATUS_REJECTED:
         base_score -= 1.0
     score = _clamp_score(base_score)
 
