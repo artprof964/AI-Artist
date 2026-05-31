@@ -103,6 +103,7 @@ Query tracking: aligned with Safety Service-owned persistence and source freshne
 Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Connection registry and runtime env resolution: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, docs, and tracker
+Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Secret redaction: shared across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters

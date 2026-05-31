@@ -1,5 +1,6 @@
 from pathlib import Path
 
+from backend.connection_settings import DEEPSEEK_API_KEY_ENV_VAR, STANDARD_LLM_API_KEY_ENV_VAR
 from backend.readiness import (
     BACKUP_COMMANDS,
     HEALTH_CHECK_COMMANDS,
@@ -27,7 +28,8 @@ def test_env_example_documents_required_readiness_keys_without_real_secrets() ->
 
     assert check.status == ReadinessStatus.PASS, check.detail
     assert {required.name for required in REQUIRED_ENV_VARS} <= set(parsed)
-    assert parsed["deepseek-open-art"] == ""
+    assert parsed[STANDARD_LLM_API_KEY_ENV_VAR] == ""
+    assert DEEPSEEK_API_KEY_ENV_VAR not in parsed
     assert parsed["SLACK_BOT_TOKEN"] == ""
     assert parsed["git_ai-artist_codex_token"] == ""
 

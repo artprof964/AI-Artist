@@ -216,6 +216,11 @@ mypy                        Python type checks where useful
 
 ## Environment Variables
 
+`deepseek-open-art` is the standard project key for LLM API access. It maps to
+the DeepSeek-compatible endpoint below and replaces provider-specific key names
+in setup, readiness checks, and live smoke tests. `DEEPSEEK_API_KEY` remains a
+loader-only legacy alias for old local shells.
+
 ```text
 deepseek-open-art=...
 LLM_API_URL=https://api.deepseek.com

@@ -4,7 +4,7 @@ from typing import Any, Protocol
 from openai import OpenAI
 
 from backend.connection_settings import (
-    DEEPSEEK_OPEN_ART_ENV_VAR,
+    STANDARD_LLM_API_KEY_ENV_VAR,
     load_connection_settings,
     runtime_env,
 )
@@ -33,7 +33,7 @@ def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelC
     settings = load_connection_settings(runtime_env(env))
     if not settings.llm_api_key:
         raise RuntimeError(
-            f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test"
+            f"{STANDARD_LLM_API_KEY_ENV_VAR} is required for the live LLM API smoke test"
         )
 
     return LLMAPIModelConfig(

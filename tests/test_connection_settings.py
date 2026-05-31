@@ -8,6 +8,7 @@ from backend.connection_settings import (
     DEFAULT_LLM_PRIMARY_MODEL,
     GITHUB_TOKEN_ENV_VAR,
     SLACK_BOT_TOKEN_ENV_VAR,
+    STANDARD_LLM_API_KEY_ENV_VAR,
     env_example_values,
     load_connection_settings,
     require_env_value,
@@ -17,7 +18,9 @@ from backend.readiness import REQUIRED_ENV_VARS
 
 
 def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
-    settings = load_connection_settings({DEEPSEEK_OPEN_ART_ENV_VAR: "deepseek-secret"})
+    assert STANDARD_LLM_API_KEY_ENV_VAR == DEEPSEEK_OPEN_ART_ENV_VAR
+
+    settings = load_connection_settings({STANDARD_LLM_API_KEY_ENV_VAR: "deepseek-secret"})
 
     assert settings.llm_api_key == "deepseek-secret"
     assert settings.llm_api_url == DEFAULT_LLM_API_URL
@@ -59,6 +62,7 @@ def test_required_env_registry_is_shared_with_readiness() -> None:
 
     assert settings_names == readiness_names
     assert example_values[DEEPSEEK_OPEN_ART_ENV_VAR] == ""
+    assert DEEPSEEK_API_KEY_ENV_VAR not in example_values
     assert example_values[SLACK_BOT_TOKEN_ENV_VAR] == ""
     assert example_values[GITHUB_TOKEN_ENV_VAR] == ""
     assert example_values["LLM_API_URL"] == DEFAULT_LLM_API_URL

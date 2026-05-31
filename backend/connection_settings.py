@@ -7,6 +7,7 @@ from typing import Mapping
 
 DEEPSEEK_OPEN_ART_ENV_VAR = "deepseek-open-art"
 DEEPSEEK_API_KEY_ENV_VAR = "DEEPSEEK_API_KEY"
+STANDARD_LLM_API_KEY_ENV_VAR = DEEPSEEK_OPEN_ART_ENV_VAR
 GITHUB_TOKEN_ENV_VAR = "git_ai-artist_codex_token"
 SLACK_BOT_TOKEN_ENV_VAR = "SLACK_BOT_TOKEN"
 
@@ -57,7 +58,7 @@ class ConnectionSettings:
 
 CONNECTION_ENV_VARS: tuple[EnvVarSpec, ...] = (
     EnvVarSpec(
-        DEEPSEEK_OPEN_ART_ENV_VAR,
+        STANDARD_LLM_API_KEY_ENV_VAR,
         "llm_api_key",
         "DeepSeek LLM API access",
         secret=True,
@@ -193,6 +194,7 @@ __all__ = [
     "EnvVarSpec",
     "GITHUB_TOKEN_ENV_VAR",
     "SLACK_BOT_TOKEN_ENV_VAR",
+    "STANDARD_LLM_API_KEY_ENV_VAR",
     "ConnectionSettings",
     "env_example_values",
     "env_value",

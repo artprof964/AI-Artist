@@ -104,6 +104,7 @@
 - `../../validation_reports/http_method_standardization_2026-05-31.md`
 - `../../validation_reports/connection_runtime_env_standardization_2026-05-31.md`
 - `../../validation_reports/connection_registry_loader_standardization_2026-05-31.md`
+- `../../validation_reports/llm_api_key_standard_2026-05-31.md`
 - `../../backend/connection_settings.py`
 - `../../backend/http_methods.py`
 - `../../backend/github_adapter.py`

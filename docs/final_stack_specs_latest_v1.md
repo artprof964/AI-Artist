@@ -119,7 +119,9 @@ OpenClaw agents, prompts, logs, audit payloads, and memory files must not
 contain raw API keys, OAuth tokens, Slack tokens, GitHub tokens, signing keys, or
 private webhook secrets.
 Connection names, defaults, secret aliases, target setting fields, and runtime env resolution must be changed through
-backend/connection_settings.py before adapter-specific code.
+backend/connection_settings.py before adapter-specific code; the standard LLM
+API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
+a legacy loader alias.
 Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Secret redaction patterns and replacement behavior must flow through

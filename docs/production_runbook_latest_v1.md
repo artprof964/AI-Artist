@@ -49,6 +49,16 @@ SLACK_BOT_TOKEN
 git_ai-artist_codex_token
 ```
 
+`deepseek-open-art` is the project-standard LLM API key name. The loader keeps
+`DEEPSEEK_API_KEY` only as a backward-compatible alias, and new setup,
+readiness, smoke-test, and deployment instructions must use `deepseek-open-art`.
+
+PowerShell setup example:
+
+```powershell
+${env:deepseek-open-art}="..."
+```
+
 Required local service keys:
 
 ```text
