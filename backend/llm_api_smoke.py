@@ -18,6 +18,7 @@ LLM_SMOKE_SYSTEM_PROMPT = "You are a helpful assistant"
 LLM_SMOKE_USER_PROMPT = "Hello"
 LLM_SMOKE_REASONING_EFFORT = "high"
 LLM_SMOKE_THINKING_TYPE = "enabled"
+LLM_SMOKE_TIMEOUT_SECONDS = 30.0
 
 
 @dataclass(frozen=True)
@@ -79,7 +80,7 @@ def create_llm_api_client(config: LLMAPIModelConfig) -> OpenAI:
 
 def run_llm_api_smoke_test(
     env: Mapping[str, str] | None = None,
-    timeout_seconds: float = 30.0,
+    timeout_seconds: float = LLM_SMOKE_TIMEOUT_SECONDS,
     llm_client: LLMAPIHTTPClient | None = None,
 ) -> dict[str, Any]:
     config = load_llm_api_model_config(env)

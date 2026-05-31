@@ -17,6 +17,7 @@ from backend.llm_api_smoke import (
     LLM_SMOKE_REASONING_EFFORT,
     LLM_SMOKE_SYSTEM_PROMPT,
     LLM_SMOKE_THINKING_TYPE,
+    LLM_SMOKE_TIMEOUT_SECONDS,
     LLM_SMOKE_USER_PROMPT,
     SECRET_REDACTION,
     build_smoke_request,
@@ -136,10 +137,12 @@ def test_smoke_request_defaults_are_centralized() -> None:
     assert "LLM_SMOKE_USER_PROMPT" in source
     assert "LLM_SMOKE_REASONING_EFFORT" in source
     assert "LLM_SMOKE_THINKING_TYPE" in source
+    assert "LLM_SMOKE_TIMEOUT_SECONDS" in source
     assert '"content": "You are a helpful assistant"' not in source
     assert '"content": "Hello"' not in source
     assert '"reasoning_effort": "high"' not in source
     assert '"type": "enabled"' not in source
+    assert "timeout_seconds: float = 30.0" not in source
 
 
 def test_shared_redaction_removes_nested_sensitive_values() -> None:
@@ -178,9 +181,9 @@ def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> N
     raw_call = client.completions.calls[0]
     assert raw_call["model"] == "test-model"
     assert raw_call["timeout"] == 3.5
-    assert raw_call["messages"][1]["content"] == "Hello"
-    assert raw_call["reasoning_effort"] == "high"
-    assert raw_call["extra_body"] == {"thinking": {"type": "enabled"}}
+    assert raw_call["messages"][1]["content"] == LLM_SMOKE_USER_PROMPT
+    assert raw_call["reasoning_effort"] == LLM_SMOKE_REASONING_EFFORT
+    assert raw_call["extra_body"] == {"thinking": {"type": LLM_SMOKE_THINKING_TYPE}}
 
     assert result["response_id"] == "resp_smoke_123"
     assert result["model"] == "test-model"
@@ -188,6 +191,20 @@ def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> N
     assert result["request"]["api_key"] == SECRET_REDACTION
     assert result["request"]["base_url"] == "https://example.test/llm"
     assert "llm-test-secret" not in repr(result)
+
+
+def test_llm_api_smoke_test_uses_centralized_default_timeout() -> None:
+    client = RecordingLLMClient()
+
+    run_llm_api_smoke_test(
+        {
+            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
+            "LLM_PRIMARY_MODEL": "test-model",
+        },
+        llm_client=client,
+    )
+
+    assert client.completions.calls[0]["timeout"] == LLM_SMOKE_TIMEOUT_SECONDS
 
 
 def test_llm_api_smoke_uses_shared_response_choice_parser() -> None:
