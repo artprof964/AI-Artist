@@ -6,6 +6,10 @@ from backend.health_contracts import (
     health_expected_signal,
     health_response_payload,
 )
+from backend.repo_paths import backend_module_path, read_repo_text, repo_root_from
+
+
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_health_response_payload_centralizes_status_and_service_name() -> None:
@@ -22,9 +26,9 @@ def test_readiness_uses_shared_health_expected_signal() -> None:
 
 
 def test_health_contract_literals_are_not_duplicated_at_runtime_boundaries() -> None:
-    app_source = Path("backend/app.py").read_text(encoding="utf-8")
-    readiness_source = Path("backend/readiness.py").read_text(encoding="utf-8")
-    schema_source = Path("backend/schemas.py").read_text(encoding="utf-8")
+    app_source = read_repo_text(REPO_ROOT, backend_module_path("app.py"))
+    readiness_source = read_repo_text(REPO_ROOT, backend_module_path("readiness.py"))
+    schema_source = read_repo_text(REPO_ROOT, backend_module_path("schemas.py"))
 
     assert 'status="ok"' not in app_source
     assert "ai-artist-safety-service" not in app_source

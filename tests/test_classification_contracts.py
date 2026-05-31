@@ -6,6 +6,10 @@ from backend.classification_contracts import (
     classification_confidence,
     classification_reasons,
 )
+from backend.repo_paths import backend_module_path, read_repo_text, repo_root_from
+
+
+REPO_ROOT = repo_root_from(Path(__file__))
 
 
 def test_classification_confidence_is_centralized_by_request_kind() -> None:
@@ -22,7 +26,7 @@ def test_classification_reasons_are_centralized() -> None:
 
 
 def test_service_uses_shared_classification_contracts() -> None:
-    service_source = Path("backend/service.py").read_text(encoding="utf-8")
+    service_source = read_repo_text(REPO_ROOT, backend_module_path("service.py"))
 
     assert "classification_confidence(request_kind)" in service_source
     assert "classification_reasons(" in service_source
