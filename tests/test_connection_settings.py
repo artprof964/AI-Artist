@@ -6,9 +6,11 @@ from backend.connection_settings import (
     DEFAULT_COMFYUI_URL,
     DEFAULT_LLM_API_URL,
     DEFAULT_LLM_PRIMARY_MODEL,
+    DEFAULT_SAFETY_SERVICE_URL,
     GITHUB_TOKEN_ENV_VAR,
     SLACK_BOT_TOKEN_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
+    connection_endpoint_url,
     env_example_values,
     load_connection_settings,
     require_env_value,
@@ -26,6 +28,7 @@ def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
     assert settings.llm_api_url == DEFAULT_LLM_API_URL
     assert settings.llm_primary_model == DEFAULT_LLM_PRIMARY_MODEL
     assert settings.comfyui_url == DEFAULT_COMFYUI_URL
+    assert settings.safety_service_url == DEFAULT_SAFETY_SERVICE_URL
     assert settings.github_token == ""
     assert settings.slack_bot_token == ""
 
@@ -43,6 +46,7 @@ def test_connection_settings_allow_endpoint_and_model_overrides() -> None:
             "LLM_API_URL": "https://example.test/llm",
             "LLM_PRIMARY_MODEL": "example-primary",
             "COMFYUI_URL": "http://localhost:9999",
+            "SAFETY_SERVICE_URL": "http://localhost:7777/",
             SLACK_BOT_TOKEN_ENV_VAR: "xoxb-local-token",
             GITHUB_TOKEN_ENV_VAR: "ghp_localtoken",
         }
@@ -51,6 +55,7 @@ def test_connection_settings_allow_endpoint_and_model_overrides() -> None:
     assert settings.llm_api_url == "https://example.test/llm"
     assert settings.llm_primary_model == "example-primary"
     assert settings.comfyui_url == "http://localhost:9999"
+    assert settings.safety_service_url == "http://localhost:7777/"
     assert settings.slack_bot_token == "xoxb-local-token"
     assert settings.github_token == "ghp_localtoken"
 
@@ -66,6 +71,7 @@ def test_required_env_registry_is_shared_with_readiness() -> None:
     assert example_values[SLACK_BOT_TOKEN_ENV_VAR] == ""
     assert example_values[GITHUB_TOKEN_ENV_VAR] == ""
     assert example_values["LLM_API_URL"] == DEFAULT_LLM_API_URL
+    assert example_values["SAFETY_SERVICE_URL"] == DEFAULT_SAFETY_SERVICE_URL
 
 
 def test_connection_registry_maps_every_runtime_setting_once() -> None:
@@ -106,3 +112,9 @@ def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
     env = {DEEPSEEK_OPEN_ART_ENV_VAR: "explicit-secret"}
 
     assert runtime_env(env) is env
+
+
+def test_connection_endpoint_url_normalizes_base_and_path_slashes() -> None:
+    assert connection_endpoint_url("http://localhost:8000/", "/health") == (
+        "http://localhost:8000/health"
+    )

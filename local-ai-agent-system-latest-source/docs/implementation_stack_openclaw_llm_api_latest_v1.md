@@ -238,6 +238,7 @@ MINIO_ENDPOINT=http://localhost:9000
 REDIS_URL=redis://localhost:6379/0
 OPA_URL=http://localhost:8181
 COMFYUI_URL=http://localhost:8188
+SAFETY_SERVICE_URL=http://localhost:8000
 
 SLACK_BOT_TOKEN=...
 git_ai-artist_codex_token=...

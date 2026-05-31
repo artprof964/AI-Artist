@@ -75,6 +75,7 @@ MINIO_ENDPOINT
 REDIS_URL
 OPA_URL
 COMFYUI_URL
+SAFETY_SERVICE_URL
 ```
 
 Local validation command:

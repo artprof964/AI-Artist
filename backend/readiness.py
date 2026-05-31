@@ -3,7 +3,14 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
-from backend.connection_settings import CONNECTION_ENV_VARS
+from backend.connection_settings import (
+    CONNECTION_ENV_VARS,
+    DEFAULT_MINIO_ENDPOINT,
+    DEFAULT_OPA_URL,
+    DEFAULT_QDRANT_URL,
+    DEFAULT_SAFETY_SERVICE_URL,
+    connection_endpoint_url,
+)
 from backend.health_contracts import health_expected_signal
 from backend.markdown_utils import markdown_heading_text
 
@@ -100,25 +107,25 @@ HEALTH_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
     CommandDefinition(
         slug="qdrant",
         target="Qdrant",
-        command="curl.exe -fsS http://localhost:6333/healthz",
+        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_QDRANT_URL, 'healthz')}",
         expected_signal="healthz check passed",
     ),
     CommandDefinition(
         slug="minio",
         target="MinIO",
-        command="curl.exe -fsS http://localhost:9000/minio/health/live",
+        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_MINIO_ENDPOINT, 'minio/health/live')}",
         expected_signal="HTTP 200 and non-error response",
     ),
     CommandDefinition(
         slug="opa",
         target="OPA",
-        command="curl.exe -fsS http://localhost:8181/health",
+        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_OPA_URL, 'health')}",
         expected_signal="HTTP 200 and non-error response",
     ),
     CommandDefinition(
         slug="safety_service",
         target="Safety Service",
-        command="curl.exe -fsS http://localhost:8000/health",
+        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_SAFETY_SERVICE_URL, 'health')}",
         expected_signal=health_expected_signal(),
     ),
 )
@@ -149,7 +156,10 @@ BACKUP_COMMANDS: tuple[CommandDefinition, ...] = (
     CommandDefinition(
         slug="qdrant_backup",
         target="Qdrant",
-        command="curl.exe -fsS -X POST http://localhost:6333/collections/{collection}/snapshots",
+        command=(
+            "curl.exe -fsS -X POST "
+            f"{connection_endpoint_url(DEFAULT_QDRANT_URL, 'collections/{collection}/snapshots')}"
+        ),
         expected_signal="snapshot name returned for each production collection",
     ),
 )
@@ -171,7 +181,7 @@ RESTORE_CHECK_COMMANDS: tuple[CommandDefinition, ...] = (
     CommandDefinition(
         slug="qdrant_restore_check",
         target="Qdrant",
-        command="curl.exe -fsS http://localhost:6333/collections/{collection}/snapshots",
+        command=f"curl.exe -fsS {connection_endpoint_url(DEFAULT_QDRANT_URL, 'collections/{collection}/snapshots')}",
         expected_signal="snapshot created during backup is listed",
     ),
 )

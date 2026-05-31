@@ -1,6 +1,13 @@
 from pathlib import Path
 
 from backend.connection_settings import DEEPSEEK_API_KEY_ENV_VAR, STANDARD_LLM_API_KEY_ENV_VAR
+from backend.connection_settings import (
+    DEFAULT_MINIO_ENDPOINT,
+    DEFAULT_OPA_URL,
+    DEFAULT_QDRANT_URL,
+    DEFAULT_SAFETY_SERVICE_URL,
+    connection_endpoint_url,
+)
 from backend.readiness import (
     BACKUP_COMMANDS,
     HEALTH_CHECK_COMMANDS,
@@ -56,6 +63,28 @@ def test_readiness_command_definitions_cover_health_backup_and_restore() -> None
     assert all("TODO" not in command.command.upper() for command in HEALTH_CHECK_COMMANDS)
     assert all("TODO" not in command.command.upper() for command in BACKUP_COMMANDS)
     assert all("TODO" not in command.command.upper() for command in RESTORE_CHECK_COMMANDS)
+
+
+def test_readiness_commands_use_shared_connection_defaults() -> None:
+    commands = {command.slug: command.command for command in HEALTH_CHECK_COMMANDS}
+    backup_commands = {command.slug: command.command for command in BACKUP_COMMANDS}
+    restore_commands = {command.slug: command.command for command in RESTORE_CHECK_COMMANDS}
+    readiness_source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+
+    assert connection_endpoint_url(DEFAULT_QDRANT_URL, "healthz") in commands["qdrant"]
+    assert connection_endpoint_url(DEFAULT_MINIO_ENDPOINT, "minio/health/live") in commands["minio"]
+    assert connection_endpoint_url(DEFAULT_OPA_URL, "health") in commands["opa"]
+    assert connection_endpoint_url(DEFAULT_SAFETY_SERVICE_URL, "health") in commands["safety_service"]
+    assert connection_endpoint_url(DEFAULT_QDRANT_URL, "collections/{collection}/snapshots") in (
+        backup_commands["qdrant_backup"]
+    )
+    assert connection_endpoint_url(DEFAULT_QDRANT_URL, "collections/{collection}/snapshots") in (
+        restore_commands["qdrant_restore_check"]
+    )
+    assert "http://localhost:6333" not in readiness_source
+    assert "http://localhost:9000" not in readiness_source
+    assert "http://localhost:8181" not in readiness_source
+    assert "http://localhost:8000" not in readiness_source
 
 
 def test_readiness_report_passes_for_checked_in_runbook_and_env_example() -> None:

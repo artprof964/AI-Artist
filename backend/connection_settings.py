@@ -24,6 +24,7 @@ DEFAULT_MINIO_ENDPOINT = "http://localhost:9000"
 DEFAULT_REDIS_URL = "redis://localhost:6379/0"
 DEFAULT_OPA_URL = "http://localhost:8181"
 DEFAULT_COMFYUI_URL = "http://localhost:8188"
+DEFAULT_SAFETY_SERVICE_URL = "http://localhost:8000"
 
 
 @dataclass(frozen=True)
@@ -52,6 +53,7 @@ class ConnectionSettings:
     redis_url: str
     opa_url: str
     comfyui_url: str
+    safety_service_url: str
     slack_bot_token: str
     github_token: str
 
@@ -117,6 +119,12 @@ CONNECTION_ENV_VARS: tuple[EnvVarSpec, ...] = (
     EnvVarSpec("REDIS_URL", "redis_url", "Redis queue and transient state endpoint", default=DEFAULT_REDIS_URL),
     EnvVarSpec("OPA_URL", "opa_url", "OPA policy service endpoint", default=DEFAULT_OPA_URL),
     EnvVarSpec("COMFYUI_URL", "comfyui_url", "Local ComfyUI endpoint", default=DEFAULT_COMFYUI_URL),
+    EnvVarSpec(
+        "SAFETY_SERVICE_URL",
+        "safety_service_url",
+        "Local FastAPI safety service endpoint",
+        default=DEFAULT_SAFETY_SERVICE_URL,
+    ),
     EnvVarSpec(SLACK_BOT_TOKEN_ENV_VAR, "slack_bot_token", "Slack adapter bot token", secret=True),
     EnvVarSpec(GITHUB_TOKEN_ENV_VAR, "github_token", "GitHub adapter token", secret=True),
 )
@@ -173,6 +181,10 @@ def env_example_values() -> dict[str, str]:
     return {spec.name: "" if spec.secret else spec.default for spec in CONNECTION_ENV_VARS}
 
 
+def connection_endpoint_url(base_url: str, path: str) -> str:
+    return f"{base_url.rstrip('/')}/{path.lstrip('/')}"
+
+
 __all__ = [
     "CONNECTION_ENV_VARS",
     "CONNECTION_SETTING_NAMES",
@@ -191,11 +203,13 @@ __all__ = [
     "DEFAULT_OPENCLAW_WORKSPACE_ROOT",
     "DEFAULT_QDRANT_URL",
     "DEFAULT_REDIS_URL",
+    "DEFAULT_SAFETY_SERVICE_URL",
     "EnvVarSpec",
     "GITHUB_TOKEN_ENV_VAR",
     "SLACK_BOT_TOKEN_ENV_VAR",
     "STANDARD_LLM_API_KEY_ENV_VAR",
     "ConnectionSettings",
+    "connection_endpoint_url",
     "env_example_values",
     "env_value",
     "load_connection_settings",
