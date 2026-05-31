@@ -54,7 +54,7 @@ can be marked done.
 36a. OpenClaw tool policy metadata, redaction, metric tags, and telemetry fields use `backend/openclaw_contracts.py`.
 37. Telemetry stages, log levels, default metric values, metric-name constants/formatting, trace-id fallback formatting, and event-message formatting use `backend/observability.py`.
 38. Publishing outcome statuses use `backend/publishing_status.py`.
-38a. Local publishing dry-run response fields and deterministic ID material use `backend/publishing_contracts.py`.
+38a. Local publishing dry-run response fields, deterministic ID material, and status/target aliases use `backend/publishing_contracts.py`, with status/target field spellings reused from `backend/runtime_field_contracts.py`.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
 40. Knowledge Agent names, retrieval artifact types, vector payload fields/shape, vector payload write/read helpers, approved-source payload flags, collection defaults, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 41. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
@@ -258,7 +258,7 @@ Output:
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
    - Request metadata defaults, default channel, request envelope field names, and fingerprint field names use the shared metadata contract before schema or telemetry changes.
    - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
-   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, audit response, or side-effect audit payload shapes are changed.
+   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, audit response, publishing response, or side-effect audit payload shapes are changed.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
@@ -336,7 +336,7 @@ Output:
    - Side-effect audit operation, target, status, reason, and policy-scope payload fields use the shared runtime field contract.
    - Side-effect audit execution-envelope and client-response payload fields use the shared adapter result field contract.
    - Publishing audit actor and policy scopes use the shared request-scope contract.
-   - Local publishing dry-run responses and deterministic IDs use the shared publishing contract helper.
+   - Local publishing dry-run responses, deterministic IDs, and status/target fields use the shared publishing contract helper and runtime field contract.
 ```
 
 ## Definition Of Done

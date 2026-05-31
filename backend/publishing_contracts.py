@@ -1,13 +1,14 @@
 from typing import Any
 
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
+from backend.runtime_field_contracts import STATUS_FIELD, TARGET_FIELD
 
 
 LOCAL_PUBLISH_ID_PREFIX = "local-publish"
 PUBLISHING_EXTERNAL_POST_ID_FIELD = "external_post_id"
 PUBLISHING_PAYLOAD_FIELD = "payload"
-PUBLISHING_STATUS_FIELD = "status"
-PUBLISHING_TARGET_FIELD = "target"
+PUBLISHING_STATUS_FIELD = STATUS_FIELD
+PUBLISHING_TARGET_FIELD = TARGET_FIELD
 
 
 def local_publishing_id_material(
