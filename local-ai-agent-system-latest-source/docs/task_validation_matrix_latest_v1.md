@@ -22,12 +22,12 @@ contract is satisfied.
 | T14 | Source freshness check | Freshness tests increment `source_data_registry.change_seq` and prove stale cached responses are blocked. | Bestanden | 2026-05-31 |
 | T15 | Audit event log | Audit tests verify request, policy, reuse, execution-envelope, tool-call, and artifact events are persisted with correlation ids. | Bestanden | 2026-05-31 |
 | T16 | Knowledge Agent retrieval | Retrieval test ingests sample source data, embeds it, queries Qdrant, returns source-cited results through the Knowledge Agent, and excludes unapproved sources. | Bestanden | 2026-05-31 |
-| T17 | ComfyUI adapter behind execution gate | Adapter test proves image generation fails without a valid execution envelope and succeeds with a mocked approved envelope. | Bestanden | 2026-05-31 |
+| T17 | ComfyUI adapter behind execution gate | Shared execution-gate tests and adapter tests prove image generation fails without a valid execution envelope and succeeds with a mocked approved envelope. | Bestanden | 2026-05-31 |
 | T18 | Image provenance | Artifact test verifies prompt hash, workflow hash, model, seed, source refs, storage uri, and review status are stored for every image. | Bestanden | 2026-05-31 |
 | T19 | Critic/Curator rubrics | Rubric test scores sample images or mocked image metadata and returns structured critique, pass/fail, and improvement notes. | Bestanden | 2026-05-31 |
 | T20 | Slack development channel | Slack adapter test uses a mocked Slack API to confirm inbound request handling and outbound response formatting. | Bestanden | 2026-05-31 |
 | T21 | Source ingestion | Ingestion test imports approved sample sources, stores snapshots, records source registry rows, and rejects disallowed source domains. | Bestanden | 2026-05-31 |
-| T22 | Publishing Agent with human approval | Publishing test proves external publishing remains blocked until human approval is attached to the execution envelope. | Bestanden | 2026-05-31 |
+| T22 | Publishing Agent with human approval | Shared execution-gate tests and publishing tests prove external publishing remains blocked until human approval is attached to the execution envelope. | Bestanden | 2026-05-31 |
 | T23 | GitHub adapter | GitHub adapter test uses a mocked GitHub API and confirms `git_ai-artist_codex_token` is read only by the adapter, not agents. | Bestanden | 2026-05-31 |
 | T24 | Unit tests for safety service and policies | CI test suite runs canonicalizer, classifier, OPA, cache, freshness, and audit unit tests with `--cov-fail-under=90` over the safety service modules. | Bestanden | 2026-05-31 |
 | T25 | OpenClaw-to-safety integration tests | End-to-end test sends a request through OpenClaw hook, Safety Service, mock agents, validation, and final response synthesis. | Bestanden | 2026-05-31 |

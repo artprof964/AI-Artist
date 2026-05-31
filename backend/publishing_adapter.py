@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Protocol
 from uuid import UUID
 
-from pydantic import ValidationError
-
+from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
 
 
@@ -48,8 +47,16 @@ class PublishingAdapter:
         *,
         now: datetime | None = None,
     ) -> PublishingResult:
-        envelope = _coerce_envelope(request.execution_envelope)
-        _validate_execution_envelope(envelope, target=request.target, now=now)
+        envelope = require_execution_envelope(
+            request.execution_envelope,
+            operation=PUBLISH_OPERATION,
+            missing_message="publishing requires an execution envelope",
+            error_type=PublishingExecutionGateError,
+            target=request.target,
+            target_label="publish target",
+            require_human_approval=True,
+            now=now,
+        )
 
         client_response = self._client.publish(request.target, request.payload)
 
@@ -60,58 +67,6 @@ class PublishingAdapter:
             target=request.target,
             client_response=client_response,
         )
-
-
-def _coerce_envelope(
-    envelope: ExecutionEnvelopeResponse | dict[str, Any] | None,
-) -> ExecutionEnvelopeResponse:
-    if envelope is None:
-        raise PublishingExecutionGateError("publishing requires an execution envelope")
-
-    if isinstance(envelope, ExecutionEnvelopeResponse):
-        return envelope
-
-    try:
-        return ExecutionEnvelopeResponse.model_validate(envelope)
-    except ValidationError as exc:
-        raise PublishingExecutionGateError("execution envelope is invalid") from exc
-
-
-def _validate_execution_envelope(
-    envelope: ExecutionEnvelopeResponse,
-    *,
-    target: str,
-    now: datetime | None = None,
-) -> None:
-    if envelope.operation != PUBLISH_OPERATION:
-        raise PublishingExecutionGateError("execution envelope operation must be publish")
-
-    if envelope.target != target:
-        raise PublishingExecutionGateError("execution envelope target does not match publish target")
-
-    if not envelope.valid:
-        raise PublishingExecutionGateError("execution envelope is not valid")
-
-    if not envelope.allow:
-        raise PublishingExecutionGateError("execution envelope does not allow execution")
-
-    if not envelope.human_approval.approved:
-        raise PublishingExecutionGateError("publishing requires human approval")
-
-    if not envelope.signature:
-        raise PublishingExecutionGateError("execution envelope must include a signature")
-
-    comparison_time = _as_aware_utc(now or datetime.now(timezone.utc))
-    expires_at = _as_aware_utc(envelope.expires_at)
-    if expires_at <= comparison_time:
-        raise PublishingExecutionGateError("execution envelope is expired")
-
-
-def _as_aware_utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
-
 
 __all__ = [
     "PublishingAdapter",

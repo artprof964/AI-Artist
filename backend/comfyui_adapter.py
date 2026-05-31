@@ -1,12 +1,11 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Any, Protocol
 from uuid import UUID
 
-from pydantic import ValidationError
-
+from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
 
 
@@ -48,8 +47,13 @@ class ComfyUIAdapter:
         *,
         now: datetime | None = None,
     ) -> ComfyUIImageGenerationResult:
-        envelope = _coerce_envelope(request.execution_envelope)
-        _validate_execution_envelope(envelope, now=now)
+        envelope = require_execution_envelope(
+            request.execution_envelope,
+            operation=IMAGE_GENERATE_OPERATION,
+            missing_message="image generation requires an execution envelope",
+            error_type=ComfyUIExecutionGateError,
+            now=now,
+        )
 
         client_response = self._client.submit_workflow(request.workflow)
 
@@ -60,51 +64,6 @@ class ComfyUIAdapter:
             prompt=request.prompt,
             client_response=client_response,
         )
-
-
-def _coerce_envelope(
-    envelope: ExecutionEnvelopeResponse | dict[str, Any] | None,
-) -> ExecutionEnvelopeResponse:
-    if envelope is None:
-        raise ComfyUIExecutionGateError("image generation requires an execution envelope")
-
-    if isinstance(envelope, ExecutionEnvelopeResponse):
-        return envelope
-
-    try:
-        return ExecutionEnvelopeResponse.model_validate(envelope)
-    except ValidationError as exc:
-        raise ComfyUIExecutionGateError("execution envelope is invalid") from exc
-
-
-def _validate_execution_envelope(
-    envelope: ExecutionEnvelopeResponse,
-    *,
-    now: datetime | None = None,
-) -> None:
-    if envelope.operation != IMAGE_GENERATE_OPERATION:
-        raise ComfyUIExecutionGateError("execution envelope operation must be image_generate")
-
-    if not envelope.valid:
-        raise ComfyUIExecutionGateError("execution envelope is not valid")
-
-    if not envelope.allow:
-        raise ComfyUIExecutionGateError("execution envelope does not allow execution")
-
-    if not envelope.signature:
-        raise ComfyUIExecutionGateError("execution envelope must include a signature")
-
-    comparison_time = _as_aware_utc(now or datetime.now(timezone.utc))
-    expires_at = _as_aware_utc(envelope.expires_at)
-    if expires_at <= comparison_time:
-        raise ComfyUIExecutionGateError("execution envelope is expired")
-
-
-def _as_aware_utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
-
 
 __all__ = [
     "ComfyUIAdapter",

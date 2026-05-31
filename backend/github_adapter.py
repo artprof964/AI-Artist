@@ -1,16 +1,15 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import datetime
 import os
 from typing import Any, Protocol
 from urllib.parse import urlsplit
 from uuid import UUID
 
-from pydantic import ValidationError
-
 from backend.audit import redact_audit_value
 from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
+from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
 
 
@@ -73,8 +72,16 @@ class GitHubAdapter:
         *,
         now: datetime | None = None,
     ) -> GitHubWriteResult:
-        envelope = _coerce_envelope(request.execution_envelope)
-        _validate_execution_envelope(envelope, target=request.target, now=now)
+        envelope = require_execution_envelope(
+            request.execution_envelope,
+            operation=GITHUB_WRITE_OPERATION,
+            missing_message="GitHub write requires an execution envelope",
+            error_type=GitHubExecutionGateError,
+            target=request.target,
+            target_label="GitHub target",
+            require_human_approval_when_marked=True,
+            now=now,
+        )
         method = _normalize_write_method(request.method)
         path = _normalize_api_path(request.path)
 
@@ -106,56 +113,6 @@ class GitHubAdapter:
             ).strip()
         except RuntimeError as exc:
             raise GitHubAdapterConfigurationError(str(exc)) from exc
-
-
-def _coerce_envelope(
-    envelope: ExecutionEnvelopeResponse | dict[str, Any] | None,
-) -> ExecutionEnvelopeResponse:
-    if envelope is None:
-        raise GitHubExecutionGateError("GitHub write requires an execution envelope")
-
-    if isinstance(envelope, ExecutionEnvelopeResponse):
-        return envelope
-
-    try:
-        return ExecutionEnvelopeResponse.model_validate(envelope)
-    except ValidationError as exc:
-        raise GitHubExecutionGateError("execution envelope is invalid") from exc
-
-
-def _validate_execution_envelope(
-    envelope: ExecutionEnvelopeResponse,
-    *,
-    target: str,
-    now: datetime | None = None,
-) -> None:
-    if envelope.operation != GITHUB_WRITE_OPERATION:
-        raise GitHubExecutionGateError(
-            "execution envelope operation must be github_write"
-        )
-
-    if envelope.target != target:
-        raise GitHubExecutionGateError(
-            "execution envelope target does not match GitHub target"
-        )
-
-    if not envelope.valid:
-        raise GitHubExecutionGateError("execution envelope is not valid")
-
-    if not envelope.allow:
-        raise GitHubExecutionGateError("execution envelope does not allow execution")
-
-    if envelope.requires_human_approval and not envelope.human_approval.approved:
-        raise GitHubExecutionGateError("execution envelope requires human approval")
-
-    if not envelope.signature:
-        raise GitHubExecutionGateError("execution envelope must include a signature")
-
-    comparison_time = _as_aware_utc(now or datetime.now(timezone.utc))
-    expires_at = _as_aware_utc(envelope.expires_at)
-    if expires_at <= comparison_time:
-        raise GitHubExecutionGateError("execution envelope is expired")
-
 
 def _normalize_write_method(method: str) -> str:
     if not isinstance(method, str):
@@ -197,13 +154,6 @@ def _redact_secret(value: Any, secret: str) -> Any:
         return value.replace(secret, "[REDACTED]")
 
     return value
-
-
-def _as_aware_utc(value: datetime) -> datetime:
-    if value.tzinfo is None:
-        return value.replace(tzinfo=timezone.utc)
-    return value.astimezone(timezone.utc)
-
 
 __all__ = [
     "GITHUB_TOKEN_ENV_VAR",
