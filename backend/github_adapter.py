@@ -4,7 +4,6 @@ from dataclasses import dataclass
 from datetime import datetime
 import os
 from typing import Any, Protocol
-from urllib.parse import urlsplit
 from uuid import UUID
 
 from backend.adapter_results import targeted_result_fields
@@ -13,6 +12,7 @@ from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
 from backend.execution_gate import require_execution_envelope
 from backend.schemas import ExecutionEnvelopeResponse
 from backend.secret_redaction import redact_secret_value
+from backend.url_utils import safe_relative_api_path
 
 
 GITHUB_WRITE_OPERATION = "github_write"
@@ -135,22 +135,16 @@ def _normalize_write_method(method: str) -> str:
 
 
 def _normalize_api_path(path: str) -> str:
-    if not isinstance(path, str):
-        raise GitHubExecutionGateError("GitHub API path must be a string")
-
-    normalized = path.strip()
-    split_path = urlsplit(normalized)
-    if split_path.scheme or split_path.netloc:
-        raise GitHubExecutionGateError("GitHub API path must not be an absolute URL")
-    if not split_path.path.startswith("/"):
-        raise GitHubExecutionGateError("GitHub API path must be relative and start with /")
-    if "\\" in normalized:
-        raise GitHubExecutionGateError("GitHub API path must use forward slashes")
-    if any(ord(character) < 32 for character in normalized):
-        raise GitHubExecutionGateError("GitHub API path must not contain control characters")
-    if any(segment in {".", ".."} for segment in split_path.path.split("/")):
-        raise GitHubExecutionGateError("GitHub API path must not contain traversal segments")
-    return normalized
+    return safe_relative_api_path(
+        path,
+        error_type=GitHubExecutionGateError,
+        type_message="GitHub API path must be a string",
+        absolute_message="GitHub API path must not be an absolute URL",
+        relative_message="GitHub API path must be relative and start with /",
+        slash_message="GitHub API path must use forward slashes",
+        control_message="GitHub API path must not contain control characters",
+        traversal_message="GitHub API path must not contain traversal segments",
+    )
 
 
 __all__ = [

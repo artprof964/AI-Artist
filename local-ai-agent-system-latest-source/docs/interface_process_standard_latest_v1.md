@@ -24,6 +24,7 @@ can be marked done.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
 13. Cache, provenance, execution-envelope, and persistence timestamps use `backend/time_utils.py` for UTC normalization.
 14. Connector payload string-field extraction uses `backend/payload_fields.py`.
+15. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
 ```
 
 ## Standard Request Envelope
@@ -188,6 +189,7 @@ Output:
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
+   - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
 
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
@@ -200,6 +202,8 @@ Output:
    - Any external write, publish, GitHub write, deletion, or image generation
      receives a signed execution envelope.
    - Envelope expiry comparisons use shared UTC normalization.
+   - Connector API paths are normalized and rejected for absolute URLs, traversal,
+     backslashes, and control characters before token reads.
 
 9. Deliver
    - Output Tool Agent sends the response or executes the approved action.

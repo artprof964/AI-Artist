@@ -4,9 +4,9 @@ import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
-from urllib.parse import urlparse
 
 from backend.source_freshness import SourceFreshnessRegistry, SourceRegistryEntry
+from backend.url_utils import http_url_domain
 
 
 DEFAULT_APPROVED_DOMAINS = frozenset(
@@ -166,13 +166,11 @@ class SourceIngestionService:
         )
 
     def _domain_for_candidate(self, candidate: SourceIngestionCandidate) -> str:
-        parsed = urlparse(candidate.uri)
-        if parsed.scheme.lower() not in {"http", "https"} or not parsed.netloc:
-            raise SourceIngestionError(
-                candidate.source_key,
-                "source ingestion requires an absolute http(s) URL",
-            )
-        return (parsed.hostname or "").lower()
+        return http_url_domain(
+            candidate.uri,
+            error_type=lambda reason: SourceIngestionError(candidate.source_key, reason),
+            message="source ingestion requires an absolute http(s) URL",
+        )
 
 
 def _content_hash(content: str) -> str:
