@@ -90,6 +90,7 @@
 - `../../tests/test_slack_adapter.py`
 - `../../validation_reports/t21_source_ingestion_validation_2026-05-31.md`
 - `../../validation_reports/source_ingestion_hash_boundary_standardization_2026-05-31.md`
+- `../../validation_reports/source_ingestion_url_boundary_standardization_2026-05-31.md`
 - `../../backend/source_ingestion.py`
 - `../../tests/test_source_ingestion.py`
 - `../../validation_reports/t22_publishing_agent_validation_2026-05-31.md`

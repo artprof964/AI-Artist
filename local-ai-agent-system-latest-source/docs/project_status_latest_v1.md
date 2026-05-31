@@ -43,7 +43,7 @@ Numeric scoring utilities: centralized in backend/numeric_utils.py
 Time creation/normalization: centralized in backend/time_utils.py
 Payload fields and nested payload objects: centralized in backend/payload_fields.py
 Response fields: centralized in backend/response_fields.py
-URL validation: centralized in backend/url_utils.py and called directly by connector boundaries
+URL validation: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
 HTTP method vocabulary and normalization: centralized in backend/http_methods.py
 Operations: centralized in backend/operations.py
 Model coercion: centralized in backend/model_coercion.py
@@ -145,7 +145,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 317 passed, 1 skipped, 1 warning
+final pytest: 318 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

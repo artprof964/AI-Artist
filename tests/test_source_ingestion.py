@@ -202,3 +202,10 @@ def test_source_ingestion_uses_shared_canonical_hash_helpers_directly() -> None:
     assert "from backend.canonical_hash import sha256_text, sha256_version_tag" in source
     assert "def _content_hash(" not in source
     assert "hashlib.sha256" not in source
+
+
+def test_source_ingestion_uses_shared_url_boundary_directly() -> None:
+    source = (PROJECT_ROOT / "backend" / "source_ingestion.py").read_text(encoding="utf-8")
+
+    assert "def _domain_for_candidate(" not in source
+    assert "http_url_domain(" in source

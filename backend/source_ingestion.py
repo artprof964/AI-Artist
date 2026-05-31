@@ -106,7 +106,11 @@ class SourceIngestionService:
         rejected_sources: list[RejectedSource] = []
 
         for candidate in candidates:
-            domain = self._domain_for_candidate(candidate)
+            domain = http_url_domain(
+                candidate.uri,
+                error_type=lambda reason: SourceIngestionError(candidate.source_key, reason),
+                message="source ingestion requires an absolute http(s) URL",
+            )
             if domain not in self.approved_domains:
                 rejected_sources.append(
                     RejectedSource(
@@ -164,13 +168,6 @@ class SourceIngestionService:
             imported_snapshots=tuple(imported_snapshots),
             registry_entries=tuple(registry_entries),
             rejected_sources=tuple(rejected_sources),
-        )
-
-    def _domain_for_candidate(self, candidate: SourceIngestionCandidate) -> str:
-        return http_url_domain(
-            candidate.uri,
-            error_type=lambda reason: SourceIngestionError(candidate.source_key, reason),
-            message="source ingestion requires an absolute http(s) URL",
         )
 
 
