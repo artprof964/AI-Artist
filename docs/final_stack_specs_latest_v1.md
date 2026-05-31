@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 427 passed, 1 skipped, 1 warning
+Final validation: 429 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -70,7 +70,7 @@ backend/time_utils.py: shared UTC datetime creation and normalization for runtim
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction plus payload validation messages.
 backend/response_fields.py: shared provider response field access, first-choice message parsing, shape validation, and response validation messages.
 backend/url_utils.py: shared URL domain and relative API path validation.
-backend/http_methods.py: shared HTTP method vocabulary and normalization for connector boundaries.
+backend/http_methods.py: shared HTTP method vocabulary, normalization, and validation messages for connector boundaries.
 backend/file_scanning.py: shared reviewable text-file suffixes and recursive scanner file discovery.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and domain boundaries.
@@ -246,8 +246,8 @@ messages are changed.
 URL/domain extraction and relative API path validation must flow through
 backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.
-HTTP method vocabulary and normalization must flow through backend/http_methods.py
-before connector-specific method allowlists are added.
+HTTP method vocabulary, normalization, and validation messages must flow through
+backend/http_methods.py before connector-specific method allowlists are added.
 GitHub adapter action labels, target labels, API validation messages, token
 purpose text, and token-required message routing must flow through
 backend/github_contracts.py and backend/connection_settings.py before GitHub

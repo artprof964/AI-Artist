@@ -2,9 +2,12 @@ import pytest
 
 from backend.http_methods import (
     HTTP_METHOD_DELETE,
+    HTTP_METHOD_NOT_ALLOWED_MESSAGE,
     HTTP_METHOD_PATCH,
     HTTP_METHOD_POST,
     HTTP_METHOD_PUT,
+    HTTP_METHOD_TYPE_MESSAGE,
+    HTTP_WRITE_METHOD_REQUIRED_MESSAGE,
     HTTP_WRITE_METHODS,
     HTTPMethodError,
     normalize_http_method,
@@ -28,6 +31,12 @@ def test_http_write_method_vocabulary_is_centralized() -> None:
     )
 
 
+def test_http_method_validation_messages_are_centralized() -> None:
+    assert HTTP_METHOD_TYPE_MESSAGE == "HTTP method must be a string"
+    assert HTTP_METHOD_NOT_ALLOWED_MESSAGE == "HTTP method is not allowed"
+    assert HTTP_WRITE_METHOD_REQUIRED_MESSAGE == "HTTP method must be a write method"
+
+
 def test_normalize_http_write_method_trims_uppercases_and_accepts_writes() -> None:
     assert normalize_http_write_method(" post ") == HTTP_METHOD_POST
     assert normalize_http_write_method("PATCH") == HTTP_METHOD_PATCH
@@ -37,8 +46,13 @@ def test_normalize_http_write_method_trims_uppercases_and_accepts_writes() -> No
 
 @pytest.mark.parametrize("method", ["GET", "HEAD", "OPTIONS", "", "   "])
 def test_normalize_http_write_method_rejects_non_write_methods(method: str) -> None:
-    with pytest.raises(HTTPMethodError, match="write method"):
+    with pytest.raises(HTTPMethodError, match=HTTP_WRITE_METHOD_REQUIRED_MESSAGE):
         normalize_http_write_method(method)
+
+
+def test_normalize_http_method_rejects_non_string_with_shared_message() -> None:
+    with pytest.raises(HTTPMethodError, match=HTTP_METHOD_TYPE_MESSAGE):
+        normalize_http_method(123, allowed_methods={HTTP_METHOD_POST})  # type: ignore[arg-type]
 
 
 def test_normalize_http_method_allows_custom_error_type_and_messages() -> None:

@@ -39,7 +39,7 @@ can be marked done.
 27. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 28. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.
 29. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-30. Connector HTTP method vocabulary and normalization uses `backend/http_methods.py`.
+30. Connector HTTP method vocabulary, normalization, and validation messages use `backend/http_methods.py`.
 31. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
 32. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
 33. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.

@@ -61,7 +61,7 @@ Time creation/normalization: centralized in backend/time_utils.py for runtime co
 Payload fields, nested payload objects, and payload validation messages: centralized in backend/payload_fields.py
 Response fields, first-choice message parsing, and response validation messages: centralized in backend/response_fields.py
 URL validation: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
-HTTP method vocabulary and normalization: centralized in backend/http_methods.py
+HTTP method vocabulary, normalization, and validation messages: centralized in backend/http_methods.py
 File scanning suffixes and discovery: centralized in backend/file_scanning.py
 Operations: centralized in backend/operations.py
 Publishing audit operation value: uses backend/operations.py directly
@@ -166,7 +166,7 @@ Connection endpoint URLs and env example rendering/parsing: shared across readin
 Shell commands: shared across readiness health, backup, and restore command definitions
 Readiness paths: shared across local backup directories, container dump path, and MinIO source alias
 Repository paths: shared across Compose, env, runbook, OPA policy, PostgreSQL schema, repo-root lookup, workspace file lookups, backend module discovery, and backend module source lookups
-HTTP methods: shared across GitHub write method validation and future connector method allowlists
+HTTP methods: shared across GitHub write method validation, validation messages, and future connector method allowlists
 GitHub adapter contracts: shared across action labels, target labels, API validation messages, token-purpose text, token-required message routing through connection settings, and adapter secret lookup
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
@@ -203,7 +203,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 427 passed, 1 skipped, 1 warning
+final pytest: 429 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

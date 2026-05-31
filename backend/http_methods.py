@@ -15,6 +15,10 @@ HTTP_WRITE_METHODS: frozenset[str] = frozenset(
     }
 )
 
+HTTP_METHOD_TYPE_MESSAGE = "HTTP method must be a string"
+HTTP_METHOD_NOT_ALLOWED_MESSAGE = "HTTP method is not allowed"
+HTTP_WRITE_METHOD_REQUIRED_MESSAGE = "HTTP method must be a write method"
+
 
 class HTTPMethodError(ValueError):
     """Raised when an HTTP method does not match a connector boundary contract."""
@@ -25,8 +29,8 @@ def normalize_http_method(
     *,
     allowed_methods: frozenset[str] | set[str],
     error_type: type[Exception] = HTTPMethodError,
-    type_message: str = "HTTP method must be a string",
-    allowed_message: str = "HTTP method is not allowed",
+    type_message: str = HTTP_METHOD_TYPE_MESSAGE,
+    allowed_message: str = HTTP_METHOD_NOT_ALLOWED_MESSAGE,
 ) -> str:
     if not isinstance(value, str):
         raise error_type(type_message)
@@ -41,8 +45,8 @@ def normalize_http_write_method(
     value: str,
     *,
     error_type: type[Exception] = HTTPMethodError,
-    type_message: str = "HTTP method must be a string",
-    allowed_message: str = "HTTP method must be a write method",
+    type_message: str = HTTP_METHOD_TYPE_MESSAGE,
+    allowed_message: str = HTTP_WRITE_METHOD_REQUIRED_MESSAGE,
 ) -> str:
     return normalize_http_method(
         value,
@@ -58,7 +62,10 @@ __all__ = [
     "HTTP_METHOD_PATCH",
     "HTTP_METHOD_POST",
     "HTTP_METHOD_PUT",
+    "HTTP_METHOD_NOT_ALLOWED_MESSAGE",
+    "HTTP_METHOD_TYPE_MESSAGE",
     "HTTPMethodError",
+    "HTTP_WRITE_METHOD_REQUIRED_MESSAGE",
     "HTTP_WRITE_METHODS",
     "normalize_http_method",
     "normalize_http_write_method",
