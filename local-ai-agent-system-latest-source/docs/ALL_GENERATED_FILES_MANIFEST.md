@@ -151,6 +151,7 @@
 - `../../validation_reports/backend_source_inspection_standardization_2026-05-31.md`
 - `../../validation_reports/repo_root_workspace_path_standardization_2026-05-31.md`
 - `../../validation_reports/repo_source_open_standardization_2026-05-31.md`
+- `../../validation_reports/test_utc_now_standardization_2026-05-31.md`
 - `../../validation_reports/llm_api_key_standard_2026-05-31.md`
 - `../../backend/connection_settings.py`
 - `../../backend/shell_commands.py`

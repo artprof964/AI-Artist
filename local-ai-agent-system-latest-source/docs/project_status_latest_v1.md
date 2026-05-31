@@ -56,7 +56,7 @@ Critic/Curator rubric categories and decisions: centralized in backend/critic_ru
 Text tokenization, labels, and contextual snippets: centralized in backend/text_utils.py
 Markdown heading parsing: centralized in backend/markdown_utils.py
 Numeric scoring utilities and direct rubric clamps: centralized in backend/numeric_utils.py
-Time creation/normalization: centralized in backend/time_utils.py
+Time creation/normalization: centralized in backend/time_utils.py for runtime code and tests
 Payload fields and nested payload objects: centralized in backend/payload_fields.py
 Response fields and first-choice message parsing: centralized in backend/response_fields.py
 URL validation: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
@@ -153,7 +153,7 @@ Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests
 Text utilities: shared directly across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
 Markdown utilities: shared across production readiness runbook validation and future documentation validators
 Numeric utilities: shared directly across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
-Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
+Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, execution-envelope expiry validation, and tests that need current UTC timestamps
 Payload fields: shared across Slack event parsing, nested event object validation, audit scope extraction, and generated image metadata parsing
 Slack adapter boundaries: shared payload, request identity, and secret-redaction helpers are called directly without local wrapper functions
 Slack adapter contracts: shared across source labels, inbound event validation messages, and outbound response validation messages
@@ -189,7 +189,8 @@ service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 10 passed; runbook, env schema rendering, shared service URL, shell command construction, backup paths, health checks, backup commands, restore checks, retention, and contacts validated
 repo path validation: 6 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, repo-root lookup, workspace file lookups, backend module discovery, backend module source reads, raw-open source-inspection guard tests, source-inspection guard tests, and repo-root guard tests centralized
-final pytest: 384 passed, 1 skipped, 1 warning
+time utility validation: 6 focused files passed; direct test `datetime.now(timezone.utc)` calls guarded
+final pytest: 385 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

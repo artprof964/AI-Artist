@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from typing import Any
 from uuid import UUID
 
@@ -12,10 +12,11 @@ from backend.publishing_adapter import (
 from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
+from backend.time_utils import utc_now
 
 
 REQUEST_ID = UUID("22222222-2222-2222-2222-222222222222")
-NOW = datetime.now(timezone.utc)
+NOW = utc_now()
 PUBLISH_TARGET = "mock-publisher://channels/artist-feed"
 
 

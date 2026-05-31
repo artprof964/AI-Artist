@@ -1,13 +1,14 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from uuid import UUID
 
 from backend.adapter_results import gated_result_fields, targeted_result_fields
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
+from backend.time_utils import utc_now
 
 
 REQUEST_ID = UUID("53535353-5353-5353-5353-535353535353")
 ENVELOPE_ID = UUID("54545454-5454-5454-5454-545454545454")
-NOW = datetime.now(timezone.utc)
+NOW = utc_now()
 
 
 def envelope() -> ExecutionEnvelopeResponse:

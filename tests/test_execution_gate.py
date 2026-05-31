@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from uuid import UUID
 
 import pytest
@@ -18,11 +18,12 @@ from backend.execution_gate_messages import (
 )
 from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
+from backend.time_utils import utc_now
 
 
 REQUEST_ID = UUID("42424242-4242-4242-4242-424242424242")
 ENVELOPE_ID = UUID("43434343-4343-4343-4343-434343434343")
-NOW = datetime.now(timezone.utc)
+NOW = utc_now()
 
 
 def envelope(**overrides: object) -> ExecutionEnvelopeResponse:

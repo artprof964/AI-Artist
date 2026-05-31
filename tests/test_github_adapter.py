@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import ast
-from datetime import datetime, timedelta, timezone
+from datetime import timedelta
 from pathlib import Path
 from typing import Any
 from uuid import UUID
@@ -23,10 +23,11 @@ from backend.repo_paths import (
 )
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
+from backend.time_utils import utc_now
 
 
 REQUEST_ID = UUID("23232323-2323-2323-2323-232323232323")
-NOW = datetime.now(timezone.utc)
+NOW = utc_now()
 GITHUB_TARGET = "github://artprof964/AI-Art/issues"
 GITHUB_PATH = "/repos/artprof964/AI-Art/issues"
 MOCK_GITHUB_TOKEN = "ghp_mocked_t23_secret_token_1234567890"

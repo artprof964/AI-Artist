@@ -4,6 +4,7 @@ from pathlib import Path
 from backend.repo_paths import (
     backend_module_filenames,
     read_backend_module_text,
+    read_repo_text,
     repo_root_from,
 )
 from backend.time_utils import as_utc, utc_now
@@ -43,5 +44,18 @@ def test_backend_modules_do_not_wrap_shared_utc_normalization() -> None:
         text = read_backend_module_text(module_filename, PROJECT_ROOT)
         if "def _as_utc(" in text or "def _as_aware_utc(" in text:
             offenders.append(module_filename)
+
+    assert offenders == []
+
+
+def test_tests_use_shared_utc_now_helper_for_current_time() -> None:
+    offenders: list[str] = []
+
+    for test_path in sorted((PROJECT_ROOT / "tests").glob("test_*.py")):
+        if test_path.name == "test_time_utils.py":
+            continue
+        source = read_repo_text(PROJECT_ROOT, Path("tests") / test_path.name)
+        if "datetime.now(timezone.utc)" in source:
+            offenders.append(test_path.name)
 
     assert offenders == []
