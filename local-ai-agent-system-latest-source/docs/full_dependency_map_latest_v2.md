@@ -122,7 +122,7 @@ Normalized request fingerprint -> requester scope + policy scope
 ## Secrets
 
 ```text
-LLM API Client -> os.environ["deepseek-open-art"]
+LLM API Client -> os.environ["DEEPSEEK_API_KEY"]
 GitHub Adapter -> os.environ["git_ai-artist_codex_token"]
 Production later -> OpenBao runtime injection
 Secrets never enter chat memory, agent memory, prompts, logs, or audit payloads.

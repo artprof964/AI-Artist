@@ -5,8 +5,8 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 169 passed, 1 skipped, 1 warning
-Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
+Final validation: 170 passed, 1 skipped, 1 warning
+Skipped test: live provider-neutral LLM API smoke test requires DEEPSEEK_API_KEY
 Lint: ruff all checks passed
 ```
 

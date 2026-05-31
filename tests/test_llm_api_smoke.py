@@ -1,12 +1,12 @@
 import os
 from typing import Any
 
-import httpx
 import pytest
 
 from backend.llm_api_smoke import (
     DEFAULT_LLM_API_URL,
-    DEEPSEEK_OPEN_ART_ENV_VAR,
+    DEFAULT_LLM_PRIMARY_MODEL,
+    DEEPSEEK_API_KEY_ENV_VAR,
     SECRET_REDACTION,
     build_smoke_request,
     load_llm_api_model_config,
@@ -15,39 +15,30 @@ from backend.llm_api_smoke import (
 )
 
 
-class RecordingHTTPClient:
+class RecordingChatCompletions:
     def __init__(self) -> None:
         self.calls: list[dict[str, Any]] = []
 
-    def post(
-        self,
-        url: str,
-        *,
-        headers: dict[str, str],
-        json: dict[str, Any],
-        timeout: float,
-    ) -> httpx.Response:
-        self.calls.append(
-            {
-                "url": url,
-                "headers": headers,
-                "json": json,
-                "timeout": timeout,
-            }
-        )
-        return httpx.Response(
-            200,
-            headers={"x-request-id": "req_smoke_123"},
-            json={"id": "resp_smoke_123", "model": json["model"], "status": "completed"},
-            request=httpx.Request("POST", url),
-        )
+    def create(self, **kwargs: Any) -> dict[str, Any]:
+        self.calls.append(kwargs)
+        return {
+            "id": "resp_smoke_123",
+            "model": kwargs["model"],
+            "choices": [{"message": {"content": "Hello! How can I help you today?"}}],
+        }
+
+
+class RecordingLLMClient:
+    def __init__(self) -> None:
+        self.completions = RecordingChatCompletions()
+        self.chat = type("RecordingChat", (), {"completions": self.completions})()
 
 
 def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
-    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
+    config = load_llm_api_model_config({DEEPSEEK_API_KEY_ENV_VAR: "llm-test-secret"})
 
     assert config.api_url == DEFAULT_LLM_API_URL
-    assert config.primary_model == "provider-primary-model"
+    assert config.primary_model == DEFAULT_LLM_PRIMARY_MODEL
     assert config.fallback_model == "provider-fallback-model"
     assert config.classifier_model == "provider-classifier-model"
     assert config.embedding_model == "provider-embedding-model"
@@ -58,7 +49,7 @@ def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
 def test_llm_api_model_config_allows_provider_overrides() -> None:
     config = load_llm_api_model_config(
         {
-            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
+            DEEPSEEK_API_KEY_ENV_VAR: "llm-test-secret",
             "LLM_API_URL": "https://example.test/llm",
             "LLM_PRIMARY_MODEL": "primary-any-provider",
             "LLM_FALLBACK_MODEL": "fallback-any-provider",
@@ -74,18 +65,29 @@ def test_llm_api_model_config_allows_provider_overrides() -> None:
     assert config.embedding_model == "embedding-any-provider"
 
 
+def test_llm_api_model_config_accepts_legacy_deepseek_open_art_env_var() -> None:
+    config = load_llm_api_model_config({"deepseek-open-art": "legacy-llm-secret"})
+
+    assert config.api_key == "legacy-llm-secret"
+
+
 def test_llm_api_model_config_requires_api_key() -> None:
-    with pytest.raises(RuntimeError, match=DEEPSEEK_OPEN_ART_ENV_VAR):
+    with pytest.raises(RuntimeError, match=DEEPSEEK_API_KEY_ENV_VAR):
         load_llm_api_model_config({})
 
 
 def test_smoke_request_targets_configured_llm_api_model() -> None:
-    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
+    config = load_llm_api_model_config({DEEPSEEK_API_KEY_ENV_VAR: "llm-test-secret"})
     request = build_smoke_request(config)
 
-    assert request["model"] == "provider-primary-model"
-    assert request["input"] == "Return exactly: ai-artist-llm-api-smoke-ok"
-    assert request["max_output_tokens"] == 32
+    assert request["model"] == DEFAULT_LLM_PRIMARY_MODEL
+    assert request["messages"] == [
+        {"role": "system", "content": "You are a helpful assistant"},
+        {"role": "user", "content": "Hello"},
+    ]
+    assert request["stream"] is False
+    assert request["reasoning_effort"] == "high"
+    assert request["extra_body"] == {"thinking": {"type": "enabled"}}
 
 
 def test_redact_secrets_removes_nested_sensitive_values() -> None:
@@ -106,43 +108,45 @@ def test_redact_secrets_removes_nested_sensitive_values() -> None:
     assert "xoxb-secret" not in repr(redacted)
 
 
-def test_llm_api_smoke_test_uses_mocked_client_and_redacts_request() -> None:
-    client = RecordingHTTPClient()
+def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> None:
+    client = RecordingLLMClient()
 
     result = run_llm_api_smoke_test(
         {
-            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
+            DEEPSEEK_API_KEY_ENV_VAR: "llm-test-secret",
             "LLM_API_URL": "https://example.test/llm",
             "LLM_PRIMARY_MODEL": "test-model",
         },
         timeout_seconds=3.5,
-        http_client=client,
+        llm_client=client,
     )
 
-    assert len(client.calls) == 1
-    raw_call = client.calls[0]
-    assert raw_call["url"] == "https://example.test/llm"
-    assert raw_call["headers"]["Authorization"] == "Bearer llm-test-secret"
-    assert raw_call["json"]["model"] == "test-model"
+    assert len(client.completions.calls) == 1
+    raw_call = client.completions.calls[0]
+    assert raw_call["model"] == "test-model"
     assert raw_call["timeout"] == 3.5
+    assert raw_call["messages"][1]["content"] == "Hello"
+    assert raw_call["reasoning_effort"] == "high"
+    assert raw_call["extra_body"] == {"thinking": {"type": "enabled"}}
 
-    assert result["request_id"] == "req_smoke_123"
     assert result["response_id"] == "resp_smoke_123"
     assert result["model"] == "test-model"
-    assert result["status"] == "completed"
-    assert result["request"]["headers"]["Authorization"] == SECRET_REDACTION
+    assert result["content"] == "Hello! How can I help you today?"
+    assert result["request"]["api_key"] == SECRET_REDACTION
+    assert result["request"]["base_url"] == "https://example.test/llm"
     assert "llm-test-secret" not in repr(result)
 
 
 @pytest.mark.skipif(
-    not os.environ.get(DEEPSEEK_OPEN_ART_ENV_VAR),
-    reason=f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test",
+    not os.environ.get(DEEPSEEK_API_KEY_ENV_VAR) and not os.environ.get("deepseek-open-art"),
+    reason=f"{DEEPSEEK_API_KEY_ENV_VAR} is required for the live LLM API smoke test",
 )
 def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     result = run_llm_api_smoke_test()
 
-    assert result["request_id"]
     assert result["response_id"]
     assert result["model"]
-    assert result["request"]["headers"]["Authorization"] == SECRET_REDACTION
-    assert os.environ[DEEPSEEK_OPEN_ART_ENV_VAR] not in repr(result)
+    assert result["content"]
+    assert result["request"]["api_key"] == SECRET_REDACTION
+    api_key = os.environ.get(DEEPSEEK_API_KEY_ENV_VAR) or os.environ["deepseek-open-art"]
+    assert api_key not in repr(result)

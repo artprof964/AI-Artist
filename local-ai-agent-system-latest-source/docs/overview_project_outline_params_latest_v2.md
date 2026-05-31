@@ -5,7 +5,7 @@
 ```text
 Agent control plane: OpenClaw
 Primary LLM backend: provider-neutral LLM API
-Primary model lane: provider-primary-model, with provider fallback / classifier for cost-controlled paths
+Primary model lane: deepseek-v4-pro, with provider fallback / classifier for cost-controlled paths
 Image generation: ComfyUI with Flux / SDXL
 Safety layer: FastAPI + OPA + PostgreSQL audit/cache/source tracking
 ```

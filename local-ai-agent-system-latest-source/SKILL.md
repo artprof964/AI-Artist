@@ -143,7 +143,7 @@ External Request
 - provider-neutral LLM API
 - FastAPI safety service
 - OPA
-- provider-primary-model, provider-fallback-model, provider-classifier-model
+- deepseek-v4-pro, provider-fallback-model, provider-classifier-model
 - LlamaIndex
 - Qdrant
 - PostgreSQL

@@ -49,7 +49,7 @@ External Request
 - OpenClaw owns orchestration and loop control.
 - Sub-agents push structured outputs to the main OpenClaw runtime.
 - Output Tool Agent owns delivery.
-- LLM API access uses deepseek-open-art from environment.
+- LLM API access uses DEEPSEEK_API_KEY from environment.
 - GitHub access uses git_ai-artist_codex_token from environment.
 - OpenClaw agents never see raw secrets.
 - Standard interfaces are defined in `docs/interface_process_standard_latest_v1.md`.
