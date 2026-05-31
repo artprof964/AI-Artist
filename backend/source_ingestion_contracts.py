@@ -19,10 +19,18 @@ SOURCE_METADATA_TITLE_KEY = "title"
 SOURCE_METADATA_DOMAIN_KEY = "source_domain"
 
 
+def source_registry_metadata(*, title: str, domain: str) -> dict[str, str]:
+    return {
+        SOURCE_METADATA_TITLE_KEY: title,
+        SOURCE_METADATA_DOMAIN_KEY: domain,
+    }
+
+
 __all__ = [
     "DEFAULT_APPROVED_SOURCE_DOMAINS",
     "SOURCE_INGESTION_ABSOLUTE_HTTP_URL_REQUIRED",
     "SOURCE_INGESTION_DOMAIN_NOT_APPROVED",
     "SOURCE_METADATA_DOMAIN_KEY",
     "SOURCE_METADATA_TITLE_KEY",
+    "source_registry_metadata",
 ]

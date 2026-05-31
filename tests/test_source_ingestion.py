@@ -15,6 +15,7 @@ from backend.source_ingestion_contracts import (
     SOURCE_INGESTION_DOMAIN_NOT_APPROVED,
     SOURCE_METADATA_DOMAIN_KEY,
     SOURCE_METADATA_TITLE_KEY,
+    source_registry_metadata,
 )
 from path_helpers import read_backend_source
 
@@ -229,7 +230,18 @@ def test_source_ingestion_registry_metadata_keys_are_centralized() -> None:
 
     assert SOURCE_METADATA_TITLE_KEY == "title"
     assert SOURCE_METADATA_DOMAIN_KEY == "source_domain"
-    assert "SOURCE_METADATA_TITLE_KEY" in source
-    assert "SOURCE_METADATA_DOMAIN_KEY" in source
+    assert "source_registry_metadata(" in source
+    assert "SOURCE_METADATA_TITLE_KEY" not in source
+    assert "SOURCE_METADATA_DOMAIN_KEY" not in source
     assert '"title": candidate.title' not in source
     assert '"source_domain": domain' not in source
+
+
+def test_source_ingestion_uses_shared_registry_metadata_shape() -> None:
+    source = read_backend_source("source_ingestion.py")
+
+    assert source_registry_metadata(title="Title", domain="art.example") == {
+        SOURCE_METADATA_TITLE_KEY: "Title",
+        SOURCE_METADATA_DOMAIN_KEY: "art.example",
+    }
+    assert "source_registry_metadata(title=candidate.title, domain=domain)" in source
