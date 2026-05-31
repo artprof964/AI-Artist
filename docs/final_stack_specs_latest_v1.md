@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 170 passed, 1 skipped, 1 warning
+Final validation: 175 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -54,6 +54,7 @@ backend/audit.py: in-memory audit repository and recursive secret redaction.
 backend/response_cache.py: approved read-only response cache.
 backend/source_freshness.py: dependency snapshot and stale-source checks.
 backend/source_ingestion.py: approved local source ingestion and domain/scheme rejection.
+backend/connection_settings.py: shared env var names, defaults, aliases, and connection settings loader.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration and redacted smoke request path.
 backend/openclaw_hook.py: pre-tool Safety Service hook.
 backend/orchestrator.py: mock sub-agent routing and synthesis.
@@ -93,6 +94,8 @@ External publish/write paths require human approval.
 OpenClaw agents, prompts, logs, audit payloads, and memory files must not
 contain raw API keys, OAuth tokens, Slack tokens, GitHub tokens, signing keys, or
 private webhook secrets.
+Connection names, defaults, and secret aliases must be changed through
+backend/connection_settings.py before adapter-specific code.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```

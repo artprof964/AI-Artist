@@ -17,7 +17,7 @@ Validated the provider-neutral LLM API configuration smoke test:
 7 passed, 1 skipped
 
 .venv\Scripts\python -m pytest -q -p no:cacheprovider
-170 passed, 1 skipped, 1 warning
+175 passed, 1 skipped, 1 warning
 
 .venv\Scripts\python -m ruff check backend\llm_api_smoke.py tests\test_llm_api_smoke.py
 All checks passed!
@@ -44,7 +44,7 @@ All checks passed!
 1 passed in 3.38s
 
 .venv\Scripts\python.exe -m pytest -q -p no:cacheprovider
-170 passed, 1 skipped, 1 warning
+175 passed, 1 skipped, 1 warning
 ```
 
 One earlier full-suite attempt failed outside T09 in
@@ -58,6 +58,7 @@ regression.
 ## Notes
 
 - `deepseek-open-art`, primary, fallback, classifier, and embedding model env vars are loaded through `backend.llm_api_smoke.load_llm_api_model_config`.
+- Shared env names, defaults, and the legacy `DEEPSEEK_API_KEY` alias are centralized in `backend.connection_settings`.
 - The smoke request targets `https://api.deepseek.com` through the OpenAI SDK and uses `deepseek-v4-pro` by default.
 - Unit tests use a mocked OpenAI-compatible client to verify model, timeout, messages, reasoning effort, thinking options, response id, and content.
 - The returned request record redacts the API key, and tests assert that the test API key is absent from the result representation.

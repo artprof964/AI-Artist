@@ -148,10 +148,11 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
 
 
 def test_github_token_env_var_is_owned_by_adapter_not_backend_agents() -> None:
+    allowed_owners = {"connection_settings.py", "github_adapter.py"}
     forbidden_refs: list[str] = []
 
     for source_path in sorted((PROJECT_ROOT / "backend").glob("*.py")):
-        if source_path.name == "github_adapter.py":
+        if source_path.name in allowed_owners:
             continue
 
         tree = ast.parse(source_path.read_text(encoding="utf-8"), filename=str(source_path))

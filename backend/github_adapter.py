@@ -10,11 +10,11 @@ from uuid import UUID
 from pydantic import ValidationError
 
 from backend.audit import redact_audit_value
+from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, require_env_value
 from backend.schemas import ExecutionEnvelopeResponse
 
 
 GITHUB_WRITE_OPERATION = "github_write"
-GITHUB_TOKEN_ENV_VAR = "git_ai-artist_codex_token"
 
 
 class GitHubExecutionGateError(PermissionError):
@@ -98,12 +98,14 @@ class GitHubAdapter:
         )
 
     def _read_runtime_token(self) -> str:
-        token = os.environ.get(self._token_env_var, "").strip()
-        if not token:
-            raise GitHubAdapterConfigurationError(
-                f"{self._token_env_var} must be set for GitHub adapter execution"
-            )
-        return token
+        try:
+            return require_env_value(
+                os.environ,
+                self._token_env_var,
+                purpose="GitHub adapter execution",
+            ).strip()
+        except RuntimeError as exc:
+            raise GitHubAdapterConfigurationError(str(exc)) from exc
 
 
 def _coerce_envelope(

@@ -3,11 +3,13 @@ from typing import Any
 
 import pytest
 
-from backend.llm_api_smoke import (
+from backend.connection_settings import (
     DEFAULT_LLM_API_URL,
     DEFAULT_LLM_PRIMARY_MODEL,
     DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
+)
+from backend.llm_api_smoke import (
     SECRET_REDACTION,
     build_smoke_request,
     load_llm_api_model_config,

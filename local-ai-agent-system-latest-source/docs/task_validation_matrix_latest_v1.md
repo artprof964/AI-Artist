@@ -14,7 +14,7 @@ contract is satisfied.
 | T06 | OPA default-deny policies | Policy tests prove write, publish, delete, GitHub write, and cache replay are denied by default and allowed only with valid policy inputs. | Bestanden | 2026-05-31 |
 | T07 | PostgreSQL migrations | Migration test applies schema from empty DB, verifies all query/source/cache/audit tables and indexes, then rolls back cleanly. | Bestanden | 2026-05-31 |
 | T08 | OpenClaw AI-Artist workspace | Workspace test confirms required `SOUL.md`, `IDENTITY.md`, `USER.md`, `AGENTS.md`, `TOOLS.md`, `MEMORY.md`, and memory folders exist. | Bestanden | 2026-05-31 |
-| T09 | Provider-neutral LLM API configuration | Smoke test loads DeepSeek model env vars, calls the OpenAI-compatible LLM API with a redacted request, and records response id/model/content without logging secrets. | Bestanden | 2026-05-31 |
+| T09 | Provider-neutral LLM API configuration | Smoke test loads DeepSeek model env vars from `backend.connection_settings`, calls the OpenAI-compatible LLM API with a redacted request, and records response id/model/content without logging secrets. | Bestanden | 2026-05-31 |
 | T10 | OpenClaw safety-service tool hook | Integration test attempts a tool call and confirms Safety Service receives the pre-execution request before any adapter runs. | Bestanden | 2026-05-31 |
 | T11 | `SubAgentOutput` schema | Schema tests accept valid agent outputs and reject missing status, malformed artifacts, invalid confidence, and unstructured errors. | Bestanden | 2026-05-31 |
 | T12 | Mock sub-agents | Orchestration test routes one request through all mock agents, collects structured outputs, and synthesizes a single result. | Bestanden | 2026-05-31 |

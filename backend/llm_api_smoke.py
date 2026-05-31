@@ -4,11 +4,10 @@ from typing import Any, Protocol
 
 from openai import OpenAI
 
-
-DEFAULT_LLM_API_URL = "https://api.deepseek.com"
-DEFAULT_LLM_PRIMARY_MODEL = "deepseek-v4-pro"
-DEEPSEEK_OPEN_ART_ENV_VAR = "deepseek-open-art"
-DEEPSEEK_API_KEY_ENV_VAR = "DEEPSEEK_API_KEY"
+from backend.connection_settings import (
+    DEEPSEEK_OPEN_ART_ENV_VAR,
+    load_connection_settings,
+)
 SECRET_REDACTION = "[REDACTED]"
 SECRET_KEY_TERMS = {
     "api_key",
@@ -37,21 +36,19 @@ class LLMAPIHTTPClient(Protocol):
 
 def load_llm_api_model_config(env: dict[str, str] | None = None) -> LLMAPIModelConfig:
     values = env if env is not None else os.environ
-    api_key = values.get(DEEPSEEK_OPEN_ART_ENV_VAR, "") or values.get(
-        DEEPSEEK_API_KEY_ENV_VAR, ""
-    )
-    if not api_key:
+    settings = load_connection_settings(values)
+    if not settings.llm_api_key:
         raise RuntimeError(
             f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test"
         )
 
     return LLMAPIModelConfig(
-        api_key=api_key,
-        api_url=values.get("LLM_API_URL", DEFAULT_LLM_API_URL),
-        primary_model=values.get("LLM_PRIMARY_MODEL", DEFAULT_LLM_PRIMARY_MODEL),
-        fallback_model=values.get("LLM_FALLBACK_MODEL", "provider-fallback-model"),
-        classifier_model=values.get("LLM_CLASSIFIER_MODEL", "provider-classifier-model"),
-        embedding_model=values.get("LLM_EMBEDDING_MODEL", "provider-embedding-model"),
+        api_key=settings.llm_api_key,
+        api_url=settings.llm_api_url,
+        primary_model=settings.llm_primary_model,
+        fallback_model=settings.llm_fallback_model,
+        classifier_model=settings.llm_classifier_model,
+        embedding_model=settings.llm_embedding_model,
     )
 
 

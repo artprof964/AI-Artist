@@ -3,6 +3,8 @@ from __future__ import annotations
 from dataclasses import dataclass
 from enum import Enum
 
+from backend.connection_settings import CONNECTION_ENV_VARS
+
 
 class ReadinessStatus(str, Enum):
     PASS = "pass"
@@ -53,22 +55,10 @@ class ReadinessReport:
 
 
 REQUIRED_ENV_VARS: tuple[RequiredEnvVar, ...] = (
-    RequiredEnvVar("deepseek-open-art", "DeepSeek LLM API access", True),
-    RequiredEnvVar("LLM_API_URL", "Provider-neutral LLM API endpoint"),
-    RequiredEnvVar("LLM_PRIMARY_MODEL", "Primary LLM model selection"),
-    RequiredEnvVar("LLM_FALLBACK_MODEL", "Fallback LLM model selection"),
-    RequiredEnvVar("LLM_CLASSIFIER_MODEL", "Request classifier model selection"),
-    RequiredEnvVar("LLM_EMBEDDING_MODEL", "Embedding model selection"),
-    RequiredEnvVar("OPENCLAW_WORKSPACE_ROOT", "Local OpenClaw workspace root"),
-    RequiredEnvVar("OPENCLAW_GATEWAY_URL", "Local OpenClaw gateway endpoint"),
-    RequiredEnvVar("DATABASE_URL", "PostgreSQL application connection string"),
-    RequiredEnvVar("QDRANT_URL", "Qdrant vector store endpoint"),
-    RequiredEnvVar("MINIO_ENDPOINT", "MinIO object store endpoint"),
-    RequiredEnvVar("REDIS_URL", "Redis queue and transient state endpoint"),
-    RequiredEnvVar("OPA_URL", "OPA policy service endpoint"),
-    RequiredEnvVar("COMFYUI_URL", "Local ComfyUI endpoint"),
-    RequiredEnvVar("SLACK_BOT_TOKEN", "Slack adapter bot token", True),
-    RequiredEnvVar("git_" + "ai-artist_codex_token", "GitHub adapter token", True),
+    *(
+        RequiredEnvVar(spec.name, spec.purpose, spec.secret)
+        for spec in CONNECTION_ENV_VARS
+    ),
 )
 
 
