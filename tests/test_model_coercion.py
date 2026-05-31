@@ -1,7 +1,11 @@
 import pytest
 from pydantic import BaseModel, Field
 
-from backend.model_coercion import ModelCoercionError, coerce_model
+from backend.model_coercion import (
+    ModelCoercionError,
+    coerce_model,
+    model_payload_invalid_message,
+)
 from backend.repo_paths import backend_module_filenames, backend_module_path
 from path_helpers import PROJECT_ROOT, read_backend_source
 
@@ -25,8 +29,16 @@ def test_coerce_model_validates_dict_payload() -> None:
 
 
 def test_coerce_model_raises_default_error_for_invalid_payload() -> None:
-    with pytest.raises(ModelCoercionError, match="ExampleModel payload is invalid"):
+    with pytest.raises(ModelCoercionError, match=model_payload_invalid_message(ExampleModel)):
         coerce_model({"name": ""}, ExampleModel)
+
+
+def test_model_coercion_default_message_is_centralized() -> None:
+    source = read_backend_source("model_coercion.py")
+
+    assert model_payload_invalid_message(ExampleModel) == "ExampleModel payload is invalid"
+    assert "model_payload_invalid_message(" in source
+    assert 'message or f"{model_type.__name__} payload is invalid"' not in source
 
 
 def test_coerce_model_allows_custom_error_type_and_message() -> None:

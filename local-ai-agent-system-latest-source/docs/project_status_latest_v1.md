@@ -66,7 +66,7 @@ File scanning suffixes and discovery: centralized in backend/file_scanning.py
 Operations: centralized in backend/operations.py
 Publishing audit operation value: uses backend/operations.py directly
 Gated adapter operation values: use backend/operations.py directly
-Model coercion: centralized in backend/model_coercion.py and called directly at domain boundaries
+Model coercion and validation messages: centralized in backend/model_coercion.py and called directly at domain boundaries
 Telemetry stages and log levels: centralized in backend/observability.py
 Publishing outcome statuses: centralized in backend/publishing_status.py
 ```
@@ -176,7 +176,7 @@ Publishing operation constants: shared directly across publishing adapter gates 
 Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
-Model coercion: shared directly across execution-envelope validation, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
+Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, and security review probes
 Publishing statuses: shared across Publishing Agent result handling and side-effect audit payloads
 Deprecated architecture term scan: clean
@@ -203,7 +203,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 430 passed, 1 skipped, 1 warning
+final pytest: 431 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

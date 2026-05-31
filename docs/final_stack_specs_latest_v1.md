@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 430 passed, 1 skipped, 1 warning
+Final validation: 431 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -73,7 +73,7 @@ backend/url_utils.py: shared URL domain and relative API path validation plus UR
 backend/http_methods.py: shared HTTP method vocabulary, normalization, and validation messages for connector boundaries.
 backend/file_scanning.py: shared reviewable text-file suffixes and recursive scanner file discovery.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
-backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and domain boundaries.
+backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
@@ -273,9 +273,9 @@ constants before service, cache, orchestration, tool, or review-specific
 telemetry calls are added.
 Publishing outcome status values must flow through backend/publishing_status.py
 before publishing agent or side-effect audit status text is added.
-Pydantic model/dict coercion at adapter and domain boundaries must flow through
-backend/model_coercion.py before direct model validation or one-off validation
-wrappers are added.
+Pydantic model/dict coercion and validation messages at adapter and domain
+boundaries must flow through backend/model_coercion.py before direct model
+validation or one-off validation wrappers are added.
 Generated image provenance stores prompt_hash and workflow_hash, not raw prompt
 text in stored records.
 ```
