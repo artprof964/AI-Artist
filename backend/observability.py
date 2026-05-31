@@ -35,10 +35,22 @@ LOG_LEVELS: tuple[LogLevel, ...] = (
     LOG_LEVEL_WARNING,
     LOG_LEVEL_ERROR,
 )
+DEFAULT_METRIC_VALUE = 1.0
+OBSERVABILITY_METRIC_PREFIX = "ai_artist"
+UNKNOWN_REQUEST_TRACE_ID = "request:unknown"
+REQUEST_TRACE_ID_PREFIX = "request"
 
 
 def observability_event_message(event: str) -> str:
     return event.replace("_", " ")
+
+
+def observability_metric_name(stage: TelemetryStage, event: str) -> str:
+    return f"{OBSERVABILITY_METRIC_PREFIX}.{stage}.{event}.total"
+
+
+def request_trace_id(request_id: UUID | str) -> str:
+    return f"{REQUEST_TRACE_ID_PREFIX}:{request_id}"
 
 
 @dataclass(frozen=True)
@@ -91,7 +103,7 @@ class InMemoryObservabilityCollector:
         trace_id: str,
         request_id: UUID | str | None = None,
         metric_name: str | None = None,
-        metric_value: float = 1.0,
+        metric_value: float = DEFAULT_METRIC_VALUE,
         metric_tags: dict[str, Any] | None = None,
         log_level: LogLevel = LOG_LEVEL_INFO,
         message: str | None = None,
@@ -110,7 +122,7 @@ class InMemoryObservabilityCollector:
             emitted_at=emitted_at,
         )
         metric = MetricRecord(
-            name=metric_name or f"ai_artist.{stage}.{event}.total",
+            name=metric_name or observability_metric_name(stage, event),
             value=metric_value,
             stage=stage,
             trace_id=trace_id,
@@ -164,8 +176,8 @@ def trace_id_from_request(
     if isinstance(correlation_id, str) and correlation_id:
         return correlation_id
     if request_id is not None:
-        return f"request:{request_id}"
-    return "request:unknown"
+        return request_trace_id(request_id)
+    return UNKNOWN_REQUEST_TRACE_ID
 
 
 def record_observability_stage(
@@ -175,7 +187,7 @@ def record_observability_stage(
     trace_id: str,
     request_id: UUID | str | None = None,
     metric_name: str | None = None,
-    metric_value: float = 1.0,
+    metric_value: float = DEFAULT_METRIC_VALUE,
     metric_tags: dict[str, Any] | None = None,
     log_level: LogLevel = LOG_LEVEL_INFO,
     message: str | None = None,
@@ -195,6 +207,7 @@ def record_observability_stage(
     )
 
 __all__ = [
+    "DEFAULT_METRIC_VALUE",
     "InMemoryObservabilityCollector",
     "LOG_LEVEL_ERROR",
     "LOG_LEVEL_INFO",
@@ -202,6 +215,8 @@ __all__ = [
     "LOG_LEVELS",
     "LogLevel",
     "MetricRecord",
+    "OBSERVABILITY_METRIC_PREFIX",
+    "REQUEST_TRACE_ID_PREFIX",
     "StructuredLogRecord",
     "TELEMETRY_STAGE_CACHE",
     "TELEMETRY_STAGE_ORCHESTRATION",
@@ -211,8 +226,11 @@ __all__ = [
     "TELEMETRY_STAGES",
     "TelemetryStage",
     "TraceRecord",
+    "UNKNOWN_REQUEST_TRACE_ID",
     "observability_collector",
     "observability_event_message",
+    "observability_metric_name",
     "record_observability_stage",
+    "request_trace_id",
     "trace_id_from_request",
 ]
