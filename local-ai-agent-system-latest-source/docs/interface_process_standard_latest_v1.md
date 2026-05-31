@@ -29,7 +29,7 @@ can be marked done.
 17. Mock sub-agent names and artifact types use `backend/mock_agent_contracts.py`.
 18. Generated-image review status vocabulary and checks use `backend/review_status.py`.
 19. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
-20. Text tokenization and label/tag normalization use `backend/text_utils.py`.
+20. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 21. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
 22. Connection names, target setting fields, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
 23. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
@@ -237,6 +237,7 @@ Output:
    - Fresh or changed requests route through OpenClaw sub-agents.
    - Mock orchestration agent names and artifact types use the shared mock-agent contract.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
+   - Knowledge retrieval result snippets use the shared contextual snippet helper.
    - Retrieval vector similarity, rubric scoring, and orchestration confidence use shared numeric helpers.
    - Critic/Curator score bounds call the shared numeric clamp directly without local wrapper functions.
 

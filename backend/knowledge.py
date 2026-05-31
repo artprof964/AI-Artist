@@ -21,7 +21,7 @@ from backend.numeric_utils import cosine_similarity
 from backend.runtime_ids import runtime_uuid
 from backend.schemas import SubAgentOutput
 from backend.subagent_status import SUBAGENT_STATUS_OK
-from backend.text_utils import alnum_tokens
+from backend.text_utils import alnum_tokens, contextual_snippet
 
 
 @dataclass(frozen=True)
@@ -293,7 +293,7 @@ class KnowledgeAgent:
             source_id=str(payload["source_id"]),
             title=str(payload["title"]),
             uri=str(payload["uri"]),
-            snippet=_make_snippet(content, query),
+            snippet=contextual_snippet(content, query),
             score=round(hit.score, 6),
             citation=KnowledgeCitation(
                 source_id=str(payload["source_id"]),
@@ -310,20 +310,3 @@ class KnowledgeAgent:
         if self._approved_source_ids:
             return source_id in self._approved_source_ids
         return hit.payload.get(KNOWLEDGE_APPROVED_PAYLOAD_FIELD) is True
-
-
-def _make_snippet(content: str, query: str, *, max_length: int = 180) -> str:
-    lowered_content = content.lower()
-    query_tokens = alnum_tokens(query)
-    start = 0
-    for token in query_tokens:
-        index = lowered_content.find(token)
-        if index >= 0:
-            start = max(index - 40, 0)
-            break
-    snippet = content[start : start + max_length].strip()
-    if start > 0:
-        snippet = f"...{snippet}"
-    if start + max_length < len(content):
-        snippet = f"{snippet}..."
-    return snippet

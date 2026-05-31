@@ -171,3 +171,10 @@ def test_knowledge_agent_contract_vocabulary_is_centralized() -> None:
     assert '"approved": True' not in source
     assert '"approved") is True' not in source
     assert "Read-only retrieval from approved local sample data." not in source
+
+
+def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:
+    source = Path("backend/knowledge.py").read_text(encoding="utf-8")
+
+    assert "def _make_snippet(" not in source
+    assert "contextual_snippet(" in source

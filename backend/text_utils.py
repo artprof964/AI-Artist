@@ -34,10 +34,27 @@ def normalize_label(value: str) -> str:
     return " ".join(value.strip().lower().replace("_", " ").replace("-", " ").split())
 
 
+def contextual_snippet(content: str, query: str, *, max_length: int = 180) -> str:
+    lowered_content = content.lower()
+    start = 0
+    for token in alnum_tokens(query):
+        index = lowered_content.find(token)
+        if index >= 0:
+            start = max(index - 40, 0)
+            break
+    snippet = content[start : start + max_length].strip()
+    if start > 0:
+        snippet = f"...{snippet}"
+    if start + max_length < len(content):
+        snippet = f"{snippet}..."
+    return snippet
+
+
 __all__ = [
     "ALNUM_TOKEN_PATTERN",
     "IDENTIFIER_TOKEN_PATTERN",
     "alnum_tokens",
+    "contextual_snippet",
     "identifier_tokens",
     "normalize_label",
     "token_set",

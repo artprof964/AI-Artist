@@ -42,7 +42,7 @@ Mock sub-agent names and artifact types: centralized in backend/mock_agent_contr
 Knowledge Agent contracts: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories and decisions: centralized in backend/critic_rubric.py
-Text tokenization and labels: centralized in backend/text_utils.py
+Text tokenization, labels, and contextual snippets: centralized in backend/text_utils.py
 Markdown heading parsing: centralized in backend/markdown_utils.py
 Numeric scoring utilities and direct rubric clamps: centralized in backend/numeric_utils.py
 Time creation/normalization: centralized in backend/time_utils.py
@@ -132,7 +132,7 @@ Mock agent contracts: shared across mock orchestration routing, simulation metad
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, approved-hit filtering, artifact metadata, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary: shared across Critic/Curator scoring and rubric tests
-Text utilities: shared across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
+Text utilities: shared directly across Safety Service classifier terms, Knowledge retrieval embeddings/snippets, and Critic/Curator rubric labels
 Markdown utilities: shared across production readiness runbook validation and future documentation validators
 Numeric utilities: shared directly across Knowledge vector similarity, Critic/Curator score clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
@@ -162,7 +162,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 347 passed, 1 skipped, 1 warning
+final pytest: 349 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
