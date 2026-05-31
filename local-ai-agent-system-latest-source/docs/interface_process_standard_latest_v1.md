@@ -20,7 +20,7 @@ can be marked done.
 8. Redis/Celery/Dagster own background execution state.
 9. ComfyUI owns image workflow execution.
 10. External write actions require a signed execution envelope.
-11. Canonical hashes and deterministic local IDs are produced through `backend/canonical_hash.py`.
+11. Canonical hashes, deterministic local IDs, and source version tags are produced through `backend/canonical_hash.py`.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
 13. Cache, provenance, execution-envelope, and persistence timestamps use `backend/time_utils.py` for UTC normalization.
 14. Connector payload string-field extraction uses `backend/payload_fields.py`.
@@ -193,6 +193,7 @@ Output:
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
+   - Source snapshot content hashes and version tags use the shared canonical hash helper.
 
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.

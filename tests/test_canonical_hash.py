@@ -7,6 +7,7 @@ from backend.canonical_hash import (
     deterministic_prefixed_id,
     sha256_json,
     sha256_text,
+    sha256_version_tag,
 )
 
 
@@ -50,3 +51,11 @@ def test_unicode_canonicalization_can_preserve_utf8_material() -> None:
     assert sha256_json(value, ensure_ascii=False) == hashlib.sha256(
         '{"prompt":"quiet café"}'.encode("utf-8")
     ).hexdigest()
+
+
+def test_sha256_version_tag_uses_digest_prefix() -> None:
+    content = "source snapshot content"
+    digest = hashlib.sha256(content.encode("utf-8")).hexdigest()
+
+    assert sha256_version_tag(content) == f"sha256:{digest[:12]}"
+    assert sha256_version_tag(content, digest_length=20) == f"sha256:{digest[:20]}"

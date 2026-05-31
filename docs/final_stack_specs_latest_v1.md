@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 233 passed, 1 skipped, 1 warning
+Final validation: 234 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -50,7 +50,7 @@ evaluation, execution-envelope signing, audit event recording.
 backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
-backend/canonical_hash.py: canonical JSON, SHA-256 digests, and deterministic ID helpers.
+backend/canonical_hash.py: canonical JSON, SHA-256 digests, deterministic ID helpers, and version tags.
 backend/request_identity.py: request text normalization, fingerprints, and stable request UUIDs.
 backend/time_utils.py: shared UTC datetime normalization.
 backend/payload_fields.py: shared connector payload string-field extraction.
@@ -114,9 +114,9 @@ Gated adapter result envelope fields must flow through backend/adapter_results.p
 before adapter-specific return dataclasses add extra fields.
 Side-effect audit payloads must flow through backend/side_effect_audit.py before
 adapter-specific agents persist tool-call audit events.
-Canonical JSON, SHA-256 digests, and deterministic local IDs must flow through
-backend/canonical_hash.py before request fingerprints, artifact hashes, signatures,
-or mocked external IDs are created.
+Canonical JSON, SHA-256 digests, deterministic local IDs, and version tags must
+flow through backend/canonical_hash.py before request fingerprints, artifact
+hashes, source snapshot versions, signatures, or mocked external IDs are created.
 Request text normalization, fingerprint wrappers, and stable channel request
 UUIDs must flow through backend/request_identity.py before service or adapter
 specific request identity logic is added.

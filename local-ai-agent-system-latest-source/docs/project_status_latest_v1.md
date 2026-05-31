@@ -92,7 +92,7 @@ Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Secret redaction: shared across audit, observability, LLM smoke, OpenClaw hook, GitHub, Slack, and security review
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters
-Canonical hashing: shared across Safety Service request fingerprints, execution-envelope signatures, publishing IDs, and image provenance hashes
+Canonical hashing: shared across Safety Service request fingerprints, execution-envelope signatures, publishing IDs, image provenance hashes, and source snapshot version tags
 Request identity: shared across Safety Service canonicalization/classification and Slack request normalization
 Time normalization: shared across cache expiry checks, image provenance timestamps, and execution-envelope expiry validation
 Payload fields: shared across Slack event parsing and generated image metadata parsing
@@ -109,7 +109,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 233 passed, 1 skipped, 1 warning
+final pytest: 234 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

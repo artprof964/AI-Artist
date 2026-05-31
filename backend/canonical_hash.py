@@ -23,6 +23,10 @@ def sha256_json(value: Any, *, ensure_ascii: bool = True) -> str:
     return sha256_text(canonical_json(value, ensure_ascii=ensure_ascii))
 
 
+def sha256_version_tag(value: str, *, digest_length: int = 12) -> str:
+    return f"sha256:{sha256_text(value)[:digest_length]}"
+
+
 def deterministic_prefixed_id(
     prefix: str,
     material: Any,
@@ -39,4 +43,5 @@ __all__ = [
     "deterministic_prefixed_id",
     "sha256_json",
     "sha256_text",
+    "sha256_version_tag",
 ]

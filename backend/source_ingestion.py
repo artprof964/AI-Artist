@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-import hashlib
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from typing import Any
 
+from backend.canonical_hash import sha256_text, sha256_version_tag
 from backend.source_freshness import SourceFreshnessRegistry, SourceRegistryEntry
 from backend.url_utils import http_url_domain
 
@@ -117,7 +117,7 @@ class SourceIngestionService:
                 continue
 
             content_hash = _content_hash(candidate.content)
-            version_tag = f"sha256:{content_hash[:12]}"
+            version_tag = sha256_version_tag(candidate.content)
             existing_entry = _existing_registry_entry(self.registry, candidate.source_key)
             changed = (
                 existing_entry is not None
@@ -174,7 +174,7 @@ class SourceIngestionService:
 
 
 def _content_hash(content: str) -> str:
-    return hashlib.sha256(content.encode("utf-8")).hexdigest()
+    return sha256_text(content)
 
 
 def _existing_registry_entry(
