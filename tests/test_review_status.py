@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from backend.repo_paths import read_backend_module_text
 from backend.review_status import (
     REVIEW_STATUS_APPROVED,
     REVIEW_STATUS_PENDING,
@@ -26,8 +25,8 @@ def test_is_review_status_accepts_only_known_review_statuses() -> None:
 
 
 def test_review_status_literals_are_not_repeated_in_domain_modules() -> None:
-    image_provenance_source = Path("backend/image_provenance.py").read_text(encoding="utf-8")
-    critic_source = Path("backend/critic_curator.py").read_text(encoding="utf-8")
+    image_provenance_source = read_backend_module_text("image_provenance.py")
+    critic_source = read_backend_module_text("critic_curator.py")
 
     assert 'Literal["pending", "approved", "rejected"]' not in image_provenance_source
     assert '{"pending", "approved", "rejected"}' not in critic_source

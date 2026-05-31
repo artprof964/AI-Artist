@@ -1,4 +1,3 @@
-from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -42,13 +41,11 @@ from backend.orchestrator import (
     run_mock_subagent_orchestration,
     synthesize_subagent_outputs,
 )
+from backend.repo_paths import read_backend_module_text
 from backend.schemas import SubAgentOutput
 
 
 TASK_ID = UUID("12121212-1212-1212-1212-121212121212")
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
-
-
 def test_mock_subagent_orchestration_routes_request_through_all_agents() -> None:
     request = MockAgentRequest(
         task_id=TASK_ID,
@@ -164,7 +161,7 @@ def test_mock_agent_contract_vocabulary_is_centralized() -> None:
 
 
 def test_orchestrator_uses_shared_mock_agent_contracts() -> None:
-    source = (PROJECT_ROOT / "backend" / "orchestrator.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("orchestrator.py")
 
     assert "from backend.mock_agent_contracts import" in source
     assert '"agent_name": "knowledge"' not in source

@@ -22,12 +22,27 @@ def repo_path(repo_root: Path, relative_path: Path) -> Path:
     return repo_root / relative_path
 
 
+def current_repo_root() -> Path:
+    return repo_root_from(Path(__file__))
+
+
 def backend_module_path(module_filename: str) -> Path:
     return BACKEND_DIR / module_filename
 
 
+def backend_module_filenames(repo_root: Path | None = None) -> tuple[str, ...]:
+    backend_path = repo_path(repo_root or current_repo_root(), BACKEND_DIR)
+    return tuple(path.name for path in sorted(backend_path.glob("*.py")))
+
+
 def read_repo_text(repo_root: Path, relative_path: Path) -> str:
     return repo_path(repo_root, relative_path).read_text(encoding="utf-8")
+
+
+def read_backend_module_text(
+    module_filename: str, repo_root: Path | None = None
+) -> str:
+    return read_repo_text(repo_root or current_repo_root(), backend_module_path(module_filename))
 
 
 __all__ = [
@@ -40,7 +55,10 @@ __all__ = [
     "POSTGRES_INIT_DIR",
     "POSTGRES_QUERY_TRACKING_SCHEMA_PATH",
     "PRODUCTION_RUNBOOK_PATH",
+    "backend_module_filenames",
     "backend_module_path",
+    "current_repo_root",
+    "read_backend_module_text",
     "read_repo_text",
     "repo_path",
     "repo_root_from",

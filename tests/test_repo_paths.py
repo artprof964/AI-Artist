@@ -8,7 +8,9 @@ from backend.repo_paths import (
     POSTGRES_INIT_DIR,
     POSTGRES_QUERY_TRACKING_SCHEMA_PATH,
     PRODUCTION_RUNBOOK_PATH,
+    backend_module_filenames,
     backend_module_path,
+    read_backend_module_text,
     read_repo_text,
     repo_path,
     repo_root_from,
@@ -41,3 +43,21 @@ def test_backend_module_path_and_text_reader_use_repo_path_contract() -> None:
     assert "def canonicalize_request(" in read_repo_text(
         repo_root, backend_module_path("service.py")
     )
+    assert "def canonicalize_request(" in read_backend_module_text(
+        "service.py", repo_root
+    )
+    assert "service.py" in backend_module_filenames(repo_root)
+
+
+def test_backend_source_inspection_tests_use_shared_reader() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    offenders: list[str] = []
+
+    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
+        if test_path.name == "test_repo_paths.py":
+            continue
+        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+        if 'Path("backend/' in source or ' / "backend" / ' in source:
+            offenders.append(test_path.name)
+
+    assert offenders == []

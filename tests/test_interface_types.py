@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from backend.interface_types import (
     AUDIT_EVENT_ARTIFACT,
     AUDIT_EVENT_EXECUTION_ENVELOPE,
@@ -18,6 +16,7 @@ from backend.interface_types import (
     REQUEST_KIND_READ,
     REQUEST_KINDS,
 )
+from backend.repo_paths import read_backend_module_text
 
 
 def test_request_kind_vocabulary_is_centralized() -> None:
@@ -49,8 +48,8 @@ def test_audit_event_type_vocabulary_is_centralized() -> None:
 
 
 def test_schema_and_operations_import_shared_interface_types() -> None:
-    schemas_source = Path("backend/schemas.py").read_text(encoding="utf-8")
-    operations_source = Path("backend/operations.py").read_text(encoding="utf-8")
+    schemas_source = read_backend_module_text("schemas.py")
+    operations_source = read_backend_module_text("operations.py")
 
     assert "from backend.interface_types import" in schemas_source
     assert "from backend.interface_types import" in operations_source
@@ -59,12 +58,12 @@ def test_schema_and_operations_import_shared_interface_types() -> None:
 
 
 def test_runtime_modules_import_interface_types_directly() -> None:
-    for module_path in (
-        Path("backend/audit.py"),
-        Path("backend/openclaw_hook.py"),
-        Path("backend/response_cache.py"),
+    for module_filename in (
+        "audit.py",
+        "openclaw_hook.py",
+        "response_cache.py",
     ):
-        source = module_path.read_text(encoding="utf-8")
+        source = read_backend_module_text(module_filename)
 
         assert "from backend.interface_types import" in source
         assert "from backend.schemas import Operation" not in source

@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from backend.repo_paths import read_backend_module_text
 from backend.slack_contracts import (
     SLACK_SOURCE,
     slack_event_object_required,
@@ -24,7 +23,7 @@ def test_slack_contracts_preserve_message_text() -> None:
 
 
 def test_slack_adapter_uses_shared_contract_messages() -> None:
-    source = Path("backend/slack_adapter.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("slack_adapter.py")
 
     forbidden_literals = [
         '"Slack payload must include an event object"',

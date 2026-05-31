@@ -5,6 +5,7 @@ from backend.repo_paths import (
     ENV_EXAMPLE_PATH,
     OPA_POLICY_PATH,
     POSTGRES_QUERY_TRACKING_SCHEMA_PATH,
+    read_repo_text,
     repo_path,
     repo_root_from,
 )
@@ -53,7 +54,7 @@ def test_backend_scaffold_tree_exists() -> None:
 
 
 def test_compose_defines_foundation_services() -> None:
-    compose = repo_path(REPO_ROOT, DOCKER_COMPOSE_PATH).read_text(encoding="utf-8")
+    compose = read_repo_text(REPO_ROOT, DOCKER_COMPOSE_PATH)
 
     for service in ["postgres:", "redis:", "qdrant:", "minio:", "opa:"]:
         assert service in compose
@@ -63,10 +64,8 @@ def test_compose_defines_foundation_services() -> None:
 
 
 def test_policy_and_database_scaffold_cover_required_contracts() -> None:
-    policy = repo_path(REPO_ROOT, OPA_POLICY_PATH).read_text(encoding="utf-8")
-    schema = repo_path(REPO_ROOT, POSTGRES_QUERY_TRACKING_SCHEMA_PATH).read_text(
-        encoding="utf-8"
-    )
+    policy = read_repo_text(REPO_ROOT, OPA_POLICY_PATH)
+    schema = read_repo_text(REPO_ROOT, POSTGRES_QUERY_TRACKING_SCHEMA_PATH)
 
     assert "default allow = false" in policy
     assert "execution_envelope.valid" in policy

@@ -1,7 +1,6 @@
-from pathlib import Path
-
 import pytest
 
+from backend.repo_paths import read_backend_module_text
 from backend.subagent_status import (
     SUBAGENT_STATUS_BLOCKED,
     SUBAGENT_STATUS_FAILED,
@@ -51,7 +50,7 @@ def test_count_subagent_statuses_returns_plain_counts() -> None:
 
 
 def test_orchestrator_uses_shared_subagent_status_helpers() -> None:
-    source = Path("backend/orchestrator.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("orchestrator.py")
 
     assert "dominant_subagent_status" in source
     assert "count_subagent_statuses" in source

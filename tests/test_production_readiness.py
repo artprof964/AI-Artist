@@ -28,7 +28,14 @@ from backend.readiness_paths import (
     POSTGRES_BACKUP_DIR,
     POSTGRES_CONTAINER_DUMP_PATH,
 )
-from backend.repo_paths import ENV_EXAMPLE_PATH, PRODUCTION_RUNBOOK_PATH, repo_path, repo_root_from
+from backend.repo_paths import (
+    ENV_EXAMPLE_PATH,
+    PRODUCTION_RUNBOOK_PATH,
+    read_backend_module_text,
+    read_repo_text,
+    repo_path,
+    repo_root_from,
+)
 
 
 REPO_ROOT = repo_root_from(Path(__file__))
@@ -37,7 +44,7 @@ ENV_EXAMPLE_FILE_PATH = repo_path(REPO_ROOT, ENV_EXAMPLE_PATH)
 
 
 def test_env_example_documents_required_readiness_keys_without_real_secrets() -> None:
-    env_text = ENV_EXAMPLE_FILE_PATH.read_text(encoding="utf-8")
+    env_text = read_repo_text(REPO_ROOT, ENV_EXAMPLE_PATH)
     parsed = parse_env_example(env_text)
     check = validate_env_example(env_text)
 
@@ -50,11 +57,11 @@ def test_env_example_documents_required_readiness_keys_without_real_secrets() ->
 
 
 def test_env_example_matches_shared_connection_registry_rendering() -> None:
-    assert ENV_EXAMPLE_FILE_PATH.read_text(encoding="utf-8") == env_example_text()
+    assert read_repo_text(REPO_ROOT, ENV_EXAMPLE_PATH) == env_example_text()
 
 
 def test_runbook_contains_all_required_readiness_sections() -> None:
-    runbook_text = RUNBOOK_PATH.read_text(encoding="utf-8")
+    runbook_text = read_repo_text(REPO_ROOT, PRODUCTION_RUNBOOK_PATH)
     checks = validate_runbook(runbook_text)
 
     assert len(checks) == len(RUNBOOK_REQUIREMENTS)
@@ -81,7 +88,7 @@ def test_readiness_commands_use_shared_connection_defaults() -> None:
     commands = {command.slug: command.command for command in HEALTH_CHECK_COMMANDS}
     backup_commands = {command.slug: command.command for command in BACKUP_COMMANDS}
     restore_commands = {command.slug: command.command for command in RESTORE_CHECK_COMMANDS}
-    readiness_source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+    readiness_source = read_backend_module_text("readiness.py", REPO_ROOT)
 
     assert connection_endpoint_url(DEFAULT_QDRANT_URL, "healthz") in commands["qdrant"]
     assert connection_endpoint_url(DEFAULT_MINIO_ENDPOINT, "minio/health/live") in commands["minio"]
@@ -100,7 +107,7 @@ def test_readiness_commands_use_shared_connection_defaults() -> None:
 
 
 def test_readiness_commands_use_shared_shell_command_helpers() -> None:
-    readiness_source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+    readiness_source = read_backend_module_text("readiness.py", REPO_ROOT)
 
     forbidden_fragments = [
         '"docker compose ps"',
@@ -121,7 +128,7 @@ def test_readiness_commands_use_shared_shell_command_helpers() -> None:
 def test_readiness_commands_use_shared_backup_path_contracts() -> None:
     backup_commands = {command.slug: command.command for command in BACKUP_COMMANDS}
     restore_commands = {command.slug: command.command for command in RESTORE_CHECK_COMMANDS}
-    readiness_source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+    readiness_source = read_backend_module_text("readiness.py", REPO_ROOT)
 
     assert POSTGRES_CONTAINER_DUMP_PATH in backup_commands["postgres_backup"]
     assert POSTGRES_CONTAINER_DUMP_PATH in backup_commands["postgres_copy_backup"]
@@ -143,8 +150,8 @@ def test_readiness_commands_use_shared_backup_path_contracts() -> None:
 
 def test_readiness_report_passes_for_checked_in_runbook_and_env_example() -> None:
     report = build_readiness_report(
-        runbook_text=RUNBOOK_PATH.read_text(encoding="utf-8"),
-        env_example_text=ENV_EXAMPLE_FILE_PATH.read_text(encoding="utf-8"),
+        runbook_text=read_repo_text(REPO_ROOT, PRODUCTION_RUNBOOK_PATH),
+        env_example_text=read_repo_text(REPO_ROOT, ENV_EXAMPLE_PATH),
     )
 
     assert report.ready, [check.detail for check in report.checks if not check.passed]
@@ -158,7 +165,7 @@ def test_runbook_validator_fails_when_required_sections_are_missing() -> None:
 
 
 def test_readiness_uses_shared_markdown_heading_parser() -> None:
-    source = (REPO_ROOT / "backend" / "readiness.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("readiness.py", REPO_ROOT)
 
     assert "def _heading_text(" not in source
     assert "markdown_heading_text(" in source

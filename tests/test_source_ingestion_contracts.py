@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from backend.repo_paths import read_backend_module_text
 from backend.source_ingestion_contracts import (
     DEFAULT_APPROVED_SOURCE_DOMAINS,
     SOURCE_INGESTION_ABSOLUTE_HTTP_URL_REQUIRED,
@@ -26,7 +25,7 @@ def test_source_ingestion_contracts_preserve_external_text_and_defaults() -> Non
 
 
 def test_source_ingestion_uses_shared_contracts() -> None:
-    source = Path("backend/source_ingestion.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("source_ingestion.py")
 
     forbidden_literals = [
         '"art.example"',

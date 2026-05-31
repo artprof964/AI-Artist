@@ -1,6 +1,7 @@
 from datetime import UTC, datetime, timedelta, timezone
 from pathlib import Path
 
+from backend.repo_paths import backend_module_filenames, read_backend_module_text
 from backend.time_utils import as_utc, utc_now
 
 
@@ -34,9 +35,9 @@ def test_as_utc_converts_aware_offsets_to_utc() -> None:
 
 def test_backend_modules_do_not_wrap_shared_utc_normalization() -> None:
     offenders = []
-    for source_path in (PROJECT_ROOT / "backend").glob("*.py"):
-        text = source_path.read_text(encoding="utf-8")
+    for module_filename in backend_module_filenames(PROJECT_ROOT):
+        text = read_backend_module_text(module_filename, PROJECT_ROOT)
         if "def _as_utc(" in text or "def _as_aware_utc(" in text:
-            offenders.append(source_path.name)
+            offenders.append(module_filename)
 
     assert offenders == []

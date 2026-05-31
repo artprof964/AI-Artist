@@ -1,6 +1,10 @@
 from pathlib import Path
 from uuid import UUID
 
+from backend.repo_paths import (
+    backend_module_filenames,
+    read_backend_module_text,
+)
 from backend.runtime_ids import prefixed_runtime_id, runtime_uuid
 
 
@@ -21,11 +25,11 @@ def test_prefixed_runtime_id_uses_shared_runtime_uuid() -> None:
 
 def test_backend_runtime_uuid_generation_uses_shared_helper() -> None:
     offenders: list[str] = []
-    for path in (REPO_ROOT / "backend").glob("*.py"):
-        if path.name == "runtime_ids.py":
+    for module_filename in backend_module_filenames(REPO_ROOT):
+        if module_filename == "runtime_ids.py":
             continue
-        source = path.read_text(encoding="utf-8")
+        source = read_backend_module_text(module_filename, REPO_ROOT)
         if "uuid4" in source:
-            offenders.append(str(path.relative_to(REPO_ROOT)))
+            offenders.append(module_filename)
 
     assert offenders == []

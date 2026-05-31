@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 from typing import Any
 
 import pytest
@@ -18,6 +17,7 @@ from backend.llm_api_smoke import (
     redact_secrets,
     run_llm_api_smoke_test,
 )
+from backend.repo_paths import read_backend_module_text
 
 
 class RecordingChatCompletions:
@@ -145,7 +145,7 @@ def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> N
 
 
 def test_llm_api_smoke_uses_shared_response_choice_parser() -> None:
-    source = Path("backend/llm_api_smoke.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("llm_api_smoke.py")
 
     assert "def _first_choice_content(" not in source
     assert "first_choice_message_content(" in source

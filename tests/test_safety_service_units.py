@@ -19,6 +19,7 @@ from backend.service import (
     evaluate_policy,
 )
 from backend.time_utils import as_utc
+from backend.repo_paths import read_backend_module_text
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -132,7 +133,7 @@ def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
 
 
 def test_execution_envelope_signing_uses_shared_canonical_hmac_helper() -> None:
-    source = (REPO_ROOT / "backend" / "service.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("service.py", REPO_ROOT)
     import_lines = [
         line.strip()
         for line in source.splitlines()

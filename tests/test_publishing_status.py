@@ -1,11 +1,10 @@
-from pathlib import Path
-
 from backend.publishing_status import (
     PUBLISHING_STATUS_BLOCKED,
     PUBLISHING_STATUS_PUBLISHED,
     PUBLISHING_STATUSES,
     is_publishing_status,
 )
+from backend.repo_paths import read_backend_module_text
 
 
 def test_publishing_status_vocabulary_is_centralized() -> None:
@@ -23,7 +22,7 @@ def test_is_publishing_status_accepts_only_known_values() -> None:
 
 
 def test_publishing_agent_uses_shared_status_constants() -> None:
-    source = Path("backend/publishing.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("publishing.py")
 
     assert "PUBLISHING_STATUS_BLOCKED" in source
     assert "PUBLISHING_STATUS_PUBLISHED" in source

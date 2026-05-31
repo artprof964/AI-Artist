@@ -1,5 +1,4 @@
-from pathlib import Path
-
+from backend.repo_paths import read_backend_module_text
 from backend.reason_messages import (
     CACHE_ENTRY_NOT_FOUND,
     CACHE_REPLAY_APPROVED,
@@ -10,9 +9,6 @@ from backend.reason_messages import (
     operation_requires_human_approval,
     sensitive_operation_requires_envelope,
 )
-
-
-REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_reason_messages_preserve_external_text_contracts() -> None:
@@ -39,9 +35,7 @@ def test_policy_and_envelope_reason_helpers_preserve_text_contracts() -> None:
 
 
 def test_cache_reason_literals_are_centralized() -> None:
-    response_cache_source = (REPO_ROOT / "backend" / "response_cache.py").read_text(
-        encoding="utf-8"
-    )
+    response_cache_source = read_backend_module_text("response_cache.py")
 
     assert "cache entry not found" not in response_cache_source
     assert "approved read-only cached response replayed" not in response_cache_source
@@ -49,7 +43,7 @@ def test_cache_reason_literals_are_centralized() -> None:
 
 
 def test_policy_and_execution_reason_literals_are_centralized() -> None:
-    service_source = (REPO_ROOT / "backend" / "service.py").read_text(encoding="utf-8")
+    service_source = read_backend_module_text("service.py")
 
     assert "requires a later execution envelope and OPA approval" not in service_source
     assert "requires human approval before execution envelope is valid" not in service_source

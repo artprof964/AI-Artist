@@ -28,7 +28,7 @@ Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry, endpoint URL composition, env-example rendering, and runtime env resolution: centralized in backend/connection_settings.py
 Shell command construction: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
-Repository artifact paths and source-text reads: centralized in backend/repo_paths.py
+Repository artifact paths, backend module discovery, and source-text reads: centralized in backend/repo_paths.py
 Execution gates: centralized in backend/execution_gate.py
 Execution-envelope messages: centralized in backend/execution_gate_messages.py
 Slack adapter contracts: centralized in backend/slack_contracts.py
@@ -126,7 +126,7 @@ Safety Service health: shared health response and readiness expected-signal cont
 Connection registry, endpoint URL composition, env-example rendering, and runtime env resolution: registry-driven across LLM smoke tests, GitHub adapter, readiness validation, readiness commands, docs, and tracker
 Shell command construction: shared across readiness Docker Compose, curl, and MinIO command definitions
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
-Repository artifact paths and source-text reads: shared across security review, scaffold, OPA, readiness validators, and contract guard tests
+Repository artifact paths, backend module discovery, and source-text reads: shared across security review, scaffold, OPA, readiness validators, and contract guard tests
 Standard LLM API key: deepseek-open-art is canonical for setup, readiness, and live smoke tests; DEEPSEEK_API_KEY is compatibility-only
 Execution gate: shared across GitHub, Publishing, and ComfyUI adapters
 Execution gate messages: shared across invalid envelope, operation mismatch, target mismatch, approval, signature, and expiry failures
@@ -163,7 +163,7 @@ URL validation: shared directly across GitHub API path safety and source-ingesti
 Connection endpoint URLs and env example rendering: shared across readiness health, backup, restore command definitions, and `.env.example`
 Shell commands: shared across readiness health, backup, and restore command definitions
 Readiness paths: shared across local backup directories, container dump path, and MinIO source alias
-Repository paths: shared across Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module source lookups
+Repository paths: shared across Compose, env, runbook, OPA policy, PostgreSQL schema, backend module discovery, and backend module source lookups
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
 GitHub adapter contracts: shared across action labels, target labels, API validation messages, and token-purpose text
 File scanning: shared across security review workspace secret scans and future scanner paths
@@ -188,8 +188,8 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 10 passed; runbook, env schema rendering, shared service URL, shell command construction, backup paths, health checks, backup commands, restore checks, retention, and contacts validated
-repo path validation: 3 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, and backend module source reads centralized
-final pytest: 381 passed, 1 skipped, 1 warning
+repo path validation: 4 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, backend module discovery, backend module source reads, and source-inspection guard tests centralized
+final pytest: 382 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

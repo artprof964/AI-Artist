@@ -7,6 +7,7 @@ import shutil
 from backend.audit import REDACTED_SECRET_VALUE, redact_audit_value
 from backend.image_provenance import LocalImageProvenanceStore, record_generated_image_provenance
 from backend.observability import InMemoryObservabilityCollector
+from backend.repo_paths import read_backend_module_text
 from backend.security_review import (
     review_audit_payload_redaction,
     review_observability_redaction,
@@ -153,14 +154,14 @@ def test_artifact_provenance_review_flags_raw_prompt_metadata() -> None:
 
 
 def test_security_review_uses_canonical_json_for_backend_serialization() -> None:
-    source = (REPO_ROOT / "backend" / "security_review.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("security_review.py", REPO_ROOT)
 
     assert "json.dumps" not in source
     assert "canonical_json" in source
 
 
 def test_security_review_uses_shared_secret_detection_boundary() -> None:
-    source = (REPO_ROOT / "backend" / "security_review.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("security_review.py", REPO_ROOT)
 
     assert "SECRET_ASSIGNMENT_PATTERN" not in source
     assert "SECRET_VALUE_PATTERNS" not in source
@@ -169,7 +170,7 @@ def test_security_review_uses_shared_secret_detection_boundary() -> None:
 
 
 def test_security_review_uses_shared_text_file_scanner() -> None:
-    source = (REPO_ROOT / "backend" / "security_review.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("security_review.py", REPO_ROOT)
 
     assert "TEXT_REVIEW_SUFFIXES" not in source
     assert "def _iter_text_review_files(" not in source

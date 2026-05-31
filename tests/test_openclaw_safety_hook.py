@@ -1,5 +1,4 @@
 import json
-from pathlib import Path
 
 from fastapi.testclient import TestClient
 
@@ -15,11 +14,11 @@ from backend.orchestrator import (
     MockOrchestrationResult,
     run_mock_subagent_orchestration,
 )
+from backend.repo_paths import read_backend_module_text
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness, SubAgentOutput
 
 
 client = TestClient(app)
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 class RecordingSafetyClient:
@@ -283,7 +282,7 @@ def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthes
 
 
 def test_openclaw_hook_uses_shared_secret_redaction_boundary_directly() -> None:
-    source = (PROJECT_ROOT / "backend" / "openclaw_hook.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("openclaw_hook.py")
 
     assert "def _redact_sensitive_value(" not in source
     assert "redact_secret_value(" in source

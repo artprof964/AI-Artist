@@ -1,5 +1,3 @@
-from pathlib import Path
-
 import pytest
 
 from backend.http_methods import (
@@ -12,6 +10,7 @@ from backend.http_methods import (
     normalize_http_method,
     normalize_http_write_method,
 )
+from backend.repo_paths import read_backend_module_text
 
 
 class CustomHTTPMethodError(ValueError):
@@ -61,7 +60,7 @@ def test_normalize_http_method_allows_custom_error_type_and_messages() -> None:
 
 
 def test_github_adapter_uses_shared_http_method_boundary() -> None:
-    source = Path("backend/github_adapter.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("github_adapter.py")
 
     assert "from backend.http_methods import normalize_http_write_method" in source
     assert "def _normalize_write_method(" not in source

@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from backend.repo_paths import backend_module_path, read_repo_text, repo_root_from
+from backend.repo_paths import read_backend_module_text, repo_root_from
 from backend.request_metadata import request_metadata_fields
 from backend.schemas import RequestMetadata
 
@@ -18,7 +18,7 @@ def test_request_metadata_fields_centralizes_workspace_and_agent_mapping() -> No
 
 
 def test_service_uses_shared_request_metadata_mapping() -> None:
-    service_source = read_repo_text(REPO_ROOT, backend_module_path("service.py"))
+    service_source = read_backend_module_text("service.py", REPO_ROOT)
 
     assert "request_metadata_fields(payload.metadata)" in service_source
     assert "payload.metadata.workspace" not in service_source

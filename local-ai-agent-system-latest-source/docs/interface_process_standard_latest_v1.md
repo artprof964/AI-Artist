@@ -63,7 +63,7 @@ can be marked done.
 51. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 52. Production readiness Docker Compose, curl, and MinIO command strings use `backend/shell_commands.py`.
 53. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
-54. Repository artifact paths and source-text reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files use `backend/repo_paths.py`.
+54. Repository artifact paths, backend module discovery, and source-text reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files use `backend/repo_paths.py`.
 ```
 
 ## Standard Request Envelope
@@ -114,9 +114,9 @@ Rules:
   shared shell command helper.
 - Readiness backup directories, container dump paths, and MinIO aliases use the
   shared readiness path contract.
-- Repository artifact paths and source-text reads use the shared repo path
-  contract before runtime review checks, scaffold validators, or contract
-  guards read checked-in files.
+- Repository artifact paths, backend module discovery, and source-text reads use
+  the shared repo path contract before runtime review checks, scaffold
+  validators, or contract guards read checked-in files.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

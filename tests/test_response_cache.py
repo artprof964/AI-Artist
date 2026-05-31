@@ -1,6 +1,5 @@
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 
 import pytest
 
@@ -10,12 +9,12 @@ from backend.response_cache import (
     ApprovedResponseCacheEntry,
     evaluate_cached_response_reuse,
 )
+from backend.repo_paths import read_backend_module_text
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
 
 
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
 REQUEST_FINGERPRINT = "sha256:repeat-read-request"
-PROJECT_ROOT = Path(__file__).resolve().parents[1]
 
 
 def base_policy_request() -> PolicyEvaluateRequest:
@@ -239,7 +238,7 @@ def test_rejects_missing_cache_entry() -> None:
 
 
 def test_response_cache_uses_shared_request_kind_and_operation_constants() -> None:
-    source = (PROJECT_ROOT / "backend" / "response_cache.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("response_cache.py")
 
     assert "REQUEST_KIND_READ" in source
     assert "OPERATION_READ" in source

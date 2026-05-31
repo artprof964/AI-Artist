@@ -3,6 +3,11 @@ from pydantic import BaseModel, Field
 from pathlib import Path
 
 from backend.model_coercion import ModelCoercionError, coerce_model
+from backend.repo_paths import (
+    backend_module_filenames,
+    backend_module_path,
+    read_backend_module_text,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -43,12 +48,12 @@ def test_coerce_model_allows_custom_error_type_and_message() -> None:
 
 def test_backend_domain_code_uses_shared_model_coercion_boundary() -> None:
     offenders: list[str] = []
-    allowed = {REPO_ROOT / "backend" / "model_coercion.py"}
-    for path in (REPO_ROOT / "backend").glob("*.py"):
-        if path in allowed:
+    allowed = {"model_coercion.py"}
+    for module_filename in backend_module_filenames(REPO_ROOT):
+        if module_filename in allowed:
             continue
-        source = path.read_text(encoding="utf-8")
+        source = read_backend_module_text(module_filename, REPO_ROOT)
         if ".model_validate(" in source:
-            offenders.append(str(path.relative_to(REPO_ROOT)))
+            offenders.append(str(backend_module_path(module_filename)))
 
     assert offenders == []

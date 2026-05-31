@@ -1,6 +1,5 @@
 import json
 from datetime import datetime, timedelta, timezone
-from pathlib import Path
 from uuid import UUID
 
 import pytest
@@ -22,6 +21,7 @@ from backend.openclaw_hook import (
 )
 from backend.orchestrator import MockAgentRequest, run_mock_subagent_orchestration
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
+from backend.repo_paths import read_backend_module_text
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
@@ -200,7 +200,7 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
 
 
 def test_observability_uses_shared_redacted_audit_mapping_boundary() -> None:
-    source = Path("backend/observability.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("observability.py")
 
     assert "def _safe_dict(" not in source
     assert "redacted_audit_mapping(" in source

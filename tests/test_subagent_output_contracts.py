@@ -1,9 +1,9 @@
-from pathlib import Path
 from uuid import UUID
 
 import pytest
 
 from backend.model_coercion import ModelCoercionError
+from backend.repo_paths import read_backend_module_text
 from backend.subagent_output_contracts import build_subagent_output
 from backend.subagent_status import SUBAGENT_STATUS_OK
 
@@ -43,8 +43,8 @@ def test_build_subagent_output_preserves_schema_validation() -> None:
 
 
 def test_subagent_output_boundaries_use_shared_constructor() -> None:
-    orchestrator_source = Path("backend/orchestrator.py").read_text(encoding="utf-8")
-    knowledge_source = Path("backend/knowledge.py").read_text(encoding="utf-8")
+    orchestrator_source = read_backend_module_text("orchestrator.py")
+    knowledge_source = read_backend_module_text("knowledge.py")
 
     assert "build_subagent_output(" in orchestrator_source
     assert "build_subagent_output(" in knowledge_source

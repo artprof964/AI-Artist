@@ -1,5 +1,4 @@
 from datetime import datetime, timezone
-from pathlib import Path
 from typing import Any
 from uuid import UUID
 
@@ -9,6 +8,7 @@ from backend.audit import audit_event_repository, list_audit_events_by_correlati
 from backend.publishing import LocalPublishingClient, PublishingAgent, PublishingAgentRequest
 from backend.publishing_adapter import PublishingExecutionGateError
 from backend.publishing_status import PUBLISHING_STATUS_BLOCKED, PUBLISHING_STATUS_PUBLISHED
+from backend.repo_paths import read_backend_module_text
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 
@@ -142,9 +142,7 @@ def test_publishing_agent_redacts_sensitive_client_response_in_audit_event() -> 
 
 
 def test_publishing_agent_uses_shared_publish_operation_constant() -> None:
-    source = (Path(__file__).resolve().parents[1] / "backend" / "publishing.py").read_text(
-        encoding="utf-8"
-    )
+    source = read_backend_module_text("publishing.py")
 
     assert "from backend.operations import OPERATION_PUBLISH" in source
     assert 'operation="publish"' not in source

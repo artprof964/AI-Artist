@@ -1,6 +1,11 @@
 from pathlib import Path
 
 from backend.mapping_utils import copy_mapping, merge_mappings
+from backend.repo_paths import (
+    backend_module_filenames,
+    backend_module_path,
+    read_backend_module_text,
+)
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -37,9 +42,9 @@ def test_backend_metadata_copies_use_shared_mapping_helper() -> None:
         "dict(image)",
     )
     offenders: list[str] = []
-    for path in (REPO_ROOT / "backend").glob("*.py"):
-        source = path.read_text(encoding="utf-8")
+    for module_filename in backend_module_filenames(REPO_ROOT):
+        source = read_backend_module_text(module_filename, REPO_ROOT)
         if any(pattern in source for pattern in forbidden_patterns):
-            offenders.append(str(path.relative_to(REPO_ROOT)))
+            offenders.append(str(backend_module_path(module_filename)))
 
     assert offenders == []

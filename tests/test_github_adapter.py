@@ -15,6 +15,11 @@ from backend.github_adapter import (
     GitHubExecutionGateError,
     GitHubWriteRequest,
 )
+from backend.repo_paths import (
+    backend_module_filenames,
+    backend_module_path,
+    read_backend_module_text,
+)
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 
@@ -162,16 +167,20 @@ def test_github_token_env_var_is_owned_by_adapter_not_backend_agents() -> None:
     allowed_owners = {"connection_settings.py", "github_adapter.py"}
     forbidden_refs: list[str] = []
 
-    for source_path in sorted((PROJECT_ROOT / "backend").glob("*.py")):
-        if source_path.name in allowed_owners:
+    for module_filename in backend_module_filenames(PROJECT_ROOT):
+        if module_filename in allowed_owners:
             continue
 
-        tree = ast.parse(source_path.read_text(encoding="utf-8"), filename=str(source_path))
+        source_path = backend_module_path(module_filename)
+        tree = ast.parse(
+            read_backend_module_text(module_filename, PROJECT_ROOT),
+            filename=str(source_path),
+        )
         for node in ast.walk(tree):
             if isinstance(node, ast.Constant) and node.value == GITHUB_TOKEN_ENV_VAR:
-                forbidden_refs.append(f"{source_path.relative_to(PROJECT_ROOT)}:{node.lineno}")
+                forbidden_refs.append(f"{source_path}:{node.lineno}")
             elif isinstance(node, ast.Name) and node.id == "GITHUB_TOKEN_ENV_VAR":
-                forbidden_refs.append(f"{source_path.relative_to(PROJECT_ROOT)}:{node.lineno}")
+                forbidden_refs.append(f"{source_path}:{node.lineno}")
 
     assert forbidden_refs == []
 
@@ -318,14 +327,14 @@ def test_github_adapter_rejects_unsafe_paths_before_token_read(
 
 
 def test_github_adapter_uses_shared_url_boundary_directly() -> None:
-    source = (PROJECT_ROOT / "backend" / "github_adapter.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
 
     assert "def _normalize_api_path(" not in source
     assert "safe_relative_api_path(" in source
 
 
 def test_github_adapter_uses_shared_operation_constant_directly() -> None:
-    source = (PROJECT_ROOT / "backend" / "github_adapter.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
 
     assert "GITHUB_WRITE_OPERATION =" not in source
     assert '"GITHUB_WRITE_OPERATION"' not in source
@@ -333,7 +342,7 @@ def test_github_adapter_uses_shared_operation_constant_directly() -> None:
 
 
 def test_github_adapter_uses_shared_missing_envelope_message() -> None:
-    source = (PROJECT_ROOT / "backend" / "github_adapter.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("github_adapter.py", PROJECT_ROOT)
 
     assert '"GitHub write requires an execution envelope"' not in source
     assert "execution_envelope_required(GITHUB_WRITE_ACTION_LABEL)" in source

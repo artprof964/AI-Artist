@@ -148,6 +148,7 @@
 - `../../validation_reports/readiness_path_standardization_2026-05-31.md`
 - `../../validation_reports/repo_path_standardization_2026-05-31.md`
 - `../../validation_reports/repo_source_read_standardization_2026-05-31.md`
+- `../../validation_reports/backend_source_inspection_standardization_2026-05-31.md`
 - `../../validation_reports/llm_api_key_standard_2026-05-31.md`
 - `../../backend/connection_settings.py`
 - `../../backend/shell_commands.py`

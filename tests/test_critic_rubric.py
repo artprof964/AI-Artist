@@ -1,5 +1,3 @@
-from pathlib import Path
-
 from backend.critic_rubric import (
     CRITIC_DECISION_FAIL,
     CRITIC_DECISION_PASS,
@@ -14,6 +12,7 @@ from backend.critic_rubric import (
     is_critic_decision,
     is_rubric_category,
 )
+from backend.repo_paths import read_backend_module_text
 
 
 def test_critic_rubric_category_vocabulary_is_centralized() -> None:
@@ -42,7 +41,7 @@ def test_critic_rubric_helpers_accept_only_known_values() -> None:
 
 
 def test_critic_curator_uses_shared_rubric_vocabulary() -> None:
-    source = Path("backend/critic_curator.py").read_text(encoding="utf-8")
+    source = read_backend_module_text("critic_curator.py")
 
     assert "from backend.critic_rubric import" in source
     assert 'CriticDecision = Literal["pass", "fail"]' not in source
