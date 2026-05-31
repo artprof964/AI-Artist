@@ -47,6 +47,7 @@ can be marked done.
 35. ComfyUI generated-image URI conventions and response image storage references use `backend/comfyui_contracts.py`.
 36. Source registry missing-row messages use `backend/source_registry_contracts.py`.
 37. Execution-envelope validation failure messages use `backend/execution_gate_messages.py`.
+38. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
 ```
 
 ## Standard Request Envelope
@@ -255,6 +256,7 @@ Output:
 10. Audit
    - Every request, cache reuse, policy decision, execution envelope, tool call,
      and artifact is recorded.
+   - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
 ```
 
 ## Definition Of Done

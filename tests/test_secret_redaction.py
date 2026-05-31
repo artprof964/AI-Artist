@@ -1,6 +1,7 @@
 from backend.secret_redaction import (
     LOWER_REDACTED_SECRET_VALUE,
     REDACTED_SECRET_VALUE,
+    contains_secret_like_value,
     looks_secret_key,
     redact_secret_text,
     redact_secret_value,
@@ -56,3 +57,10 @@ def test_looks_secret_key_covers_adapter_secret_terms() -> None:
     assert looks_secret_key("private_webhook_secret")
     assert looks_secret_key("Authorization")
     assert not looks_secret_key("model")
+
+
+def test_contains_secret_like_value_covers_tokens_and_assignments() -> None:
+    assert contains_secret_like_value("token: keepthissecret")
+    assert contains_secret_like_value("Bearer nested-secret-token")
+    assert contains_secret_like_value("github_token: ghp_localreviewsecret0000000000")
+    assert not contains_secret_like_value("model: deepseek-v4-pro")

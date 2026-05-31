@@ -157,3 +157,12 @@ def test_security_review_uses_canonical_json_for_backend_serialization() -> None
 
     assert "json.dumps" not in source
     assert "canonical_json" in source
+
+
+def test_security_review_uses_shared_secret_detection_boundary() -> None:
+    source = (REPO_ROOT / "backend" / "security_review.py").read_text(encoding="utf-8")
+
+    assert "SECRET_ASSIGNMENT_PATTERN" not in source
+    assert "SECRET_VALUE_PATTERNS" not in source
+    assert "def _contains_secret_like_value(" not in source
+    assert "contains_secret_like_value(" in source

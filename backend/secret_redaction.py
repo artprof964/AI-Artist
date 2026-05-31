@@ -28,11 +28,25 @@ SECRET_VALUE_PATTERNS = (
     re.compile(r"\bxoxa-[A-Za-z0-9-]{8,}\b", re.IGNORECASE),
     re.compile(r"\bBearer\s+[A-Za-z0-9._~+/=-]{8,}\b", re.IGNORECASE),
 )
+SECRET_ASSIGNMENT_PATTERN = re.compile(
+    r"""(?ix)
+    \b(api[_-]?key|token|password|secret)\b
+    \s*[:=]\s*
+    ["']?
+    (?P<value>[A-Za-z0-9._~+/=-]{8,})
+    """,
+)
 
 
 def looks_secret_key(key: str) -> bool:
     normalized = key.lower()
     return any(term in normalized for term in SECRET_KEY_TERMS)
+
+
+def contains_secret_like_value(text: str) -> bool:
+    return any(pattern.search(text) for pattern in SECRET_VALUE_PATTERNS) or bool(
+        SECRET_ASSIGNMENT_PATTERN.search(text)
+    )
 
 
 def redact_secret_text(
@@ -45,7 +59,7 @@ def redact_secret_text(
     if collapse_matching_string:
         if any(secret and secret in value for secret in explicit_secrets):
             return replacement
-        if any(pattern.search(value) for pattern in SECRET_VALUE_PATTERNS):
+        if contains_secret_like_value(value):
             return replacement
 
     redacted = value
@@ -106,8 +120,10 @@ def redact_secret_value(
 __all__ = [
     "LOWER_REDACTED_SECRET_VALUE",
     "REDACTED_SECRET_VALUE",
+    "SECRET_ASSIGNMENT_PATTERN",
     "SECRET_KEY_TERMS",
     "SECRET_VALUE_PATTERNS",
+    "contains_secret_like_value",
     "looks_secret_key",
     "redact_secret_text",
     "redact_secret_value",

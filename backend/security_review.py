@@ -17,19 +17,11 @@ from backend.schemas import (
     SourceFreshness,
 )
 from backend.service import SENSITIVE_OPERATIONS, create_execution_envelope, evaluate_policy
-from backend.secret_redaction import SECRET_VALUE_PATTERNS
+from backend.secret_redaction import contains_secret_like_value
 from backend.runtime_ids import runtime_uuid
 
 
 TEXT_REVIEW_SUFFIXES = {".json", ".md", ".txt", ".yaml", ".yml"}
-SECRET_ASSIGNMENT_PATTERN = re.compile(
-    r"""(?ix)
-    \b(api[_-]?key|token|password|secret)\b
-    \s*[:=]\s*
-    ["']?
-    (?P<value>[A-Za-z0-9._~+/=-]{8,})
-    """,
-)
 OPA_POLICY = Path("policies") / "opa" / "ai_artist.rego"
 
 
@@ -45,7 +37,7 @@ def scan_workspace_secret_files(workspaces_root: Path) -> list[SecurityReviewFin
     for path in _iter_text_review_files(workspaces_root):
         text = path.read_text(encoding="utf-8")
         for line_number, line in enumerate(text.splitlines(), start=1):
-            if _contains_secret_like_value(line):
+            if contains_secret_like_value(line):
                 findings.append(
                     SecurityReviewFinding(
                         surface="workspace",
@@ -77,7 +69,7 @@ def review_observability_redaction(fields: dict[str, Any]) -> list[SecurityRevie
             "logs": [record.__dict__ for record in collector.logs()],
         }
     )
-    if _contains_secret_like_value(serialized):
+    if contains_secret_like_value(serialized):
         return [
             SecurityReviewFinding(
                 surface="observability",
@@ -187,15 +179,9 @@ def _iter_text_review_files(root: Path) -> Iterable[Path]:
     )
 
 
-def _contains_secret_like_value(text: str) -> bool:
-    return any(pattern.search(text) for pattern in SECRET_VALUE_PATTERNS) or bool(
-        SECRET_ASSIGNMENT_PATTERN.search(text)
-    )
-
-
 def _find_unredacted_secrets(value: Any, *, surface: str) -> list[SecurityReviewFinding]:
     serialized = canonical_json(value)
-    if not _contains_secret_like_value(serialized):
+    if not contains_secret_like_value(serialized):
         return []
     return [
         SecurityReviewFinding(

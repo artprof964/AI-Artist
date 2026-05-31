@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 334 passed, 1 skipped, 1 warning
+Final validation: 336 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -70,7 +70,7 @@ backend/operations.py: shared operation constants, classifier terms, and sensiti
 backend/model_coercion.py: shared Pydantic model/dict coercion for adapter and domain boundaries.
 backend/adapter_results.py: shared gated adapter result field mapping.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording.
-backend/secret_redaction.py: shared secret-key and token-shape redaction utilities.
+backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
@@ -130,8 +130,9 @@ Execution-envelope validation must flow through backend/execution_gate.py before
 adapter-specific side-effect logic.
 Execution-envelope validation failure messages must flow through
 backend/execution_gate_messages.py before gated adapters expose envelope errors.
-Secret redaction patterns and replacement behavior must flow through
-backend/secret_redaction.py before adapter-specific logging or response shaping.
+Secret detection patterns, assignment scanning, and replacement behavior must
+flow through backend/secret_redaction.py before adapter-specific logging,
+response shaping, security review, or future scanner logic.
 OpenClaw policy metadata redaction must call `backend/secret_redaction.py`
 directly when preparing Safety Service policy requests.
 Slack payload parsing, request text normalization, stable request IDs, and
