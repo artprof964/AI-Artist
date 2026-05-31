@@ -1,3 +1,6 @@
+import ast
+from pathlib import Path
+
 from backend.connection_settings import (
     CONNECTION_ENV_VARS,
     CONNECTION_SETTING_NAMES,
@@ -18,6 +21,12 @@ from backend.connection_settings import (
     runtime_env,
 )
 from backend.readiness import REQUIRED_ENV_VARS
+from backend.repo_paths import (
+    backend_module_filenames,
+    read_backend_module_text,
+    read_repo_text,
+    repo_root_from,
+)
 
 
 def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
@@ -113,6 +122,36 @@ def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
     env = {DEEPSEEK_OPEN_ART_ENV_VAR: "explicit-secret"}
 
     assert runtime_env(env) is env
+
+
+def test_runtime_env_access_is_centralized_in_connection_settings() -> None:
+    assert "os.environ" in read_backend_module_text("connection_settings.py")
+
+    for module_name in backend_module_filenames():
+        if module_name == "connection_settings.py":
+            continue
+        assert "os.environ" not in read_backend_module_text(module_name)
+
+
+def test_tests_do_not_import_os_for_environment_access() -> None:
+    repo_root = repo_root_from(Path(__file__))
+    offenders: list[str] = []
+
+    for test_path in sorted((repo_root / "tests").glob("test_*.py")):
+        source = read_repo_text(repo_root, Path("tests") / test_path.name)
+        tree = ast.parse(source)
+        imports_os = any(
+            (
+                isinstance(node, ast.Import)
+                and any(alias.name == "os" for alias in node.names)
+            )
+            or (isinstance(node, ast.ImportFrom) and node.module == "os")
+            for node in ast.walk(tree)
+        )
+        if imports_os:
+            offenders.append(test_path.name)
+
+    assert offenders == []
 
 
 def test_connection_endpoint_url_normalizes_base_and_path_slashes() -> None:

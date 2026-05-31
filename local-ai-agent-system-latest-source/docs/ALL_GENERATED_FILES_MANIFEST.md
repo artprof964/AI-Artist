@@ -144,6 +144,7 @@
 - `../../validation_reports/connection_registry_loader_standardization_2026-05-31.md`
 - `../../validation_reports/connection_endpoint_readiness_standardization_2026-05-31.md`
 - `../../validation_reports/connection_env_example_rendering_standardization_2026-05-31.md`
+- `../../validation_reports/runtime_env_access_guard_standardization_2026-05-31.md`
 - `../../validation_reports/shell_command_standardization_2026-05-31.md`
 - `../../validation_reports/process_execution_standardization_2026-05-31.md`
 - `../../validation_reports/readiness_path_standardization_2026-05-31.md`

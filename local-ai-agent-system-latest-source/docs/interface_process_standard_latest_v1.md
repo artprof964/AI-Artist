@@ -34,7 +34,7 @@ can be marked done.
 22. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
 23. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 24. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
-25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering, and runtime env resolution use `backend/connection_settings.py`.
+25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering, and runtime env resolution/access guards use `backend/connection_settings.py`.
 26. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 27. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 28. Provider response object/dict field access, first-choice message content extraction, and shape validation use `backend/response_fields.py`.
@@ -106,7 +106,8 @@ Rules:
 - OpenClaw never forwards API keys, OAuth tokens, signing keys, or private
   webhooks to the configured LLM API.
 - Runtime env and connection settings are resolved through the shared
-  connection settings helper before adapters read provider credentials.
+  connection settings helper before adapters or live tests read provider
+  credentials.
 - `.env.example` must match the shared connection settings registry rendering.
 - Readiness health, backup, and restore endpoint commands compose service URLs
   through the shared connection settings helper.

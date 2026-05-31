@@ -1,4 +1,3 @@
-import os
 from typing import Any
 
 import pytest
@@ -9,6 +8,8 @@ from backend.connection_settings import (
     DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
+    require_env_value,
+    runtime_env,
 )
 from backend.llm_api_smoke import (
     SECRET_REDACTION,
@@ -152,7 +153,7 @@ def test_llm_api_smoke_uses_shared_response_choice_parser() -> None:
 
 
 @pytest.mark.skipif(
-    not os.environ.get(STANDARD_LLM_API_KEY_ENV_VAR),
+    not runtime_env().get(STANDARD_LLM_API_KEY_ENV_VAR),
     reason=f"{DEEPSEEK_OPEN_ART_ENV_VAR} is required for the live LLM API smoke test",
 )
 def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
@@ -162,5 +163,5 @@ def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
     assert result["model"]
     assert result["content"]
     assert result["request"]["api_key"] == SECRET_REDACTION
-    api_key = os.environ[STANDARD_LLM_API_KEY_ENV_VAR]
+    api_key = require_env_value(runtime_env(), STANDARD_LLM_API_KEY_ENV_VAR, purpose="LLM API smoke test")
     assert api_key not in repr(result)
