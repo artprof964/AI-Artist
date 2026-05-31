@@ -6,6 +6,7 @@ import pytest
 from backend.canonical_hash import canonical_json
 from backend.repo_paths import OPA_POLICY_PATH, repo_path
 from backend.shell_commands import (
+    compact_process_error,
     docker_compose_exec_args,
     missing_command_result,
     run_process,
@@ -79,7 +80,7 @@ def _opa_command() -> list[str]:
         if probe.returncode == 0:
             _OPA_COMMAND = command
             return command
-        errors.append(f"{label}: {_compact_error(probe)}")
+        errors.append(f"{label}: {compact_process_error(probe)}")
 
     _OPA_SKIP_REASON = (
         "OPA policy tests require a running docker compose opa service or local opa CLI; "
@@ -100,13 +101,6 @@ def _probe_opa_command(command: list[str]) -> Any:
         )
     except FileNotFoundError as exc:
         return missing_command_result(command, exc)
-
-
-def _compact_error(result: Any) -> str:
-    output = (result.stderr or result.stdout).strip().splitlines()
-    if not output:
-        return f"exit {result.returncode}"
-    return output[-1]
 
 
 def policy_input(

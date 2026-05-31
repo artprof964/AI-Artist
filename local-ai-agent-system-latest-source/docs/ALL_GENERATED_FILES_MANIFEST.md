@@ -153,6 +153,7 @@
 - `../../validation_reports/shell_command_standardization_2026-05-31.md`
 - `../../validation_reports/process_argument_builder_standardization_2026-05-31.md`
 - `../../validation_reports/process_execution_standardization_2026-05-31.md`
+- `../../validation_reports/process_error_formatter_standardization_2026-05-31.md`
 - `../../validation_reports/process_output_parser_standardization_2026-05-31.md`
 - `../../validation_reports/readiness_path_standardization_2026-05-31.md`
 - `../../validation_reports/repo_path_standardization_2026-05-31.md`

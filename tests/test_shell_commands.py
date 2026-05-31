@@ -1,6 +1,7 @@
 import ast
 
 from backend.shell_commands import (
+    compact_process_error,
     curl_command,
     docker_compose_args,
     docker_compose_command,
@@ -100,6 +101,16 @@ def test_missing_command_result_uses_shared_exit_contract() -> None:
     assert "missing" in result.stderr
 
 
+def test_compact_process_error_uses_stderr_stdout_or_exit_code() -> None:
+    missing = missing_command_result(["missing"], FileNotFoundError("missing executable"))
+    stdout_only = type(missing)(args=["tool"], returncode=2, stdout="line one\nline two\n", stderr="")
+    no_output = type(missing)(args=["tool"], returncode=3, stdout="", stderr="")
+
+    assert compact_process_error(missing) == "missing executable"
+    assert compact_process_error(stdout_only) == "line two"
+    assert compact_process_error(no_output) == "exit 3"
+
+
 def test_delimited_process_output_parsers_share_psql_row_contract() -> None:
     output = "\n".join(
         [
@@ -158,3 +169,10 @@ def test_opa_policy_tests_use_shared_process_argument_builders() -> None:
     assert "docker_compose_exec_args(" in source
     assert "shell_args(" in source
     assert '"docker",\n                "compose",' not in source
+
+
+def test_opa_policy_tests_use_shared_process_error_formatter() -> None:
+    source = read_test_source("test_opa_policy.py")
+
+    assert "compact_process_error(" in source
+    assert "def _compact_error(" not in source

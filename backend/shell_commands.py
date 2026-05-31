@@ -66,6 +66,13 @@ def missing_command_result(args: Sequence[str], exc: FileNotFoundError) -> subpr
     )
 
 
+def compact_process_error(result: subprocess.CompletedProcess[str]) -> str:
+    output = (result.stderr or result.stdout).strip().splitlines()
+    if not output:
+        return f"exit {result.returncode}"
+    return output[-1]
+
+
 def parse_delimited_key_value_rows(output: str, *, delimiter: str = "|") -> list[tuple[str, str]]:
     rows: list[tuple[str, str]] = []
     for line in output.splitlines():
@@ -101,6 +108,7 @@ def parse_delimited_values_for_key(
 
 __all__ = [
     "curl_command",
+    "compact_process_error",
     "docker_compose_args",
     "docker_compose_command",
     "docker_compose_exec_args",

@@ -26,7 +26,7 @@ Safety Service health contract: centralized in backend/health_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, and env-access guards: centralized in backend/connection_settings.py
-Shell command/process argument construction, process execution defaults, and delimited process-output parsing: centralized in backend/shell_commands.py
+Shell command/process argument construction, process execution defaults, compact process errors, and delimited process-output parsing: centralized in backend/shell_commands.py
 Readiness backup paths: centralized in backend/readiness_paths.py
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: centralized in backend/repo_paths.py
 Test project-root resolution, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration: centralized in tests/path_helpers.py
@@ -125,7 +125,7 @@ Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Safety Service health: shared health response and readiness expected-signal contract
 Connection registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, and env-access guards: registry-driven across LLM smoke tests, Slack adapter, GitHub adapter, readiness validation, readiness commands, docs, and tracker
-Shell command/process argument construction, process execution, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations and migration output parsing
+Shell command/process argument construction, process execution, compact process error formatting, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations, OPA probe diagnostics, and migration output parsing
 Readiness backup paths: shared across readiness backup/restore commands and runbook path examples
 Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads: shared across security review, scaffold, OPA, readiness validators, workspace validators, and contract guard tests
 Test path/source helpers: shared across repo-wide guard tests, filesystem/process fixture tests, and checked-in source inspection tests for connection settings, connection env-access checks, canonical hashing, classification contracts, health contracts, request metadata, mapping utilities, model coercion, runtime IDs, Safety Service, security review, source ingestion, source freshness, ComfyUI, Publishing, publishing status, Slack, HTTP method, GitHub adapter, GitHub contract, image provenance, Critic/Curator, Knowledge Agent, mock sub-agents, sub-agent output/status, execution gate, interface types, LLM API smoke, observability, OpenClaw hook, reason messages, review statuses, response cache, production readiness, tree shape, time utilities, shell commands, OPA policy, PostgreSQL migration, OpenClaw workspace, file scanning, and repo path contracts
@@ -194,8 +194,8 @@ repo path validation: 8 passed; Compose, env, runbook, OPA policy, PostgreSQL sc
 time utility validation: 6 focused files passed; direct test `datetime.now(timezone.utc)` calls guarded
 canonical JSON validation: 6 focused files passed; non-canonical-hash tests guarded against direct `json.dumps`
 test text-hash validation: 2 focused files passed; non-canonical-hash tests guarded against direct `hashlib` imports
-process execution validation: 2 focused files passed; tests guarded against direct `subprocess` imports and local PostgreSQL output parsers
-process argument validation: 2 focused files passed; OPA tests guarded against local process argument list construction
+process execution validation: 2 focused files passed; tests guarded against direct `subprocess` imports, local PostgreSQL output parsers, and local OPA process-error formatters
+process argument validation: 2 focused files passed; OPA tests guarded against local process argument list construction and local process-error formatting
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
@@ -203,7 +203,7 @@ runtime secret validation: LLM API smoke, GitHub, and Slack guarded against loca
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 413 passed, 1 skipped, 1 warning
+final pytest: 415 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
