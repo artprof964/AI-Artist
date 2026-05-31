@@ -8,6 +8,16 @@ from backend.side_effect_audit import (
     build_side_effect_audit_payload,
     record_side_effect_audit_event,
 )
+from backend.side_effect_audit_contracts import (
+    SIDE_EFFECT_ACTOR_SCOPE_FIELD,
+    SIDE_EFFECT_CLIENT_RESPONSE_FIELD,
+    SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD,
+    SIDE_EFFECT_OPERATION_FIELD,
+    SIDE_EFFECT_POLICY_SCOPE_FIELD,
+    SIDE_EFFECT_REASON_FIELD,
+    SIDE_EFFECT_STATUS_FIELD,
+    SIDE_EFFECT_TARGET_FIELD,
+)
 from path_helpers import read_backend_source
 
 
@@ -36,14 +46,14 @@ def test_build_side_effect_audit_payload_uses_standard_fields() -> None:
     )
 
     assert payload == {
-        "actor_scope": "user:local",
-        "policy_scope": "workspace:ai-artist-main",
-        "operation": "publish",
-        "target": "mock-publisher://channels/artist-feed",
-        "status": PUBLISHING_STATUS_PUBLISHED,
-        "reason": PUBLISHING_STATUS_PUBLISHED,
-        "execution_envelope_id": str(ENVELOPE_ID),
-        "client_response": {"status": PUBLISHING_STATUS_PUBLISHED},
+        SIDE_EFFECT_ACTOR_SCOPE_FIELD: "user:local",
+        SIDE_EFFECT_POLICY_SCOPE_FIELD: "workspace:ai-artist-main",
+        SIDE_EFFECT_OPERATION_FIELD: "publish",
+        SIDE_EFFECT_TARGET_FIELD: "mock-publisher://channels/artist-feed",
+        SIDE_EFFECT_STATUS_FIELD: PUBLISHING_STATUS_PUBLISHED,
+        SIDE_EFFECT_REASON_FIELD: PUBLISHING_STATUS_PUBLISHED,
+        SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD: str(ENVELOPE_ID),
+        SIDE_EFFECT_CLIENT_RESPONSE_FIELD: {"status": PUBLISHING_STATUS_PUBLISHED},
     }
 
 
@@ -68,9 +78,10 @@ def test_record_side_effect_audit_event_redacts_client_response() -> None:
     assert event.event_type == AUDIT_EVENT_TOOL_CALL
     assert len(events) == 1
     payload = events[0].payload
-    assert payload["client_response"]["authorization"] == "[REDACTED]"
-    assert payload["client_response"]["debug"]["api_key"] == "[REDACTED]"
-    assert payload["client_response"]["status"] == PUBLISHING_STATUS_PUBLISHED
+    response_payload = payload[SIDE_EFFECT_CLIENT_RESPONSE_FIELD]
+    assert response_payload["authorization"] == "[REDACTED]"
+    assert response_payload["debug"]["api_key"] == "[REDACTED]"
+    assert response_payload["status"] == PUBLISHING_STATUS_PUBLISHED
     assert "side-effect-secret" not in repr(payload)
 
 
@@ -79,3 +90,27 @@ def test_side_effect_audit_uses_shared_audit_event_type_constant() -> None:
 
     assert "AUDIT_EVENT_TOOL_CALL" in source
     assert 'event_type="tool_call"' not in source
+
+
+def test_side_effect_audit_payload_fields_are_centralized() -> None:
+    assert SIDE_EFFECT_ACTOR_SCOPE_FIELD == "actor_scope"
+    assert SIDE_EFFECT_POLICY_SCOPE_FIELD == "policy_scope"
+    assert SIDE_EFFECT_OPERATION_FIELD == "operation"
+    assert SIDE_EFFECT_TARGET_FIELD == "target"
+    assert SIDE_EFFECT_STATUS_FIELD == "status"
+    assert SIDE_EFFECT_REASON_FIELD == "reason"
+    assert SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD == "execution_envelope_id"
+    assert SIDE_EFFECT_CLIENT_RESPONSE_FIELD == "client_response"
+
+    source = read_backend_source("side_effect_audit.py")
+    for literal in (
+        '"actor_scope"',
+        '"policy_scope"',
+        '"operation"',
+        '"target"',
+        '"status"',
+        '"reason"',
+        '"execution_envelope_id"',
+        '"client_response"',
+    ):
+        assert literal not in source

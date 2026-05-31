@@ -63,6 +63,7 @@ can be marked done.
 47. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
 48. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
 49. Publishing side-effect audit operation values use `backend/operations.py`, and side-effect audit event types use `backend/interface_types.py`.
+49a. Side-effect audit payload field names use `backend/side_effect_audit_contracts.py`.
 50. Gated adapter operation values use `backend/operations.py` directly.
 51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
 51. Slack source labels, requester/policy scopes, local-request payloads, outbound payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
@@ -319,7 +320,7 @@ Output:
      and artifact is recorded.
    - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
    - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
-   - Publishing side-effect audit events use the shared publish operation and audit event type constants.
+   - Publishing side-effect audit events use the shared publish operation, payload field-name, and audit event type constants.
    - Publishing audit actor and policy scopes use the shared request-scope contract.
 ```
 

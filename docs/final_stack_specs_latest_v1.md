@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 479 passed, 1 warning
+Final validation: 480 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -79,7 +79,8 @@ backend/operations.py: shared operation constants, classifier terms, and sensiti
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
 backend/adapter_results.py: shared gated adapter result field mapping.
-backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared audit event type contracts.
+backend/side_effect_audit_contracts.py: shared side-effect audit payload field names.
+backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field and audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
@@ -199,8 +200,9 @@ Gated adapter action and target labels must flow through
 backend/adapter_gate_contracts.py before execution-envelope message construction.
 Gated adapter result envelope fields must flow through backend/adapter_results.py
 before adapter-specific return dataclasses add extra fields.
-Side-effect audit payloads and event types must flow through backend/side_effect_audit.py
-and backend/interface_types.py before adapter-specific agents persist tool-call audit events.
+Side-effect audit payload field names and event types must flow through
+backend/side_effect_audit_contracts.py, backend/side_effect_audit.py, and
+backend/interface_types.py before adapter-specific agents persist tool-call audit events.
 Canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic local IDs, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes must
 flow through backend/canonical_hash.py before request fingerprints, artifact
 hashes, image provenance hashes, source snapshot versions, signatures, mocked external IDs, security-review scans, deterministic test serializations, or deterministic test text hashes are created.

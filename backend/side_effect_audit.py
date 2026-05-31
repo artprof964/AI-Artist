@@ -7,6 +7,16 @@ from uuid import UUID
 from backend.audit import record_audit_event
 from backend.interface_types import AUDIT_EVENT_TOOL_CALL
 from backend.schemas import AuditEventRequest, AuditEventResponse
+from backend.side_effect_audit_contracts import (
+    SIDE_EFFECT_ACTOR_SCOPE_FIELD,
+    SIDE_EFFECT_CLIENT_RESPONSE_FIELD,
+    SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD,
+    SIDE_EFFECT_OPERATION_FIELD,
+    SIDE_EFFECT_POLICY_SCOPE_FIELD,
+    SIDE_EFFECT_REASON_FIELD,
+    SIDE_EFFECT_STATUS_FIELD,
+    SIDE_EFFECT_TARGET_FIELD,
+)
 
 
 @dataclass(frozen=True)
@@ -27,14 +37,16 @@ def build_side_effect_audit_payload(
     client_response: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     return {
-        "actor_scope": context.actor_scope,
-        "policy_scope": context.policy_scope,
-        "operation": context.operation,
-        "target": context.target,
-        "status": status,
-        "reason": reason,
-        "execution_envelope_id": str(execution_envelope_id) if execution_envelope_id else None,
-        "client_response": client_response or {},
+        SIDE_EFFECT_ACTOR_SCOPE_FIELD: context.actor_scope,
+        SIDE_EFFECT_POLICY_SCOPE_FIELD: context.policy_scope,
+        SIDE_EFFECT_OPERATION_FIELD: context.operation,
+        SIDE_EFFECT_TARGET_FIELD: context.target,
+        SIDE_EFFECT_STATUS_FIELD: status,
+        SIDE_EFFECT_REASON_FIELD: reason,
+        SIDE_EFFECT_EXECUTION_ENVELOPE_ID_FIELD: (
+            str(execution_envelope_id) if execution_envelope_id else None
+        ),
+        SIDE_EFFECT_CLIENT_RESPONSE_FIELD: client_response or {},
     }
 
 

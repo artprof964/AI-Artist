@@ -42,7 +42,7 @@ Secret detection, structured unredacted-secret checks, redaction, and redacted a
 ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
 Gated adapter action and target labels: centralized in backend/adapter_gate_contracts.py
 Adapter results: centralized in backend/adapter_results.py
-Side-effect audit: centralized in backend/side_effect_audit.py with shared audit event type contracts
+Side-effect audit: centralized in backend/side_effect_audit.py with shared payload field and audit event type contracts
 Canonical hashing, HMAC signatures, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes: centralized in backend/canonical_hash.py
 Request identity, direct Safety Service request normalization, and trace IDs: centralized in backend/request_identity.py
 Request metadata mapping, canonical request fingerprint field shape, and canonicalization observability field shape: centralized in backend/request_metadata.py
@@ -148,7 +148,7 @@ OpenClaw contracts: shared across tool policy metadata redaction, tool metric ta
 Redacted audit mappings: shared directly by observability fields and metric tags
 Gated adapter action and target labels: shared across Publishing and ComfyUI execution-envelope message construction; GitHub labels remain in the GitHub contract boundary
 Adapter results: shared across GitHub, Publishing, and ComfyUI gated adapters
-Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with tool-call audit event typing routed through interface contracts
+Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with payload field names routed through side_effect_audit_contracts.py and tool-call audit event typing routed through interface contracts
 Canonical hashing: shared across Safety Service request fingerprints, execution-envelope HMAC signatures, publishing IDs, direct image provenance hashes, source snapshot version tags, security-review serialization, OPA test input serialization, telemetry secret-leak assertions, deterministic test serialization, and deterministic test text hashes
 Source ingestion contracts: shared approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape before registry writes
 Source ingestion hashes: source snapshots call shared canonical hash/version helpers directly before registry writes
@@ -220,7 +220,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 479 passed, 1 warning
+final pytest: 480 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```
