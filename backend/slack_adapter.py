@@ -21,8 +21,13 @@ from backend.slack_contracts import (
     SLACK_ADAPTER_EXECUTION_PURPOSE,
     SLACK_SOURCE,
     slack_event_object_required,
+    slack_local_request_metadata,
+    slack_local_request_payload,
     slack_optional_string_field,
+    slack_outbound_message_payload,
+    slack_policy_scope,
     slack_required_string_field,
+    slack_requester_scope,
     slack_response_text_required,
 )
 
@@ -56,27 +61,26 @@ class SlackRequestEnvelope:
     policy_scope: str = field(init=False)
 
     def __post_init__(self) -> None:
-        object.__setattr__(self, "requester_scope", f"slack:user:{self.user}")
-        object.__setattr__(self, "policy_scope", f"slack:channel:{self.channel}")
+        object.__setattr__(self, "requester_scope", slack_requester_scope(self.user))
+        object.__setattr__(self, "policy_scope", slack_policy_scope(self.channel))
 
     def to_local_request(self) -> dict[str, Any]:
-        return {
-            "request_id": str(self.request_id),
-            "channel": self.source,
-            "request_text": self.text,
-            "requester_scope": self.requester_scope,
-            "policy_scope": self.policy_scope,
-            "metadata": {
-                "slack_channel": self.channel,
-                "slack_user": self.user,
-                "slack_text": self.text,
-                "slack_message_ts": self.message_ts,
-                "slack_thread_ts": self.thread_ts,
-                "slack_event_id": self.event_id,
-                "slack_team_id": self.team_id,
-                "slack_channel_type": self.channel_type,
-            },
-        }
+        return slack_local_request_payload(
+            request_id=str(self.request_id),
+            text=self.text,
+            requester_scope=self.requester_scope,
+            policy_scope=self.policy_scope,
+            metadata=slack_local_request_metadata(
+                channel=self.channel,
+                user=self.user,
+                text=self.text,
+                message_ts=self.message_ts,
+                thread_ts=self.thread_ts,
+                event_id=self.event_id,
+                team_id=self.team_id,
+                channel_type=self.channel_type,
+            ),
+        )
 
 
 @dataclass(frozen=True)
@@ -212,11 +216,11 @@ class SlackAdapter:
             replacement=LOWER_REDACTED_SECRET_VALUE,
         )
 
-        return {
-            "channel": envelope.channel,
-            "text": text,
-            "thread_ts": envelope.thread_ts,
-        }
+        return slack_outbound_message_payload(
+            channel=envelope.channel,
+            text=text,
+            thread_ts=envelope.thread_ts,
+        )
 
     def send_response(
         self,

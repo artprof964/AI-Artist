@@ -34,7 +34,7 @@ Repository artifact paths, repo-root resolution, workspace paths/text reads, bac
 Test project-root resolution, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration: centralized in tests/path_helpers.py
 Execution gates: centralized in backend/execution_gate.py
 Execution-envelope messages: centralized in backend/execution_gate_messages.py
-Slack adapter contracts: centralized in backend/slack_contracts.py
+Slack adapter contracts, scopes, and payload shapes: centralized in backend/slack_contracts.py
 GitHub adapter contracts and token-required message routing: centralized in backend/github_contracts.py and backend/connection_settings.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, structured unredacted-secret checks, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
@@ -168,8 +168,8 @@ Markdown utilities: shared across production readiness runbook validation and fu
 Numeric utilities: shared directly across Knowledge vector similarity, embedding validation, empty-vector handling, Critic/Curator rubric helper clamping/averages, and mock orchestration confidence
 Time creation/normalization: shared directly across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, execution-envelope expiry validation, and tests that need current UTC timestamps
 Payload fields: shared across Slack event parsing, nested event object validation, payload validation messages, audit scope extraction, and generated image metadata parsing
-Slack adapter boundaries: shared payload, request identity, secret-redaction, adapter secret, and connection error-message helpers are called directly without local wrapper functions
-Slack adapter contracts: shared across source labels, inbound event validation messages, outbound response validation messages, and token-purpose text
+Slack adapter boundaries: shared payload, request identity, secret-redaction, adapter secret, Slack contract, and connection error-message helpers are called directly without local wrapper functions
+Slack adapter contracts: shared across source labels, requester/policy scopes, local request payloads, outbound payloads, inbound event validation messages, outbound response validation messages, and token-purpose text
 Response fields: shared directly across provider-neutral LLM API response parsing, first-choice message content extraction, response validation messages, ComfyUI image response parsing, and publishing audit status parsing
 ComfyUI contracts: shared across image provenance response validation, storage URI construction, and future ComfyUI adapter response handling
 URL validation: shared directly across GitHub API path safety, URL validation messages, and source-ingestion domain allowlisting
@@ -215,7 +215,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 464 passed, 1 skipped, 1 warning
+final pytest: 465 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

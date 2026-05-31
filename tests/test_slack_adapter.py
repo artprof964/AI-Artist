@@ -10,7 +10,14 @@ from backend.slack_adapter import (
     SlackAdapterConfigurationError,
     SlackAdapterError,
 )
-from backend.slack_contracts import SLACK_ADAPTER_EXECUTION_PURPOSE
+from backend.slack_contracts import (
+    SLACK_ADAPTER_EXECUTION_PURPOSE,
+    SLACK_CHANNEL_METADATA_KEY,
+    SLACK_MESSAGE_TS_METADATA_KEY,
+    SLACK_TEXT_METADATA_KEY,
+    SLACK_THREAD_TS_METADATA_KEY,
+    SLACK_USER_METADATA_KEY,
+)
 from path_helpers import read_backend_source
 
 
@@ -70,11 +77,13 @@ def test_slack_adapter_normalizes_inbound_event_to_local_request_envelope() -> N
     assert local_request["request_text"] == "generate three visual directions"
     assert local_request["requester_scope"] == "slack:user:U789"
     assert local_request["policy_scope"] == "slack:channel:C456"
-    assert local_request["metadata"]["slack_channel"] == "C456"
-    assert local_request["metadata"]["slack_user"] == "U789"
-    assert local_request["metadata"]["slack_text"] == "generate three visual directions"
-    assert local_request["metadata"]["slack_message_ts"] == "1717142400.000100"
-    assert local_request["metadata"]["slack_thread_ts"] == "1717142399.000090"
+    assert local_request["metadata"][SLACK_CHANNEL_METADATA_KEY] == "C456"
+    assert local_request["metadata"][SLACK_USER_METADATA_KEY] == "U789"
+    assert local_request["metadata"][SLACK_TEXT_METADATA_KEY] == (
+        "generate three visual directions"
+    )
+    assert local_request["metadata"][SLACK_MESSAGE_TS_METADATA_KEY] == "1717142400.000100"
+    assert local_request["metadata"][SLACK_THREAD_TS_METADATA_KEY] == "1717142399.000090"
 
 
 def test_slack_adapter_formats_and_posts_threaded_outbound_response_without_token() -> None:
@@ -212,6 +221,9 @@ def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
     assert "from backend.payload_fields import" in source
     assert "from backend.request_identity import" in source
     assert "from backend.secret_redaction import" in source
+    assert "slack_local_request_metadata(" in source
+    assert "slack_local_request_payload(" in source
+    assert "slack_outbound_message_payload(" in source
     assert "adapter_runtime_secret(" in source
     assert "require_runtime_secret(" not in source
     assert "load_connection_settings(" not in source
@@ -224,3 +236,5 @@ def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
     assert "def _redact_secret(" not in source
     assert "def _redact_secret_text(" not in source
     assert "def _read_runtime_token(" not in source
+    assert '"slack_channel"' not in source
+    assert 'f"slack:user:{self.user}"' not in source
