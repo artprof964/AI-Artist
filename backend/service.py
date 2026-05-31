@@ -32,7 +32,7 @@ from backend.operations import (
     is_sensitive_operation,
 )
 from backend.request_identity import normalize_request_text, request_fingerprint
-from backend.request_metadata import request_metadata_fields
+from backend.request_metadata import request_fingerprint_fields, request_observability_fields
 from backend.reason_messages import (
     READ_ENVELOPE_NOT_REQUIRED,
     READ_POLICY_ALLOWED,
@@ -57,14 +57,13 @@ from backend.time_utils import utc_now
 
 def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
     canonical_text = normalize_request_text(payload.request_text)
-    metadata_fields = request_metadata_fields(payload.metadata)
-    fingerprint_payload = {
-        "request_text": canonical_text,
-        "requester_scope": payload.requester_scope,
-        "policy_scope": payload.policy_scope,
-        "channel": payload.channel,
-        **metadata_fields,
-    }
+    fingerprint_payload = request_fingerprint_fields(
+        request_text=canonical_text,
+        requester_scope=payload.requester_scope,
+        policy_scope=payload.policy_scope,
+        channel=payload.channel,
+        metadata=payload.metadata,
+    )
     fingerprint = request_fingerprint(fingerprint_payload)
     response = CanonicalizeResponse(
         request_id=payload.request_id,
@@ -82,16 +81,16 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
         trace_id=trace_id_from_request(payload.request_id),
         request_id=payload.request_id,
         metric_name=METRIC_REQUEST_CANONICALIZED,
-        metric_tags={
-            "channel": payload.channel,
-            **metadata_fields,
-        },
+        metric_tags=request_observability_fields(
+            channel=payload.channel,
+            metadata=payload.metadata,
+        ),
         message="request canonicalized",
-        fields={
-            "channel": payload.channel,
-            **metadata_fields,
-            "request_fingerprint": response.request_fingerprint,
-        },
+        fields=request_observability_fields(
+            channel=payload.channel,
+            metadata=payload.metadata,
+            request_fingerprint=response.request_fingerprint,
+        ),
     )
     return response
 

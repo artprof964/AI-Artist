@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 468 passed, 1 skipped, 1 warning
+Final validation: 470 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -57,7 +57,7 @@ backend/classification_contracts.py: shared classifier confidence and reason for
 backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes.
 backend/request_identity.py: request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
-backend/request_metadata.py: shared RequestMetadata workspace/agent mapping for fingerprints and observability fields.
+backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -202,7 +202,8 @@ and prefixed runtime trace IDs must flow through backend/request_identity.py
 before service or adapter specific request identity logic is added.
 Safety Service canonicalization and classification must call
 backend/request_identity.py directly for request text normalization.
-RequestMetadata workspace/agent mapping must flow through
+RequestMetadata workspace/agent mapping, canonical request fingerprint field
+shape, and canonicalization observability field shape must flow through
 backend/request_metadata.py before service fingerprinting, observability metric
 tags, or structured observability fields are built.
 Default requester, policy, publishing actor, and publishing policy scopes must

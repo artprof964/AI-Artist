@@ -67,6 +67,7 @@
 - `../../tests/test_review_status.py`
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`
 - `../../validation_reports/request_metadata_mapping_standardization_2026-05-31.md`
+- `../../validation_reports/request_metadata_fingerprint_observability_standardization_2026-05-31.md`
 - `../../validation_reports/request_scope_contract_standardization_2026-05-31.md`
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`
