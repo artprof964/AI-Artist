@@ -114,11 +114,16 @@ def test_migrated_source_inspection_tests_use_shared_path_helpers() -> None:
     migrated_tests = {
         "test_classification_contracts.py",
         "test_comfyui_adapter.py",
+        "test_critic_curator.py",
+        "test_critic_rubric.py",
         "test_health_contracts.py",
         "test_http_methods.py",
         "test_github_contracts.py",
+        "test_image_provenance.py",
+        "test_knowledge_agent.py",
         "test_mapping_utils.py",
         "test_model_coercion.py",
+        "test_mock_subagents.py",
         "test_publishing_adapter.py",
         "test_production_readiness.py",
         "test_request_metadata.py",
@@ -127,6 +132,8 @@ def test_migrated_source_inspection_tests_use_shared_path_helpers() -> None:
         "test_security_review.py",
         "test_slack_adapter.py",
         "test_source_ingestion.py",
+        "test_subagent_output_contracts.py",
+        "test_subagent_status.py",
         "test_tree_shape.py",
     }
     offenders: list[str] = []

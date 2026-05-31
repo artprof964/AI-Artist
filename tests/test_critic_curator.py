@@ -1,13 +1,11 @@
 from datetime import datetime, timezone
-from pathlib import Path
 
 from backend.critic_curator import RUBRIC_CATEGORIES, score_image_batch, score_image_quality
 from backend.critic_rubric import CRITIC_DECISION_FAIL, CRITIC_DECISION_PASS
 from backend.image_provenance import ImageProvenanceRecord
-from backend.repo_paths import read_backend_module_text, read_workspace_text, repo_root_from
+from backend.repo_paths import read_workspace_text
+from path_helpers import PROJECT_ROOT, read_backend_source
 
-
-REPO_ROOT = repo_root_from(Path(__file__))
 
 PROVENANCE = ImageProvenanceRecord(
     image_id="studio-hero-001",
@@ -26,7 +24,7 @@ def test_rubric_categories_match_workspace_markdown() -> None:
     rubric_categories = [
         line.removeprefix("- ").strip()
         for line in read_workspace_text(
-            REPO_ROOT, "critic-curator", "rubrics", "image_quality.md"
+            PROJECT_ROOT, "critic-curator", "rubrics", "image_quality.md"
         ).splitlines()
         if line.startswith("- ")
     ]
@@ -171,14 +169,14 @@ def test_batch_scoring_is_deterministic_and_preserves_order() -> None:
 
 
 def test_critic_curator_uses_shared_model_coercion_directly() -> None:
-    source = read_backend_module_text("critic_curator.py")
+    source = read_backend_source("critic_curator.py")
 
     assert "def _coerce_metadata(" not in source
     assert "coerce_model(metadata, ImageQualityMetadata)" in source
 
 
 def test_critic_curator_uses_shared_numeric_clamp_directly() -> None:
-    source = read_backend_module_text("critic_curator.py")
+    source = read_backend_source("critic_curator.py")
 
     assert "def _clamp_score(" not in source
     assert "rounded_clamp(" in source

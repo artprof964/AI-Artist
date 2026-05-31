@@ -1,6 +1,5 @@
 import pytest
 
-from backend.repo_paths import read_backend_module_text
 from backend.subagent_status import (
     SUBAGENT_STATUS_BLOCKED,
     SUBAGENT_STATUS_FAILED,
@@ -11,6 +10,7 @@ from backend.subagent_status import (
     dominant_subagent_status,
     subagent_status_priority,
 )
+from path_helpers import read_backend_source
 
 
 def test_subagent_status_priority_is_centralized_in_expected_order() -> None:
@@ -50,7 +50,7 @@ def test_count_subagent_statuses_returns_plain_counts() -> None:
 
 
 def test_orchestrator_uses_shared_subagent_status_helpers() -> None:
-    source = read_backend_module_text("orchestrator.py")
+    source = read_backend_source("orchestrator.py")
 
     assert "dominant_subagent_status" in source
     assert "count_subagent_statuses" in source

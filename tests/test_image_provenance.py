@@ -12,7 +12,7 @@ from backend.image_provenance import (
     record_generated_image_provenance,
     sha256_workflow,
 )
-from backend.repo_paths import read_backend_module_text
+from path_helpers import read_backend_source
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -181,7 +181,7 @@ def test_rejects_comfyui_image_without_storage_reference() -> None:
 
 
 def test_image_provenance_uses_shared_comfyui_storage_uri_contract() -> None:
-    source = read_backend_module_text("image_provenance.py")
+    source = read_backend_source("image_provenance.py")
 
     assert "def _storage_uri_from_comfyui_image(" not in source
     assert "comfyui_image_storage_uri(" in source
@@ -192,14 +192,14 @@ def test_image_provenance_uses_shared_comfyui_storage_uri_contract() -> None:
 
 
 def test_image_provenance_uses_shared_model_coercion_directly() -> None:
-    source = read_backend_module_text("image_provenance.py")
+    source = read_backend_source("image_provenance.py")
 
     assert "def _coerce_provenance_input(" not in source
     assert "coerce_model(provenance, ImageProvenanceInput)" in source
 
 
 def test_image_provenance_uses_canonical_text_hash_directly() -> None:
-    source = read_backend_module_text("image_provenance.py")
+    source = read_backend_source("image_provenance.py")
 
     assert "def sha256_text(" not in source
     assert "from backend.canonical_hash import sha256_json, sha256_text" in source

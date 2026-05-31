@@ -3,9 +3,9 @@ from uuid import UUID
 import pytest
 
 from backend.model_coercion import ModelCoercionError
-from backend.repo_paths import read_backend_module_text
 from backend.subagent_output_contracts import build_subagent_output
 from backend.subagent_status import SUBAGENT_STATUS_OK
+from path_helpers import read_backend_source
 
 
 TASK_ID = UUID("29292929-2929-2929-2929-292929292929")
@@ -43,8 +43,8 @@ def test_build_subagent_output_preserves_schema_validation() -> None:
 
 
 def test_subagent_output_boundaries_use_shared_constructor() -> None:
-    orchestrator_source = read_backend_module_text("orchestrator.py")
-    knowledge_source = read_backend_module_text("knowledge.py")
+    orchestrator_source = read_backend_source("orchestrator.py")
+    knowledge_source = read_backend_source("knowledge.py")
 
     assert "build_subagent_output(" in orchestrator_source
     assert "build_subagent_output(" in knowledge_source

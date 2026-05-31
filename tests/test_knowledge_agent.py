@@ -13,9 +13,9 @@ from backend.knowledge import (
     KnowledgeSourceDocument,
     VectorPoint,
 )
-from backend.repo_paths import read_backend_module_text
 from backend.schemas import SubAgentOutput
 from backend.subagent_status import SUBAGENT_STATUS_OK
+from path_helpers import read_backend_source
 
 
 TASK_ID = UUID("16161616-1616-1616-1616-161616161616")
@@ -163,7 +163,7 @@ def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:
 
 
 def test_knowledge_agent_contract_vocabulary_is_centralized() -> None:
-    source = read_backend_module_text("knowledge.py")
+    source = read_backend_source("knowledge.py")
 
     assert '"agent_name": "knowledge"' not in source
     assert '"status": "ok"' not in source
@@ -174,7 +174,7 @@ def test_knowledge_agent_contract_vocabulary_is_centralized() -> None:
 
 
 def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:
-    source = read_backend_module_text("knowledge.py")
+    source = read_backend_source("knowledge.py")
 
     assert "def _make_snippet(" not in source
     assert "contextual_snippet(" in source
