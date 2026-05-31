@@ -5,6 +5,7 @@ from typing import Any
 from uuid import UUID
 
 from backend.audit import record_audit_event
+from backend.interface_types import AUDIT_EVENT_TOOL_CALL
 from backend.schemas import AuditEventRequest, AuditEventResponse
 
 
@@ -48,7 +49,7 @@ def record_side_effect_audit_event(
 ) -> AuditEventResponse:
     return record_audit_event(
         AuditEventRequest(
-            event_type="tool_call",
+            event_type=AUDIT_EVENT_TOOL_CALL,
             request_id=request_id,
             correlation_id=context.correlation_id,
             payload=build_side_effect_audit_payload(

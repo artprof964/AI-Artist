@@ -1,12 +1,14 @@
 from uuid import UUID
 
 from backend.audit import audit_event_repository, list_audit_events_by_correlation_id
+from backend.interface_types import AUDIT_EVENT_TOOL_CALL
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from backend.side_effect_audit import (
     SideEffectAuditContext,
     build_side_effect_audit_payload,
     record_side_effect_audit_event,
 )
+from path_helpers import read_backend_source
 
 
 CORRELATION_ID = UUID("64646464-6464-6464-6464-646464646464")
@@ -63,9 +65,17 @@ def test_record_side_effect_audit_event_redacts_client_response() -> None:
     events = list_audit_events_by_correlation_id(CORRELATION_ID)
 
     assert event.request_id == REQUEST_ID
+    assert event.event_type == AUDIT_EVENT_TOOL_CALL
     assert len(events) == 1
     payload = events[0].payload
     assert payload["client_response"]["authorization"] == "[REDACTED]"
     assert payload["client_response"]["debug"]["api_key"] == "[REDACTED]"
     assert payload["client_response"]["status"] == PUBLISHING_STATUS_PUBLISHED
     assert "side-effect-secret" not in repr(payload)
+
+
+def test_side_effect_audit_uses_shared_audit_event_type_constant() -> None:
+    source = read_backend_source("side_effect_audit.py")
+
+    assert "AUDIT_EVENT_TOOL_CALL" in source
+    assert 'event_type="tool_call"' not in source
