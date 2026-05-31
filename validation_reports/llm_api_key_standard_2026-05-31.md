@@ -21,13 +21,18 @@ backward-compatible alias for old local shells.
 
 ## Expected Result
 
-Focused tests pass, ruff passes, and the live smoke test is skipped unless the
-runtime environment contains `deepseek-open-art`.
+Focused tests pass, ruff passes, and the live smoke test uses
+`deepseek-open-art` when that runtime environment value is present. If the
+standard key is absent, the live smoke test skips rather than falling back to
+project setup through `DEEPSEEK_API_KEY`.
 
 ## Result
 
 ```text
-20 passed, 1 skipped
+44 passed
+Live smoke test: 1 passed with deepseek-open-art
+Live prompt response: DeepSeek answered the "how is the weather" prompt and
+reported it does not have real-time weather access.
 All checks passed!
-Full suite: 315 passed, 1 skipped, 1 warning
+Full suite: 477 passed, 1 warning
 ```

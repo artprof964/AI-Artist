@@ -220,5 +220,5 @@ env parser validation: 2 focused files passed; readiness guarded against local e
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 final pytest: 477 passed, 1 warning
 final ruff: all checks passed
-skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
+live LLM API smoke test: passed with deepseek-open-art
 ```
