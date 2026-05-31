@@ -57,6 +57,7 @@ can be marked done.
 39. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
 40. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
 41. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
+41a. Audit actor/policy scope payload field names use `backend/audit_contracts.py`.
 42. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
 43. Source registry missing-row messages, dependency-role defaults, empty change-sequence defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
 44. Execution-envelope validation failure, signature failure, and required-envelope messages use `backend/execution_gate_messages.py`.
@@ -323,6 +324,7 @@ Output:
      and artifact is recorded.
    - Security review and scanner paths detect secret-like values through the shared secret-redaction boundary.
    - Security review and scanner paths discover reviewable workspace files through the shared file-scanning boundary.
+   - Audit record actor/policy scope extraction and side-effect audit payload fields use the shared audit scope field-name constants.
    - Publishing side-effect audit events use the shared publish operation, payload field-name, and audit event type constants.
    - Publishing audit actor and policy scopes use the shared request-scope contract.
    - Local publishing dry-run responses and deterministic IDs use the shared publishing contract helper.

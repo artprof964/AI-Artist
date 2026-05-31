@@ -1,0 +1,8 @@
+AUDIT_ACTOR_SCOPE_FIELD = "actor_scope"
+AUDIT_POLICY_SCOPE_FIELD = "policy_scope"
+
+
+__all__ = [
+    "AUDIT_ACTOR_SCOPE_FIELD",
+    "AUDIT_POLICY_SCOPE_FIELD",
+]

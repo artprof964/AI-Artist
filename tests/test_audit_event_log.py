@@ -2,6 +2,8 @@ from fastapi.testclient import TestClient
 
 from backend.app import app
 from backend.audit import audit_event_repository
+from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_FIELD
+from path_helpers import read_backend_source
 
 
 client = TestClient(app)
@@ -107,3 +109,14 @@ def test_audit_correlation_id_must_be_uuid_compatible() -> None:
     )
 
     assert response.status_code == 422
+
+
+def test_audit_scope_payload_fields_are_centralized() -> None:
+    source = read_backend_source("audit.py")
+
+    assert AUDIT_ACTOR_SCOPE_FIELD == "actor_scope"
+    assert AUDIT_POLICY_SCOPE_FIELD == "policy_scope"
+    assert 'string_field_or_none(redacted_payload, "actor_scope")' not in source
+    assert 'string_field_or_none(redacted_payload, "policy_scope")' not in source
+    assert "AUDIT_ACTOR_SCOPE_FIELD" in source
+    assert "AUDIT_POLICY_SCOPE_FIELD" in source

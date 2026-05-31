@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from backend.audit import audit_event_repository, list_audit_events_by_correlation_id
+from backend.audit_contracts import AUDIT_ACTOR_SCOPE_FIELD, AUDIT_POLICY_SCOPE_FIELD
 from backend.interface_types import AUDIT_EVENT_TOOL_CALL
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from backend.side_effect_audit import (
@@ -95,6 +96,8 @@ def test_side_effect_audit_uses_shared_audit_event_type_constant() -> None:
 def test_side_effect_audit_payload_fields_are_centralized() -> None:
     assert SIDE_EFFECT_ACTOR_SCOPE_FIELD == "actor_scope"
     assert SIDE_EFFECT_POLICY_SCOPE_FIELD == "policy_scope"
+    assert SIDE_EFFECT_ACTOR_SCOPE_FIELD == AUDIT_ACTOR_SCOPE_FIELD
+    assert SIDE_EFFECT_POLICY_SCOPE_FIELD == AUDIT_POLICY_SCOPE_FIELD
     assert SIDE_EFFECT_OPERATION_FIELD == "operation"
     assert SIDE_EFFECT_TARGET_FIELD == "target"
     assert SIDE_EFFECT_STATUS_FIELD == "status"
