@@ -1,0 +1,20 @@
+OPERATION_FIELD = "operation"
+REQUEST_KIND_FIELD = "request_kind"
+REQUESTER_SCOPE_FIELD = "requester_scope"
+POLICY_SCOPE_FIELD = "policy_scope"
+ALLOW_FIELD = "allow"
+REQUIRES_HUMAN_APPROVAL_FIELD = "requires_human_approval"
+REASON_FIELD = "reason"
+POLICY_VERSION_FIELD = "policy_version"
+
+
+__all__ = [
+    "ALLOW_FIELD",
+    "OPERATION_FIELD",
+    "POLICY_SCOPE_FIELD",
+    "POLICY_VERSION_FIELD",
+    "REASON_FIELD",
+    "REQUESTER_SCOPE_FIELD",
+    "REQUEST_KIND_FIELD",
+    "REQUIRES_HUMAN_APPROVAL_FIELD",
+]

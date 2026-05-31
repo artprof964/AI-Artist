@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 491 passed, 1 warning
+Final validation: 493 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -60,6 +60,7 @@ backend/request_identity.py: request text normalization, direct Safety Service c
 backend/request_metadata_contracts.py: shared request metadata defaults, default request channel, request envelope field names, and fingerprint field names.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape using request metadata contracts.
 backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
+backend/runtime_field_contracts.py: shared operation, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry and policy contexts.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -228,6 +229,10 @@ structured observability fields are built.
 Safety Service canonicalization, classification, and policy observability event,
 message, tag, and field shapes must flow through
 backend/service_observability_contracts.py before service telemetry is emitted.
+Operation, request-kind, requester/policy scope, allow, human-approval, reason,
+and policy-version field names must flow through
+backend/runtime_field_contracts.py before service observability, OpenClaw tool
+telemetry, or future policy context field shapes are changed.
 Default requester, policy, publishing actor, and publishing policy scopes must
 flow through backend/request_scope_contracts.py before schemas, mock
 orchestration, publishing audit context, or future request envelopes change

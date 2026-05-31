@@ -31,6 +31,7 @@
 - `../../validation_reports/trace_identity_standardization_2026-05-31.md`
 - `../../validation_reports/canonical_hmac_signature_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_id_standardization_2026-05-31.md`
+- `../../validation_reports/runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/mapping_utils_standardization_2026-05-31.md`
 - `../../validation_reports/reason_messages_standardization_2026-05-31.md`
 - `../../validation_reports/policy_reason_standardization_2026-05-31.md`
@@ -50,6 +51,7 @@
 - `../../backend/api_contracts.py`
 - `../../backend/interface_types.py`
 - `../../backend/runtime_ids.py`
+- `../../backend/runtime_field_contracts.py`
 - `../../backend/mapping_utils.py`
 - `../../backend/reason_messages.py`
 - `../../backend/classification_contracts.py`

@@ -26,6 +26,7 @@ can be marked done.
 14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 15. Request metadata defaults, default request channel, request envelope field names, RequestMetadata workspace/agent mapping, canonical request fingerprint fields, and canonicalization observability fields use `backend/request_metadata_contracts.py` and `backend/request_metadata.py`.
 15a. Safety Service canonicalization, classification, and policy observability event/message/tag/field shapes use `backend/service_observability_contracts.py`.
+15b. Operation, request-kind, requester/policy scope, allow, human-approval, reason, and policy-version field names use `backend/runtime_field_contracts.py` before service observability or OpenClaw tool telemetry shapes are changed.
 16. Default requester, policy, publishing actor, and publishing policy scopes use `backend/request_scope_contracts.py`.
 17. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
@@ -256,6 +257,7 @@ Output:
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
    - Request metadata defaults, default channel, request envelope field names, and fingerprint field names use the shared metadata contract before schema or telemetry changes.
    - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
+   - Runtime policy/telemetry field names use the shared runtime field contract before service or OpenClaw telemetry shapes are changed.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.

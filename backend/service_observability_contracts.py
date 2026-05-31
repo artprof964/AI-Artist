@@ -1,3 +1,13 @@
+from backend.runtime_field_contracts import (
+    ALLOW_FIELD,
+    OPERATION_FIELD,
+    POLICY_SCOPE_FIELD,
+    POLICY_VERSION_FIELD,
+    REASON_FIELD,
+    REQUEST_KIND_FIELD,
+    REQUIRES_HUMAN_APPROVAL_FIELD,
+)
+
 REQUEST_CANONICALIZE_EVENT = "canonicalize"
 REQUEST_CANONICALIZED_MESSAGE = "request canonicalized"
 REQUEST_CLASSIFY_EVENT = "classify"
@@ -5,14 +15,7 @@ REQUEST_CLASSIFIED_MESSAGE = "request classified"
 POLICY_EVALUATE_EVENT = "evaluate"
 POLICY_EVALUATED_MESSAGE = "policy evaluated"
 
-REQUEST_KIND_FIELD = "request_kind"
-OPERATION_FIELD = "operation"
 CONFIDENCE_FIELD = "confidence"
-POLICY_SCOPE_FIELD = "policy_scope"
-ALLOW_FIELD = "allow"
-REQUIRES_HUMAN_APPROVAL_FIELD = "requires_human_approval"
-REASON_FIELD = "reason"
-POLICY_VERSION_FIELD = "policy_version"
 ALL_REQUIRED_SOURCES_UNCHANGED_FIELD = "all_required_sources_unchanged"
 CHANGED_SOURCE_COUNT_FIELD = "changed_source_count"
 

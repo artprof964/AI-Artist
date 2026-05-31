@@ -21,6 +21,15 @@ from backend.service_observability_contracts import (
     policy_observability_fields,
 )
 from path_helpers import read_backend_source
+from backend.runtime_field_contracts import (
+    ALLOW_FIELD as RUNTIME_ALLOW_FIELD,
+    OPERATION_FIELD as RUNTIME_OPERATION_FIELD,
+    POLICY_SCOPE_FIELD as RUNTIME_POLICY_SCOPE_FIELD,
+    POLICY_VERSION_FIELD as RUNTIME_POLICY_VERSION_FIELD,
+    REASON_FIELD as RUNTIME_REASON_FIELD,
+    REQUEST_KIND_FIELD as RUNTIME_REQUEST_KIND_FIELD,
+    REQUIRES_HUMAN_APPROVAL_FIELD as RUNTIME_REQUIRES_HUMAN_APPROVAL_FIELD,
+)
 
 
 def test_service_observability_event_and_message_contracts_are_centralized() -> None:
@@ -30,6 +39,28 @@ def test_service_observability_event_and_message_contracts_are_centralized() -> 
     assert REQUEST_CLASSIFIED_MESSAGE == "request classified"
     assert POLICY_EVALUATE_EVENT == "evaluate"
     assert POLICY_EVALUATED_MESSAGE == "policy evaluated"
+
+
+def test_service_observability_uses_shared_runtime_field_contracts() -> None:
+    source = read_backend_source("service_observability_contracts.py")
+
+    assert REQUEST_KIND_FIELD == RUNTIME_REQUEST_KIND_FIELD
+    assert OPERATION_FIELD == RUNTIME_OPERATION_FIELD
+    assert POLICY_SCOPE_FIELD == RUNTIME_POLICY_SCOPE_FIELD
+    assert ALLOW_FIELD == RUNTIME_ALLOW_FIELD
+    assert REQUIRES_HUMAN_APPROVAL_FIELD == RUNTIME_REQUIRES_HUMAN_APPROVAL_FIELD
+    assert REASON_FIELD == RUNTIME_REASON_FIELD
+    assert POLICY_VERSION_FIELD == RUNTIME_POLICY_VERSION_FIELD
+    for literal in (
+        'REQUEST_KIND_FIELD = "request_kind"',
+        'OPERATION_FIELD = "operation"',
+        'POLICY_SCOPE_FIELD = "policy_scope"',
+        'ALLOW_FIELD = "allow"',
+        'REQUIRES_HUMAN_APPROVAL_FIELD = "requires_human_approval"',
+        'REASON_FIELD = "reason"',
+        'POLICY_VERSION_FIELD = "policy_version"',
+    ):
+        assert literal not in source
 
 
 def test_classification_observability_shapes_are_centralized() -> None:

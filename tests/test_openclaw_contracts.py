@@ -17,6 +17,15 @@ from backend.openclaw_contracts import (
     openclaw_tool_metric_tags,
     openclaw_tool_preflight_fields,
 )
+from backend.runtime_field_contracts import (
+    OPERATION_FIELD,
+    POLICY_SCOPE_FIELD,
+    POLICY_VERSION_FIELD,
+    REASON_FIELD,
+    REQUESTER_SCOPE_FIELD,
+    REQUEST_KIND_FIELD,
+    REQUIRES_HUMAN_APPROVAL_FIELD,
+)
 from path_helpers import read_backend_source
 
 
@@ -83,6 +92,28 @@ def test_openclaw_tool_observability_shapes_are_centralized() -> None:
         OPENCLAW_OPERATION_FIELD: "publish",
         OPENCLAW_ADAPTER_RESULT_PRESENT_FIELD: True,
     }
+
+
+def test_openclaw_policy_fields_use_shared_runtime_contracts() -> None:
+    source = read_backend_source("openclaw_contracts.py")
+
+    assert OPENCLAW_OPERATION_FIELD == OPERATION_FIELD
+    assert OPENCLAW_REQUEST_KIND_FIELD == REQUEST_KIND_FIELD
+    assert OPENCLAW_REQUESTER_SCOPE_FIELD == REQUESTER_SCOPE_FIELD
+    assert OPENCLAW_POLICY_SCOPE_FIELD == POLICY_SCOPE_FIELD
+    assert OPENCLAW_REASON_FIELD == REASON_FIELD
+    assert OPENCLAW_POLICY_VERSION_FIELD == POLICY_VERSION_FIELD
+    assert OPENCLAW_REQUIRES_HUMAN_APPROVAL_FIELD == REQUIRES_HUMAN_APPROVAL_FIELD
+    for literal in (
+        'OPENCLAW_OPERATION_FIELD = "operation"',
+        'OPENCLAW_REQUEST_KIND_FIELD = "request_kind"',
+        'OPENCLAW_REQUESTER_SCOPE_FIELD = "requester_scope"',
+        'OPENCLAW_POLICY_SCOPE_FIELD = "policy_scope"',
+        'OPENCLAW_REASON_FIELD = "reason"',
+        'OPENCLAW_POLICY_VERSION_FIELD = "policy_version"',
+        'OPENCLAW_REQUIRES_HUMAN_APPROVAL_FIELD = "requires_human_approval"',
+    ):
+        assert literal not in source
 
 
 def test_openclaw_hook_uses_shared_contract_shapes() -> None:
