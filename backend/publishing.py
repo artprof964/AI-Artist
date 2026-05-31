@@ -12,6 +12,11 @@ from backend.publishing_adapter import (
     PublishingExecutionGateError,
     PublishingRequest,
 )
+from backend.publishing_status import (
+    PUBLISHING_STATUS_BLOCKED,
+    PUBLISHING_STATUS_PUBLISHED,
+    PublishingStatus,
+)
 from backend.response_fields import field_value
 from backend.schemas import AuditEventResponse, ExecutionEnvelopeResponse
 from backend.side_effect_audit import SideEffectAuditContext, record_side_effect_audit_event
@@ -29,7 +34,7 @@ class PublishingAgentRequest:
 
 @dataclass(frozen=True)
 class PublishingAgentResult:
-    status: str
+    status: PublishingStatus
     target: str
     execution_envelope_id: UUID
     request_id: UUID
@@ -47,7 +52,7 @@ class LocalPublishingClient:
         self.calls.append((target, payload))
         return {
             "external_post_id": deterministic_publish_id(target=target, payload=payload),
-            "status": "published",
+            "status": PUBLISHING_STATUS_PUBLISHED,
             "target": target,
         }
 
@@ -74,21 +79,25 @@ class PublishingAgent:
         except PublishingExecutionGateError as exc:
             self._record_publish_audit_event(
                 request,
-                status="blocked",
+                status=PUBLISHING_STATUS_BLOCKED,
                 reason=str(exc),
             )
             raise
 
         audit_event = self._record_publish_audit_event(
             request,
-            status="published",
-            reason=field_value(result.client_response, "status", "published"),
+            status=PUBLISHING_STATUS_PUBLISHED,
+            reason=field_value(
+                result.client_response,
+                "status",
+                PUBLISHING_STATUS_PUBLISHED,
+            ),
             execution_envelope_id=result.execution_envelope_id,
             request_id=result.request_id,
             client_response=result.client_response,
         )
         return PublishingAgentResult(
-            status="published",
+            status=PUBLISHING_STATUS_PUBLISHED,
             target=result.target,
             execution_envelope_id=result.execution_envelope_id,
             request_id=result.request_id,
@@ -100,7 +109,7 @@ class PublishingAgent:
         self,
         request: PublishingAgentRequest,
         *,
-        status: str,
+        status: PublishingStatus,
         reason: str,
         execution_envelope_id: UUID | None = None,
         request_id: UUID | None = None,

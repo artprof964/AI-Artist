@@ -7,6 +7,7 @@ import pytest
 from backend.audit import audit_event_repository, list_audit_events_by_correlation_id
 from backend.publishing import LocalPublishingClient, PublishingAgent, PublishingAgentRequest
 from backend.publishing_adapter import PublishingExecutionGateError
+from backend.publishing_status import PUBLISHING_STATUS_BLOCKED, PUBLISHING_STATUS_PUBLISHED
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
 
@@ -24,7 +25,7 @@ class SecretEchoPublishingClient(LocalPublishingClient):
             "authorization": "Bearer secret-publish-token",
             "debug": {"api_key": "sk-publish-secret-value"},
             "external_post_id": "mock-post-secret-001",
-            "status": "published",
+            "status": PUBLISHING_STATUS_PUBLISHED,
             "target": target,
         }
 
@@ -99,13 +100,16 @@ def test_publishing_agent_blocks_external_publish_until_human_approval_is_attach
     )
 
     assert client.calls == [(PUBLISH_TARGET, payload)]
-    assert result.status == "published"
+    assert result.status == PUBLISHING_STATUS_PUBLISHED
     assert result.execution_envelope_id == approved_envelope.execution_envelope_id
     assert result.request_id == REQUEST_ID
     assert result.client_response["external_post_id"].startswith("local-publish-")
 
     audit_events = list_audit_events_by_correlation_id(CORRELATION_ID)
-    assert [event.payload["status"] for event in audit_events] == ["blocked", "published"]
+    assert [event.payload["status"] for event in audit_events] == [
+        PUBLISHING_STATUS_BLOCKED,
+        PUBLISHING_STATUS_PUBLISHED,
+    ]
     assert audit_events[0].payload["operation"] == "publish"
     assert audit_events[1].payload["client_response"] == result.client_response
 

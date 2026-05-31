@@ -1,6 +1,7 @@
 from uuid import UUID
 
 from backend.audit import audit_event_repository, list_audit_events_by_correlation_id
+from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from backend.side_effect_audit import (
     SideEffectAuditContext,
     build_side_effect_audit_payload,
@@ -26,10 +27,10 @@ def context() -> SideEffectAuditContext:
 def test_build_side_effect_audit_payload_uses_standard_fields() -> None:
     payload = build_side_effect_audit_payload(
         context=context(),
-        status="published",
-        reason="published",
+        status=PUBLISHING_STATUS_PUBLISHED,
+        reason=PUBLISHING_STATUS_PUBLISHED,
         execution_envelope_id=ENVELOPE_ID,
-        client_response={"status": "published"},
+        client_response={"status": PUBLISHING_STATUS_PUBLISHED},
     )
 
     assert payload == {
@@ -37,10 +38,10 @@ def test_build_side_effect_audit_payload_uses_standard_fields() -> None:
         "policy_scope": "workspace:ai-artist-main",
         "operation": "publish",
         "target": "mock-publisher://channels/artist-feed",
-        "status": "published",
-        "reason": "published",
+        "status": PUBLISHING_STATUS_PUBLISHED,
+        "reason": PUBLISHING_STATUS_PUBLISHED,
         "execution_envelope_id": str(ENVELOPE_ID),
-        "client_response": {"status": "published"},
+        "client_response": {"status": PUBLISHING_STATUS_PUBLISHED},
     }
 
 
@@ -49,14 +50,14 @@ def test_record_side_effect_audit_event_redacts_client_response() -> None:
 
     event = record_side_effect_audit_event(
         context=context(),
-        status="published",
-        reason="published",
+        status=PUBLISHING_STATUS_PUBLISHED,
+        reason=PUBLISHING_STATUS_PUBLISHED,
         request_id=REQUEST_ID,
         execution_envelope_id=ENVELOPE_ID,
         client_response={
             "authorization": "Bearer side-effect-secret",
             "debug": {"api_key": "sk-side-effect-secret"},
-            "status": "published",
+            "status": PUBLISHING_STATUS_PUBLISHED,
         },
     )
     events = list_audit_events_by_correlation_id(CORRELATION_ID)
@@ -66,5 +67,5 @@ def test_record_side_effect_audit_event_redacts_client_response() -> None:
     payload = events[0].payload
     assert payload["client_response"]["authorization"] == "[REDACTED]"
     assert payload["client_response"]["debug"]["api_key"] == "[REDACTED]"
-    assert payload["client_response"]["status"] == "published"
+    assert payload["client_response"]["status"] == PUBLISHING_STATUS_PUBLISHED
     assert "side-effect-secret" not in repr(payload)

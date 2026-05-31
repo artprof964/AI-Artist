@@ -44,6 +44,7 @@ URL validation: centralized in backend/url_utils.py
 Operations: centralized in backend/operations.py
 Model coercion: centralized in backend/model_coercion.py
 Telemetry stages and log levels: centralized in backend/observability.py
+Publishing outcome statuses: centralized in backend/publishing_status.py
 ```
 
 ## Completed
@@ -120,6 +121,7 @@ Operations: shared across Safety Service classification, policy/envelope sensiti
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
 Model coercion: shared across execution-envelope validation, image provenance input, critic metadata scoring, Knowledge Agent output, and mock sub-agent output
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, and security review probes
+Publishing statuses: shared across Publishing Agent result handling and side-effect audit payloads
 Deprecated architecture term scan: clean
 ```
 
@@ -131,7 +133,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 8 passed; prompt/memory secrets, audit redaction, observability redaction, canonical JSON serialization, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 292 passed, 1 skipped, 1 warning
+final pytest: 295 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```
