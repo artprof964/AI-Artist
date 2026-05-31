@@ -23,6 +23,7 @@ Validation passed: 28
 Validation pending: 0
 Interface contracts: 28 defined
 Safety Service health contract: centralized in backend/health_contracts.py
+Safety Service API metadata and route paths: centralized in backend/api_contracts.py
 Classification response contract: centralized in backend/classification_contracts.py
 Interface type contracts: centralized in backend/interface_types.py
 Connection settings registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: centralized in backend/connection_settings.py and backend/adapter_secrets.py
@@ -125,6 +126,7 @@ Query tracking: aligned with Safety Service-owned persistence and source freshne
 Hardware: aligned with LLM API; GPU needed only for real ComfyUI path
 Production readiness: local runbook, env schema, health checks, backup/restore checks, retention, incident contacts
 Safety Service health: shared health response and readiness expected-signal contract
+Safety Service API contracts: shared FastAPI metadata and route paths across app decorators and endpoint tests
 Connection registry, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, adapter secret lookup, and env-access guards: registry-driven across LLM smoke tests, Slack adapter, GitHub adapter, readiness validation, readiness commands, docs, and tracker
 LLM smoke request defaults, overrides, and timeout: centralized in backend/llm_api_smoke.py
 Shell command/process argument construction, process execution, compact process error formatting, and delimited output parsing: shared across readiness Docker Compose, curl, and MinIO command definitions plus OPA and PostgreSQL test process invocations, OPA probe diagnostics, and migration output parsing
@@ -178,6 +180,7 @@ Classification response contract: shared across Safety Service classifier confid
 Publishing operation constants: shared directly across publishing adapter gates and publishing audit records
 Gated adapter operation constants: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, OpenClaw tool hooks, and cache replay boundaries
+API route contracts: shared directly across FastAPI decorators and endpoint tests
 Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants
 Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default event messages, and security review probes
@@ -206,7 +209,7 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, initial change-sequence defaults, and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 438 passed, 1 skipped, 1 warning
+final pytest: 439 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

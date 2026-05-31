@@ -44,6 +44,7 @@
 - `../../validation_reports/classification_response_contract_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
 - `../../backend/request_metadata.py`
+- `../../backend/api_contracts.py`
 - `../../backend/interface_types.py`
 - `../../backend/runtime_ids.py`
 - `../../backend/mapping_utils.py`
@@ -212,6 +213,7 @@
 - `../../tests/path_helpers.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
+- `../../validation_reports/api_contract_standardization_2026-05-31.md`
 - `../../validation_reports/health_contract_standardization_2026-05-31.md`
 - `../../validation_reports/response_fields_standardization_2026-05-31.md`
 - `../../validation_reports/response_field_message_standardization_2026-05-31.md`

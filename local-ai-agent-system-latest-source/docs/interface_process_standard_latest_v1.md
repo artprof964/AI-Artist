@@ -14,59 +14,60 @@ can be marked done.
 2. The provider-neutral LLM API owns reasoning only; it never receives raw secrets.
 3. FastAPI Safety Service owns deterministic safety decisions.
 4. Safety Service health status, service name, response payload, and readiness expected-signal text use `backend/health_contracts.py`.
-5. OPA owns policy authorization.
-6. PostgreSQL owns request, source, cache, and audit records.
-7. Qdrant owns vector retrieval.
-8. MinIO owns generated files and source snapshots.
-9. Redis/Celery/Dagster own background execution state.
-10. ComfyUI owns image workflow execution.
-11. External write actions require a signed execution envelope.
-12. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
-13. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
-14. RequestMetadata workspace/agent mapping uses `backend/request_metadata.py`.
-15. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
-16. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
-17. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
-18. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
-19. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
-20. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
-21. Generated-image review status vocabulary and checks use `backend/review_status.py`.
-22. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
-23. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
-24. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
-25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
-26. LLM smoke request prompts, reasoning effort, thinking mode, timeout, request payload construction, runtime secret lookup, and redacted request recording use `backend/llm_api_smoke.py`.
-27. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
-28. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
-29. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.
-30. Connector URL/domain, relative API path validation, and URL validation messages use `backend/url_utils.py`.
-31. Connector HTTP method vocabulary, normalization, and validation messages use `backend/http_methods.py`.
-32. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-33. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
-34. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
-35. Telemetry stages, log levels, and event-message formatting use `backend/observability.py`.
-36. Publishing outcome statuses use `backend/publishing_status.py`.
-37. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
-38. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
-39. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
-40. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
-41. Source registry missing-row messages, dependency-role defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
-42. Execution-envelope validation failure and required-envelope messages use `backend/execution_gate_messages.py`.
-43. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
-44. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
-45. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
-46. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
-47. Publishing side-effect audit operation values use `backend/operations.py`.
-48. Gated adapter operation values use `backend/operations.py` directly.
-49. Slack source labels, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
-50. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
-51. Source ingestion approved-domain defaults, rejection messages, and registry metadata keys use `backend/source_ingestion_contracts.py`.
-52. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
-53. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
-54. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
-55. Production readiness env, runbook, and command validation detail messages use `backend/readiness.py`.
-56. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
-57. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
+5. Safety Service API metadata and route paths use `backend/api_contracts.py`.
+6. OPA owns policy authorization.
+7. PostgreSQL owns request, source, cache, and audit records.
+8. Qdrant owns vector retrieval.
+9. MinIO owns generated files and source snapshots.
+10. Redis/Celery/Dagster own background execution state.
+11. ComfyUI owns image workflow execution.
+12. External write actions require a signed execution envelope.
+13. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, direct image-provenance text hashes, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
+14. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
+15. RequestMetadata workspace/agent mapping uses `backend/request_metadata.py`.
+16. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
+17. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
+18. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
+19. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
+20. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
+21. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
+22. Generated-image review status vocabulary and checks use `backend/review_status.py`.
+23. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
+24. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
+25. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
+26. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards use `backend/connection_settings.py`.
+27. LLM smoke request prompts, reasoning effort, thinking mode, timeout, request payload construction, runtime secret lookup, and redacted request recording use `backend/llm_api_smoke.py`.
+28. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
+29. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
+30. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.
+31. Connector URL/domain, relative API path validation, and URL validation messages use `backend/url_utils.py`.
+32. Connector HTTP method vocabulary, normalization, and validation messages use `backend/http_methods.py`.
+33. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+34. Classifier confidence and reason formatting use `backend/classification_contracts.py`.
+35. Request kind, channel, operation, and audit event type contracts use `backend/interface_types.py`.
+36. Telemetry stages, log levels, and event-message formatting use `backend/observability.py`.
+37. Publishing outcome statuses use `backend/publishing_status.py`.
+38. Pydantic model/dict coercion and validation messages at service, adapter, and domain boundaries call `backend/model_coercion.py` directly.
+39. Knowledge Agent names, retrieval artifact types, approved-source payload flags, collection defaults, policy notes, and summary vocabulary use `backend/knowledge_contracts.py`.
+40. Observability fields and metric tags use `backend/audit.py` redacted mapping helpers for telemetry-safe dict payloads.
+41. ComfyUI generated-image URI conventions, response image validation messages, and response image storage references use `backend/comfyui_contracts.py`.
+42. Source registry missing-row messages, dependency-role defaults, and initial change-sequence defaults use `backend/source_registry_contracts.py`.
+43. Execution-envelope validation failure and required-envelope messages use `backend/execution_gate_messages.py`.
+44. Secret-like value detection, assignment scanning, and redaction use `backend/secret_redaction.py`.
+45. Reviewable text-file suffixes and recursive scanner discovery use `backend/file_scanning.py`.
+46. Markdown heading extraction for documentation validators uses `backend/markdown_utils.py`.
+47. Optional source registry row lookup uses `SourceFreshnessRegistry.find_source` and `SourceFreshnessRegistry.find_source_by_id`.
+48. Publishing side-effect audit operation values use `backend/operations.py`.
+49. Gated adapter operation values use `backend/operations.py` directly.
+50. Slack source labels, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
+51. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
+52. Source ingestion approved-domain defaults, rejection messages, and registry metadata keys use `backend/source_ingestion_contracts.py`.
+53. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
+54. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
+55. Production readiness backup directories, container dump paths, and MinIO aliases use `backend/readiness_paths.py`.
+56. Production readiness env, runbook, and command validation detail messages use `backend/readiness.py`.
+57. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
+58. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
 ```
 
 ## Standard Request Envelope

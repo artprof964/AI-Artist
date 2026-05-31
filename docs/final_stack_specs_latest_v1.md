@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 438 passed, 1 skipped, 1 warning
+Final validation: 439 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -47,7 +47,8 @@ evaluation, execution-envelope signing, audit event recording.
 ## Backend Modules
 
 ```text
-backend/app.py: FastAPI endpoints.
+backend/api_contracts.py: shared FastAPI app metadata and Safety Service route paths.
+backend/app.py: FastAPI endpoints using shared API contracts.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/health_contracts.py: shared Safety Service health status, service name, response payload, and readiness signal.
@@ -139,6 +140,9 @@ private webhook secrets.
 Safety Service health status, service name, response payload, and readiness
 expected-signal text must flow through backend/health_contracts.py before
 endpoint, schema, or runbook readiness health-check logic is changed.
+Safety Service API metadata and route paths must flow through
+backend/api_contracts.py before FastAPI decorators, endpoint tests, or
+interface docs change.
 Connection names, defaults, secret aliases, target setting fields, endpoint URL
 composition, env-example rendering/parsing, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards must be changed through
 backend/connection_settings.py before adapter-specific code; the standard LLM
