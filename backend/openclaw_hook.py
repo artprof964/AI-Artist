@@ -3,6 +3,7 @@ from typing import Any, Protocol
 from uuid import UUID, uuid4
 
 from backend.observability import record_observability_stage
+from backend.request_identity import prefixed_trace_id
 from backend.schemas import (
     Operation,
     PolicyEvaluateRequest,
@@ -22,7 +23,7 @@ class ToolCallRequest:
     policy_scope: str
     arguments: dict[str, Any] = field(default_factory=dict)
     metadata: dict[str, Any] = field(default_factory=dict)
-    correlation_id: str = field(default_factory=lambda: f"tool-call:{uuid4()}")
+    correlation_id: str = field(default_factory=lambda: prefixed_trace_id("tool-call"))
     request_id: UUID = field(default_factory=uuid4)
     source_freshness: SourceFreshness = field(default_factory=SourceFreshness)
 

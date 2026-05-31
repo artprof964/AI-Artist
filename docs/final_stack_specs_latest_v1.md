@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 250 passed, 1 skipped, 1 warning
+Final validation: 251 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -51,7 +51,7 @@ backend/app.py: FastAPI endpoints.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope.
 backend/schemas.py: API and SubAgentOutput schemas.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, deterministic ID helpers, and version tags.
-backend/request_identity.py: request text normalization, fingerprints, and stable request UUIDs.
+backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction.
 backend/response_fields.py: shared provider response field access and shape validation.
@@ -119,9 +119,9 @@ adapter-specific agents persist tool-call audit events.
 Canonical JSON, SHA-256 digests, deterministic local IDs, and version tags must
 flow through backend/canonical_hash.py before request fingerprints, artifact
 hashes, source snapshot versions, signatures, or mocked external IDs are created.
-Request text normalization, fingerprint wrappers, and stable channel request
-UUIDs must flow through backend/request_identity.py before service or adapter
-specific request identity logic is added.
+Request text normalization, fingerprint wrappers, stable channel request UUIDs,
+and prefixed runtime trace IDs must flow through backend/request_identity.py
+before service or adapter specific request identity logic is added.
 UTC datetime creation and normalization must flow through backend/time_utils.py
 before cache, provenance, execution gate, source freshness, observability, or
 future persistence time comparisons are added.

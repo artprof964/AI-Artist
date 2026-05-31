@@ -21,7 +21,7 @@ can be marked done.
 9. ComfyUI owns image workflow execution.
 10. External write actions require a signed execution envelope.
 11. Canonical hashes, deterministic local IDs, and source version tags are produced through `backend/canonical_hash.py`.
-12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
+12. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 13. Connection names, defaults, secret aliases, and runtime env resolution use `backend/connection_settings.py`.
 14. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
 15. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
@@ -185,7 +185,7 @@ Output:
 2. Normalize
    - Safety Service canonicalizes request text and builds a stable fingerprint.
    - Canonical JSON and SHA-256 digest creation flows through the shared hash helper.
-   - Channel adapters use the shared request identity helper for text normalization and stable event ids.
+   - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
 
 3. Classify
    - Safety Service classifies request as read, action, or mixed.

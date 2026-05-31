@@ -1,8 +1,9 @@
-from uuid import NAMESPACE_URL, uuid5
+from uuid import NAMESPACE_URL, UUID, uuid5
 
 from backend.canonical_hash import sha256_json
 from backend.request_identity import (
     normalize_request_text,
+    prefixed_trace_id,
     request_fingerprint,
     stable_request_uuid,
 )
@@ -32,3 +33,11 @@ def test_stable_request_uuid_uses_namespace_and_empty_string_for_missing_parts()
         NAMESPACE_URL,
         "slack:Ev123::C456:U789:1717142400.000100",
     )
+
+
+def test_prefixed_trace_id_builds_runtime_uuid_trace_identifier() -> None:
+    trace_id = prefixed_trace_id("tool-call")
+    prefix, raw_uuid = trace_id.split(":", maxsplit=1)
+
+    assert prefix == "tool-call"
+    assert UUID(raw_uuid)
