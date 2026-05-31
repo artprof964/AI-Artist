@@ -22,6 +22,7 @@ from backend.operations import (
     is_sensitive_operation,
 )
 from backend.request_identity import normalize_request_text, request_fingerprint
+from backend.request_metadata import request_metadata_fields
 from backend.reason_messages import (
     READ_ENVELOPE_NOT_REQUIRED,
     READ_POLICY_ALLOWED,
@@ -54,13 +55,13 @@ def normalize_text(request_text: str) -> str:
 
 def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
     canonical_text = normalize_text(payload.request_text)
+    metadata_fields = request_metadata_fields(payload.metadata)
     fingerprint_payload = {
         "request_text": canonical_text,
         "requester_scope": payload.requester_scope,
         "policy_scope": payload.policy_scope,
         "channel": payload.channel,
-        "workspace": payload.metadata.workspace,
-        "agent": payload.metadata.agent,
+        **metadata_fields,
     }
     fingerprint = request_fingerprint(fingerprint_payload)
     response = CanonicalizeResponse(
@@ -81,14 +82,12 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
         metric_name="ai_artist.request.canonicalized.total",
         metric_tags={
             "channel": payload.channel,
-            "workspace": payload.metadata.workspace,
-            "agent": payload.metadata.agent,
+            **metadata_fields,
         },
         message="request canonicalized",
         fields={
             "channel": payload.channel,
-            "workspace": payload.metadata.workspace,
-            "agent": payload.metadata.agent,
+            **metadata_fields,
             "request_fingerprint": response.request_fingerprint,
         },
     )

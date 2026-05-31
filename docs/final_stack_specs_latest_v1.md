@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 355 passed, 1 skipped, 1 warning
+Final validation: 357 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -54,6 +54,7 @@ backend/health_contracts.py: shared Safety Service health status, service name, 
 backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, and security-review serialization.
 backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
+backend/request_metadata.py: shared RequestMetadata workspace/agent mapping for fingerprints and observability fields.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache, source-freshness, policy, and execution-envelope reason strings.
@@ -155,6 +156,9 @@ hashes, source snapshot versions, signatures, mocked external IDs, or security-r
 Request text normalization, fingerprint wrappers, stable channel request UUIDs,
 and prefixed runtime trace IDs must flow through backend/request_identity.py
 before service or adapter specific request identity logic is added.
+RequestMetadata workspace/agent mapping must flow through
+backend/request_metadata.py before service fingerprinting, observability metric
+tags, or structured observability fields are built.
 Runtime UUIDs and prefixed runtime IDs must flow through
 backend/runtime_ids.py before service, schema, adapter, orchestration,
 freshness, retrieval, or review-specific runtime IDs are created.

@@ -40,6 +40,7 @@
 - `../../validation_reports/review_status_standardization_2026-05-31.md`
 - `../../validation_reports/interface_types_standardization_2026-05-31.md`
 - `../../backend/request_identity.py`
+- `../../backend/request_metadata.py`
 - `../../backend/interface_types.py`
 - `../../backend/runtime_ids.py`
 - `../../backend/mapping_utils.py`
@@ -49,6 +50,7 @@
 - `../../backend/mock_agent_contracts.py`
 - `../../backend/review_status.py`
 - `../../tests/test_request_identity.py`
+- `../../tests/test_request_metadata.py`
 - `../../tests/test_interface_types.py`
 - `../../tests/test_runtime_ids.py`
 - `../../tests/test_mapping_utils.py`
@@ -57,6 +59,7 @@
 - `../../tests/test_subagent_output_contracts.py`
 - `../../tests/test_review_status.py`
 - `../../validation_reports/t11_subagent_output_schema_validation_2026-05-31.md`
+- `../../validation_reports/request_metadata_mapping_standardization_2026-05-31.md`
 - `../../validation_reports/t12_mock_subagents_validation_2026-05-31.md`
 - `../../validation_reports/t13_response_cache_validation_2026-05-31.md`
 - `../../validation_reports/response_cache_boundary_standardization_2026-05-31.md`
