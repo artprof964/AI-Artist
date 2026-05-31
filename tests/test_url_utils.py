@@ -1,6 +1,15 @@
 import pytest
 
 from backend.url_utils import URLValidationError, http_url_domain, safe_relative_api_path
+from backend.url_utils import (
+    API_PATH_ABSOLUTE_MESSAGE,
+    API_PATH_CONTROL_MESSAGE,
+    API_PATH_RELATIVE_MESSAGE,
+    API_PATH_SLASH_MESSAGE,
+    API_PATH_TRAVERSAL_MESSAGE,
+    API_PATH_TYPE_MESSAGE,
+    HTTP_URL_ABSOLUTE_MESSAGE,
+)
 
 
 class CustomURLError(ValueError):
@@ -24,6 +33,16 @@ def test_http_url_domain_rejects_non_absolute_http_urls(uri: str) -> None:
         http_url_domain(uri)
 
 
+def test_url_validation_messages_are_centralized() -> None:
+    assert HTTP_URL_ABSOLUTE_MESSAGE == "URL must be an absolute http(s) URL"
+    assert API_PATH_TYPE_MESSAGE == "API path must be a string"
+    assert API_PATH_ABSOLUTE_MESSAGE == "API path must not be an absolute URL"
+    assert API_PATH_RELATIVE_MESSAGE == "API path must be relative and start with /"
+    assert API_PATH_SLASH_MESSAGE == "API path must use forward slashes"
+    assert API_PATH_CONTROL_MESSAGE == "API path must not contain control characters"
+    assert API_PATH_TRAVERSAL_MESSAGE == "API path must not contain traversal segments"
+
+
 def test_http_url_domain_allows_custom_error_type_and_message() -> None:
     with pytest.raises(CustomURLError, match="custom URL message"):
         http_url_domain(
@@ -40,14 +59,14 @@ def test_safe_relative_api_path_trims_and_accepts_forward_slash_paths() -> None:
 
 
 @pytest.mark.parametrize(
-    ("path", "match"),
-    [
-        ("https://api.github.com/repos/artprof964/AI-Art/issues", "absolute URL"),
-        ("//api.github.com/repos/artprof964/AI-Art/issues", "absolute URL"),
-        ("repos/artprof964/AI-Art/issues", "start with /"),
-        ("/repos\\artprof964\\AI-Art\\issues", "forward slashes"),
-        ("/repos/artprof964/AI-Art/issues\n/1", "control characters"),
-        ("/repos/artprof964/AI-Art/../issues", "traversal"),
+        ("path", "match"),
+        [
+        ("https://api.github.com/repos/artprof964/AI-Art/issues", API_PATH_ABSOLUTE_MESSAGE),
+        ("//api.github.com/repos/artprof964/AI-Art/issues", API_PATH_ABSOLUTE_MESSAGE),
+        ("repos/artprof964/AI-Art/issues", API_PATH_RELATIVE_MESSAGE),
+        ("/repos\\artprof964\\AI-Art\\issues", API_PATH_SLASH_MESSAGE),
+        ("/repos/artprof964/AI-Art/issues\n/1", API_PATH_CONTROL_MESSAGE),
+        ("/repos/artprof964/AI-Art/../issues", API_PATH_TRAVERSAL_MESSAGE),
     ],
 )
 def test_safe_relative_api_path_rejects_unsafe_shapes(path: str, match: str) -> None:

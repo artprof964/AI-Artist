@@ -7,6 +7,15 @@ class URLValidationError(ValueError):
     """Raised when a URL or path does not meet a connector boundary contract."""
 
 
+HTTP_URL_ABSOLUTE_MESSAGE = "URL must be an absolute http(s) URL"
+API_PATH_TYPE_MESSAGE = "API path must be a string"
+API_PATH_ABSOLUTE_MESSAGE = "API path must not be an absolute URL"
+API_PATH_RELATIVE_MESSAGE = "API path must be relative and start with /"
+API_PATH_SLASH_MESSAGE = "API path must use forward slashes"
+API_PATH_CONTROL_MESSAGE = "API path must not contain control characters"
+API_PATH_TRAVERSAL_MESSAGE = "API path must not contain traversal segments"
+
+
 def http_url_domain(
     value: str,
     *,
@@ -16,7 +25,7 @@ def http_url_domain(
 ) -> str:
     parsed = urlparse(value)
     if parsed.scheme.lower() not in allowed_schemes or not parsed.netloc:
-        raise error_type(message or "URL must be an absolute http(s) URL")
+        raise error_type(message or HTTP_URL_ABSOLUTE_MESSAGE)
     return (parsed.hostname or "").lower()
 
 
@@ -24,12 +33,12 @@ def safe_relative_api_path(
     value: str,
     *,
     error_type: type[Exception] = URLValidationError,
-    type_message: str = "API path must be a string",
-    absolute_message: str = "API path must not be an absolute URL",
-    relative_message: str = "API path must be relative and start with /",
-    slash_message: str = "API path must use forward slashes",
-    control_message: str = "API path must not contain control characters",
-    traversal_message: str = "API path must not contain traversal segments",
+    type_message: str = API_PATH_TYPE_MESSAGE,
+    absolute_message: str = API_PATH_ABSOLUTE_MESSAGE,
+    relative_message: str = API_PATH_RELATIVE_MESSAGE,
+    slash_message: str = API_PATH_SLASH_MESSAGE,
+    control_message: str = API_PATH_CONTROL_MESSAGE,
+    traversal_message: str = API_PATH_TRAVERSAL_MESSAGE,
 ) -> str:
     if not isinstance(value, str):
         raise error_type(type_message)
@@ -50,6 +59,13 @@ def safe_relative_api_path(
 
 
 __all__ = [
+    "API_PATH_ABSOLUTE_MESSAGE",
+    "API_PATH_CONTROL_MESSAGE",
+    "API_PATH_RELATIVE_MESSAGE",
+    "API_PATH_SLASH_MESSAGE",
+    "API_PATH_TRAVERSAL_MESSAGE",
+    "API_PATH_TYPE_MESSAGE",
+    "HTTP_URL_ABSOLUTE_MESSAGE",
     "URLValidationError",
     "http_url_domain",
     "safe_relative_api_path",

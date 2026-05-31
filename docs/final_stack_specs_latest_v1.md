@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 429 passed, 1 skipped, 1 warning
+Final validation: 430 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -69,7 +69,7 @@ backend/numeric_utils.py: shared numeric clamps, averages, vector similarity, an
 backend/time_utils.py: shared UTC datetime creation and normalization for runtime code and tests.
 backend/payload_fields.py: shared connector payload string-field and nested-object extraction plus payload validation messages.
 backend/response_fields.py: shared provider response field access, first-choice message parsing, shape validation, and response validation messages.
-backend/url_utils.py: shared URL domain and relative API path validation.
+backend/url_utils.py: shared URL domain and relative API path validation plus URL validation messages.
 backend/http_methods.py: shared HTTP method vocabulary, normalization, and validation messages for connector boundaries.
 backend/file_scanning.py: shared reviewable text-file suffixes and recursive scanner file discovery.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
@@ -243,9 +243,9 @@ response parsing logic is added.
 Source ingestion approved-domain defaults and rejection text must flow through
 backend/source_ingestion_contracts.py before ingestion allowlists or rejection
 messages are changed.
-URL/domain extraction and relative API path validation must flow through
-backend/url_utils.py before connector-specific URL allowlist or path-safety
-logic is added.
+URL/domain extraction, relative API path validation, and URL validation messages
+must flow through backend/url_utils.py before connector-specific URL allowlist or
+path-safety logic is added.
 HTTP method vocabulary, normalization, and validation messages must flow through
 backend/http_methods.py before connector-specific method allowlists are added.
 GitHub adapter action labels, target labels, API validation messages, token
