@@ -53,12 +53,8 @@ POLICY_VERSION = "local-default-deny-v0"
 LOCAL_ENVELOPE_SIGNING_KEY = b"ai-artist-local-safety-service-dev-key"
 
 
-def normalize_text(request_text: str) -> str:
-    return normalize_request_text(request_text, lowercase=True)
-
-
 def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
-    canonical_text = normalize_text(payload.request_text)
+    canonical_text = normalize_request_text(payload.request_text)
     metadata_fields = request_metadata_fields(payload.metadata)
     fingerprint_payload = {
         "request_text": canonical_text,
@@ -99,8 +95,8 @@ def canonicalize_request(payload: CanonicalizeRequest) -> CanonicalizeResponse:
 
 
 def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
-    text = normalize_text(payload.request_text)
-    terms = set(normalized_terms(text))
+    text = normalize_request_text(payload.request_text)
+    terms = set(identifier_tokens(text))
     has_action = bool(terms & ACTION_TERMS)
     has_read = bool(terms & READ_TERMS)
     operation = infer_operation(terms, payload.operation)
@@ -132,10 +128,6 @@ def classify_request(payload: ClassifyRequest) -> ClassifyResponse:
         },
     )
     return response
-
-
-def normalized_terms(value: str) -> set[str]:
-    return set(identifier_tokens(normalize_text(value)))
 
 
 def evaluate_policy(payload: PolicyEvaluateRequest) -> PolicyEvaluateResponse:
@@ -255,8 +247,6 @@ __all__ = [
     "create_execution_envelope",
     "evaluate_policy",
     "list_audit_events_by_correlation_id",
-    "normalize_text",
-    "normalized_terms",
     "record_audit_event",
     "SENSITIVE_OPERATIONS",
 ]

@@ -47,6 +47,15 @@ def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None
     assert first.request_fingerprint != third.request_fingerprint
 
 
+def test_service_uses_shared_text_normalization_and_tokenization_directly() -> None:
+    source = read_backend_module_text("service.py", REPO_ROOT)
+
+    assert "def normalize_text(" not in source
+    assert "def normalized_terms(" not in source
+    assert "normalize_request_text(payload.request_text)" in source
+    assert "identifier_tokens(text)" in source
+
+
 @pytest.mark.parametrize(
     ("request_text", "explicit_operation", "expected_operation", "expected_kind"),
     [

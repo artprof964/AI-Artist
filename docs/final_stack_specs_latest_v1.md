@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 394 passed, 1 skipped, 1 warning
+Final validation: 395 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -54,7 +54,7 @@ backend/health_contracts.py: shared Safety Service health status, service name, 
 backend/classification_contracts.py: shared classifier confidence and reason formatting.
 backend/interface_types.py: shared request kind, channel, operation, and audit event type contracts for schemas and runtime modules.
 backend/canonical_hash.py: canonical JSON, SHA-256 digests, canonical HMAC signatures, deterministic ID helpers, version tags, security-review serialization, deterministic test serialization, and deterministic test text hashes.
-backend/request_identity.py: request text normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
+backend/request_identity.py: request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable request UUIDs, and prefixed runtime trace IDs.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping for fingerprints and observability fields.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -63,7 +63,7 @@ backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, a
 backend/subagent_output_contracts.py: shared SubAgentOutput construction and model-coercion boundary.
 backend/review_status.py: shared generated-image review status vocabulary and checks.
 backend/critic_rubric.py: shared Critic/Curator rubric categories and pass/fail decision vocabulary.
-backend/text_utils.py: shared text tokenization, label normalization, and contextual snippets.
+backend/text_utils.py: shared text tokenization, direct Safety Service classifier token parsing, label normalization, and contextual snippets.
 backend/markdown_utils.py: shared Markdown heading extraction for documentation validators.
 backend/numeric_utils.py: shared numeric clamps, averages, and vector similarity.
 backend/time_utils.py: shared UTC datetime creation and normalization for runtime code and tests.
@@ -179,6 +179,8 @@ hashes, source snapshot versions, signatures, mocked external IDs, security-revi
 Request text normalization, fingerprint wrappers, stable channel request UUIDs,
 and prefixed runtime trace IDs must flow through backend/request_identity.py
 before service or adapter specific request identity logic is added.
+Safety Service canonicalization and classification must call
+backend/request_identity.py directly for request text normalization.
 RequestMetadata workspace/agent mapping must flow through
 backend/request_metadata.py before service fingerprinting, observability metric
 tags, or structured observability fields are built.
@@ -212,6 +214,8 @@ backend/critic_rubric.py before scorer-specific rubric logic is added.
 Text tokenization, label/tag normalization, and contextual snippets must flow through
 backend/text_utils.py before classifier, retrieval, or rubric-specific token
 parsing logic is added.
+Safety Service classification must call backend/text_utils.py directly for
+classifier token parsing.
 Markdown heading extraction must flow through backend/markdown_utils.py before
 readiness or future documentation validators inspect section headings.
 Numeric clamps, rounded averages, and vector similarity must flow through

@@ -22,7 +22,7 @@ can be marked done.
 10. ComfyUI owns image workflow execution.
 11. External write actions require a signed execution envelope.
 12. Canonical JSON, hashes, HMAC signatures, deterministic local IDs, source version tags, security-review serialization, deterministic test serialization, and deterministic test text hashes are produced through `backend/canonical_hash.py`.
-13. Request text normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
+13. Request text normalization, direct Safety Service canonicalization/classification normalization, fingerprints, stable channel UUIDs, and prefixed runtime trace IDs are produced through `backend/request_identity.py`.
 14. RequestMetadata workspace/agent mapping uses `backend/request_metadata.py`.
 15. Runtime UUIDs and prefixed runtime IDs use `backend/runtime_ids.py`.
 16. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
@@ -32,7 +32,7 @@ can be marked done.
 20. Mock sub-agent names, artifact types, output text, error text, synthesis text, and orchestration telemetry use `backend/mock_agent_contracts.py`.
 21. Generated-image review status vocabulary and checks use `backend/review_status.py`.
 22. Critic/Curator rubric categories and decisions use `backend/critic_rubric.py`.
-23. Text tokenization, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
+23. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
 24. Numeric clamps, rounded averages, and vector similarity use `backend/numeric_utils.py` directly at scoring boundaries.
 25. Connection names, target setting fields, defaults, secret aliases, endpoint URL composition, env-example rendering, and runtime env resolution/access guards use `backend/connection_settings.py`.
 26. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
