@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 500 passed, 1 warning
+Final validation: 501 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -109,7 +109,7 @@ backend/llm_api_contracts.py: shared provider-neutral LLM chat request field nam
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path using shared LLM request/result contracts.
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
-backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes.
+backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, vector payload fields/shape, approved payload flag, collection default, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result score cutoff/precision, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, embedding, vector-search, and result-score boundaries.

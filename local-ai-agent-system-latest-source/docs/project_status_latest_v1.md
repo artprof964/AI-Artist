@@ -60,7 +60,7 @@ Source ingestion contracts and registry metadata payloads: centralized in backen
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
 Sub-agent output construction: centralized in backend/subagent_output_contracts.py
-Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes
+Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes
 Knowledge Agent contracts, vector payload fields, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, and result-score cutoff/precision: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and pass/fail helpers: centralized in backend/critic_rubric.py
@@ -173,7 +173,7 @@ Source freshness contracts: shared across schema defaults, unchanged-source chec
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
-Mock agent contracts: shared across mock orchestration routing, simulation metadata, artifacts, output text, error text, synthesis text, telemetry events/messages/metrics, telemetry field/tag shapes, and tests
+Mock agent contracts: shared across mock orchestration routing, simulation metadata lookup, artifacts, output text, error text, synthesis text, telemetry events/messages/metrics, telemetry field/tag shapes, and tests
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, vector payload construction/reading, approved-hit filtering, artifact metadata, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary and scoring contracts: shared across Critic/Curator scoring, score conversion, pass/fail decisions, and rubric tests
@@ -228,6 +228,7 @@ service text boundary validation: 3 focused files passed; Safety Service guarded
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
 ComfyUI response contract validation: 22 focused tests passed; response image field names and storage-reference fallback centralized in comfyui_contracts.py
+mock simulation metadata validation: 7 focused tests passed; mock-agent status simulation metadata field and lookup centralized in mock_agent_contracts.py
 runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
@@ -238,7 +239,7 @@ adapter result field validation: 48 focused tests passed; gated adapter result e
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 runtime field contract validation: 17 focused tests passed; service observability and OpenClaw policy telemetry field names share runtime_field_contracts.py
 knowledge vector payload validation: 20 focused tests passed; vector payload fields and payload construction centralized in knowledge_contracts.py
-final pytest: 500 passed, 1 warning
+final pytest: 501 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

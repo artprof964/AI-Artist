@@ -34,6 +34,7 @@ from backend.mock_agent_contracts import (
     MOCK_ORCHESTRATION_START_EVENT,
     MOCK_SYNTHESIS_EMPTY_OUTPUTS,
     MOCK_SYNTHESIS_SEPARATOR,
+    mock_agent_status_simulation,
     mock_orchestration_completed_fields,
     mock_orchestration_completed_metric_tags,
     mock_orchestration_started_fields,
@@ -92,8 +93,7 @@ class MockOrchestrationResult(BaseModel):
 
 
 def _should_simulate(request: MockAgentRequest, agent_name: str, status: SubAgentStatus) -> bool:
-    simulations = request.metadata.get("simulate_agent_statuses", {})
-    return isinstance(simulations, dict) and simulations.get(agent_name) == status
+    return mock_agent_status_simulation(request.metadata, agent_name=agent_name) == status
 
 
 def _knowledge_agent(request: MockAgentRequest) -> SubAgentOutput:

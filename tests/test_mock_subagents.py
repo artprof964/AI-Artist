@@ -41,8 +41,10 @@ from backend.mock_agent_contracts import (
     MOCK_ORCHESTRATION_STARTED_METRIC,
     MOCK_ORCHESTRATION_START_EVENT,
     MOCK_ORCHESTRATION_TASK_ID_FIELD,
+    MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY,
     MOCK_SYNTHESIS_EMPTY_OUTPUTS,
     MOCK_SYNTHESIS_SEPARATOR,
+    mock_agent_status_simulation,
     mock_orchestration_completed_fields,
     mock_orchestration_completed_metric_tags,
     mock_orchestration_started_fields,
@@ -102,7 +104,11 @@ def test_mock_subagent_orchestration_aggregates_retry_status_and_errors() -> Non
     request = MockAgentRequest(
         task_id=TASK_ID,
         request_text="Plan a safe local image concept from workspace context.",
-        metadata={"simulate_agent_statuses": {MOCK_AGENT_IMAGE_PLANNER: "needs_retry"}},
+        metadata={
+            MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY: {
+                MOCK_AGENT_IMAGE_PLANNER: "needs_retry"
+            }
+        },
     )
 
     result = run_mock_subagent_orchestration(request)
@@ -184,6 +190,28 @@ def test_mock_agent_contract_vocabulary_is_centralized() -> None:
     assert MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD == "artifact_count"
     assert MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD == "source_count"
     assert MOCK_ORCHESTRATION_ERROR_COUNT_FIELD == "error_count"
+    assert MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY == "simulate_agent_statuses"
+
+
+def test_mock_agent_status_simulation_metadata_lookup_is_centralized() -> None:
+    assert (
+        mock_agent_status_simulation(
+            {
+                MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY: {
+                    MOCK_AGENT_IMAGE_PLANNER: "needs_retry"
+                }
+            },
+            agent_name=MOCK_AGENT_IMAGE_PLANNER,
+        )
+        == "needs_retry"
+    )
+    assert (
+        mock_agent_status_simulation(
+            {MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY: "not-a-mapping"},
+            agent_name=MOCK_AGENT_IMAGE_PLANNER,
+        )
+        is None
+    )
 
 
 def test_mock_orchestration_telemetry_shapes_are_centralized() -> None:
@@ -264,6 +292,8 @@ def test_orchestrator_uses_shared_mock_agent_contracts() -> None:
     assert "mock_orchestration_started_fields(" in source
     assert "mock_orchestration_completed_metric_tags(" in source
     assert "mock_orchestration_completed_fields(" in source
+    assert "mock_agent_status_simulation(" in source
+    assert '"simulate_agent_statuses"' not in source
     forbidden_telemetry_shapes = [
         '"agent_count": len(MOCK_SUB_AGENTS)',
         '"status": result.status',

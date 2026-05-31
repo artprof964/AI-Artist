@@ -74,6 +74,18 @@ MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD = "status_counts"
 MOCK_ORCHESTRATION_ARTIFACT_COUNT_FIELD = "artifact_count"
 MOCK_ORCHESTRATION_SOURCE_COUNT_FIELD = "source_count"
 MOCK_ORCHESTRATION_ERROR_COUNT_FIELD = "error_count"
+MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY = "simulate_agent_statuses"
+
+
+def mock_agent_status_simulation(
+    metadata: dict[str, object],
+    *,
+    agent_name: str,
+) -> object:
+    simulations = metadata.get(MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY, {})
+    if not isinstance(simulations, dict):
+        return None
+    return simulations.get(agent_name)
 
 
 def mock_orchestration_started_metric_tags(*, agent_count: int) -> dict[str, int]:
@@ -164,8 +176,10 @@ __all__ = [
     "MOCK_ORCHESTRATION_STATUS_COUNTS_FIELD",
     "MOCK_ORCHESTRATION_STATUS_FIELD",
     "MOCK_ORCHESTRATION_TASK_ID_FIELD",
+    "MOCK_SIMULATE_AGENT_STATUSES_METADATA_KEY",
     "MOCK_SYNTHESIS_EMPTY_OUTPUTS",
     "MOCK_SYNTHESIS_SEPARATOR",
+    "mock_agent_status_simulation",
     "mock_orchestration_completed_fields",
     "mock_orchestration_completed_metric_tags",
     "mock_orchestration_started_fields",
