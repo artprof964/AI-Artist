@@ -59,6 +59,9 @@
 - `../../tests/test_github_adapter.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
+- `../../validation_reports/response_fields_standardization_2026-05-31.md`
+- `../../backend/response_fields.py`
+- `../../tests/test_response_fields.py`
 - `../../tests/test_safety_service_units.py`
 - `../../.github/workflows/t24-safety-unit-ci.yml`
 - `../../scripts/run_t24_unit_ci.ps1`

@@ -8,6 +8,7 @@ from backend.connection_settings import (
     DEEPSEEK_OPEN_ART_ENV_VAR,
     load_connection_settings,
 )
+from backend.response_fields import field_value
 from backend.secret_redaction import REDACTED_SECRET_VALUE, redact_secret_value
 
 
@@ -88,22 +89,16 @@ def run_llm_api_smoke_test(
                 "json": request_body,
             }
         ),
-        "response_id": _read_attr_or_key(response, "id"),
-        "model": _read_attr_or_key(response, "model", config.primary_model),
+        "response_id": field_value(response, "id"),
+        "model": field_value(response, "model", config.primary_model),
         "content": _first_choice_content(response),
     }
 
 
-def _read_attr_or_key(value: Any, key: str, default: Any = None) -> Any:
-    if isinstance(value, dict):
-        return value.get(key, default)
-    return getattr(value, key, default)
-
-
 def _first_choice_content(response: Any) -> str | None:
-    choices = _read_attr_or_key(response, "choices", [])
+    choices = field_value(response, "choices", [])
     if not choices:
         return None
     first_choice = choices[0]
-    message = _read_attr_or_key(first_choice, "message", {})
-    return _read_attr_or_key(message, "content")
+    message = field_value(first_choice, "message", {})
+    return field_value(message, "content")

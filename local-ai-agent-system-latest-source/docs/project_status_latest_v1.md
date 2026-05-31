@@ -31,6 +31,7 @@ Canonical hashing: centralized in backend/canonical_hash.py
 Request identity: centralized in backend/request_identity.py
 Time creation/normalization: centralized in backend/time_utils.py
 Payload fields: centralized in backend/payload_fields.py
+Response fields: centralized in backend/response_fields.py
 URL validation: centralized in backend/url_utils.py
 Operations: centralized in backend/operations.py
 Model coercion: centralized in backend/model_coercion.py
@@ -97,6 +98,7 @@ Canonical hashing: shared across Safety Service request fingerprints, execution-
 Request identity: shared across Safety Service canonicalization/classification and Slack request normalization
 Time creation/normalization: shared across cache expiry checks, image provenance timestamps, source freshness, source ingestion, observability, service envelope issuance, and execution-envelope expiry validation
 Payload fields: shared across Slack event parsing and generated image metadata parsing
+Response fields: shared across provider-neutral LLM API response parsing, ComfyUI image response parsing, and publishing audit status parsing
 URL validation: shared across GitHub API path safety and source-ingestion domain allowlisting
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Model coercion: shared across execution-envelope validation, image provenance input, and critic metadata scoring
@@ -111,7 +113,7 @@ docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 7 passed; prompt/memory secrets, audit redaction, observability redaction, policy bypass controls, and artifact prompt-hash handling validated
 T28 production readiness: 5 passed; runbook, env schema, health checks, backup commands, restore checks, retention, and contacts validated
-final pytest: 239 passed, 1 skipped, 1 warning
+final pytest: 245 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

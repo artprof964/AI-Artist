@@ -7,6 +7,7 @@ from typing import Any, Literal, Protocol
 from backend.canonical_hash import sha256_json, sha256_text as canonical_sha256_text
 from backend.model_coercion import coerce_model
 from backend.payload_fields import optional_string_field, required_string_field
+from backend.response_fields import field_value, required_response_list, require_response_mapping
 from backend.time_utils import as_utc, utc_now
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -131,14 +132,20 @@ def record_comfyui_image_provenance(
     review_status: ReviewStatus,
     store: ImageProvenanceStore = image_provenance_store,
 ) -> list[ImageProvenanceRecord]:
-    images = client_response.get("images")
-    if not isinstance(images, list) or not images:
-        raise ImageProvenanceError("client response must include generated images")
+    images = required_response_list(
+        client_response,
+        "images",
+        error_type=ImageProvenanceError,
+        message="client response must include generated images",
+    )
 
     records: list[ImageProvenanceRecord] = []
     for image in images:
-        if not isinstance(image, dict):
-            raise ImageProvenanceError("generated image entries must be objects")
+        image_response = require_response_mapping(
+            image,
+            error_type=ImageProvenanceError,
+            message="generated image entries must be objects",
+        )
 
         records.append(
             store.record(
@@ -148,7 +155,8 @@ def record_comfyui_image_provenance(
                     "model": model,
                     "seed": seed,
                     "source_refs": source_refs,
-                    "storage_uri": image.get("storage_uri") or _storage_uri_from_comfyui_image(image),
+                    "storage_uri": field_value(image_response, "storage_uri")
+                    or _storage_uri_from_comfyui_image(image_response),
                     "review_status": review_status,
                 }
             )
@@ -188,22 +196,23 @@ def _coerce_provenance_input(
     return coerce_model(provenance, ImageProvenanceInput)
 
 
-def _storage_uri_from_comfyui_image(image: dict[str, Any]) -> str:
+def _storage_uri_from_comfyui_image(image: dict[str, Any] | Any) -> str:
+    image_payload = dict(image)
     filename = required_string_field(
-        image,
+        image_payload,
         "filename",
         error_type=ImageProvenanceError,
         message="generated image must include filename or storage_uri",
     )
     image_type = required_string_field(
-        {"type": image.get("type", "output")},
+        {"type": field_value(image_payload, "type", "output")},
         "type",
         error_type=ImageProvenanceError,
         message="generated image type must be a non-empty string",
     )
     subfolder = (
         optional_string_field(
-            image,
+            image_payload,
             "subfolder",
             error_type=ImageProvenanceError,
             message="generated image subfolder must be a string",

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 239 passed, 1 skipped, 1 warning
+Final validation: 245 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -54,6 +54,7 @@ backend/canonical_hash.py: canonical JSON, SHA-256 digests, deterministic ID hel
 backend/request_identity.py: request text normalization, fingerprints, and stable request UUIDs.
 backend/time_utils.py: shared UTC datetime creation and normalization.
 backend/payload_fields.py: shared connector payload string-field extraction.
+backend/response_fields.py: shared provider response field access and shape validation.
 backend/url_utils.py: shared URL domain and relative API path validation.
 backend/operations.py: shared operation constants, classifier terms, and sensitivity rules.
 backend/model_coercion.py: shared Pydantic model/dict coercion for adapter boundaries.
@@ -126,6 +127,9 @@ before cache, provenance, execution gate, source freshness, observability, or
 future persistence time comparisons are added.
 Connector payload required/optional string extraction must flow through
 backend/payload_fields.py before adapter-specific payload parsing logic is added.
+Provider response object/dict field access and shape validation must flow through
+backend/response_fields.py before adapter-specific SDK response parsing logic is
+added.
 URL/domain extraction and relative API path validation must flow through
 backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.

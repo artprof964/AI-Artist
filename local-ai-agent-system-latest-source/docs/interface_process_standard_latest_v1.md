@@ -24,9 +24,10 @@ can be marked done.
 12. Request text normalization, fingerprints, and stable channel UUIDs are produced through `backend/request_identity.py`.
 13. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` for UTC creation and normalization.
 14. Connector payload string-field extraction uses `backend/payload_fields.py`.
-15. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
-16. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
-17. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
+15. Provider response object/dict field access and shape validation uses `backend/response_fields.py`.
+16. Connector URL/domain and relative API path validation uses `backend/url_utils.py`.
+17. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
+18. Pydantic model/dict coercion at service and adapter boundaries uses `backend/model_coercion.py`.
 ```
 
 ## Standard Request Envelope
@@ -203,6 +204,7 @@ Output:
    - Runtime validates `SubAgentOutput`, compares results, retries if needed,
      and synthesizes one response.
    - Domain and adapter inputs coerce model-or-dict payloads through the shared model coercion helper.
+   - Provider SDK object-or-dict responses are read through the shared response-field helper.
 
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation

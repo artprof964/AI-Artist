@@ -12,6 +12,7 @@ from backend.publishing_adapter import (
     PublishingExecutionGateError,
     PublishingRequest,
 )
+from backend.response_fields import field_value
 from backend.schemas import AuditEventResponse, ExecutionEnvelopeResponse
 from backend.side_effect_audit import SideEffectAuditContext, record_side_effect_audit_event
 
@@ -81,7 +82,7 @@ class PublishingAgent:
         audit_event = self._record_publish_audit_event(
             request,
             status="published",
-            reason=result.client_response.get("status", "published"),
+            reason=field_value(result.client_response, "status", "published"),
             execution_envelope_id=result.execution_envelope_id,
             request_id=result.request_id,
             client_response=result.client_response,
