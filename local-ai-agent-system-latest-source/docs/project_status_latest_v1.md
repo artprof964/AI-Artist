@@ -33,7 +33,7 @@ Test project-root resolution, checked-in project text reads, backend source read
 Execution gates: centralized in backend/execution_gate.py
 Execution-envelope messages: centralized in backend/execution_gate_messages.py
 Slack adapter contracts: centralized in backend/slack_contracts.py
-GitHub adapter contracts: centralized in backend/github_contracts.py
+GitHub adapter contracts and token-required message routing: centralized in backend/github_contracts.py and backend/connection_settings.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
 ComfyUI generated-image URI and response validation contracts: centralized in backend/comfyui_contracts.py
@@ -167,7 +167,7 @@ Shell commands: shared across readiness health, backup, and restore command defi
 Readiness paths: shared across local backup directories, container dump path, and MinIO source alias
 Repository paths: shared across Compose, env, runbook, OPA policy, PostgreSQL schema, repo-root lookup, workspace file lookups, backend module discovery, and backend module source lookups
 HTTP methods: shared across GitHub write method validation and future connector method allowlists
-GitHub adapter contracts: shared across action labels, target labels, API validation messages, token-purpose text, and adapter secret lookup
+GitHub adapter contracts: shared across action labels, target labels, API validation messages, token-purpose text, token-required message routing through connection settings, and adapter secret lookup
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and execution gate validation errors
@@ -199,11 +199,11 @@ process argument validation: 2 focused files passed; OPA tests guarded against l
 service text boundary validation: 3 focused files passed; Safety Service guarded against local request normalization/token wrappers
 runtime env access validation: 2 focused files passed, 1 skipped; backend and tests guarded against direct env reads outside connection settings
 image provenance hash validation: 2 focused files passed; image provenance guarded against local text-hash wrappers
-runtime secret validation: LLM API smoke uses shared runtime-token resolution and connection error messages; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods; LLM smoke guarded against local redaction wrappers
+runtime secret validation: LLM API smoke uses shared runtime-token resolution and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods; LLM smoke guarded against local redaction wrappers
 source registry lookup validation: 1 focused file passed; key/id optional lookup and source-id stale checks use public registry boundaries
 env parser validation: 2 focused files passed; readiness guarded against local env parser logic
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
-final pytest: 424 passed, 1 skipped, 1 warning
+final pytest: 425 passed, 1 skipped, 1 warning
 final ruff: all checks passed
 skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 ```

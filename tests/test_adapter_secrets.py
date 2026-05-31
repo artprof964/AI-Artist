@@ -1,7 +1,7 @@
 import pytest
 
 from backend.adapter_secrets import adapter_runtime_secret
-from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR
+from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR, connection_value_required
 
 
 class AdapterConfigError(RuntimeError):
@@ -62,4 +62,7 @@ def test_adapter_runtime_secret_wraps_missing_secret_errors() -> None:
             error_type=AdapterConfigError,
         )
 
-    assert str(exc.value) == f"{SLACK_BOT_TOKEN_ENV_VAR} is required for standard adapter"
+    assert str(exc.value) == connection_value_required(
+        SLACK_BOT_TOKEN_ENV_VAR,
+        "standard adapter",
+    )

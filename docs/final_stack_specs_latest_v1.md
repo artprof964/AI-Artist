@@ -5,7 +5,7 @@
 ```text
 Date: 2026-05-31
 Implementation status: all 28 tracker tasks complete
-Final validation: 424 passed, 1 skipped, 1 warning
+Final validation: 425 passed, 1 skipped, 1 warning
 Skipped test: live provider-neutral LLM API smoke test requires deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -81,7 +81,7 @@ backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, res
 backend/source_registry_contracts.py: shared source registry missing-row message contract.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults and rejection message contracts.
 backend/slack_contracts.py: shared Slack source label, validation message contracts, and token-purpose text.
-backend/github_contracts.py: shared GitHub adapter action labels, validation messages, and token-purpose text.
+backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
 backend/audit.py: in-memory audit repository, recursive secret redaction, and redacted mapping helper for telemetry/audit payloads.
 backend/execution_gate_messages.py: shared execution-envelope validation failure and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion and validation for gated adapters.
@@ -248,9 +248,10 @@ backend/url_utils.py before connector-specific URL allowlist or path-safety
 logic is added.
 HTTP method vocabulary and normalization must flow through backend/http_methods.py
 before connector-specific method allowlists are added.
-GitHub adapter action labels, target labels, API validation messages, and token
-purpose text must flow through backend/github_contracts.py before GitHub adapter
-errors are raised.
+GitHub adapter action labels, target labels, API validation messages, token
+purpose text, and token-required message routing must flow through
+backend/github_contracts.py and backend/connection_settings.py before GitHub
+adapter errors are raised.
 Reviewable text-file suffixes and recursive scanner discovery must flow through
 backend/file_scanning.py before security review or future scanner paths inspect
 workspace files.

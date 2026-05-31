@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from backend.connection_settings import connection_value_required
+
 
 GITHUB_WRITE_ACTION_LABEL = "GitHub write"
 GITHUB_TARGET_LABEL = "GitHub target"
@@ -16,7 +18,7 @@ GITHUB_API_PATH_TRAVERSAL_MESSAGE = "GitHub API path must not contain traversal 
 
 
 def github_token_required(env_var_name: str) -> str:
-    return f"{env_var_name} is required for {GITHUB_ADAPTER_EXECUTION_PURPOSE}"
+    return connection_value_required(env_var_name, GITHUB_ADAPTER_EXECUTION_PURPOSE)
 
 
 __all__ = [

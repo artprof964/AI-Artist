@@ -1,4 +1,4 @@
-from backend.connection_settings import GITHUB_TOKEN_ENV_VAR
+from backend.connection_settings import GITHUB_TOKEN_ENV_VAR, connection_value_required
 from backend.github_contracts import (
     GITHUB_ADAPTER_EXECUTION_PURPOSE,
     GITHUB_API_METHOD_ALLOWED_MESSAGE,
@@ -30,8 +30,18 @@ def test_github_contracts_preserve_adapter_text() -> None:
     assert GITHUB_API_PATH_TRAVERSAL_MESSAGE == "GitHub API path must not contain traversal segments"
     assert (
         github_token_required(GITHUB_TOKEN_ENV_VAR)
-        == f"{GITHUB_TOKEN_ENV_VAR} is required for GitHub adapter execution"
+        == connection_value_required(
+            GITHUB_TOKEN_ENV_VAR,
+            GITHUB_ADAPTER_EXECUTION_PURPOSE,
+        )
     )
+
+
+def test_github_token_required_uses_connection_message_boundary() -> None:
+    source = read_backend_source("github_contracts.py")
+
+    assert "connection_value_required(" in source
+    assert 'f"{env_var_name} is required for {GITHUB_ADAPTER_EXECUTION_PURPOSE}"' not in source
 
 
 def test_github_adapter_uses_shared_contract_messages() -> None:

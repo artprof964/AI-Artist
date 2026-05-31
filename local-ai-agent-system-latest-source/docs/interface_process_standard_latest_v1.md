@@ -58,7 +58,7 @@ can be marked done.
 46. Publishing side-effect audit operation values use `backend/operations.py`.
 47. Gated adapter operation values use `backend/operations.py` directly.
 48. Slack source labels, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
-49. GitHub adapter action labels, validation messages, and token-purpose text use `backend/github_contracts.py`.
+49. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
 50. Source ingestion approved-domain defaults and rejection messages use `backend/source_ingestion_contracts.py`.
 51. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 52. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
