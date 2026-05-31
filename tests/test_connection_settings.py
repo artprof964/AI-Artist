@@ -24,8 +24,8 @@ from backend.connection_settings import (
     runtime_env,
 )
 from backend.readiness import REQUIRED_ENV_VARS
-from backend.repo_paths import backend_module_filenames, read_backend_module_text
-from path_helpers import iter_test_module_sources
+from backend.repo_paths import backend_module_filenames
+from path_helpers import iter_test_module_sources, read_backend_source
 
 
 def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
@@ -161,12 +161,12 @@ def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
 
 
 def test_runtime_env_access_is_centralized_in_connection_settings() -> None:
-    assert "os.environ" in read_backend_module_text("connection_settings.py")
+    assert "os.environ" in read_backend_source("connection_settings.py")
 
     for module_name in backend_module_filenames():
         if module_name == "connection_settings.py":
             continue
-        assert "os.environ" not in read_backend_module_text(module_name)
+        assert "os.environ" not in read_backend_source(module_name)
 
 
 def test_tests_do_not_import_os_for_environment_access() -> None:
