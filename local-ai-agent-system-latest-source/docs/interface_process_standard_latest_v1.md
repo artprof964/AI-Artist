@@ -83,6 +83,7 @@ can be marked done.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 61. Gated-adapter and policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
+63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 ```
 
 ## Standard Request Envelope
@@ -144,6 +145,9 @@ Rules:
 - Repo-wide validation tests that scan project, backend, or test sources use
   shared test path helpers instead of local root resolution, local source reads,
   or test-module glob loops.
+- LLM, Slack, GitHub, connection-settings, and future connection tests use
+  `tests/connection_env_helpers.py` instead of repeating env-var maps or test
+  secret constants locally.
 - Cache, source freshness, observability, Safety Service unit, and future
   policy-path tests use `tests/policy_request_helpers.py` instead of
   constructing standard `PolicyEvaluateRequest` fixtures directly.

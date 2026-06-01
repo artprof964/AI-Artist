@@ -5,7 +5,6 @@ import pytest
 from backend.connection_settings import (
     DEFAULT_LLM_API_URL,
     DEFAULT_LLM_PRIMARY_MODEL,
-    DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
     STANDARD_LLM_API_KEY_ENV_VAR,
     connection_value_required,
@@ -49,6 +48,12 @@ from backend.llm_api_contracts import (
     llm_smoke_result_payload,
 )
 from backend.secret_redaction import redact_secret_value
+from connection_env_helpers import (
+    TEST_LEGACY_LLM_API_KEY,
+    TEST_LLM_API_KEY,
+    legacy_llm_env,
+    llm_env,
+)
 from path_helpers import read_backend_source
 
 
@@ -74,29 +79,28 @@ class RecordingLLMClient:
 def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
     assert STANDARD_LLM_API_KEY_ENV_VAR == DEEPSEEK_OPEN_ART_ENV_VAR
 
-    config = load_llm_api_model_config({STANDARD_LLM_API_KEY_ENV_VAR: "llm-test-secret"})
+    config = load_llm_api_model_config(llm_env())
 
     assert config.api_url == DEFAULT_LLM_API_URL
     assert config.primary_model == DEFAULT_LLM_PRIMARY_MODEL
     assert config.fallback_model == "provider-fallback-model"
     assert config.classifier_model == "provider-classifier-model"
     assert config.embedding_model == "provider-embedding-model"
-    assert config.api_key == "llm-test-secret"
-    assert "llm-test-secret" not in repr(
+    assert config.api_key == TEST_LLM_API_KEY
+    assert TEST_LLM_API_KEY not in repr(
         redact_secret_value(config.__dict__, redact_string_values=False)
     )
 
 
 def test_llm_api_model_config_allows_provider_overrides() -> None:
     config = load_llm_api_model_config(
-        {
-            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
-            "LLM_API_URL": "https://example.test/llm",
-            "LLM_PRIMARY_MODEL": "primary-any-provider",
-            "LLM_FALLBACK_MODEL": "fallback-any-provider",
-            "LLM_CLASSIFIER_MODEL": "classifier-any-provider",
-            "LLM_EMBEDDING_MODEL": "embedding-any-provider",
-        }
+        llm_env(
+            api_url="https://example.test/llm",
+            primary_model="primary-any-provider",
+            fallback_model="fallback-any-provider",
+            classifier_model="classifier-any-provider",
+            embedding_model="embedding-any-provider",
+        )
     )
 
     assert config.api_url == "https://example.test/llm"
@@ -107,9 +111,9 @@ def test_llm_api_model_config_allows_provider_overrides() -> None:
 
 
 def test_llm_api_model_config_accepts_legacy_deepseek_api_key_env_var() -> None:
-    config = load_llm_api_model_config({DEEPSEEK_API_KEY_ENV_VAR: "legacy-llm-secret"})
+    config = load_llm_api_model_config(legacy_llm_env())
 
-    assert config.api_key == "legacy-llm-secret"
+    assert config.api_key == TEST_LEGACY_LLM_API_KEY
 
 
 def test_llm_api_model_config_requires_api_key() -> None:
@@ -123,7 +127,7 @@ def test_llm_api_model_config_requires_api_key() -> None:
 
 
 def test_smoke_request_targets_configured_llm_api_model() -> None:
-    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
+    config = load_llm_api_model_config(llm_env())
     request = build_smoke_request(config)
 
     assert request[LLM_REQUEST_MODEL_FIELD] == DEFAULT_LLM_PRIMARY_MODEL
@@ -145,7 +149,7 @@ def test_smoke_request_targets_configured_llm_api_model() -> None:
 
 
 def test_smoke_request_accepts_prompt_and_reasoning_overrides() -> None:
-    config = load_llm_api_model_config({DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret"})
+    config = load_llm_api_model_config(llm_env())
     request = build_smoke_request(
         config,
         system_prompt="Use concise responses",
@@ -262,11 +266,7 @@ def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> N
     client = RecordingLLMClient()
 
     result = run_llm_api_smoke_test(
-        {
-            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
-            "LLM_API_URL": "https://example.test/llm",
-            "LLM_PRIMARY_MODEL": "test-model",
-        },
+        llm_env(api_url="https://example.test/llm", primary_model="test-model"),
         timeout_seconds=3.5,
         llm_client=client,
     )
@@ -288,17 +288,14 @@ def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> N
     assert result[LLM_SMOKE_RESULT_REQUEST_FIELD][LLM_REQUEST_LOG_BASE_URL_FIELD] == (
         "https://example.test/llm"
     )
-    assert "llm-test-secret" not in repr(result)
+    assert TEST_LLM_API_KEY not in repr(result)
 
 
 def test_llm_api_smoke_test_uses_centralized_default_timeout() -> None:
     client = RecordingLLMClient()
 
     run_llm_api_smoke_test(
-        {
-            DEEPSEEK_OPEN_ART_ENV_VAR: "llm-test-secret",
-            "LLM_PRIMARY_MODEL": "test-model",
-        },
+        llm_env(primary_model="test-model"),
         llm_client=client,
     )
 

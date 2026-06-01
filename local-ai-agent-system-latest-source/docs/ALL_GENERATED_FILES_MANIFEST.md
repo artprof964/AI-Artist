@@ -197,6 +197,7 @@
 - `../../validation_reports/runtime_env_access_guard_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_resolution_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_registry_derivation_standardization_2026-06-01.md`
+- `../../validation_reports/connection_env_helper_standardization_2026-06-01.md`
 - `../../validation_reports/adapter_secret_lookup_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_secret_registry_lookup_standardization_2026-06-01.md`
 - `../../validation_reports/connection_error_message_standardization_2026-05-31.md`
@@ -253,6 +254,7 @@
 - `../../tests/test_readiness_paths.py`
 - `../../tests/test_repo_paths.py`
 - `../../tests/path_helpers.py`
+- `../../tests/connection_env_helpers.py`
 - `../../tests/policy_request_helpers.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`

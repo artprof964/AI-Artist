@@ -31,13 +31,19 @@ from backend.connection_settings import (
 )
 from backend.readiness import REQUIRED_ENV_VARS
 from backend.repo_paths import backend_module_filenames
-from path_helpers import iter_test_module_sources, read_backend_source
+from connection_env_helpers import (
+    full_connection_env,
+    github_token_env,
+    legacy_llm_env,
+    llm_env,
+)
+from path_helpers import iter_test_module_sources, read_backend_source, read_test_source
 
 
 def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
     assert STANDARD_LLM_API_KEY_ENV_VAR == DEEPSEEK_OPEN_ART_ENV_VAR
 
-    settings = load_connection_settings({STANDARD_LLM_API_KEY_ENV_VAR: "deepseek-secret"})
+    settings = load_connection_settings(llm_env(api_key="deepseek-secret"))
 
     assert settings.llm_api_key == "deepseek-secret"
     assert settings.llm_api_url == DEFAULT_LLM_API_URL
@@ -49,23 +55,13 @@ def test_connection_settings_load_defaults_and_standard_secret_names() -> None:
 
 
 def test_connection_settings_keep_backward_compatible_deepseek_alias() -> None:
-    settings = load_connection_settings({DEEPSEEK_API_KEY_ENV_VAR: "legacy-secret"})
+    settings = load_connection_settings(legacy_llm_env(api_key="legacy-secret"))
 
     assert settings.llm_api_key == "legacy-secret"
 
 
 def test_connection_settings_allow_endpoint_and_model_overrides() -> None:
-    settings = load_connection_settings(
-        {
-            DEEPSEEK_OPEN_ART_ENV_VAR: "deepseek-secret",
-            "LLM_API_URL": "https://example.test/llm",
-            "LLM_PRIMARY_MODEL": "example-primary",
-            "COMFYUI_URL": "http://localhost:9999",
-            "SAFETY_SERVICE_URL": "http://localhost:7777/",
-            SLACK_BOT_TOKEN_ENV_VAR: "xoxb-local-token",
-            GITHUB_TOKEN_ENV_VAR: "ghp_localtoken",
-        }
-    )
+    settings = load_connection_settings(full_connection_env())
 
     assert settings.llm_api_url == "https://example.test/llm"
     assert settings.llm_primary_model == "example-primary"
@@ -140,6 +136,17 @@ def test_connection_registry_resolves_setting_name_from_standard_env_var() -> No
     assert str(exc.value) == unknown_connection_setting("CUSTOM_TOKEN")
 
 
+def test_connection_tests_use_shared_env_helpers() -> None:
+    for test_module in (
+        "test_connection_settings.py",
+        "test_llm_api_smoke.py",
+        "test_slack_adapter.py",
+        "test_github_adapter.py",
+    ):
+        source = read_test_source(test_module)
+        assert "connection_env_helpers import" in source
+
+
 def test_connection_settings_loader_uses_registry_defaults_and_aliases() -> None:
     env = {
         spec.name: f"value-for-{spec.setting_name}"
@@ -171,7 +178,7 @@ def test_require_env_value_reports_standard_name_when_missing() -> None:
 
 
 def test_require_runtime_secret_trims_and_loads_registry_setting() -> None:
-    env = {GITHUB_TOKEN_ENV_VAR: "  ghp_localtoken  "}
+    env = github_token_env(token="ghp_localtoken", padded=True)
 
     assert (
         require_runtime_secret(
@@ -186,7 +193,7 @@ def test_require_runtime_secret_trims_and_loads_registry_setting() -> None:
 def test_require_runtime_secret_supports_custom_env_names() -> None:
     assert (
         require_runtime_secret(
-            {"CUSTOM_GITHUB_TOKEN": "  custom-token  "},
+            github_token_env(token="custom-token", env_var="CUSTOM_GITHUB_TOKEN", padded=True),
             "CUSTOM_GITHUB_TOKEN",
             purpose="custom adapter",
         )
@@ -197,7 +204,7 @@ def test_require_runtime_secret_supports_custom_env_names() -> None:
 def test_require_runtime_secret_reports_standard_name_when_missing() -> None:
     with pytest.raises(RuntimeError) as exc:
         require_runtime_secret(
-            {GITHUB_TOKEN_ENV_VAR: "   "},
+            github_token_env(token=" ", padded=True),
             GITHUB_TOKEN_ENV_VAR,
             purpose="GitHub adapter execution",
         )
@@ -211,7 +218,7 @@ def test_require_runtime_secret_reports_standard_name_when_missing() -> None:
 def test_require_runtime_secret_reports_unknown_connection_setting() -> None:
     with pytest.raises(RuntimeError) as exc:
         require_runtime_secret(
-            {GITHUB_TOKEN_ENV_VAR: "ghp_localtoken"},
+            github_token_env(token="ghp_localtoken"),
             GITHUB_TOKEN_ENV_VAR,
             purpose="GitHub adapter execution",
             setting_name="missing_setting",
@@ -230,7 +237,7 @@ def test_connection_error_messages_are_centralized() -> None:
 
 
 def test_runtime_env_returns_explicit_mapping_without_process_env() -> None:
-    env = {DEEPSEEK_OPEN_ART_ENV_VAR: "explicit-secret"}
+    env = llm_env(api_key="explicit-secret")
 
     assert runtime_env(env) is env
 

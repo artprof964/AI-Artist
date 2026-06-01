@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 526 passed, 1 warning
+Final validation: 527 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -105,6 +105,7 @@ backend/shell_commands.py: shared shell command and process argument constructio
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
+tests/connection_env_helpers.py: shared test env builders and secret constants for LLM, Slack, GitHub, and full connection-settings test scenarios.
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
@@ -192,6 +193,9 @@ runbook, OPA policy, PostgreSQL schema, workspace, or backend module files.
 Repo-wide validation tests that scan checked-in project, backend, or test source
 must use tests/path_helpers.py for project root resolution, project text reads,
 backend source reads, test source reads, and source iteration.
+Connection tests that need LLM, Slack, GitHub, or full connection env fixtures
+must use tests/connection_env_helpers.py before repeating env-var names,
+provider keys, or adapter token literals.
 Policy-path tests that need cache-reuse or Safety Service policy requests must
 use tests/policy_request_helpers.py before cache, source freshness,
 observability, Safety Service unit, or future policy-path tests construct

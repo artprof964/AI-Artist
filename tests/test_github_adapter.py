@@ -19,6 +19,7 @@ from backend.repo_paths import (
     backend_module_path,
 )
 from backend.time_utils import utc_now
+from connection_env_helpers import TEST_GITHUB_TOKEN, github_token_env
 from execution_envelope_helpers import (
     approved_execution_envelope,
     unapproved_execution_envelope,
@@ -30,7 +31,7 @@ REQUEST_ID = UUID("23232323-2323-2323-2323-232323232323")
 NOW = utc_now()
 GITHUB_TARGET = "github://artprof964/AI-Art/issues"
 GITHUB_PATH = "/repos/artprof964/AI-Art/issues"
-MOCK_GITHUB_TOKEN = "ghp_mocked_t23_secret_token_1234567890"
+MOCK_GITHUB_TOKEN = TEST_GITHUB_TOKEN
 
 
 class MockGitHubAPI:
@@ -132,7 +133,7 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
 
 def test_github_adapter_can_read_token_from_injected_connection_env() -> None:
     client = MockGitHubAPI()
-    adapter = GitHubAdapter(client, env={GITHUB_TOKEN_ENV_VAR: MOCK_GITHUB_TOKEN})
+    adapter = GitHubAdapter(client, env=github_token_env())
     envelope = approved_envelope()
 
     result = adapter.write(github_write_request(envelope=envelope), now=NOW)

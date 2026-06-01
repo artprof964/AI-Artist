@@ -18,10 +18,11 @@ from backend.slack_contracts import (
     SLACK_THREAD_TS_METADATA_KEY,
     SLACK_USER_METADATA_KEY,
 )
+from connection_env_helpers import TEST_SLACK_BOT_TOKEN, slack_token_env
 from path_helpers import read_backend_source
 
 
-BOT_TOKEN = "xoxb-local-secret-token"
+BOT_TOKEN = TEST_SLACK_BOT_TOKEN
 
 
 class MockSlackClient:
@@ -138,7 +139,7 @@ def test_slack_adapter_can_read_token_from_injected_connection_env() -> None:
     client = MockSlackClient(BOT_TOKEN)
     adapter = SlackAdapter(
         client,
-        env={SLACK_BOT_TOKEN_ENV_VAR: f"  {BOT_TOKEN}  "},
+        env=slack_token_env(padded=True),
     )
     envelope = adapter.normalize_inbound_event(slack_event_payload())
 
@@ -153,7 +154,7 @@ def test_slack_adapter_supports_custom_runtime_token_env_name() -> None:
     client = MockSlackClient(BOT_TOKEN)
     adapter = SlackAdapter(
         client,
-        env={"CUSTOM_SLACK_TOKEN": f"  {BOT_TOKEN}  "},
+        env=slack_token_env(env_var="CUSTOM_SLACK_TOKEN", padded=True),
         token_env_var="CUSTOM_SLACK_TOKEN",
     )
     envelope = adapter.normalize_inbound_event(slack_event_payload())
@@ -164,7 +165,7 @@ def test_slack_adapter_supports_custom_runtime_token_env_name() -> None:
 
 
 def test_slack_adapter_reports_missing_runtime_token_before_send() -> None:
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env={SLACK_BOT_TOKEN_ENV_VAR: "   "})
+    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env=slack_token_env(token=" ", padded=True))
     envelope = adapter.normalize_inbound_event(slack_event_payload())
 
     with pytest.raises(SlackAdapterConfigurationError) as exc:
@@ -177,7 +178,7 @@ def test_slack_adapter_reports_missing_runtime_token_before_send() -> None:
 
 
 def test_slack_adapter_rejects_empty_response_before_token_read() -> None:
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env={SLACK_BOT_TOKEN_ENV_VAR: "   "})
+    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env=slack_token_env(token=" ", padded=True))
     envelope = adapter.normalize_inbound_event(slack_event_payload())
 
     with pytest.raises(SlackAdapterError) as exc:
