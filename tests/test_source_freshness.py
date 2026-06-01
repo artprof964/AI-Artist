@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
-from backend.schemas import PolicyEvaluateResponse, SourceFreshness
+from backend.schemas import SourceFreshness
 from backend.source_freshness_contracts import (
     DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
     DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
@@ -20,6 +20,7 @@ from backend.source_registry_contracts import (
 from cache_entry_helpers import approved_response_cache_entry_for_test
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
+from policy_response_helpers import approved_policy_response_for_test
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -33,15 +34,6 @@ def policy_request_from_registry(
     snapshot = registry.record_dependency_snapshot(source_keys=source_keys)
     return policy_evaluate_request_for_test(
         source_freshness=snapshot.source_freshness,
-    )
-
-
-def approved_policy_response() -> PolicyEvaluateResponse:
-    return PolicyEvaluateResponse(
-        allow=True,
-        reason="cache replay allowed by OPA",
-        requires_human_approval=False,
-        policy_version="test-policy-v1",
     )
 
 
@@ -122,7 +114,7 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
         policy_request=policy_evaluate_request_for_test(
             source_freshness=snapshot_at_cache.source_freshness,
         ),
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=cache_entry(),
         now=NOW,
@@ -134,7 +126,7 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
         policy_request=policy_evaluate_request_for_test(
             source_freshness=stale_snapshot.source_freshness,
         ),
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=cache_entry(),
         now=NOW,

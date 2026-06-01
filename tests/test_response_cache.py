@@ -24,11 +24,12 @@ from backend.response_cache_contracts import (
     cache_reuse_observability_fields,
 )
 from backend.runtime_field_contracts import OPERATION_FIELD, REASON_FIELD, REQUEST_KIND_FIELD
-from backend.schemas import PolicyEvaluateResponse, SourceFreshness
+from backend.schemas import SourceFreshness
 from cache_entry_helpers import approved_response_cache_entry_for_test
 from execution_envelope_helpers import stale_source_freshness
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
+from policy_response_helpers import approved_policy_response_for_test
 
 
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
@@ -37,15 +38,6 @@ REQUEST_FINGERPRINT = "sha256:repeat-read-request"
 
 def base_policy_request():
     return policy_evaluate_request_for_test()
-
-
-def approved_policy_response() -> PolicyEvaluateResponse:
-    return PolicyEvaluateResponse(
-        allow=True,
-        reason="cache replay allowed by OPA",
-        requires_human_approval=False,
-        policy_version="test-policy-v1",
-    )
 
 
 def base_cache_entry() -> ApprovedResponseCacheEntry:
@@ -62,7 +54,7 @@ def base_cache_entry() -> ApprovedResponseCacheEntry:
 def test_replays_approved_read_response_with_fresh_non_expired_cache_entry() -> None:
     decision = evaluate_cached_response_reuse(
         policy_request=base_policy_request(),
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
         now=NOW,
@@ -79,7 +71,7 @@ def test_rejects_non_read_replay_requests(request_kind: str) -> None:
 
     decision = evaluate_cached_response_reuse(
         policy_request=request,
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
         now=NOW,
@@ -94,7 +86,7 @@ def test_rejects_non_reuse_policy_requests() -> None:
 
     decision = evaluate_cached_response_reuse(
         policy_request=request,
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
         now=NOW,
@@ -119,7 +111,7 @@ def test_rejects_stale_replay_request_sources(source_freshness: SourceFreshness)
 
     decision = evaluate_cached_response_reuse(
         policy_request=request,
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
         now=NOW,
@@ -130,8 +122,8 @@ def test_rejects_stale_replay_request_sources(source_freshness: SourceFreshness)
 
 
 def test_rejects_policy_denial_or_human_approval_requirement() -> None:
-    denied = approved_policy_response().model_copy(update={"allow": False})
-    approval_required = approved_policy_response().model_copy(
+    denied = approved_policy_response_for_test().model_copy(update={"allow": False})
+    approval_required = approved_policy_response_for_test().model_copy(
         update={"requires_human_approval": True}
     )
 
@@ -208,7 +200,7 @@ def test_rejects_cache_entry_mismatches_and_unsafe_states(
 ) -> None:
     decision = evaluate_cached_response_reuse(
         policy_request=base_policy_request(),
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=request_fingerprint,
         cache_entry=entry,
         now=NOW,
@@ -221,7 +213,7 @@ def test_rejects_cache_entry_mismatches_and_unsafe_states(
 def test_rejects_missing_cache_entry() -> None:
     decision = evaluate_cached_response_reuse(
         policy_request=base_policy_request(),
-        policy_response=approved_policy_response(),
+        policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=None,
         now=NOW,
@@ -337,4 +329,23 @@ def test_cache_path_tests_use_shared_cache_entry_helper() -> None:
         ]
 
         assert "approved_response_cache_entry_for_test(" in source
+        assert direct_constructor_calls == []
+
+
+def test_cache_path_tests_use_shared_policy_response_helper() -> None:
+    for test_module in (
+        "test_response_cache.py",
+        "test_source_freshness.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        direct_constructor_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "PolicyEvaluateResponse"
+        ]
+
+        assert "approved_policy_response_for_test(" in source
         assert direct_constructor_calls == []
