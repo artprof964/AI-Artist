@@ -46,7 +46,12 @@ from backend.slack_contracts import (
     slack_requester_scope,
     slack_response_text_required,
 )
-from backend.runtime_field_contracts import CLIENT_RESPONSE_FIELD, REQUEST_ID_FIELD
+from backend.runtime_field_contracts import (
+    CLIENT_RESPONSE_FIELD,
+    POLICY_SCOPE_FIELD,
+    REQUEST_ID_FIELD,
+    REQUESTER_SCOPE_FIELD,
+)
 from path_helpers import read_backend_source
 
 
@@ -116,6 +121,8 @@ def test_slack_scope_and_payload_shapes_are_centralized() -> None:
 
 def test_slack_field_names_and_post_result_shape_are_centralized() -> None:
     assert SLACK_LOCAL_REQUEST_ID_FIELD == REQUEST_ID_FIELD
+    assert SLACK_LOCAL_REQUESTER_SCOPE_FIELD == REQUESTER_SCOPE_FIELD
+    assert SLACK_LOCAL_POLICY_SCOPE_FIELD == POLICY_SCOPE_FIELD
     assert SLACK_EVENT_OBJECT_FIELD == "event"
     assert SLACK_EVENT_CHANNEL_FIELD == "channel"
     assert SLACK_EVENT_USER_FIELD == "user"
@@ -203,3 +210,12 @@ def test_slack_client_response_uses_runtime_field_contract() -> None:
 
     assert "SLACK_POST_RESULT_CLIENT_RESPONSE_FIELD = CLIENT_RESPONSE_FIELD" in source
     assert 'SLACK_POST_RESULT_CLIENT_RESPONSE_FIELD = "client_response"' not in source
+
+
+def test_slack_local_scope_fields_use_runtime_field_contracts() -> None:
+    source = read_backend_source("slack_contracts.py")
+
+    assert "SLACK_LOCAL_REQUESTER_SCOPE_FIELD = REQUESTER_SCOPE_FIELD" in source
+    assert "SLACK_LOCAL_POLICY_SCOPE_FIELD = POLICY_SCOPE_FIELD" in source
+    assert 'SLACK_LOCAL_REQUESTER_SCOPE_FIELD = "requester_scope"' not in source
+    assert 'SLACK_LOCAL_POLICY_SCOPE_FIELD = "policy_scope"' not in source

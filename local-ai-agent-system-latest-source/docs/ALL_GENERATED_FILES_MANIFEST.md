@@ -140,6 +140,7 @@
 - `../../validation_reports/slack_contract_standardization_2026-05-31.md`
 - `../../validation_reports/slack_payload_contract_standardization_2026-05-31.md`
 - `../../validation_reports/slack_response_contract_standardization_2026-06-01.md`
+- `../../validation_reports/slack_scope_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/slack_runtime_secret_standardization_2026-05-31.md`
 - `../../validation_reports/payload_object_standardization_2026-05-31.md`
 - `../../validation_reports/payload_field_message_standardization_2026-05-31.md`
