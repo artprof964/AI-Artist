@@ -1,5 +1,5 @@
 from dataclasses import replace
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import ast
 
 import pytest
@@ -25,6 +25,7 @@ from backend.response_cache_contracts import (
 )
 from backend.runtime_field_contracts import OPERATION_FIELD, REASON_FIELD, REQUEST_KIND_FIELD
 from backend.schemas import PolicyEvaluateResponse, SourceFreshness
+from cache_entry_helpers import approved_response_cache_entry_for_test
 from execution_envelope_helpers import stale_source_freshness
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
@@ -48,18 +49,13 @@ def approved_policy_response() -> PolicyEvaluateResponse:
 
 
 def base_cache_entry() -> ApprovedResponseCacheEntry:
-    return ApprovedResponseCacheEntry(
+    return approved_response_cache_entry_for_test(
+        now=NOW,
         cache_key="cache:repeat-read-request",
         request_fingerprint=REQUEST_FINGERPRINT,
         requester_scope="user:local",
         policy_scope="workspace:ai-artist-main",
-        request_kind="read",
-        operation=OPERATION_READ,
         response_body={"answer": "cached read response"},
-        approved_for_reuse=True,
-        all_sources_unchanged=True,
-        cached_at=NOW - timedelta(minutes=5),
-        expires_at=NOW + timedelta(minutes=5),
     )
 
 
@@ -322,3 +318,23 @@ def test_policy_path_tests_use_shared_policy_request_helper() -> None:
 
         assert "policy_evaluate_request_for_test(" in source
         assert ("backend.schemas", "PolicyEvaluateRequest") not in imported_names
+
+
+def test_cache_path_tests_use_shared_cache_entry_helper() -> None:
+    for test_module in (
+        "test_observability.py",
+        "test_response_cache.py",
+        "test_source_freshness.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        direct_constructor_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "ApprovedResponseCacheEntry"
+        ]
+
+        assert "approved_response_cache_entry_for_test(" in source
+        assert direct_constructor_calls == []

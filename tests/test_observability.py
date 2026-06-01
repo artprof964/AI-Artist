@@ -29,7 +29,7 @@ from backend.openclaw_hook import (
     execute_tool_call_with_safety,
 )
 from backend.orchestrator import MockAgentRequest, run_mock_subagent_orchestration
-from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
+from backend.response_cache import evaluate_cached_response_reuse
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
@@ -37,6 +37,7 @@ from backend.schemas import (
     RequestMetadata,
 )
 from backend.service import canonicalize_request, classify_request, evaluate_policy
+from cache_entry_helpers import approved_response_cache_entry_for_test
 from execution_envelope_helpers import unchanged_source_freshness
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
@@ -113,18 +114,15 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
         policy_request=policy_request,
         policy_response=policy_response,
         request_fingerprint=canonical.request_fingerprint,
-        cache_entry=ApprovedResponseCacheEntry(
+        cache_entry=approved_response_cache_entry_for_test(
+            now=NOW,
             cache_key="cache:observability-read",
             request_fingerprint=canonical.request_fingerprint,
             requester_scope=canonical.requester_scope,
             policy_scope=canonical.policy_scope,
-            request_kind="read",
-            operation="read",
             response_body={"answer": "cached local response"},
-            approved_for_reuse=True,
-            all_sources_unchanged=True,
-            cached_at=NOW - timedelta(minutes=1),
-            expires_at=NOW + timedelta(minutes=9),
+            cached_delta=timedelta(minutes=1),
+            expires_delta=timedelta(minutes=9),
         ),
         now=NOW,
     )

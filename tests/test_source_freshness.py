@@ -17,6 +17,7 @@ from backend.source_registry_contracts import (
     SOURCE_REGISTRY_ROW_NOT_FOUND,
     source_registry_row_not_found,
 )
+from cache_entry_helpers import approved_response_cache_entry_for_test
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
 
@@ -45,18 +46,13 @@ def approved_policy_response() -> PolicyEvaluateResponse:
 
 
 def cache_entry() -> ApprovedResponseCacheEntry:
-    return ApprovedResponseCacheEntry(
+    return approved_response_cache_entry_for_test(
+        now=NOW,
         cache_key="cache:freshness-sensitive-read",
         request_fingerprint=REQUEST_FINGERPRINT,
-        requester_scope="user:local",
-        policy_scope="workspace:ai-artist-main",
-        request_kind="read",
-        operation="read",
         response_body={"answer": "cached source-cited response"},
-        approved_for_reuse=True,
-        all_sources_unchanged=True,
-        cached_at=NOW - timedelta(minutes=1),
-        expires_at=NOW + timedelta(minutes=9),
+        cached_delta=timedelta(minutes=1),
+        expires_delta=timedelta(minutes=9),
     )
 
 

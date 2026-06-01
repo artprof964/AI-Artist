@@ -198,6 +198,7 @@
 - `../../validation_reports/runtime_secret_resolution_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_registry_derivation_standardization_2026-06-01.md`
 - `../../validation_reports/connection_env_helper_standardization_2026-06-01.md`
+- `../../validation_reports/cache_entry_helper_standardization_2026-06-01.md`
 - `../../validation_reports/secret_test_helper_standardization_2026-06-01.md`
 - `../../validation_reports/adapter_secret_lookup_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_secret_registry_lookup_standardization_2026-06-01.md`
@@ -255,6 +256,7 @@
 - `../../tests/test_readiness_paths.py`
 - `../../tests/test_repo_paths.py`
 - `../../tests/path_helpers.py`
+- `../../tests/cache_entry_helpers.py`
 - `../../tests/connection_env_helpers.py`
 - `../../tests/policy_request_helpers.py`
 - `../../tests/secret_test_helpers.py`
