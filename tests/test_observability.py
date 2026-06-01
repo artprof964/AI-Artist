@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime, timedelta, timezone
 from uuid import UUID
 
@@ -23,21 +24,17 @@ from backend.service_observability_contracts import (
     REQUEST_CANONICALIZE_EVENT,
 )
 from backend.openclaw_hook import (
-    SafetyDecision,
-    ToolCallRequest,
-    decision_from_policy_response,
     execute_tool_call_with_safety,
 )
-from backend.orchestrator import MockAgentRequest, run_mock_subagent_orchestration
 from backend.response_cache import evaluate_cached_response_reuse
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
-    PolicyEvaluateResponse,
 )
 from backend.service import canonicalize_request, classify_request, evaluate_policy
 from cache_entry_helpers import approved_response_cache_entry_for_test
 from execution_envelope_helpers import unchanged_source_freshness
+from openclaw_hook_helpers import MockOrchestrationAdapter, RecordingSafetyClient
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
 from request_metadata_helpers import request_metadata_for_test
@@ -54,34 +51,6 @@ def clear_observability() -> None:
     observability_collector.clear()
     yield
     observability_collector.clear()
-
-
-class LocalSafetyClient:
-    def evaluate_tool_call(self, request) -> SafetyDecision:
-        response = evaluate_policy(request)
-        return decision_from_policy_response(PolicyEvaluateResponse(**response.model_dump()))
-
-
-class LocalOrchestrationAdapter:
-    def run(self, request: ToolCallRequest) -> dict[str, object]:
-        result = run_mock_subagent_orchestration(
-            MockAgentRequest(
-                task_id=request.request_id,
-                request_text=str(request.arguments["request_text"]),
-                requester_scope=request.requester_scope,
-                policy_scope=request.policy_scope,
-                metadata={
-                    "correlation_id": request.correlation_id,
-                    "workspace": request.metadata["workspace"],
-                    "tool_name": request.tool_name,
-                },
-            )
-        )
-        return {
-            "task_id": str(result.task_id),
-            "status": result.status,
-            "agent_count": len(result.agent_outputs),
-        }
 
 
 def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None:
@@ -146,8 +115,8 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
                 "oauth_token": "oauth-observability-secret",
             },
         ),
-        LocalSafetyClient(),
-        LocalOrchestrationAdapter(),
+        RecordingSafetyClient([]),
+        MockOrchestrationAdapter([]),
     )
 
     assert policy_response.allow is True
@@ -223,3 +192,14 @@ def test_observability_tests_use_shared_tool_call_request_helper() -> None:
 
     assert "tool_call_request_for_test(" in source
     assert "        ToolCallRequest(\n" not in source
+
+
+def test_observability_tests_use_shared_openclaw_hook_helpers() -> None:
+    source = read_test_source("test_observability.py")
+    tree = ast.parse(source)
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
+
+    assert "LocalSafetyClient" not in class_names
+    assert "LocalOrchestrationAdapter" not in class_names
+    assert "RecordingSafetyClient(" in source
+    assert "MockOrchestrationAdapter(" in source

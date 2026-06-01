@@ -89,7 +89,7 @@ can be marked done.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
 64a. Slack adapter tests use `tests/slack_adapter_helpers.py` for deterministic Slack clients, inbound event payloads, event identity values, timestamps, and normalized text.
 65. OpenClaw hook and observability tests use `tests/tool_call_helpers.py` for standard `ToolCallRequest` setup.
-65a. OpenClaw safety hook tests use `tests/openclaw_hook_helpers.py` for recording Safety Service clients, recording adapters, mock orchestration adapters, and event labels.
+65a. OpenClaw safety hook and observability tests use `tests/openclaw_hook_helpers.py` for recording Safety Service clients, recording adapters, mock orchestration adapters, and event labels.
 66. Cache, source-freshness, and observability tests use `tests/cache_entry_helpers.py` for standard `ApprovedResponseCacheEntry` setup.
 67. Cache and source-freshness tests use `tests/policy_response_helpers.py` for standard approved `PolicyEvaluateResponse` setup.
 68. Request metadata, Safety Service unit, and observability tests use `tests/request_metadata_helpers.py` for standard `RequestMetadata` setup.
@@ -173,9 +173,9 @@ Rules:
 - OpenClaw hook, observability, and future tool-stage tests use
   `tests/tool_call_helpers.py` instead of constructing standard
   `ToolCallRequest` fixtures directly.
-- OpenClaw hook tests use `tests/openclaw_hook_helpers.py` instead of defining
-  local recording safety clients, recording adapters, mock orchestration
-  adapters, or event labels.
+- OpenClaw hook and observability tests use `tests/openclaw_hook_helpers.py`
+  instead of defining local recording safety clients, recording adapters, mock
+  orchestration adapters, or event labels.
 - Cache, source freshness, observability, Safety Service unit, and future
   policy-path tests use `tests/policy_request_helpers.py` instead of
   constructing standard `PolicyEvaluateRequest` fixtures directly.
