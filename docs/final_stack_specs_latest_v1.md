@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 536 passed, 1 warning
+Final validation: 537 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -114,6 +114,7 @@ tests/policy_request_helpers.py: shared policy-evaluate request construction for
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
 tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
+tests/slack_adapter_helpers.py: shared Slack adapter test client, inbound event payload, channel/user/team/event IDs, timestamps, and normalized text defaults.
 tests/source_registry_helpers.py: shared SourceFreshnessRegistry construction for source freshness and source ingestion tests, including empty, single-source, two-source, and style-source registry setup.
 tests/tool_call_helpers.py: shared ToolCallRequest construction for OpenClaw safety hook and observability tests, including default operation, request kind, scope, correlation ID, request ID, metadata, arguments, and source freshness setup.
 backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
@@ -210,6 +211,10 @@ provider keys, or adapter token literals.
 Redaction and security-review tests that need secret-bearing payloads,
 workspace secret lines, observability fields, or side-effect client responses
 must use tests/secret_test_helpers.py before repeating token-shaped literals.
+Slack adapter tests that need deterministic Slack clients, inbound event
+payloads, event identity values, timestamps, or normalized text must use
+tests/slack_adapter_helpers.py before defining local Slack client or event
+payload helpers.
 Source freshness and source ingestion tests that need local source registries
 must use tests/source_registry_helpers.py before constructing
 SourceFreshnessRegistry fixtures directly.

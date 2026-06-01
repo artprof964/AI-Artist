@@ -144,6 +144,7 @@
 - `../../validation_reports/slack_contract_standardization_2026-05-31.md`
 - `../../validation_reports/slack_payload_contract_standardization_2026-05-31.md`
 - `../../validation_reports/slack_response_contract_standardization_2026-06-01.md`
+- `../../validation_reports/slack_adapter_helper_standardization_2026-06-01.md`
 - `../../validation_reports/slack_scope_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/slack_runtime_secret_standardization_2026-05-31.md`
 - `../../validation_reports/payload_object_standardization_2026-05-31.md`
@@ -154,6 +155,7 @@
 - `../../backend/slack_contracts.py`
 - `../../tests/test_slack_adapter.py`
 - `../../tests/test_slack_contracts.py`
+- `../../tests/slack_adapter_helpers.py`
 - `../../validation_reports/t21_source_ingestion_validation_2026-05-31.md`
 - `../../validation_reports/source_ingestion_hash_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/source_ingestion_url_boundary_standardization_2026-05-31.md`

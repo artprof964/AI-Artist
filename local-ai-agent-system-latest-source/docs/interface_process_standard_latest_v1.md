@@ -86,6 +86,7 @@ can be marked done.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
+64a. Slack adapter tests use `tests/slack_adapter_helpers.py` for deterministic Slack clients, inbound event payloads, event identity values, timestamps, and normalized text.
 65. OpenClaw hook and observability tests use `tests/tool_call_helpers.py` for standard `ToolCallRequest` setup.
 66. Cache, source-freshness, and observability tests use `tests/cache_entry_helpers.py` for standard `ApprovedResponseCacheEntry` setup.
 67. Cache and source-freshness tests use `tests/policy_response_helpers.py` for standard approved `PolicyEvaluateResponse` setup.
@@ -159,6 +160,9 @@ Rules:
 - Audit, security-review, secret-redaction, side-effect audit, and future
   redaction tests use `tests/secret_test_helpers.py` instead of repeating
   token-shaped payloads or redaction assertion helpers locally.
+- Slack adapter tests use `tests/slack_adapter_helpers.py` instead of defining
+  local Slack client doubles, inbound event payloads, event identity values,
+  timestamps, or normalized text locally.
 - Source freshness, source ingestion, and future source-registry tests use
   `tests/source_registry_helpers.py` instead of constructing standard
   `SourceFreshnessRegistry` fixtures directly.

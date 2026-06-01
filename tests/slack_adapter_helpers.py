@@ -1,0 +1,49 @@
+from __future__ import annotations
+
+from typing import Any
+
+SLACK_TEST_CHANNEL = "C456"
+SLACK_TEST_USER = "U789"
+SLACK_TEST_TEAM_ID = "T123"
+SLACK_TEST_EVENT_ID = "Ev123"
+SLACK_TEST_MESSAGE_TS = "1717142400.000100"
+SLACK_TEST_THREAD_TS = "1717142399.000090"
+SLACK_TEST_POSTED_TS = "1717142401.000200"
+SLACK_TEST_TEXT = "  generate   three   visual directions  "
+SLACK_TEST_NORMALIZED_TEXT = "generate three visual directions"
+
+
+class MockSlackClient:
+    def __init__(self, token: str) -> None:
+        self._token = token
+        self.calls: list[dict[str, Any]] = []
+
+    def chat_postMessage(self, **payload: Any) -> dict[str, Any]:
+        self.calls.append(payload)
+        return {
+            "ok": True,
+            "channel": payload["channel"],
+            "ts": SLACK_TEST_POSTED_TS,
+            "message": {
+                "text": payload["text"],
+                "thread_ts": payload["thread_ts"],
+            },
+            "token": self._token,
+        }
+
+
+def slack_event_payload_for_test() -> dict[str, Any]:
+    return {
+        "token": "verification-token-not-used-by-adapter",
+        "team_id": SLACK_TEST_TEAM_ID,
+        "event_id": SLACK_TEST_EVENT_ID,
+        "event": {
+            "type": "app_mention",
+            "channel": SLACK_TEST_CHANNEL,
+            "channel_type": "channel",
+            "user": SLACK_TEST_USER,
+            "text": SLACK_TEST_TEXT,
+            "ts": SLACK_TEST_MESSAGE_TS,
+            "thread_ts": SLACK_TEST_THREAD_TS,
+        },
+    }
