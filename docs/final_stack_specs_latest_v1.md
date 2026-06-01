@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 513 passed, 1 warning
+Final validation: 514 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -60,7 +60,7 @@ backend/request_identity.py: request text normalization, direct Safety Service c
 backend/request_metadata_contracts.py: shared request metadata defaults, default request channel, request envelope field names, and fingerprint field names.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape using request metadata contracts.
 backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
-backend/runtime_field_contracts.py: shared execution-envelope-id, client-response, operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, execution-envelope signatures, adapter results, audit responses, Slack local request scope/request-id/result fields, and side-effect audit payloads.
+backend/runtime_field_contracts.py: shared execution-envelope-id, client-response, operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, execution-envelope signatures, adapter results, audit response request/correlation/policy-scope fields, Slack local request scope/request-id/result fields, and side-effect audit payloads.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
@@ -82,7 +82,7 @@ backend/operations.py: shared operation constants, classifier terms, and sensiti
 backend/model_coercion.py: shared Pydantic model/dict coercion and validation messages for adapter and domain boundaries.
 backend/adapter_gate_contracts.py: shared gated-adapter action and target labels for execution-envelope messages.
 backend/adapter_results.py: shared gated adapter result field vocabulary and field mapping with generic execution-envelope/client-response/request/operation/target fields reused from runtime field contracts.
-backend/audit_contracts.py: shared audit scope payload field names, runtime request/correlation-id fields, accepted response flag, and audit response payload shape.
+backend/audit_contracts.py: shared audit scope payload field names, runtime policy-scope/request/correlation-id fields, accepted response flag, and audit response payload shape.
 backend/side_effect_audit_contracts.py: shared side-effect audit payload field names that reuse generic audit scope and runtime field contracts.
 backend/side_effect_audit.py: shared side-effect audit payload and event recording using shared payload field, runtime field, and audit event type contracts.
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
@@ -210,7 +210,7 @@ response field vocabulary, and result field mapping must flow through
 backend/adapter_results.py and backend/runtime_field_contracts.py before
 adapter-specific return dataclasses or side-effect audit payloads add result
 fields.
-Audit scope payload field names, audit request-id/correlation-id field names,
+Audit scope payload field names, audit policy-scope/request-id/correlation-id field names,
 and audit response payload shapes must flow through backend/audit_contracts.py
 and backend/runtime_field_contracts.py before audit records, audit responses,
 or side-effect audit payloads extract actor/policy scopes or change

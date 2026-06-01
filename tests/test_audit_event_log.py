@@ -10,7 +10,11 @@ from backend.audit_contracts import (
     AUDIT_RESPONSE_ACCEPTED,
     audit_response_payload,
 )
-from backend.runtime_field_contracts import CORRELATION_ID_FIELD, REQUEST_ID_FIELD
+from backend.runtime_field_contracts import (
+    CORRELATION_ID_FIELD,
+    POLICY_SCOPE_FIELD,
+    REQUEST_ID_FIELD,
+)
 from path_helpers import read_backend_source
 
 
@@ -123,7 +127,7 @@ def test_audit_scope_payload_fields_are_centralized() -> None:
     source = read_backend_source("audit.py")
 
     assert AUDIT_ACTOR_SCOPE_FIELD == "actor_scope"
-    assert AUDIT_POLICY_SCOPE_FIELD == "policy_scope"
+    assert AUDIT_POLICY_SCOPE_FIELD == POLICY_SCOPE_FIELD
     assert AUDIT_CORRELATION_ID_FIELD == CORRELATION_ID_FIELD
     assert AUDIT_REQUEST_ID_FIELD == REQUEST_ID_FIELD
     assert AUDIT_RESPONSE_ACCEPTED is True
@@ -158,3 +162,10 @@ def test_audit_response_shape_is_centralized() -> None:
     assert '"request_id": request_id' not in source
     assert "AUDIT_CORRELATION_ID_FIELD" in source
     assert "AUDIT_REQUEST_ID_FIELD" in source
+
+
+def test_audit_policy_scope_uses_runtime_field_contract() -> None:
+    source = read_backend_source("audit_contracts.py")
+
+    assert "AUDIT_POLICY_SCOPE_FIELD = POLICY_SCOPE_FIELD" in source
+    assert 'AUDIT_POLICY_SCOPE_FIELD = "policy_scope"' not in source
