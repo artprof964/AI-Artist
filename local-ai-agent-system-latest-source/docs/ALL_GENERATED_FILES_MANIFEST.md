@@ -44,6 +44,7 @@
 - `../../validation_reports/subagent_status_message_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_output_constructor_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_output_field_contract_standardization_2026-06-01.md`
+- `../../validation_reports/subagent_output_payload_helper_standardization_2026-06-01.md`
 - `../../validation_reports/task_id_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/mock_agent_contract_standardization_2026-05-31.md`
 - `../../validation_reports/mock_orchestration_telemetry_contract_standardization_2026-05-31.md`
@@ -280,6 +281,7 @@
 - `../../tests/safety_service_client_helpers.py`
 - `../../tests/secret_test_helpers.py`
 - `../../tests/source_registry_helpers.py`
+- `../../tests/subagent_output_helpers.py`
 - `../../tests/tool_call_helpers.py`
 - `../../validation_reports/tool_call_helper_standardization_2026-06-01.md`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`

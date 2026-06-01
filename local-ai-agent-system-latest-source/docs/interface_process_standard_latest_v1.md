@@ -84,6 +84,7 @@ can be marked done.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 61. Policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
 61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, and deterministic fake-client responses.
+61b. SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py` for raw valid payload dictionaries.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 63a. LLM API smoke tests use `tests/llm_api_smoke_helpers.py` for mocked OpenAI-compatible recording clients, response ids, and response content.
@@ -205,6 +206,8 @@ Rules:
   execution envelopes use `tests/gated_adapter_helpers.py` instead of defining
   adapter-local request or envelope wrappers in ComfyUI, Publishing, GitHub, or
   future gated adapter test modules.
+- SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py`
+  instead of defining local valid SubAgentOutput payload dictionaries.
 - Gated-adapter and Publishing Agent tests that need deterministic fake
   ComfyUI, GitHub, publishing, or secret-echo publishing clients use
   `tests/gated_adapter_helpers.py` instead of defining local fake client
