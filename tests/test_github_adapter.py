@@ -11,7 +11,6 @@ from backend.github_adapter import (
     GitHubAdapter,
     GitHubAdapterConfigurationError,
     GitHubExecutionGateError,
-    GitHubWriteRequest,
 )
 from backend.repo_paths import (
     backend_module_filenames,
@@ -20,9 +19,12 @@ from backend.repo_paths import (
 from backend.time_utils import utc_now
 from connection_env_helpers import TEST_GITHUB_TOKEN, github_token_env
 from gated_adapter_helpers import (
+    GITHUB_ADAPTER_PATH,
     GITHUB_ADAPTER_REQUEST_ID,
     GITHUB_ADAPTER_TARGET,
+    GITHUB_TEST_PAYLOAD,
     approved_github_write_envelope_for_test,
+    github_write_request_for_test,
     unapproved_github_write_envelope_for_test,
 )
 from path_helpers import PROJECT_ROOT, read_backend_source, read_test_source
@@ -31,7 +33,7 @@ from path_helpers import PROJECT_ROOT, read_backend_source, read_test_source
 REQUEST_ID = GITHUB_ADAPTER_REQUEST_ID
 NOW = utc_now()
 GITHUB_TARGET = GITHUB_ADAPTER_TARGET
-GITHUB_PATH = "/repos/artprof964/AI-Art/issues"
+GITHUB_PATH = GITHUB_ADAPTER_PATH
 MOCK_GITHUB_TOKEN = TEST_GITHUB_TOKEN
 
 
@@ -67,19 +69,6 @@ class MockGitHubAPI:
         }
 
 
-def github_write_request(*, envelope: object) -> GitHubWriteRequest:
-    return GitHubWriteRequest(
-        method="post",
-        path=GITHUB_PATH,
-        payload={
-            "title": "T23 local mocked issue",
-            "body": "Created through the deterministic mocked GitHub API.",
-        },
-        target=GITHUB_TARGET,
-        execution_envelope=envelope,
-    )
-
-
 def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -88,16 +77,13 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
     adapter = GitHubAdapter(client)
     envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
-    result = adapter.write(github_write_request(envelope=envelope), now=NOW)
+    result = adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
 
     assert client.calls == [
         {
             "method": "POST",
             "path": GITHUB_PATH,
-            "json": {
-                "title": "T23 local mocked issue",
-                "body": "Created through the deterministic mocked GitHub API.",
-            },
+            "json": GITHUB_TEST_PAYLOAD,
             "token": MOCK_GITHUB_TOKEN,
         }
     ]
@@ -116,7 +102,7 @@ def test_github_adapter_can_read_token_from_injected_connection_env() -> None:
     adapter = GitHubAdapter(client, env=github_token_env())
     envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
-    result = adapter.write(github_write_request(envelope=envelope), now=NOW)
+    result = adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
 
     assert client.calls[0]["token"] == MOCK_GITHUB_TOKEN
     assert result.client_response["authorization"] == "[REDACTED]"
@@ -130,7 +116,7 @@ def test_github_adapter_supports_explicit_token_connection_injection(
     adapter = GitHubAdapter(client, token=f"  {MOCK_GITHUB_TOKEN}  ")
     envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
-    result = adapter.write(github_write_request(envelope=envelope), now=NOW)
+    result = adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
 
     assert client.calls[0]["token"] == MOCK_GITHUB_TOKEN
     assert result.client_response["debug"]["token"] == "[REDACTED]"
@@ -168,7 +154,9 @@ def test_github_adapter_reads_token_only_after_execution_gate_allows(
 
     with pytest.raises(GitHubExecutionGateError, match="not valid"):
         adapter.write(
-            github_write_request(envelope=unapproved_github_write_envelope_for_test()),
+            github_write_request_for_test(
+                execution_envelope=unapproved_github_write_envelope_for_test()
+            ),
             now=NOW,
         )
 
@@ -177,8 +165,8 @@ def test_github_adapter_reads_token_only_after_execution_gate_allows(
     monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR)
     with pytest.raises(GitHubAdapterConfigurationError, match=GITHUB_TOKEN_ENV_VAR):
         adapter.write(
-            github_write_request(
-                envelope=approved_github_write_envelope_for_test(approved_at=NOW)
+            github_write_request_for_test(
+                execution_envelope=approved_github_write_envelope_for_test(approved_at=NOW)
             ),
             now=NOW,
         )
@@ -195,7 +183,9 @@ def test_github_adapter_rejects_invalid_envelope_before_token_read(
 
     with pytest.raises(GitHubExecutionGateError, match="not valid"):
         adapter.write(
-            github_write_request(envelope=unapproved_github_write_envelope_for_test()),
+            github_write_request_for_test(
+                execution_envelope=unapproved_github_write_envelope_for_test()
+            ),
             now=NOW,
         )
 
@@ -249,7 +239,7 @@ def test_github_write_rejects_invalid_execution_envelopes_before_client_executio
     adapter = GitHubAdapter(client)
 
     with pytest.raises(GitHubExecutionGateError, match=expected_reason):
-        adapter.write(github_write_request(envelope=envelope), now=NOW)
+        adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
 
     assert client.calls == []
 
@@ -278,7 +268,7 @@ def test_github_adapter_rejects_unsafe_api_shapes_before_client_execution(
 
     with pytest.raises(GitHubExecutionGateError, match=expected_reason):
         adapter.write(
-            GitHubWriteRequest(
+            github_write_request_for_test(
                 method=method,
                 path=path,
                 payload={"title": "blocked"},
@@ -310,7 +300,7 @@ def test_github_adapter_rejects_unsafe_paths_before_token_read(
 
     with pytest.raises(GitHubExecutionGateError, match=expected_reason):
         adapter.write(
-            GitHubWriteRequest(
+            github_write_request_for_test(
                 method=method,
                 path=path,
                 payload={"title": "blocked"},
@@ -379,9 +369,12 @@ def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
 
     assert "approved_github_write_envelope_for_test" in called_names
     assert "unapproved_github_write_envelope_for_test" in called_names
+    assert "github_write_request_for_test" in called_names
     assert "approved_execution_envelope" not in called_names
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_github_write_envelope" not in function_names
+    assert "github_write_request" not in function_names
+    assert ("backend.github_adapter", "GitHubWriteRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

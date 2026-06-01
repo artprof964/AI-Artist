@@ -82,7 +82,7 @@ can be marked done.
 59. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 61. Policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
-61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, and approved/unapproved execution-envelope setup.
+61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, and approved/unapproved execution-envelope setup.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
@@ -186,9 +186,10 @@ Rules:
   instead of constructing `ExecutionEnvelopeRequest` directly in
   policy-contract, Safety Service unit, or publishing-agent test modules.
 - Gated-adapter tests that need adapter request IDs, targets, operation
-  defaults, or approved/unapproved execution envelopes use
-  `tests/gated_adapter_helpers.py` instead of defining adapter-local envelope
-  wrappers in ComfyUI, Publishing, GitHub, or future gated adapter test modules.
+  defaults, payload defaults, request construction, or approved/unapproved
+  execution envelopes use `tests/gated_adapter_helpers.py` instead of defining
+  adapter-local request or envelope wrappers in ComfyUI, Publishing, GitHub, or
+  future gated adapter test modules.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

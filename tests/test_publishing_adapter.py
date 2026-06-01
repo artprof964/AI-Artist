@@ -8,13 +8,14 @@ from backend.adapter_gate_contracts import PUBLISHING_ACTION_LABEL, PUBLISHING_T
 from backend.publishing_adapter import (
     PublishingAdapter,
     PublishingExecutionGateError,
-    PublishingRequest,
 )
 from backend.time_utils import utc_now
 from gated_adapter_helpers import (
     PUBLISHING_ADAPTER_REQUEST_ID,
     PUBLISHING_ADAPTER_TARGET,
+    PUBLISHING_TEST_PAYLOAD,
     approved_publishing_envelope_for_test,
+    publishing_request_for_test,
     unapproved_publishing_envelope_for_test,
 )
 from human_approval_helpers import unapproved_human_approval_for_test
@@ -42,15 +43,11 @@ class MockPublishingClient:
 def test_publishing_blocks_external_client_until_human_approval_is_attached() -> None:
     client = MockPublishingClient()
     adapter = PublishingAdapter(client)
-    payload = {
-        "artifact_id": "image-001",
-        "caption": "A quiet studio scene with verified local provenance.",
-    }
+    payload = dict(PUBLISHING_TEST_PAYLOAD)
 
     with pytest.raises(PublishingExecutionGateError, match="not valid"):
         adapter.publish(
-            PublishingRequest(
-                target=PUBLISH_TARGET,
+            publishing_request_for_test(
                 payload=payload,
                 execution_envelope=unapproved_publishing_envelope_for_test(),
             ),
@@ -61,8 +58,7 @@ def test_publishing_blocks_external_client_until_human_approval_is_attached() ->
 
     envelope = approved_publishing_envelope_for_test(approved_at=NOW)
     result = adapter.publish(
-        PublishingRequest(
-            target=PUBLISH_TARGET,
+        publishing_request_for_test(
             payload=payload,
             execution_envelope=envelope,
         ),
@@ -133,8 +129,7 @@ def test_publishing_rejects_invalid_execution_envelopes_before_client_execution(
 
     with pytest.raises(PublishingExecutionGateError, match=expected_reason):
         adapter.publish(
-            PublishingRequest(
-                target=PUBLISH_TARGET,
+            publishing_request_for_test(
                 payload={"artifact_id": "image-001", "caption": "ready"},
                 execution_envelope=envelope,
             ),
@@ -190,9 +185,11 @@ def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None
 
     assert "approved_publishing_envelope_for_test" in called_names
     assert "unapproved_publishing_envelope_for_test" in called_names
+    assert "publishing_request_for_test" in called_names
     assert "approved_execution_envelope" not in called_names
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_publish_envelope" not in function_names
+    assert ("backend.publishing_adapter", "PublishingRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

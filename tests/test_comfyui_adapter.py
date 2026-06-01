@@ -8,13 +8,14 @@ from backend.adapter_gate_contracts import COMFYUI_IMAGE_GENERATION_ACTION_LABEL
 from backend.comfyui_adapter import (
     ComfyUIAdapter,
     ComfyUIExecutionGateError,
-    ComfyUIImageGenerationRequest,
 )
 from backend.time_utils import utc_now
 from gated_adapter_helpers import (
     COMFYUI_ADAPTER_REQUEST_ID,
     COMFYUI_ADAPTER_TARGET,
+    COMFYUI_TEST_WORKFLOW,
     approved_comfyui_envelope_for_test,
+    comfyui_image_request_for_test,
     unapproved_comfyui_envelope_for_test,
 )
 from path_helpers import read_backend_source, read_test_source
@@ -47,16 +48,12 @@ def test_image_generation_succeeds_with_mocked_approved_execution_envelope() -> 
     client = MockComfyUIClient()
     adapter = ComfyUIAdapter(client)
     envelope = approved_comfyui_envelope_for_test(approved_at=NOW)
-    workflow = {
-        "prompt": "paint a quiet studio scene",
-        "nodes": [{"id": "positive_prompt", "type": "CLIPTextEncode"}],
-    }
+    workflow = dict(COMFYUI_TEST_WORKFLOW)
 
     result = adapter.generate_image(
-        ComfyUIImageGenerationRequest(
-            prompt="paint a quiet studio scene",
-            workflow=workflow,
+        comfyui_image_request_for_test(
             execution_envelope=envelope,
+            workflow=workflow,
         ),
         now=NOW,
     )
@@ -103,8 +100,7 @@ def test_image_generation_fails_without_valid_execution_envelope(
 
     with pytest.raises(ComfyUIExecutionGateError, match=expected_reason):
         adapter.generate_image(
-            ComfyUIImageGenerationRequest(
-                prompt="paint a quiet studio scene",
+            comfyui_image_request_for_test(
                 workflow={"nodes": []},
                 execution_envelope=envelope,
             ),
@@ -157,9 +153,11 @@ def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
 
     assert "approved_comfyui_envelope_for_test" in called_names
     assert "unapproved_comfyui_envelope_for_test" in called_names
+    assert "comfyui_image_request_for_test" in called_names
     assert "approved_execution_envelope" not in called_names
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_envelope" not in function_names
+    assert ("backend.comfyui_adapter", "ComfyUIImageGenerationRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names
