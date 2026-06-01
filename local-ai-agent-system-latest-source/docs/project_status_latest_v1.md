@@ -9,7 +9,7 @@
 ## Current State
 
 ```text
-Overall status: All 28 implementation tasks are complete and locally validated.
+Overall status: All 28 implementation tasks are complete and locally validated. Current work is post-completion standardization of shared contracts, connection boundaries, helper setup, and validation evidence.
 Selected control plane: OpenClaw
 Selected LLM backend: provider-neutral LLM API
 Safety layer: FastAPI Safety Service + OPA + PostgreSQL
@@ -279,6 +279,7 @@ correlation-id runtime field validation: 30 focused tests passed, 1 warning; Ope
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
 Knowledge Agent helper validation: 12 focused tests passed; Knowledge Agent tests share agent, vector store, embedding model, source document, approved sample source, and vector-point setup through tests/knowledge_agent_helpers.py and guard against direct test-local construction
 image provenance helper validation: 38 focused provenance/review/security tests passed; image provenance, Critic/Curator, and security-review tests share provenance store, payload, and record setup through tests/image_provenance_helpers.py and guard against direct LocalImageProvenanceStore/ImageProvenanceRecord imports
+project review summary: status-alignment review completed; stale backend-stack foundation-only boundary and tracker source-of-truth/dashboard implementation gate updated; optimization proposals sorted by effectiveness in validation_reports/project_review_summary_and_optimization_proposals_2026-06-01.md
 final pytest: 553 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art

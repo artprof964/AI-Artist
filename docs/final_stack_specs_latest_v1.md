@@ -515,4 +515,5 @@ Backend stack setup: docs/backend_stack_setup_latest_v1.md
 Task validation matrix: local-ai-agent-system-latest-source/docs/task_validation_matrix_latest_v1.md
 Project status: local-ai-agent-system-latest-source/docs/project_status_latest_v1.md
 Validation reports: validation_reports/t04 through t28
+Latest project review and optimization proposals: validation_reports/project_review_summary_and_optimization_proposals_2026-06-01.md
 ```

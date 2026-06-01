@@ -94,6 +94,12 @@ backend/service.py
 
 ## Current Boundary
 
-The stack is intentionally foundation-only. Real social API calls, publishing,
-and live ComfyUI generation remain blocked until the Safety Service,
-execution-envelope checks, and validation tests are implemented.
+This document records the first runnable backend stack slice. The current
+project has advanced beyond foundation-only status: all 28 tracker tasks are
+complete, the latest final validation is 553 passed with 1 warning, and the
+Safety Service, execution-envelope checks, adapter gates, helper standards, and
+validation tests are implemented.
+
+Production external writes, real social API calls, and live ComfyUI generation
+remain intentionally blocked unless the required runtime configuration,
+execution-envelope approval, and human approval rules are satisfied.
