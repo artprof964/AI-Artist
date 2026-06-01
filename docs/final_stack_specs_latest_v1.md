@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 516 passed, 1 warning
+Final validation: 517 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -66,7 +66,7 @@ backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache, source-freshness, policy, and execution-envelope reason strings.
 backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, and counting helpers.
-backend/subagent_output_contracts.py: shared SubAgentOutput construction, runtime-field-backed task-id payload field, and model-coercion boundary.
+backend/subagent_output_contracts.py: shared SubAgentOutput construction, runtime-field-backed task-id/status payload fields, sub-agent output payload field names, and model-coercion boundary.
 backend/review_status.py: shared generated-image review status vocabulary and checks.
 backend/critic_rubric.py: shared Critic/Curator rubric categories, pass/fail decision vocabulary, score bounds, pass thresholds, scoring weights, publication penalties, and rubric score helpers.
 backend/text_utils.py: shared text tokenization, direct Safety Service classifier token parsing, label normalization, and contextual snippets.
@@ -276,8 +276,8 @@ checks, or future persistence code handles optional source rows.
 SubAgentOutput status vocabulary, priority, and aggregation must flow through
 backend/subagent_status.py before schema or orchestration-specific status
 logic is added.
-SubAgentOutput construction, task-id field spelling, and model coercion must
-flow through backend/subagent_output_contracts.py and
+SubAgentOutput construction, task-id/status field spellings, sub-agent output
+payload field names, and model coercion must flow through backend/subagent_output_contracts.py and
 backend/runtime_field_contracts.py before Knowledge retrieval, mock
 orchestration, or future sub-agent adapters return structured agent outputs.
 Mock sub-agent names, artifact types, output text, error text, synthesis text,

@@ -3,8 +3,17 @@ from uuid import UUID
 import pytest
 
 from backend.model_coercion import ModelCoercionError
-from backend.runtime_field_contracts import TASK_ID_FIELD
-from backend.subagent_output_contracts import build_subagent_output
+from backend.runtime_field_contracts import STATUS_FIELD, TASK_ID_FIELD
+from backend.subagent_output_contracts import (
+    SUBAGENT_AGENT_NAME_FIELD,
+    SUBAGENT_ARTIFACTS_FIELD,
+    SUBAGENT_CONFIDENCE_FIELD,
+    SUBAGENT_ERRORS_FIELD,
+    SUBAGENT_POLICY_NOTES_FIELD,
+    SUBAGENT_SOURCES_FIELD,
+    SUBAGENT_SUMMARY_FIELD,
+    build_subagent_output,
+)
 from backend.subagent_status import SUBAGENT_STATUS_OK
 from path_helpers import read_backend_source
 
@@ -59,3 +68,27 @@ def test_subagent_output_constructor_uses_runtime_task_id_field() -> None:
     assert "TASK_ID_FIELD: task_id" in source
     assert '"task_id": task_id' not in source
     assert TASK_ID_FIELD == "task_id"
+
+
+def test_subagent_output_payload_fields_are_centralized() -> None:
+    source = read_backend_source("subagent_output_contracts.py")
+
+    assert SUBAGENT_AGENT_NAME_FIELD == "agent_name"
+    assert SUBAGENT_SUMMARY_FIELD == "summary"
+    assert SUBAGENT_ARTIFACTS_FIELD == "artifacts"
+    assert SUBAGENT_SOURCES_FIELD == "sources"
+    assert SUBAGENT_POLICY_NOTES_FIELD == "policy_notes"
+    assert SUBAGENT_CONFIDENCE_FIELD == "confidence"
+    assert SUBAGENT_ERRORS_FIELD == "errors"
+    assert STATUS_FIELD == "status"
+    for literal in (
+        '"agent_name": agent_name',
+        '"status": status',
+        '"summary": summary',
+        '"artifacts": list(artifacts)',
+        '"sources": list(sources)',
+        '"policy_notes": list(policy_notes)',
+        '"confidence": confidence',
+        '"errors": list(errors)',
+    ):
+        assert literal not in source
