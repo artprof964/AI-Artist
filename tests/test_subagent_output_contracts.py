@@ -3,6 +3,7 @@ from uuid import UUID
 import pytest
 
 from backend.model_coercion import ModelCoercionError
+from backend.runtime_field_contracts import TASK_ID_FIELD
 from backend.subagent_output_contracts import build_subagent_output
 from backend.subagent_status import SUBAGENT_STATUS_OK
 from path_helpers import read_backend_source
@@ -50,3 +51,11 @@ def test_subagent_output_boundaries_use_shared_constructor() -> None:
     assert "build_subagent_output(" in knowledge_source
     assert "coerce_model(" not in knowledge_source
     assert "coerce_model(" not in orchestrator_source
+
+
+def test_subagent_output_constructor_uses_runtime_task_id_field() -> None:
+    source = read_backend_source("subagent_output_contracts.py")
+
+    assert "TASK_ID_FIELD: task_id" in source
+    assert '"task_id": task_id' not in source
+    assert TASK_ID_FIELD == "task_id"

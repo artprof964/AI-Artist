@@ -35,7 +35,7 @@ can be marked done.
 19b. Source freshness schema defaults and unchanged-source checks use `backend/source_freshness_contracts.py`.
 20. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 21. Sub-agent output construction and model coercion use `backend/subagent_output_contracts.py`.
-22. Mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes use `backend/mock_agent_contracts.py`, with generic requester/policy/status fields reused from `backend/runtime_field_contracts.py`.
+22. Mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes use `backend/mock_agent_contracts.py`, with generic task/requester/policy/status fields reused from `backend/runtime_field_contracts.py`.
 23. Generated-image review status vocabulary and checks use `backend/review_status.py`.
 24. Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and score helpers use `backend/critic_rubric.py`.
 25. Text tokenization, direct Safety Service classifier token parsing, label/tag normalization, and contextual snippets use `backend/text_utils.py`.
@@ -258,7 +258,7 @@ Output:
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
    - Request metadata defaults, default channel, request envelope field names, and fingerprint field names use the shared metadata contract before schema or telemetry changes.
    - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
-   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, execution-envelope signature, adapter result, response-cache telemetry, audit response, audit policy-scope extraction, mock orchestration telemetry, Slack local request/result, publishing response, or side-effect audit payload shapes are changed.
+   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, execution-envelope signature, adapter result, response-cache telemetry, audit response, audit policy-scope extraction, sub-agent output construction, mock orchestration telemetry, Slack local request/result, publishing response, or side-effect audit payload shapes are changed.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
@@ -294,7 +294,7 @@ Output:
 6. Orchestrate
    - Fresh or changed requests route through OpenClaw sub-agents.
    - Sub-agent outputs are constructed through the shared output contract helper.
-   - Mock orchestration agent names, artifact types, simulation metadata lookup, synthesis text, and telemetry field/tag shapes use the shared mock-agent contract, with requester/policy/status field names reused from the runtime field contract.
+   - Mock orchestration agent names, artifact types, simulation metadata lookup, synthesis text, and telemetry field/tag shapes use the shared mock-agent contract, with task/requester/policy/status field names reused from the runtime field contract.
    - Retrieval embeddings, snippets, and rubric labels use shared text tokenization and label normalization.
    - Retrieval vector payload fields/shape, vector payload write/read helpers, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, positive-hit filtering, and score precision use shared Knowledge Agent contracts.
    - Knowledge retrieval result snippets use the shared contextual snippet helper.
@@ -304,7 +304,7 @@ Output:
 7. Validate
    - Runtime validates `SubAgentOutput`, compares results, retries if needed,
      and synthesizes one response.
-   - Knowledge and mock sub-agent output coercion uses the shared sub-agent output constructor.
+   - Knowledge and mock sub-agent output coercion uses the shared sub-agent output constructor, with task-id field spelling reused from the runtime field contract.
    - Domain and adapter inputs and structured outputs coerce model-or-dict payloads through the shared model coercion helper.
    - Provider SDK object-or-dict responses are read through the shared response-field helper.
    - Connector HTTP methods are normalized through the shared HTTP method helper.

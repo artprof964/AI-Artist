@@ -1,5 +1,6 @@
 OPERATION_FIELD = "operation"
 TARGET_FIELD = "target"
+TASK_ID_FIELD = "task_id"
 REQUEST_ID_FIELD = "request_id"
 EXECUTION_ENVELOPE_ID_FIELD = "execution_envelope_id"
 CLIENT_RESPONSE_FIELD = "client_response"
@@ -28,5 +29,6 @@ __all__ = [
     "REQUEST_KIND_FIELD",
     "REQUIRES_HUMAN_APPROVAL_FIELD",
     "STATUS_FIELD",
+    "TASK_ID_FIELD",
     "TARGET_FIELD",
 ]

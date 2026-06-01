@@ -3,6 +3,7 @@ from typing import Any
 from uuid import UUID
 
 from backend.model_coercion import coerce_model
+from backend.runtime_field_contracts import TASK_ID_FIELD
 from backend.schemas import SubAgentOutput
 from backend.subagent_status import SubAgentStatus
 
@@ -21,7 +22,7 @@ def build_subagent_output(
 ) -> SubAgentOutput:
     return coerce_model(
         {
-            "task_id": task_id,
+            TASK_ID_FIELD: task_id,
             "agent_name": agent_name,
             "status": status,
             "summary": summary,

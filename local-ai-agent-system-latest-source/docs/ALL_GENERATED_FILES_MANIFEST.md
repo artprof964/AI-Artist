@@ -40,6 +40,7 @@
 - `../../validation_reports/subagent_status_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_status_message_standardization_2026-05-31.md`
 - `../../validation_reports/subagent_output_constructor_standardization_2026-05-31.md`
+- `../../validation_reports/task_id_runtime_field_contract_standardization_2026-06-01.md`
 - `../../validation_reports/mock_agent_contract_standardization_2026-05-31.md`
 - `../../validation_reports/mock_orchestration_telemetry_contract_standardization_2026-05-31.md`
 - `../../validation_reports/mock_orchestration_runtime_field_contract_standardization_2026-06-01.md`

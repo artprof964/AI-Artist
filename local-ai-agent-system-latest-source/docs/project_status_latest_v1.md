@@ -59,8 +59,8 @@ Source freshness schema defaults and unchanged-source checks: centralized in bac
 Source ingestion contracts and registry metadata payloads: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
-Sub-agent output construction: centralized in backend/subagent_output_contracts.py
-Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry events/messages/metrics, and runtime-field-backed telemetry field/tag shapes
+Sub-agent output construction: centralized in backend/subagent_output_contracts.py with task-id field spelling reused from backend/runtime_field_contracts.py
+Mock sub-agent contracts: centralized in backend/mock_agent_contracts.py for names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry events/messages/metrics, and runtime-field-backed task/requester/policy/status telemetry field/tag shapes
 Knowledge Agent contracts, vector payload fields/read helpers, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, and result-score cutoff/precision: centralized in backend/knowledge_contracts.py
 Generated-image review statuses: centralized in backend/review_status.py
 Critic/Curator rubric categories, decisions, score bounds, pass thresholds, scoring weights, publication penalties, and pass/fail helpers: centralized in backend/critic_rubric.py
@@ -162,7 +162,7 @@ Source ingestion hashes: source snapshots call shared canonical hash/version hel
 Request identity: shared directly across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
 Request metadata contracts and mapping: shared across schema defaults, Safety Service request fingerprints, metric tags, and canonicalization observability fields
 Safety Service observability contracts: shared across canonicalization, classification, and policy evaluation event/message/tag/field shapes
-Runtime field contracts: shared across Safety Service policy observability, OpenClaw tool telemetry, observability trace fallback metadata, execution-envelope signature payload fields, adapter result execution-envelope/client-response/request/operation/target fields, response-cache operation/request-kind/reason fields, audit response request/correlation-id and audit policy-scope fields, mock orchestration requester/policy/status fields, Slack local requester/policy/request-id and post-result client-response fields, publishing response status/target fields, and side-effect audit payload field names
+Runtime field contracts: shared across Safety Service policy observability, OpenClaw tool telemetry, observability trace fallback metadata, execution-envelope signature payload fields, adapter result execution-envelope/client-response/request/operation/target fields, response-cache operation/request-kind/reason fields, audit response request/correlation-id and audit policy-scope fields, sub-agent output task-id fields, mock orchestration task/requester/policy/status fields, Slack local requester/policy/request-id and post-result client-response fields, publishing response status/target fields, and side-effect audit payload field names
 Request scope defaults: shared across API schemas, mock orchestration request envelopes, and publishing audit context
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
@@ -172,8 +172,8 @@ Source registry contracts: shared across source-key/source-id freshness lookup f
 Source freshness contracts: shared across schema defaults, unchanged-source checks, source dependency snapshots, policy requests, cache replay, and execution envelopes
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
-Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion
-Mock agent contracts: shared across mock orchestration routing, simulation metadata lookup, artifacts, output text, error text, synthesis text, telemetry events/messages/metrics, runtime-field-backed telemetry field/tag shapes, and tests
+Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion, with task-id field spelling reused from runtime_field_contracts.py
+Mock agent contracts: shared across mock orchestration routing, simulation metadata lookup, artifacts, output text, error text, synthesis text, telemetry events/messages/metrics, runtime-field-backed task/requester/policy/status telemetry field/tag shapes, and tests
 Knowledge Agent contracts: shared across Knowledge retrieval output conversion, vector payload construction/read helpers, approved-hit filtering, artifact metadata, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result-score cutoff/precision, and tests
 Review statuses: shared across image provenance validation, critic/curator provenance scoring, and orchestration metadata
 Critic rubric vocabulary and scoring contracts: shared across Critic/Curator scoring, score conversion, pass/fail decisions, and rubric tests
@@ -230,6 +230,7 @@ image provenance hash validation: 2 focused files passed; image provenance guard
 ComfyUI response contract validation: 22 focused tests passed; response image field names and storage-reference fallback centralized in comfyui_contracts.py
 mock simulation metadata validation: 7 focused tests passed; mock-agent status simulation metadata field and lookup centralized in mock_agent_contracts.py
 mock orchestration runtime field validation: 8 focused tests passed; mock orchestration requester/policy/status field aliases reuse runtime_field_contracts.py while preserving mock-specific exported names
+task-id runtime field validation: 12 focused tests passed; SubAgentOutput construction and mock orchestration task-id aliases reuse runtime_field_contracts.py while preserving public payload shapes
 audit response contract validation: 5 focused tests passed, 1 warning; audit response accepted flag and payload shape centralized in audit_contracts.py
 audit policy-scope runtime field validation: 10 focused tests passed, 1 warning; audit policy-scope aliases reuse runtime_field_contracts.py while preserving audit-specific exported names
 Slack response contract validation: 51 focused tests passed; Slack inbound field constants, outbound field constants, post-result payload shape, LLM standard key, and LLM smoke contract unit paths validated together
@@ -240,17 +241,17 @@ runtime secret validation: LLM API smoke uses a named connection purpose plus sh
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 connection env validation helper validation: 32 focused tests passed; readiness env example missing-key and placeholder-secret checks use shared connection settings helpers
-publishing runtime field validation: 24 focused tests passed; latest full pytest 515 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
+publishing runtime field validation: 24 focused tests passed; latest full pytest 516 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
-request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 515 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
-execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 515 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
-client-response runtime field validation: 68 focused tests passed; full pytest 515 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
-adapter result field validation: 48 focused tests passed; latest full pytest 515 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
+request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 516 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
+execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 516 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
+client-response runtime field validation: 68 focused tests passed; full pytest 516 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
+adapter result field validation: 48 focused tests passed; latest full pytest 516 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 515 passed, 1 warning
+final pytest: 516 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

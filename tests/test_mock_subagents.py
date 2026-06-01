@@ -64,6 +64,7 @@ from backend.runtime_field_contracts import (
     POLICY_SCOPE_FIELD,
     REQUESTER_SCOPE_FIELD,
     STATUS_FIELD,
+    TASK_ID_FIELD,
 )
 from backend.schemas import SubAgentOutput
 from path_helpers import read_backend_source
@@ -186,7 +187,7 @@ def test_mock_agent_contract_vocabulary_is_centralized() -> None:
     assert MOCK_ORCHESTRATION_COMPLETED_METRIC == METRIC_ORCHESTRATION_COMPLETED
     assert MOCK_ORCHESTRATION_STARTED_MESSAGE == "orchestration started"
     assert MOCK_ORCHESTRATION_COMPLETED_MESSAGE == "orchestration completed"
-    assert MOCK_ORCHESTRATION_TASK_ID_FIELD == "task_id"
+    assert MOCK_ORCHESTRATION_TASK_ID_FIELD == TASK_ID_FIELD
     assert MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD == REQUESTER_SCOPE_FIELD
     assert MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD == POLICY_SCOPE_FIELD
     assert MOCK_ORCHESTRATION_AGENT_COUNT_FIELD == "agent_count"
@@ -322,6 +323,8 @@ def test_mock_orchestration_runtime_fields_reuse_shared_contracts() -> None:
     assert "MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD = REQUESTER_SCOPE_FIELD" in source
     assert "MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD = POLICY_SCOPE_FIELD" in source
     assert "MOCK_ORCHESTRATION_STATUS_FIELD = STATUS_FIELD" in source
+    assert "MOCK_ORCHESTRATION_TASK_ID_FIELD = TASK_ID_FIELD" in source
     assert 'MOCK_ORCHESTRATION_REQUESTER_SCOPE_FIELD = "requester_scope"' not in source
     assert 'MOCK_ORCHESTRATION_POLICY_SCOPE_FIELD = "policy_scope"' not in source
     assert 'MOCK_ORCHESTRATION_STATUS_FIELD = "status"' not in source
+    assert 'MOCK_ORCHESTRATION_TASK_ID_FIELD = "task_id"' not in source

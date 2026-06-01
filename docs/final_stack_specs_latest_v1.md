@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 515 passed, 1 warning
+Final validation: 516 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -60,13 +60,13 @@ backend/request_identity.py: request text normalization, direct Safety Service c
 backend/request_metadata_contracts.py: shared request metadata defaults, default request channel, request envelope field names, and fingerprint field names.
 backend/request_metadata.py: shared RequestMetadata workspace/agent mapping, canonical request fingerprint field shape, and canonicalization observability field shape using request metadata contracts.
 backend/service_observability_contracts.py: shared Safety Service request and policy observability event, message, tag, and field shapes.
-backend/runtime_field_contracts.py: shared execution-envelope-id, client-response, operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, execution-envelope signatures, adapter results, audit response request/correlation/policy-scope fields, mock orchestration requester/policy/status fields, Slack local request scope/request-id/result fields, and side-effect audit payloads.
+backend/runtime_field_contracts.py: shared task-id, execution-envelope-id, client-response, operation, target, request-id, correlation-id, status, request-kind, scope, allow, approval, reason, and policy-version field names for runtime telemetry, policy contexts, OpenClaw metadata, execution-envelope signatures, adapter results, audit response request/correlation/policy-scope fields, mock orchestration task/requester/policy/status fields, Slack local request scope/request-id/result fields, and side-effect audit payloads.
 backend/request_scope_contracts.py: shared default requester, policy, publishing actor, and publishing policy scope contracts for schemas, mock orchestration, and publishing audit context.
 backend/runtime_ids.py: shared runtime UUID and prefixed runtime ID generation.
 backend/mapping_utils.py: shared mapping copy and merge helpers for metadata and payload boundaries.
 backend/reason_messages.py: shared cache, source-freshness, policy, and execution-envelope reason strings.
 backend/subagent_status.py: shared SubAgentOutput status vocabulary, priority, and counting helpers.
-backend/subagent_output_contracts.py: shared SubAgentOutput construction and model-coercion boundary.
+backend/subagent_output_contracts.py: shared SubAgentOutput construction, runtime-field-backed task-id payload field, and model-coercion boundary.
 backend/review_status.py: shared generated-image review status vocabulary and checks.
 backend/critic_rubric.py: shared Critic/Curator rubric categories, pass/fail decision vocabulary, score bounds, pass thresholds, scoring weights, publication penalties, and rubric score helpers.
 backend/text_utils.py: shared text tokenization, direct Safety Service classifier token parsing, label normalization, and contextual snippets.
@@ -109,7 +109,7 @@ backend/llm_api_contracts.py: shared provider-neutral LLM chat request field nam
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path using shared LLM request/result contracts.
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
 backend/openclaw_hook.py: pre-tool Safety Service hook using direct shared request-kind and secret-redaction boundaries.
-backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes with generic requester/policy/status fields reused from runtime field contracts.
+backend/mock_agent_contracts.py: shared mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry event/message/metric contracts, and orchestration telemetry field/tag shapes with generic task/requester/policy/status fields reused from runtime field contracts.
 backend/knowledge_contracts.py: shared Knowledge Agent name, retrieval artifact, vector payload fields/shape, vector payload read helpers, approved payload flag, collection default, embedding defaults, stable token-index hashing, vector-search limit/sort behavior, result score cutoff/precision, policy note, and summary vocabulary.
 backend/orchestrator.py: mock sub-agent routing and synthesis using shared mock-agent contracts.
 backend/knowledge.py: deterministic source-cited retrieval using shared Knowledge Agent contracts for output, vector payload writes/reads, embedding, vector-search, and result-score boundaries.
@@ -276,14 +276,15 @@ checks, or future persistence code handles optional source rows.
 SubAgentOutput status vocabulary, priority, and aggregation must flow through
 backend/subagent_status.py before schema or orchestration-specific status
 logic is added.
-SubAgentOutput construction and model coercion must flow through
-backend/subagent_output_contracts.py before Knowledge retrieval, mock
+SubAgentOutput construction, task-id field spelling, and model coercion must
+flow through backend/subagent_output_contracts.py and
+backend/runtime_field_contracts.py before Knowledge retrieval, mock
 orchestration, or future sub-agent adapters return structured agent outputs.
 Mock sub-agent names, artifact types, output text, error text, synthesis text,
 orchestration telemetry events/messages/metrics, and orchestration telemetry
 field/tag shapes must flow through backend/mock_agent_contracts.py before
 orchestration-specific agent fixtures or telemetry are changed, with generic
-requester/policy/status fields reused from backend/runtime_field_contracts.py.
+task/requester/policy/status fields reused from backend/runtime_field_contracts.py.
 Knowledge Agent names, retrieval artifact metadata, vector payload fields/shape,
 vector payload write/read helpers, approved-source payload flags, collection defaults, embedding defaults, stable
 token-index hashing, vector-search limit/sort behavior, result score
