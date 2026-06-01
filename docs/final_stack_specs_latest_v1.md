@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 551 passed, 1 warning
+Final validation: 553 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -118,7 +118,7 @@ tests/policy_request_helpers.py: shared policy-evaluate request construction for
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
 tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
 tests/safety_service_client_helpers.py: shared FastAPI Safety Service TestClient and request helpers for endpoint, audit, OpenClaw hook, and observability tests.
-tests/service_request_helpers.py: shared Safety Service canonicalize and classify request construction for unit tests, including standard request text, normalized text, requester scope, policy scope, channel, metadata, and explicit operation defaults.
+tests/service_request_helpers.py: shared Safety Service canonicalize and classify request construction for unit, observability, and request-metadata tests, including standard request text, normalized text, observability request text, default-scope request construction, requester scope, policy scope, channel, metadata, and explicit operation defaults.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
 tests/slack_adapter_helpers.py: shared Slack adapter test harness, deterministic Slack client, inbound event payload, channel/user/team/event IDs, timestamps, and normalized text defaults.
 tests/source_registry_helpers.py: shared SourceFreshnessRegistry and source-ingestion harness construction for source freshness and source ingestion tests, including empty, single-source, two-source, style-source, approved-domain, snapshot-repository, service, and sample-candidate setup.
@@ -263,7 +263,7 @@ fixtures directly.
 Request metadata, Safety Service unit, and observability tests that need
 workspace/agent metadata must use tests/request_metadata_helpers.py before
 constructing RequestMetadata fixtures directly.
-Safety Service unit tests that need canonicalize or classify request models must
+Safety Service unit, observability, request-metadata, and future service-boundary tests that need canonicalize or classify request models must
 use tests/service_request_helpers.py before constructing CanonicalizeRequest or
 ClassifyRequest directly.
 Execution-envelope, execution-gate, policy-contract, adapter-result, and

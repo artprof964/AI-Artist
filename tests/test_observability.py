@@ -27,17 +27,17 @@ from backend.openclaw_hook import (
     execute_tool_call_with_safety,
 )
 from backend.response_cache import evaluate_cached_response_reuse
-from backend.schemas import (
-    CanonicalizeRequest,
-    ClassifyRequest,
-)
 from backend.service import canonicalize_request, classify_request, evaluate_policy
 from cache_entry_helpers import approved_response_cache_entry_for_test
 from execution_envelope_helpers import unchanged_source_freshness
 from openclaw_hook_helpers import MockOrchestrationAdapter, RecordingSafetyClient
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
-from request_metadata_helpers import request_metadata_for_test
+from service_request_helpers import (
+    SERVICE_OBSERVABILITY_NORMALIZED_TEXT,
+    observability_canonicalize_request_for_test,
+    observability_classify_request_for_test,
+)
 from tool_call_helpers import tool_call_request_for_test
 
 
@@ -55,19 +55,13 @@ def clear_observability() -> None:
 
 def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None:
     canonical = canonicalize_request(
-        CanonicalizeRequest(
+        observability_canonicalize_request_for_test(
             request_id=REQUEST_ID,
-            request_text="  Research   safe local image context  ",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            channel="cli",
-            metadata=request_metadata_for_test(),
         )
     )
     classified = classify_request(
-        ClassifyRequest(
+        observability_classify_request_for_test(
             request_id=REQUEST_ID,
-            request_text="Research safe local image context",
         )
     )
     policy_request = policy_evaluate_request_for_test(
@@ -106,7 +100,7 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
             request_id=REQUEST_ID,
             source_freshness=unchanged_source_freshness(),
             arguments={
-                "request_text": "Research safe local image context",
+                "request_text": SERVICE_OBSERVABILITY_NORMALIZED_TEXT,
                 "provider": {"api_key": "sk-observability-secret"},
             },
             metadata={
@@ -203,3 +197,26 @@ def test_observability_tests_use_shared_openclaw_hook_helpers() -> None:
     assert "LocalOrchestrationAdapter" not in class_names
     assert "RecordingSafetyClient(" in source
     assert "MockOrchestrationAdapter(" in source
+
+
+def test_observability_tests_use_shared_service_request_helpers() -> None:
+    source = read_test_source("test_observability.py")
+    tree = ast.parse(source)
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "observability_canonicalize_request_for_test" in called_names
+    assert "observability_classify_request_for_test" in called_names
+    assert "CanonicalizeRequest" not in called_names
+    assert "ClassifyRequest" not in called_names
+    assert ("backend.schemas", "CanonicalizeRequest") not in imported_names
+    assert ("backend.schemas", "ClassifyRequest") not in imported_names

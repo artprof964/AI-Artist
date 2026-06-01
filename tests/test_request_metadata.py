@@ -19,9 +19,9 @@ from backend.request_metadata_contracts import (
 )
 from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.orchestrator import MockAgentRequest
-from backend.schemas import CanonicalizeRequest
 from path_helpers import read_backend_source, read_test_source
 from request_metadata_helpers import request_metadata_for_test
+from service_request_helpers import default_scope_canonicalize_request_for_test
 
 
 def test_request_metadata_fields_centralizes_workspace_and_agent_mapping() -> None:
@@ -91,8 +91,9 @@ def test_default_request_scopes_are_centralized() -> None:
 
     assert DEFAULT_REQUESTER_SCOPE == "local-user"
     assert DEFAULT_POLICY_SCOPE == "default"
-    assert CanonicalizeRequest(request_text="hello").requester_scope == DEFAULT_REQUESTER_SCOPE
-    assert CanonicalizeRequest(request_text="hello").policy_scope == DEFAULT_POLICY_SCOPE
+    request = default_scope_canonicalize_request_for_test()
+    assert request.requester_scope == DEFAULT_REQUESTER_SCOPE
+    assert request.policy_scope == DEFAULT_POLICY_SCOPE
     assert MockAgentRequest(request_text="hello").requester_scope == DEFAULT_REQUESTER_SCOPE
     assert MockAgentRequest(request_text="hello").policy_scope == DEFAULT_POLICY_SCOPE
     for source in (schema_source, orchestrator_source):
@@ -149,5 +150,29 @@ def test_metadata_path_tests_use_shared_request_metadata_helper() -> None:
             and node.func.id == "RequestMetadata"
         ]
 
-        assert "request_metadata_for_test(" in source
+        assert (
+            "request_metadata_for_test(" in source
+            or "observability_canonicalize_request_for_test(" in source
+            or "canonicalize_request_for_test(" in source
+        )
         assert direct_constructor_calls == []
+
+
+def test_request_metadata_tests_use_shared_service_request_helper() -> None:
+    source = read_test_source("test_request_metadata.py")
+    tree = ast.parse(source)
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "default_scope_canonicalize_request_for_test" in called_names
+    assert "CanonicalizeRequest" not in called_names
+    assert ("backend.schemas", "CanonicalizeRequest") not in imported_names
