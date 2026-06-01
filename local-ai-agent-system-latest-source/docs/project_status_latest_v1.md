@@ -253,7 +253,7 @@ policy-path execution-envelope helper validation: 25 focused tests passed; polic
 human-approval helper validation: 41 focused tests passed; execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests share HumanApproval construction and guard against direct local constructor setup
 policy-request helper validation: 25 focused response-cache tests passed; cache, source freshness, observability, Safety Service unit, and OpenClaw hook tests share policy request and freshness helper setup, and response-cache tests call the shared policy request helper directly without local base-policy-request wrappers
 policy-response helper validation: 36 focused tests passed; response cache and source freshness tests share approved PolicyEvaluateResponse construction and guard against direct local constructor setup
-cache-entry helper validation: 39 focused tests passed; response cache, source freshness, and observability tests share ApprovedResponseCacheEntry construction and guard against direct local constructor setup
+cache-entry helper validation: 26 focused response-cache tests passed; response cache, source freshness, and observability tests share ApprovedResponseCacheEntry construction and response-cache tests call the shared cache-entry helper directly without local base-cache-entry wrappers
 connection-env helper validation: 79 focused tests passed; connection settings, LLM API smoke, Slack adapter, and GitHub adapter tests share env builders and test secret constants
 secret fixture helper validation: 31 focused tests passed, 1 warning; audit, secret-redaction, security-review, and side-effect audit tests share token-shaped payload fixtures and redaction assertions
 tool-call helper validation: 10 focused tests passed, 1 warning; OpenClaw safety hook and observability tests share ToolCallRequest construction and guard against direct local constructor setup
@@ -275,7 +275,7 @@ adapter result field validation: 48 focused tests passed; latest full pytest 532
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 544 passed, 1 warning
+final pytest: 545 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

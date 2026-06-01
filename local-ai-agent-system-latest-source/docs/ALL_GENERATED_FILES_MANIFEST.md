@@ -208,6 +208,7 @@
 - `../../validation_reports/connection_env_helper_standardization_2026-06-01.md`
 - `../../validation_reports/human_approval_helper_standardization_2026-06-01.md`
 - `../../validation_reports/cache_entry_helper_standardization_2026-06-01.md`
+- `../../validation_reports/response_cache_cache_entry_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_response_helper_standardization_2026-06-01.md`
 - `../../validation_reports/request_metadata_helper_standardization_2026-06-01.md`
 - `../../validation_reports/secret_test_helper_standardization_2026-06-01.md`

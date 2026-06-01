@@ -192,6 +192,8 @@ Rules:
 - Cache, source freshness, observability, and future cache-path tests use
   `tests/cache_entry_helpers.py` instead of constructing standard
   `ApprovedResponseCacheEntry` fixtures directly.
+- Response-cache tests call `tests/cache_entry_helpers.py` directly instead
+  of defining local base-cache-entry wrappers.
 - Cache, source freshness, and future policy-response fixture tests use
   `tests/policy_response_helpers.py` instead of constructing standard
   approved `PolicyEvaluateResponse` fixtures directly.

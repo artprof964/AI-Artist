@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 544 passed, 1 warning
+Final validation: 545 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -212,6 +212,8 @@ constructing TestClient directly.
 Cache, source-freshness, and observability tests that need approved cache
 entries must use tests/cache_entry_helpers.py before constructing
 ApprovedResponseCacheEntry directly.
+Response-cache tests must call tests/cache_entry_helpers.py directly for
+standard approved cache entries before adding local base-cache-entry wrappers.
 Connection tests that need LLM, Slack, GitHub, or full connection env fixtures
 must use tests/connection_env_helpers.py before repeating env-var names,
 provider keys, or adapter token literals.

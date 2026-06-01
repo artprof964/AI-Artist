@@ -35,23 +35,13 @@ from policy_response_helpers import approved_policy_response_for_test
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
 REQUEST_FINGERPRINT = "sha256:repeat-read-request"
 
-def base_cache_entry() -> ApprovedResponseCacheEntry:
-    return approved_response_cache_entry_for_test(
-        now=NOW,
-        cache_key="cache:repeat-read-request",
-        request_fingerprint=REQUEST_FINGERPRINT,
-        requester_scope="user:local",
-        policy_scope="workspace:ai-artist-main",
-        response_body={"answer": "cached read response"},
-    )
-
 
 def test_replays_approved_read_response_with_fresh_non_expired_cache_entry() -> None:
     decision = evaluate_cached_response_reuse(
         policy_request=policy_evaluate_request_for_test(),
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=base_cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(),
         now=NOW,
     )
 
@@ -68,7 +58,7 @@ def test_rejects_non_read_replay_requests(request_kind: str) -> None:
         policy_request=request,
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=base_cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(),
         now=NOW,
     )
 
@@ -83,7 +73,7 @@ def test_rejects_non_reuse_policy_requests() -> None:
         policy_request=request,
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=base_cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(),
         now=NOW,
     )
 
@@ -108,7 +98,7 @@ def test_rejects_stale_replay_request_sources(source_freshness: SourceFreshness)
         policy_request=request,
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=base_cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(),
         now=NOW,
     )
 
@@ -126,14 +116,14 @@ def test_rejects_policy_denial_or_human_approval_requirement() -> None:
         policy_request=policy_evaluate_request_for_test(),
         policy_response=denied,
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=base_cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(),
         now=NOW,
     )
     approval_decision = evaluate_cached_response_reuse(
         policy_request=policy_evaluate_request_for_test(),
         policy_response=approval_required,
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=base_cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(),
         now=NOW,
     )
 
@@ -147,42 +137,51 @@ def test_rejects_policy_denial_or_human_approval_requirement() -> None:
     ("entry", "request_fingerprint", "reason"),
     [
         (
-            replace(base_cache_entry(), request_kind="action"),
+            replace(approved_response_cache_entry_for_test(), request_kind="action"),
             REQUEST_FINGERPRINT,
             "cached response is not read-only",
         ),
         (
-            replace(base_cache_entry(), operation=OPERATION_WRITE),
+            replace(approved_response_cache_entry_for_test(), operation=OPERATION_WRITE),
             REQUEST_FINGERPRINT,
             "cached response is not read-only",
         ),
         (
-            base_cache_entry(),
+            approved_response_cache_entry_for_test(),
             "sha256:different-request",
             "request fingerprint mismatch",
         ),
         (
-            replace(base_cache_entry(), requester_scope="user:other"),
+            replace(approved_response_cache_entry_for_test(), requester_scope="user:other"),
             REQUEST_FINGERPRINT,
             "requester scope mismatch",
         ),
         (
-            replace(base_cache_entry(), policy_scope="workspace:other"),
+            replace(
+                approved_response_cache_entry_for_test(),
+                policy_scope="workspace:other",
+            ),
             REQUEST_FINGERPRINT,
             "policy scope mismatch",
         ),
         (
-            replace(base_cache_entry(), approved_for_reuse=False),
+            replace(
+                approved_response_cache_entry_for_test(),
+                approved_for_reuse=False,
+            ),
             REQUEST_FINGERPRINT,
             "cache entry is not approved for reuse",
         ),
         (
-            replace(base_cache_entry(), all_sources_unchanged=False),
+            replace(
+                approved_response_cache_entry_for_test(),
+                all_sources_unchanged=False,
+            ),
             REQUEST_FINGERPRINT,
             "cache entry sources are stale",
         ),
         (
-            replace(base_cache_entry(), expires_at=NOW),
+            replace(approved_response_cache_entry_for_test(), expires_at=NOW),
             REQUEST_FINGERPRINT,
             "cache entry expired",
         ),
@@ -336,6 +335,17 @@ def test_cache_path_tests_use_shared_cache_entry_helper() -> None:
 
         assert "approved_response_cache_entry_for_test(" in source
         assert direct_constructor_calls == []
+
+
+def test_response_cache_tests_use_shared_cache_entry_helper_directly() -> None:
+    source = read_test_source("test_response_cache.py")
+    tree = ast.parse(source)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+
+    assert "base_cache_entry" not in function_names
+    assert "approved_response_cache_entry_for_test(" in source
 
 
 def test_cache_path_tests_use_shared_policy_response_helper() -> None:
