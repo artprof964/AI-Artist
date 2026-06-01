@@ -108,6 +108,7 @@ tests/path_helpers.py: shared test project root, checked-in project text reads, 
 tests/cache_entry_helpers.py: shared approved response-cache entry construction for cache, source-freshness, and observability tests, including cache identity, request fingerprint, requester/policy scope, read-only operation, response body, reuse flags, source state, and cache timestamp defaults.
 tests/connection_env_helpers.py: shared test env builders and secret constants for LLM, Slack, GitHub, and full connection-settings test scenarios.
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
+tests/gated_adapter_helpers.py: shared adapter-specific envelope defaults for ComfyUI, GitHub, and Publishing adapter tests, including stable request IDs, targets, operation defaults, and approved/unapproved envelope construction.
 tests/human_approval_helpers.py: shared HumanApproval construction for execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests, including approved/unapproved state, approver scope, and approval timestamp defaults.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
@@ -230,9 +231,12 @@ publishing-adapter tests that need human approval state must use
 tests/human_approval_helpers.py before constructing HumanApproval fixtures
 directly.
 Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes must
-use tests/execution_envelope_helpers.py before ComfyUI, Publishing, GitHub,
-Safety Service unit, policy-contract, publishing-agent, or future gated test
-modules construct envelope requests directly.
+use tests/execution_envelope_helpers.py before Safety Service unit,
+policy-contract, publishing-agent, or future policy-path test modules construct
+envelope requests directly. ComfyUI, Publishing, GitHub, and future gated
+adapter tests that need adapter-specific request IDs, targets, operation
+defaults, or approved/unapproved envelopes must use tests/gated_adapter_helpers.py
+before defining adapter-local envelope wrappers.
 Execution-envelope validation, expiry checks, and signature verification must
 flow through backend/execution_gate.py before adapter-specific side-effect logic.
 Execution-envelope validation failure, signature failure, and required-envelope

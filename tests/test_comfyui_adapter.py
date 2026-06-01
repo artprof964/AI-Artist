@@ -1,7 +1,6 @@
 import ast
 from datetime import timedelta
 from typing import Any
-from uuid import UUID
 
 import pytest
 
@@ -12,16 +11,18 @@ from backend.comfyui_adapter import (
     ComfyUIImageGenerationRequest,
 )
 from backend.time_utils import utc_now
-from execution_envelope_helpers import (
-    approved_execution_envelope,
-    unapproved_execution_envelope,
+from gated_adapter_helpers import (
+    COMFYUI_ADAPTER_REQUEST_ID,
+    COMFYUI_ADAPTER_TARGET,
+    approved_comfyui_envelope_for_test,
+    unapproved_comfyui_envelope_for_test,
 )
 from path_helpers import read_backend_source, read_test_source
 
 
-REQUEST_ID = UUID("17171717-1717-1717-1717-171717171717")
+REQUEST_ID = COMFYUI_ADAPTER_REQUEST_ID
 NOW = utc_now()
-COMFYUI_TARGET = "comfyui://workflow/mock-image-generation"
+COMFYUI_TARGET = COMFYUI_ADAPTER_TARGET
 
 
 class MockComfyUIClient:
@@ -42,27 +43,10 @@ class MockComfyUIClient:
         }
 
 
-def approved_envelope(*, operation: str):
-    return approved_execution_envelope(
-        request_id=REQUEST_ID,
-        operation=operation,
-        target=COMFYUI_TARGET,
-        approved_at=NOW,
-    )
-
-
-def unapproved_envelope():
-    return unapproved_execution_envelope(
-        request_id=REQUEST_ID,
-        operation="image_generate",
-        target=COMFYUI_TARGET,
-    )
-
-
 def test_image_generation_succeeds_with_mocked_approved_execution_envelope() -> None:
     client = MockComfyUIClient()
     adapter = ComfyUIAdapter(client)
-    envelope = approved_envelope(operation="image_generate")
+    envelope = approved_comfyui_envelope_for_test(approved_at=NOW)
     workflow = {
         "prompt": "paint a quiet studio scene",
         "nodes": [{"id": "positive_prompt", "type": "CLIPTextEncode"}],
@@ -89,20 +73,23 @@ def test_image_generation_succeeds_with_mocked_approved_execution_envelope() -> 
     [
         (None, "requires an execution envelope"),
         ({"operation": "image_generate"}, "invalid"),
-        (unapproved_envelope(), "not valid"),
+        (unapproved_comfyui_envelope_for_test(), "not valid"),
         (
-            approved_envelope(operation="image_generate").model_copy(update={"allow": False}),
+            approved_comfyui_envelope_for_test(approved_at=NOW).model_copy(update={"allow": False}),
             "does not allow execution",
         ),
-        (approved_envelope(operation="publish"), "operation must be image_generate"),
         (
-            approved_envelope(operation="image_generate").model_copy(
+            approved_comfyui_envelope_for_test(operation="publish", approved_at=NOW),
+            "operation must be image_generate",
+        ),
+        (
+            approved_comfyui_envelope_for_test(approved_at=NOW).model_copy(
                 update={"expires_at": NOW - timedelta(seconds=1)}
             ),
             "expired",
         ),
         (
-            approved_envelope(operation="image_generate").model_copy(update={"signature": ""}),
+            approved_comfyui_envelope_for_test(approved_at=NOW).model_copy(update={"signature": ""}),
             "signature",
         ),
     ],
@@ -153,6 +140,14 @@ def test_comfyui_adapter_gate_labels_are_centralized() -> None:
 def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
     contents = read_test_source("test_comfyui_adapter.py")
     tree = ast.parse(contents)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
     imported_names = {
         (node.module, alias.name)
         for node in ast.walk(tree)
@@ -160,7 +155,11 @@ def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
         for alias in node.names
     }
 
-    assert "approved_execution_envelope(" in contents
-    assert "unapproved_execution_envelope(" in contents
+    assert "approved_comfyui_envelope_for_test" in called_names
+    assert "unapproved_comfyui_envelope_for_test" in called_names
+    assert "approved_execution_envelope" not in called_names
+    assert "unapproved_execution_envelope" not in called_names
+    assert "approved_envelope" not in function_names
+    assert "unapproved_envelope" not in function_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

@@ -81,7 +81,8 @@ can be marked done.
 58. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
 59. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
-61. Gated-adapter and policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
+61. Policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
+61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, and approved/unapproved execution-envelope setup.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
@@ -180,10 +181,14 @@ Rules:
   publishing-adapter, and future envelope-path tests use
   `tests/human_approval_helpers.py` instead of constructing standard
   `HumanApproval` fixtures directly.
-- Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes use
-  `tests/execution_envelope_helpers.py` instead of constructing
-  `ExecutionEnvelopeRequest` directly in adapter-specific, policy-contract,
-  Safety Service unit, or publishing-agent test modules.
+- Policy-path tests that need approved, unapproved, unchanged-source, or
+  stale-source execution envelopes use `tests/execution_envelope_helpers.py`
+  instead of constructing `ExecutionEnvelopeRequest` directly in
+  policy-contract, Safety Service unit, or publishing-agent test modules.
+- Gated-adapter tests that need adapter request IDs, targets, operation
+  defaults, or approved/unapproved execution envelopes use
+  `tests/gated_adapter_helpers.py` instead of defining adapter-local envelope
+  wrappers in ComfyUI, Publishing, GitHub, or future gated adapter test modules.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

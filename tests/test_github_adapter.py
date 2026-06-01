@@ -3,7 +3,6 @@ from __future__ import annotations
 import ast
 from datetime import timedelta
 from typing import Any
-from uuid import UUID
 
 import pytest
 
@@ -20,16 +19,18 @@ from backend.repo_paths import (
 )
 from backend.time_utils import utc_now
 from connection_env_helpers import TEST_GITHUB_TOKEN, github_token_env
-from execution_envelope_helpers import (
-    approved_execution_envelope,
-    unapproved_execution_envelope,
+from gated_adapter_helpers import (
+    GITHUB_ADAPTER_REQUEST_ID,
+    GITHUB_ADAPTER_TARGET,
+    approved_github_write_envelope_for_test,
+    unapproved_github_write_envelope_for_test,
 )
 from path_helpers import PROJECT_ROOT, read_backend_source, read_test_source
 
 
-REQUEST_ID = UUID("23232323-2323-2323-2323-232323232323")
+REQUEST_ID = GITHUB_ADAPTER_REQUEST_ID
 NOW = utc_now()
-GITHUB_TARGET = "github://artprof964/AI-Art/issues"
+GITHUB_TARGET = GITHUB_ADAPTER_TARGET
 GITHUB_PATH = "/repos/artprof964/AI-Art/issues"
 MOCK_GITHUB_TOKEN = TEST_GITHUB_TOKEN
 
@@ -66,27 +67,6 @@ class MockGitHubAPI:
         }
 
 
-def approved_envelope(
-    *,
-    operation: str = "github_write",
-    target: str = GITHUB_TARGET,
-):
-    return approved_execution_envelope(
-        request_id=REQUEST_ID,
-        operation=operation,
-        target=target,
-        approved_at=NOW,
-    )
-
-
-def unapproved_github_write_envelope():
-    return unapproved_execution_envelope(
-        request_id=REQUEST_ID,
-        operation="github_write",
-        target=GITHUB_TARGET,
-    )
-
-
 def github_write_request(*, envelope: object) -> GitHubWriteRequest:
     return GitHubWriteRequest(
         method="post",
@@ -106,7 +86,7 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
     monkeypatch.setenv(GITHUB_TOKEN_ENV_VAR, MOCK_GITHUB_TOKEN)
     client = MockGitHubAPI()
     adapter = GitHubAdapter(client)
-    envelope = approved_envelope()
+    envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
     result = adapter.write(github_write_request(envelope=envelope), now=NOW)
 
@@ -134,7 +114,7 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
 def test_github_adapter_can_read_token_from_injected_connection_env() -> None:
     client = MockGitHubAPI()
     adapter = GitHubAdapter(client, env=github_token_env())
-    envelope = approved_envelope()
+    envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
     result = adapter.write(github_write_request(envelope=envelope), now=NOW)
 
@@ -148,7 +128,7 @@ def test_github_adapter_supports_explicit_token_connection_injection(
     monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR, raising=False)
     client = MockGitHubAPI()
     adapter = GitHubAdapter(client, token=f"  {MOCK_GITHUB_TOKEN}  ")
-    envelope = approved_envelope()
+    envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
     result = adapter.write(github_write_request(envelope=envelope), now=NOW)
 
@@ -187,13 +167,21 @@ def test_github_adapter_reads_token_only_after_execution_gate_allows(
     adapter = GitHubAdapter(client)
 
     with pytest.raises(GitHubExecutionGateError, match="not valid"):
-        adapter.write(github_write_request(envelope=unapproved_github_write_envelope()), now=NOW)
+        adapter.write(
+            github_write_request(envelope=unapproved_github_write_envelope_for_test()),
+            now=NOW,
+        )
 
     assert client.calls == []
 
     monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR)
     with pytest.raises(GitHubAdapterConfigurationError, match=GITHUB_TOKEN_ENV_VAR):
-        adapter.write(github_write_request(envelope=approved_envelope()), now=NOW)
+        adapter.write(
+            github_write_request(
+                envelope=approved_github_write_envelope_for_test(approved_at=NOW)
+            ),
+            now=NOW,
+        )
 
     assert client.calls == []
 
@@ -206,7 +194,10 @@ def test_github_adapter_rejects_invalid_envelope_before_token_read(
     adapter = GitHubAdapter(client)
 
     with pytest.raises(GitHubExecutionGateError, match="not valid"):
-        adapter.write(github_write_request(envelope=unapproved_github_write_envelope()), now=NOW)
+        adapter.write(
+            github_write_request(envelope=unapproved_github_write_envelope_for_test()),
+            now=NOW,
+        )
 
     assert client.calls == []
 
@@ -216,22 +207,34 @@ def test_github_adapter_rejects_invalid_envelope_before_token_read(
     [
         (None, "requires an execution envelope"),
         ({"operation": "github_write"}, "invalid"),
-        (unapproved_github_write_envelope(), "not valid"),
+        (unapproved_github_write_envelope_for_test(), "not valid"),
         (
-            approved_envelope().model_copy(update={"allow": False}),
+            approved_github_write_envelope_for_test(approved_at=NOW).model_copy(
+                update={"allow": False}
+            ),
             "does not allow execution",
         ),
-        (approved_envelope(operation="publish"), "operation must be github_write"),
         (
-            approved_envelope().model_copy(update={"expires_at": NOW - timedelta(seconds=1)}),
+            approved_github_write_envelope_for_test(operation="publish", approved_at=NOW),
+            "operation must be github_write",
+        ),
+        (
+            approved_github_write_envelope_for_test(approved_at=NOW).model_copy(
+                update={"expires_at": NOW - timedelta(seconds=1)}
+            ),
             "expired",
         ),
         (
-            approved_envelope().model_copy(update={"signature": ""}),
+            approved_github_write_envelope_for_test(approved_at=NOW).model_copy(
+                update={"signature": ""}
+            ),
             "signature",
         ),
         (
-            approved_envelope(target="github://artprof964/AI-Art/pulls"),
+            approved_github_write_envelope_for_test(
+                target="github://artprof964/AI-Art/pulls",
+                approved_at=NOW,
+            ),
             "target does not match",
         ),
     ],
@@ -280,7 +283,7 @@ def test_github_adapter_rejects_unsafe_api_shapes_before_client_execution(
                 path=path,
                 payload={"title": "blocked"},
                 target=GITHUB_TARGET,
-                execution_envelope=approved_envelope(),
+                execution_envelope=approved_github_write_envelope_for_test(approved_at=NOW),
             ),
             now=NOW,
         )
@@ -312,7 +315,7 @@ def test_github_adapter_rejects_unsafe_paths_before_token_read(
                 path=path,
                 payload={"title": "blocked"},
                 target=GITHUB_TARGET,
-                execution_envelope=approved_envelope(),
+                execution_envelope=approved_github_write_envelope_for_test(approved_at=NOW),
             ),
             now=NOW,
         )
@@ -359,6 +362,14 @@ def test_github_adapter_uses_shared_missing_envelope_message() -> None:
 def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
     source = read_test_source("test_github_adapter.py")
     tree = ast.parse(source)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
     imported_names = {
         (node.module, alias.name)
         for node in ast.walk(tree)
@@ -366,7 +377,11 @@ def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
         for alias in node.names
     }
 
-    assert "approved_execution_envelope(" in source
-    assert "unapproved_execution_envelope(" in source
+    assert "approved_github_write_envelope_for_test" in called_names
+    assert "unapproved_github_write_envelope_for_test" in called_names
+    assert "approved_execution_envelope" not in called_names
+    assert "unapproved_execution_envelope" not in called_names
+    assert "approved_envelope" not in function_names
+    assert "unapproved_github_write_envelope" not in function_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

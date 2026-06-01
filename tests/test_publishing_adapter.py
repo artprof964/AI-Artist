@@ -1,7 +1,6 @@
 import ast
 from datetime import timedelta
 from typing import Any
-from uuid import UUID
 
 import pytest
 
@@ -12,17 +11,19 @@ from backend.publishing_adapter import (
     PublishingRequest,
 )
 from backend.time_utils import utc_now
-from execution_envelope_helpers import (
-    approved_execution_envelope,
-    unapproved_execution_envelope,
+from gated_adapter_helpers import (
+    PUBLISHING_ADAPTER_REQUEST_ID,
+    PUBLISHING_ADAPTER_TARGET,
+    approved_publishing_envelope_for_test,
+    unapproved_publishing_envelope_for_test,
 )
 from human_approval_helpers import unapproved_human_approval_for_test
 from path_helpers import read_backend_source, read_test_source
 
 
-REQUEST_ID = UUID("22222222-2222-2222-2222-222222222222")
+REQUEST_ID = PUBLISHING_ADAPTER_REQUEST_ID
 NOW = utc_now()
-PUBLISH_TARGET = "mock-publisher://channels/artist-feed"
+PUBLISH_TARGET = PUBLISHING_ADAPTER_TARGET
 
 
 class MockPublishingClient:
@@ -38,23 +39,6 @@ class MockPublishingClient:
         }
 
 
-def approved_envelope(*, operation: str = "publish", target: str = PUBLISH_TARGET):
-    return approved_execution_envelope(
-        request_id=REQUEST_ID,
-        operation=operation,
-        target=target,
-        approved_at=NOW,
-    )
-
-
-def unapproved_publish_envelope():
-    return unapproved_execution_envelope(
-        request_id=REQUEST_ID,
-        operation="publish",
-        target=PUBLISH_TARGET,
-    )
-
-
 def test_publishing_blocks_external_client_until_human_approval_is_attached() -> None:
     client = MockPublishingClient()
     adapter = PublishingAdapter(client)
@@ -68,14 +52,14 @@ def test_publishing_blocks_external_client_until_human_approval_is_attached() ->
             PublishingRequest(
                 target=PUBLISH_TARGET,
                 payload=payload,
-                execution_envelope=unapproved_publish_envelope(),
+                execution_envelope=unapproved_publishing_envelope_for_test(),
             ),
             now=NOW,
         )
 
     assert client.calls == []
 
-    envelope = approved_envelope()
+    envelope = approved_publishing_envelope_for_test(approved_at=NOW)
     result = adapter.publish(
         PublishingRequest(
             target=PUBLISH_TARGET,
@@ -97,13 +81,15 @@ def test_publishing_blocks_external_client_until_human_approval_is_attached() ->
     [
         (None, "requires an execution envelope"),
         ({"operation": "publish"}, "invalid"),
-        (unapproved_publish_envelope(), "not valid"),
+        (unapproved_publishing_envelope_for_test(), "not valid"),
         (
-            approved_envelope().model_copy(update={"allow": False}),
+            approved_publishing_envelope_for_test(approved_at=NOW).model_copy(
+                update={"allow": False}
+            ),
             "does not allow execution",
         ),
         (
-            approved_envelope().model_copy(
+            approved_publishing_envelope_for_test(approved_at=NOW).model_copy(
                 update={
                     "allow": True,
                     "human_approval": unapproved_human_approval_for_test(),
@@ -113,17 +99,27 @@ def test_publishing_blocks_external_client_until_human_approval_is_attached() ->
             ),
             "requires human approval",
         ),
-        (approved_envelope(operation="image_generate"), "operation must be publish"),
         (
-            approved_envelope().model_copy(update={"expires_at": NOW - timedelta(seconds=1)}),
+            approved_publishing_envelope_for_test(operation="image_generate", approved_at=NOW),
+            "operation must be publish",
+        ),
+        (
+            approved_publishing_envelope_for_test(approved_at=NOW).model_copy(
+                update={"expires_at": NOW - timedelta(seconds=1)}
+            ),
             "expired",
         ),
         (
-            approved_envelope().model_copy(update={"signature": ""}),
+            approved_publishing_envelope_for_test(approved_at=NOW).model_copy(
+                update={"signature": ""}
+            ),
             "signature",
         ),
         (
-            approved_envelope(target="mock-publisher://channels/other-feed"),
+            approved_publishing_envelope_for_test(
+                target="mock-publisher://channels/other-feed",
+                approved_at=NOW,
+            ),
             "target does not match",
         ),
     ],
@@ -177,6 +173,14 @@ def test_publishing_adapter_gate_labels_are_centralized() -> None:
 def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None:
     contents = read_test_source("test_publishing_adapter.py")
     tree = ast.parse(contents)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
     imported_names = {
         (node.module, alias.name)
         for node in ast.walk(tree)
@@ -184,7 +188,11 @@ def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None
         for alias in node.names
     }
 
-    assert "approved_execution_envelope(" in contents
-    assert "unapproved_execution_envelope(" in contents
+    assert "approved_publishing_envelope_for_test" in called_names
+    assert "unapproved_publishing_envelope_for_test" in called_names
+    assert "approved_execution_envelope" not in called_names
+    assert "unapproved_execution_envelope" not in called_names
+    assert "approved_envelope" not in function_names
+    assert "unapproved_publish_envelope" not in function_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names
