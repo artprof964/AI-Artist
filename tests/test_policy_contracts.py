@@ -22,16 +22,16 @@ from backend.runtime_field_contracts import (
     REQUIRES_HUMAN_APPROVAL_FIELD,
     TARGET_FIELD,
 )
-from backend.schemas import PolicyEvaluateRequest
 from backend.service import evaluate_policy
 from execution_envelope_helpers import execution_envelope_for_test
 from human_approval_helpers import approved_human_approval_for_test
 from path_helpers import read_backend_source, read_test_source
+from policy_request_helpers import policy_evaluate_request_for_test
 
 
 def test_policy_version_contract_is_shared_by_policy_and_envelope_responses() -> None:
     policy_response = evaluate_policy(
-        PolicyEvaluateRequest(
+        policy_evaluate_request_for_test(
             request_kind="read",
             operation="read",
             requester_scope="user:local",
@@ -225,3 +225,17 @@ def test_policy_path_tests_use_shared_execution_envelope_helper() -> None:
         assert "execution_envelope_for_test(" in source
         assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
         assert ("backend.service", "create_execution_envelope") not in imported_names
+
+
+def test_policy_contract_tests_use_shared_policy_request_helper() -> None:
+    source = read_test_source("test_policy_contracts.py")
+    tree = ast.parse(source)
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "policy_evaluate_request_for_test(" in source
+    assert ("backend.schemas", "PolicyEvaluateRequest") not in imported_names

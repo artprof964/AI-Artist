@@ -235,6 +235,7 @@
 - `../../validation_reports/gated_adapter_client_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_path_execution_envelope_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_request_helper_standardization_2026-06-01.md`
+- `../../validation_reports/policy_contract_policy_request_helper_standardization_2026-06-01.md`
 - `../../validation_reports/test_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/backend_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_contract_source_read_helper_standardization_2026-05-31.md`
