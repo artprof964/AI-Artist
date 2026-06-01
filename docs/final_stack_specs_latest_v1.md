@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 549 passed, 1 warning
+Final validation: 550 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -108,7 +108,7 @@ tests/path_helpers.py: shared test project root, checked-in project text reads, 
 tests/cache_entry_helpers.py: shared approved response-cache entry construction for cache, source-freshness, and observability tests, including cache identity, request fingerprint, requester/policy scope, read-only operation, response body, reuse flags, source state, and cache timestamp defaults.
 tests/connection_env_helpers.py: shared test env builders and secret constants for LLM, Slack, GitHub, and full connection-settings test scenarios.
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
-tests/gated_adapter_helpers.py: shared adapter-specific request, envelope, adapter/client harness, and fake-client defaults for ComfyUI, GitHub, Publishing adapter tests, and Publishing Agent redaction tests, including stable request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved envelope construction, mocked client responses, ComfyUI and Publishing adapter setup, GitHub token/env adapter setup, and secret-echo client responses.
+tests/gated_adapter_helpers.py: shared adapter-specific request, envelope, adapter/client harness, Publishing Agent request/harness, and fake-client defaults for ComfyUI, GitHub, Publishing adapter tests, and Publishing Agent tests, including stable request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved envelope construction, mocked client responses, ComfyUI and Publishing adapter setup, Publishing Agent local/secret-echo setup, GitHub token/env adapter setup, and secret-echo client responses.
 tests/human_approval_helpers.py: shared HumanApproval construction for execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests, including approved/unapproved state, approver scope, and approval timestamp defaults.
 tests/image_provenance_helpers.py: shared image provenance store, payload, and record construction for image provenance, Critic/Curator, and security-review tests, including stable prompt, workflow, model, seed, source references, storage URI, review status, timestamp, and record defaults.
 tests/knowledge_agent_helpers.py: shared Knowledge Agent harness, in-memory vector store, deterministic embedding model, source-document, approved sample source, and vector-point setup for Knowledge Agent tests.
@@ -270,6 +270,11 @@ Image provenance, Critic/Curator, security-review, and future artifact
 provenance tests that need provenance stores, payloads, or records must use
 tests/image_provenance_helpers.py before constructing LocalImageProvenanceStore
 or ImageProvenanceRecord directly or duplicating standard provenance payloads.
+Publishing Agent tests that need local publisher clients, secret-echo publisher
+clients, publish requests, targets, payloads, or approved/unapproved publishing
+envelopes must use tests/gated_adapter_helpers.py before constructing
+PublishingAgent, LocalPublishingClient, PublishingAgentRequest, or
+Publishing-specific envelope builders directly.
 Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes must
 use tests/execution_envelope_helpers.py before Safety Service unit,
 policy-contract, publishing-agent, or future policy-path test modules construct

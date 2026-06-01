@@ -183,6 +183,7 @@
 - `../../validation_reports/publishing_status_standardization_2026-05-31.md`
 - `../../validation_reports/publishing_operation_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/publishing_response_contract_standardization_2026-05-31.md`
+- `../../validation_reports/publishing_agent_helper_standardization_2026-06-01.md`
 - `../../backend/publishing_contracts.py`
 - `../../backend/publishing.py`
 - `../../backend/publishing_adapter.py`

@@ -210,7 +210,6 @@ def test_service_uses_shared_envelope_signing_and_ttl_contracts() -> None:
 def test_policy_path_tests_use_shared_execution_envelope_helper() -> None:
     for test_module in (
         "test_policy_contracts.py",
-        "test_publishing_agent.py",
         "test_safety_service_units.py",
     ):
         source = read_test_source(test_module)
@@ -225,6 +224,21 @@ def test_policy_path_tests_use_shared_execution_envelope_helper() -> None:
         assert "execution_envelope_for_test(" in source
         assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
         assert ("backend.service", "create_execution_envelope") not in imported_names
+
+    publishing_agent_source = read_test_source("test_publishing_agent.py")
+    publishing_agent_tree = ast.parse(publishing_agent_source)
+    publishing_agent_imports = {
+        (node.module, alias.name)
+        for node in ast.walk(publishing_agent_tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "approved_publishing_envelope_for_test(" in publishing_agent_source
+    assert "unapproved_publishing_envelope_for_test(" in publishing_agent_source
+    assert "execution_envelope_for_test(" not in publishing_agent_source
+    assert ("backend.schemas", "ExecutionEnvelopeRequest") not in publishing_agent_imports
+    assert ("backend.service", "create_execution_envelope") not in publishing_agent_imports
 
 
 def test_policy_contract_tests_use_shared_policy_request_helper() -> None:

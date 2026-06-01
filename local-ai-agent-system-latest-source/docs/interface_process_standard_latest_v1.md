@@ -83,7 +83,7 @@ can be marked done.
 59a. Safety Service endpoint, audit, OpenClaw hook, and observability tests use `tests/safety_service_client_helpers.py` for FastAPI test-client setup.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 61. Policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
-61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, adapter/client harness setup, and deterministic fake-client responses.
+61a. Gated-adapter and Publishing Agent tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, Publishing Agent request construction, approved/unapproved execution-envelope setup, adapter/agent/client harness setup, and deterministic fake-client responses.
 61b. SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py` for raw valid payload dictionaries.
 61c. Knowledge Agent tests use `tests/knowledge_agent_helpers.py` for agent, vector store, embedding model, source document, approved sample source, and vector-point setup.
 61d. Image provenance, Critic/Curator, and security-review tests use `tests/image_provenance_helpers.py` for provenance store, payload, and record setup.
@@ -219,6 +219,11 @@ Rules:
   `tests/gated_adapter_helpers.py` instead of constructing adapters directly
   or defining adapter-local request or envelope wrappers in ComfyUI,
   Publishing, GitHub, or future gated adapter test modules.
+- Publishing Agent tests that need local publisher clients, secret-echo publisher
+  clients, publish requests, targets, payloads, or approved/unapproved publishing
+  envelopes use `tests/gated_adapter_helpers.py` instead of constructing
+  `PublishingAgent`, `LocalPublishingClient`, `PublishingAgentRequest`, or local
+  publishing envelope helpers directly.
 - SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py`
   instead of defining local valid SubAgentOutput payload dictionaries.
 - Knowledge Agent tests use `tests/knowledge_agent_helpers.py` instead of

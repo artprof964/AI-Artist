@@ -1,80 +1,69 @@
 import ast
-from datetime import datetime, timezone
-from uuid import UUID
 
 import pytest
 
 from backend.audit import audit_event_repository, list_audit_events_by_correlation_id
-from backend.publishing import LocalPublishingClient, PublishingAgent, PublishingAgentRequest
 from backend.publishing_adapter import PublishingExecutionGateError
 from backend.publishing_status import PUBLISHING_STATUS_BLOCKED, PUBLISHING_STATUS_PUBLISHED
 from backend.request_scope_contracts import (
     DEFAULT_PUBLISHING_ACTOR_SCOPE,
     DEFAULT_PUBLISHING_POLICY_SCOPE,
 )
-from execution_envelope_helpers import execution_envelope_for_test
 from gated_adapter_helpers import (
+    PUBLISHING_ADAPTER_REQUEST_ID,
+    PUBLISHING_ADAPTER_TARGET,
+    PUBLISHING_AGENT_CORRELATION_ID,
     PUBLISHING_SECRET_TEST_EXTERNAL_POST_ID,
-    SecretEchoPublishingClient,
+    PUBLISHING_TEST_PAYLOAD,
+    approved_publishing_envelope_for_test,
+    local_publishing_agent_harness_for_test,
+    publishing_agent_request_for_test,
+    secret_echo_publishing_agent_harness_for_test,
+    unapproved_publishing_envelope_for_test,
 )
 from path_helpers import read_backend_source, read_test_source
 
 
-REQUEST_ID = UUID("22222222-2222-2222-2222-222222222222")
-CORRELATION_ID = UUID("22222222-2222-2222-2222-000000000001")
-NOW = datetime(2026, 5, 31, 10, 0, tzinfo=timezone.utc)
-PUBLISH_TARGET = "mock-publisher://channels/artist-feed"
-
-
-def publish_envelope(*, approved: bool):
-    return execution_envelope_for_test(
-        request_id=REQUEST_ID,
-        operation="publish",
-        target=PUBLISH_TARGET,
-        approved=approved,
-        approved_at=NOW,
-        metadata={"artifact_id": "image-001"},
-    )
+REQUEST_ID = PUBLISHING_ADAPTER_REQUEST_ID
+CORRELATION_ID = PUBLISHING_AGENT_CORRELATION_ID
+PUBLISH_TARGET = PUBLISHING_ADAPTER_TARGET
 
 
 def test_publishing_agent_blocks_external_publish_until_human_approval_is_attached() -> None:
     audit_event_repository.clear()
-    client = LocalPublishingClient()
-    agent = PublishingAgent(client)
+    harness = local_publishing_agent_harness_for_test()
+    client = harness.client
+    agent = harness.agent
     payload = {
         "artifact_id": "image-001",
         "caption": "A quiet studio scene with verified local provenance.",
         "provenance": {"image_id": "image-001", "review_status": "approved"},
     }
 
-    unapproved_envelope = publish_envelope(approved=False)
+    unapproved_envelope = unapproved_publishing_envelope_for_test()
     assert unapproved_envelope.human_approval.approved is False
     assert unapproved_envelope.valid is False
 
     with pytest.raises(PublishingExecutionGateError, match="not valid"):
         agent.publish(
-            PublishingAgentRequest(
-                target=PUBLISH_TARGET,
-                payload=payload,
+            publishing_agent_request_for_test(
                 execution_envelope=unapproved_envelope,
-                correlation_id=CORRELATION_ID,
+                payload=payload,
             ),
-            now=NOW,
+            now=unapproved_envelope.issued_at,
         )
 
     assert client.calls == []
 
-    approved_envelope = publish_envelope(approved=True)
+    approved_envelope = approved_publishing_envelope_for_test()
     assert approved_envelope.human_approval.approved is True
     assert approved_envelope.human_approval.approver_scope == "user:owner"
     assert approved_envelope.valid is True
 
     result = agent.publish(
-        PublishingAgentRequest(
-            target=PUBLISH_TARGET,
-            payload=payload,
+        publishing_agent_request_for_test(
             execution_envelope=approved_envelope,
-            correlation_id=CORRELATION_ID,
+            payload=payload,
         ),
         now=approved_envelope.issued_at,
     )
@@ -96,17 +85,16 @@ def test_publishing_agent_blocks_external_publish_until_human_approval_is_attach
 
 def test_publishing_agent_redacts_sensitive_client_response_in_audit_event() -> None:
     audit_event_repository.clear()
-    client = SecretEchoPublishingClient()
-    agent = PublishingAgent(client)
+    harness = secret_echo_publishing_agent_harness_for_test()
+    client = harness.client
+    agent = harness.agent
     payload = {"artifact_id": "image-001", "caption": "ready"}
-    envelope = publish_envelope(approved=True)
+    envelope = approved_publishing_envelope_for_test()
 
     result = agent.publish(
-        PublishingAgentRequest(
-            target=PUBLISH_TARGET,
-            payload=payload,
+        publishing_agent_request_for_test(
             execution_envelope=envelope,
-            correlation_id=CORRELATION_ID,
+            payload=payload,
         ),
         now=envelope.issued_at,
     )
@@ -129,11 +117,9 @@ def test_publishing_agent_uses_shared_publish_operation_constant() -> None:
 
 
 def test_publishing_agent_uses_shared_scope_defaults() -> None:
-    request = PublishingAgentRequest(
-        target=PUBLISH_TARGET,
-        payload={"artifact_id": "image-001"},
+    request = publishing_agent_request_for_test(
+        payload=dict(PUBLISHING_TEST_PAYLOAD),
         execution_envelope=None,
-        correlation_id=CORRELATION_ID,
     )
     source = read_backend_source("publishing.py")
 
@@ -151,3 +137,32 @@ def test_publishing_agent_tests_use_shared_fake_publishing_clients() -> None:
     class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
 
     assert "SecretEchoPublishingClient" not in class_names
+
+
+def test_publishing_agent_tests_use_shared_publishing_agent_helpers() -> None:
+    source = read_test_source("test_publishing_agent.py")
+    tree = ast.parse(source)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "publish_envelope" not in function_names
+    assert "publishing_agent_request_for_test" in called_names
+    assert "approved_publishing_envelope_for_test" in called_names
+    assert "unapproved_publishing_envelope_for_test" in called_names
+    assert "local_publishing_agent_harness_for_test" in called_names
+    assert "secret_echo_publishing_agent_harness_for_test" in called_names
+    assert ("backend.publishing", "LocalPublishingClient") not in imported_names
+    assert ("backend.publishing", "PublishingAgent") not in imported_names
+    assert ("backend.publishing", "PublishingAgentRequest") not in imported_names

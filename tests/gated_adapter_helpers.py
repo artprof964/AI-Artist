@@ -11,6 +11,7 @@ from backend.operations import (
     OPERATION_PUBLISH,
 )
 from backend.publishing import LocalPublishingClient
+from backend.publishing import PublishingAgent, PublishingAgentRequest
 from backend.publishing_adapter import PublishingAdapter, PublishingRequest
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from execution_envelope_helpers import (
@@ -43,6 +44,7 @@ COMFYUI_TEST_IMAGE_FILENAME = "mock-image.png"
 GITHUB_TEST_RESPONSE_ID = 123
 PUBLISHING_TEST_EXTERNAL_POST_ID = "mock-post-001"
 PUBLISHING_SECRET_TEST_EXTERNAL_POST_ID = "mock-post-secret-001"
+PUBLISHING_AGENT_CORRELATION_ID = UUID("22222222-2222-2222-2222-000000000001")
 
 
 class MockComfyUIClient:
@@ -154,10 +156,32 @@ class PublishingAdapterHarness:
     client: MockPublishingClient
 
 
+@dataclass(frozen=True)
+class PublishingAgentHarness:
+    agent: PublishingAgent
+    client: MockPublishingClient
+
+
 def publishing_adapter_harness_for_test() -> PublishingAdapterHarness:
     client = MockPublishingClient()
     return PublishingAdapterHarness(
         adapter=PublishingAdapter(client),
+        client=client,
+    )
+
+
+def publishing_agent_harness_for_test() -> PublishingAgentHarness:
+    client = MockPublishingClient()
+    return PublishingAgentHarness(
+        agent=PublishingAgent(client),
+        client=client,
+    )
+
+
+def local_publishing_agent_harness_for_test() -> PublishingAgentHarness:
+    client = LocalPublishingClient()
+    return PublishingAgentHarness(
+        agent=PublishingAgent(client),
         client=client,
     )
 
@@ -172,6 +196,14 @@ class SecretEchoPublishingClient(LocalPublishingClient):
             "status": PUBLISHING_STATUS_PUBLISHED,
             "target": target,
         }
+
+
+def secret_echo_publishing_agent_harness_for_test() -> PublishingAgentHarness:
+    client = SecretEchoPublishingClient()
+    return PublishingAgentHarness(
+        agent=PublishingAgent(client),
+        client=client,
+    )
 
 
 def approved_comfyui_envelope_for_test(
@@ -292,4 +324,19 @@ def publishing_request_for_test(
         target=target,
         payload=payload or dict(PUBLISHING_TEST_PAYLOAD),
         execution_envelope=execution_envelope,
+    )
+
+
+def publishing_agent_request_for_test(
+    *,
+    execution_envelope: object,
+    correlation_id: UUID = PUBLISHING_AGENT_CORRELATION_ID,
+    target: str = PUBLISHING_ADAPTER_TARGET,
+    payload: dict[str, Any] | None = None,
+) -> PublishingAgentRequest:
+    return PublishingAgentRequest(
+        target=target,
+        payload=payload or dict(PUBLISHING_TEST_PAYLOAD),
+        execution_envelope=execution_envelope,
+        correlation_id=correlation_id,
     )
