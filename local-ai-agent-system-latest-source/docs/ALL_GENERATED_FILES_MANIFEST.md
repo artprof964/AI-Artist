@@ -258,6 +258,8 @@
 - `../../tests/connection_env_helpers.py`
 - `../../tests/policy_request_helpers.py`
 - `../../tests/secret_test_helpers.py`
+- `../../tests/tool_call_helpers.py`
+- `../../validation_reports/tool_call_helper_standardization_2026-06-01.md`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
 - `../../validation_reports/api_contract_standardization_2026-05-31.md`

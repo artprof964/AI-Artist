@@ -38,8 +38,9 @@ from backend.schemas import (
 )
 from backend.service import canonicalize_request, classify_request, evaluate_policy
 from execution_envelope_helpers import unchanged_source_freshness
-from path_helpers import read_backend_source
+from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
+from tool_call_helpers import tool_call_request_for_test
 
 
 REQUEST_ID = UUID("26262626-2626-2626-2626-262626262626")
@@ -128,7 +129,7 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
         now=NOW,
     )
     tool_result = execute_tool_call_with_safety(
-        ToolCallRequest(
+        tool_call_request_for_test(
             tool_name="ai_artist.orchestrate",
             operation="read",
             request_kind="read",
@@ -217,3 +218,10 @@ def test_redacted_audit_mapping_returns_dict_without_secret_values() -> None:
     assert redacted["metadata"]["api_key"] == REDACTED_SECRET_VALUE
     assert redacted["tag"] == "safe"
     assert redacted_audit_mapping(None) == {}
+
+
+def test_observability_tests_use_shared_tool_call_request_helper() -> None:
+    source = read_test_source("test_observability.py")
+
+    assert "tool_call_request_for_test(" in source
+    assert "        ToolCallRequest(\n" not in source

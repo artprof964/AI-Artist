@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 528 passed, 1 warning
+Final validation: 530 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -109,6 +109,7 @@ tests/connection_env_helpers.py: shared test env builders and secret constants f
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
+tests/tool_call_helpers.py: shared ToolCallRequest construction for OpenClaw safety hook and observability tests, including default operation, request kind, scope, correlation ID, request ID, metadata, arguments, and source freshness setup.
 backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path using shared LLM request/result contracts.
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
@@ -200,6 +201,9 @@ provider keys, or adapter token literals.
 Redaction and security-review tests that need secret-bearing payloads,
 workspace secret lines, observability fields, or side-effect client responses
 must use tests/secret_test_helpers.py before repeating token-shaped literals.
+OpenClaw hook and observability tests that need standard tool-call requests
+must use tests/tool_call_helpers.py before constructing ToolCallRequest
+directly.
 Policy-path tests that need cache-reuse or Safety Service policy requests must
 use tests/policy_request_helpers.py before cache, source freshness,
 observability, Safety Service unit, or future policy-path tests construct

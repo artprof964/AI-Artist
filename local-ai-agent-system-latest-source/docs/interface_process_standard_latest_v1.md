@@ -85,6 +85,7 @@ can be marked done.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
+65. OpenClaw hook and observability tests use `tests/tool_call_helpers.py` for standard `ToolCallRequest` setup.
 ```
 
 ## Standard Request Envelope
@@ -152,6 +153,9 @@ Rules:
 - Audit, security-review, secret-redaction, side-effect audit, and future
   redaction tests use `tests/secret_test_helpers.py` instead of repeating
   token-shaped payloads or redaction assertion helpers locally.
+- OpenClaw hook, observability, and future tool-stage tests use
+  `tests/tool_call_helpers.py` instead of constructing standard
+  `ToolCallRequest` fixtures directly.
 - Cache, source freshness, observability, Safety Service unit, and future
   policy-path tests use `tests/policy_request_helpers.py` instead of
   constructing standard `PolicyEvaluateRequest` fixtures directly.

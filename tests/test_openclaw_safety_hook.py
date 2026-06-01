@@ -16,7 +16,8 @@ from backend.orchestrator import (
 from backend.policy_contracts import LOCAL_DEFAULT_DENY_POLICY_VERSION
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SubAgentOutput
 from execution_envelope_helpers import unchanged_source_freshness
-from path_helpers import read_backend_source
+from path_helpers import read_backend_source, read_test_source
+from tool_call_helpers import tool_call_request_for_test
 
 
 client = TestClient(app)
@@ -100,7 +101,7 @@ def test_tool_call_reaches_safety_service_before_adapter_runs() -> None:
     events: list[str] = []
     safety_client = RecordingSafetyClient(events)
     adapter = RecordingAdapter(events)
-    request = ToolCallRequest(
+    request = tool_call_request_for_test(
         tool_name="knowledge.search",
         operation="read",
         request_kind="read",
@@ -163,7 +164,7 @@ def test_denied_tool_call_never_runs_adapter() -> None:
     events: list[str] = []
     safety_client = RecordingSafetyClient(events)
     adapter = RecordingAdapter(events)
-    request = ToolCallRequest(
+    request = tool_call_request_for_test(
         tool_name="publishing.post",
         operation="publish",
         request_kind="action",
@@ -207,7 +208,7 @@ def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthes
     events: list[str] = []
     safety_client = RecordingSafetyClient(events)
     adapter = MockOrchestrationAdapter(events)
-    request = ToolCallRequest(
+    request = tool_call_request_for_test(
         tool_name="ai_artist.orchestrate",
         operation="read",
         request_kind="read",
@@ -292,3 +293,10 @@ def test_openclaw_hook_uses_shared_request_kind_constant() -> None:
 
     assert "REQUEST_KIND_READ" in source
     assert 'request.request_kind != "read"' not in source
+
+
+def test_openclaw_hook_tests_use_shared_tool_call_request_helper() -> None:
+    source = read_test_source("test_openclaw_safety_hook.py")
+
+    assert "tool_call_request_for_test(" in source
+    assert "request = ToolCallRequest(\n" not in source
