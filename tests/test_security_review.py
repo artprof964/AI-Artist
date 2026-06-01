@@ -4,7 +4,7 @@ import shutil
 
 from backend.audit import REDACTED_SECRET_VALUE, redact_audit_value
 from backend.canonical_hash import canonical_json
-from backend.image_provenance import LocalImageProvenanceStore, record_generated_image_provenance
+from backend.image_provenance import record_generated_image_provenance
 from backend.observability import InMemoryObservabilityCollector
 from backend.repo_paths import repo_path, WORKSPACES_DIR
 from backend.security_review import (
@@ -35,6 +35,10 @@ from backend.security_review_contracts import (
     security_review_target,
 )
 from path_helpers import PROJECT_ROOT, read_backend_source
+from image_provenance_helpers import (
+    image_provenance_payload_for_test,
+    image_provenance_store_for_test,
+)
 from secret_test_helpers import (
     assert_nested_payload_redacted,
     assert_no_known_nested_secrets,
@@ -115,17 +119,15 @@ def test_policy_bypass_review_verifies_default_deny_and_privileged_gates() -> No
 
 
 def test_artifact_provenance_metadata_uses_prompt_hash_instead_of_raw_prompt() -> None:
-    store = LocalImageProvenanceStore()
+    store = image_provenance_store_for_test()
     record = record_generated_image_provenance(
-        {
-            "prompt": RAW_PROMPT,
-            "workflow": {"nodes": [{"id": "prompt", "inputs": {"text": RAW_PROMPT}}]},
-            "model": "sdxl-local-art-v1",
-            "seed": 424242,
-            "source_refs": ["source:security-review"],
-            "storage_uri": "local://artifacts/security-review.png",
-            "review_status": "approved",
-        },
+        image_provenance_payload_for_test(
+            prompt=RAW_PROMPT,
+            workflow={"nodes": [{"id": "prompt", "inputs": {"text": RAW_PROMPT}}]},
+            source_refs=["source:security-review"],
+            storage_uri="local://artifacts/security-review.png",
+            review_status="approved",
+        ),
         store=store,
     )
 

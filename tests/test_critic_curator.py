@@ -1,22 +1,12 @@
-from datetime import datetime, timezone
-
 from backend.critic_curator import RUBRIC_CATEGORIES, score_image_batch, score_image_quality
 from backend.critic_rubric import CRITIC_DECISION_FAIL, CRITIC_DECISION_PASS
-from backend.image_provenance import ImageProvenanceRecord
 from backend.repo_paths import read_workspace_text
+from image_provenance_helpers import image_provenance_record_for_test
 from path_helpers import PROJECT_ROOT, read_backend_source
 
 
-PROVENANCE = ImageProvenanceRecord(
+PROVENANCE = image_provenance_record_for_test(
     image_id="studio-hero-001",
-    prompt_hash="prompt-hash",
-    workflow_hash="workflow-hash",
-    model="sdxl-local-art-v1",
-    seed=424242,
-    source_refs=["source:trend-report:2026-05-31", "source:moodboard:studio-lighting"],
-    storage_uri="local://artifacts/images/studio-hero-001.png",
-    review_status="pending",
-    created_at=datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc),
 )
 
 

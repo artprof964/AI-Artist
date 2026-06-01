@@ -86,6 +86,7 @@ can be marked done.
 61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, adapter/client harness setup, and deterministic fake-client responses.
 61b. SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py` for raw valid payload dictionaries.
 61c. Knowledge Agent tests use `tests/knowledge_agent_helpers.py` for agent, vector store, embedding model, source document, approved sample source, and vector-point setup.
+61d. Image provenance, Critic/Curator, and security-review tests use `tests/image_provenance_helpers.py` for provenance store, payload, and record setup.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 63a. LLM API smoke tests use `tests/llm_api_smoke_helpers.py` for mocked OpenAI-compatible recording clients, response ids, and response content.
@@ -223,6 +224,10 @@ Rules:
 - Knowledge Agent tests use `tests/knowledge_agent_helpers.py` instead of
   constructing standard `KnowledgeAgent`, `InMemoryQdrantVectorStore`,
   `KnowledgeSourceDocument`, or `VectorPoint` fixtures directly.
+- Image provenance, Critic/Curator, security-review, and future artifact
+  provenance tests use `tests/image_provenance_helpers.py` instead of
+  constructing `LocalImageProvenanceStore` or `ImageProvenanceRecord` directly
+  or duplicating standard provenance payload dictionaries.
 - Gated-adapter and Publishing Agent tests that need deterministic fake
   ComfyUI, GitHub, publishing, or secret-echo publishing clients use
   `tests/gated_adapter_helpers.py` instead of defining local fake client

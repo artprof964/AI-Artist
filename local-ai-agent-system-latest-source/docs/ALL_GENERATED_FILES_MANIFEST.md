@@ -134,9 +134,11 @@
 - `../../validation_reports/t18_image_provenance_validation_2026-05-31.md`
 - `../../validation_reports/direct_model_coercion_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/image_provenance_hash_boundary_standardization_2026-05-31.md`
+- `../../validation_reports/image_provenance_helper_standardization_2026-06-01.md`
 - `../../validation_reports/model_coercion_message_standardization_2026-05-31.md`
 - `../../backend/image_provenance.py`
 - `../../tests/test_image_provenance.py`
+- `../../tests/image_provenance_helpers.py`
 - `../../validation_reports/t19_critic_curator_validation_2026-05-31.md`
 - `../../validation_reports/critic_rubric_standardization_2026-05-31.md`
 - `../../validation_reports/critic_rubric_scoring_contract_standardization_2026-05-31.md`

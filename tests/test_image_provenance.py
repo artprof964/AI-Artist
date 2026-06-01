@@ -1,4 +1,4 @@
-from datetime import datetime, timezone
+import ast
 
 import pytest
 from pydantic import ValidationError
@@ -7,32 +7,24 @@ from backend.canonical_hash import sha256_json, sha256_text
 from backend.image_provenance import (
     ImageProvenanceError,
     ImageProvenanceInput,
-    LocalImageProvenanceStore,
     record_comfyui_image_provenance,
     record_generated_image_provenance,
     sha256_workflow,
 )
-from path_helpers import read_backend_source
-
-
-NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
-PROMPT = "paint a quiet studio scene"
-WORKFLOW = {
-    "nodes": [
-        {"id": "positive_prompt", "type": "CLIPTextEncode", "inputs": {"text": PROMPT}},
-        {"id": "sampler", "type": "KSampler", "inputs": {"seed": 424242}},
-    ],
-}
-MODEL = "sdxl-local-art-v1"
-SEED = 424242
-SOURCE_REFS = [
-    "source:trend-report:2026-05-31",
-    "source:moodboard:studio-lighting",
-]
+from image_provenance_helpers import (
+    PROVENANCE_TEST_MODEL,
+    PROVENANCE_TEST_PROMPT,
+    PROVENANCE_TEST_SEED,
+    PROVENANCE_TEST_SOURCE_REFS,
+    PROVENANCE_TEST_WORKFLOW,
+    image_provenance_payload_for_test,
+    image_provenance_store_for_test,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 def test_records_required_provenance_for_every_comfyui_image() -> None:
-    store = LocalImageProvenanceStore()
+    store = image_provenance_store_for_test()
     client_response = {
         "prompt_id": "mock-prompt-001",
         "images": [
@@ -51,18 +43,18 @@ def test_records_required_provenance_for_every_comfyui_image() -> None:
     }
 
     records = record_comfyui_image_provenance(
-        prompt=PROMPT,
-        workflow=WORKFLOW,
-        model=MODEL,
-        seed=SEED,
-        source_refs=SOURCE_REFS,
+        prompt=PROVENANCE_TEST_PROMPT,
+        workflow=PROVENANCE_TEST_WORKFLOW,
+        model=PROVENANCE_TEST_MODEL,
+        seed=PROVENANCE_TEST_SEED,
+        source_refs=PROVENANCE_TEST_SOURCE_REFS,
         client_response=client_response,
         review_status="pending",
         store=store,
     )
 
-    expected_prompt_hash = sha256_text(PROMPT)
-    expected_workflow_hash = sha256_json(WORKFLOW, ensure_ascii=False)
+    expected_prompt_hash = sha256_text(PROVENANCE_TEST_PROMPT)
+    expected_workflow_hash = sha256_json(PROVENANCE_TEST_WORKFLOW, ensure_ascii=False)
 
     assert len(records) == 2
     assert store.list_records() == records
@@ -73,9 +65,9 @@ def test_records_required_provenance_for_every_comfyui_image() -> None:
     for record in records:
         assert record.prompt_hash == expected_prompt_hash
         assert record.workflow_hash == expected_workflow_hash
-        assert record.model == MODEL
-        assert record.seed == SEED
-        assert record.source_refs == SOURCE_REFS
+        assert record.model == PROVENANCE_TEST_MODEL
+        assert record.seed == PROVENANCE_TEST_SEED
+        assert record.source_refs == PROVENANCE_TEST_SOURCE_REFS
         assert record.review_status == "pending"
         assert store.get(record.image_id) == record
 
@@ -89,19 +81,13 @@ def test_workflow_hash_is_deterministic_for_equivalent_dict_order() -> None:
 
 @pytest.mark.parametrize("review_status", ["pending", "approved", "rejected"])
 def test_all_allowed_review_status_values_are_accepted(review_status: str) -> None:
-    store = LocalImageProvenanceStore()
+    store = image_provenance_store_for_test()
 
     record = record_generated_image_provenance(
-        {
-            "prompt": PROMPT,
-            "workflow": WORKFLOW,
-            "model": MODEL,
-            "seed": SEED,
-            "source_refs": SOURCE_REFS,
-            "storage_uri": f"local://artifacts/images/{review_status}.png",
-            "review_status": review_status,
-            "created_at": NOW,
-        },
+        image_provenance_payload_for_test(
+            storage_uri=f"local://artifacts/images/{review_status}.png",
+            review_status=review_status,
+        ),
         store=store,
     )
 
@@ -122,11 +108,11 @@ def test_all_allowed_review_status_values_are_accepted(review_status: str) -> No
 )
 def test_rejects_missing_required_provenance_fields(missing_field: str) -> None:
     payload = {
-        "prompt": PROMPT,
-        "workflow": WORKFLOW,
-        "model": MODEL,
-        "seed": SEED,
-        "source_refs": SOURCE_REFS,
+        "prompt": PROVENANCE_TEST_PROMPT,
+        "workflow": PROVENANCE_TEST_WORKFLOW,
+        "model": PROVENANCE_TEST_MODEL,
+        "seed": PROVENANCE_TEST_SEED,
+        "source_refs": PROVENANCE_TEST_SOURCE_REFS,
         "storage_uri": "local://artifacts/images/studio.png",
         "review_status": "pending",
     }
@@ -140,10 +126,10 @@ def test_rejects_empty_source_refs() -> None:
     with pytest.raises(ValidationError):
         ImageProvenanceInput.model_validate(
             {
-                "prompt": PROMPT,
-                "workflow": WORKFLOW,
-                "model": MODEL,
-                "seed": SEED,
+                "prompt": PROVENANCE_TEST_PROMPT,
+                "workflow": PROVENANCE_TEST_WORKFLOW,
+                "model": PROVENANCE_TEST_MODEL,
+                "seed": PROVENANCE_TEST_SEED,
                 "source_refs": [],
                 "storage_uri": "local://artifacts/images/studio.png",
                 "review_status": "pending",
@@ -155,11 +141,11 @@ def test_rejects_invalid_review_status() -> None:
     with pytest.raises(ValidationError):
         ImageProvenanceInput.model_validate(
             {
-                "prompt": PROMPT,
-                "workflow": WORKFLOW,
-                "model": MODEL,
-                "seed": SEED,
-                "source_refs": SOURCE_REFS,
+                "prompt": PROVENANCE_TEST_PROMPT,
+                "workflow": PROVENANCE_TEST_WORKFLOW,
+                "model": PROVENANCE_TEST_MODEL,
+                "seed": PROVENANCE_TEST_SEED,
+                "source_refs": PROVENANCE_TEST_SOURCE_REFS,
                 "storage_uri": "local://artifacts/images/studio.png",
                 "review_status": "needs_review",
             }
@@ -169,14 +155,14 @@ def test_rejects_invalid_review_status() -> None:
 def test_rejects_comfyui_image_without_storage_reference() -> None:
     with pytest.raises(ImageProvenanceError, match="filename or storage_uri"):
         record_comfyui_image_provenance(
-            prompt=PROMPT,
-            workflow=WORKFLOW,
-            model=MODEL,
-            seed=SEED,
-            source_refs=SOURCE_REFS,
+            prompt=PROVENANCE_TEST_PROMPT,
+            workflow=PROVENANCE_TEST_WORKFLOW,
+            model=PROVENANCE_TEST_MODEL,
+            seed=PROVENANCE_TEST_SEED,
+            source_refs=PROVENANCE_TEST_SOURCE_REFS,
             client_response={"images": [{"subfolder": "", "type": "output"}]},
             review_status="pending",
-            store=LocalImageProvenanceStore(),
+            store=image_provenance_store_for_test(),
         )
 
 
@@ -208,3 +194,32 @@ def test_image_provenance_uses_canonical_text_hash_directly() -> None:
     assert "def sha256_text(" not in source
     assert "from backend.canonical_hash import sha256_json, sha256_text" in source
     assert "prompt_hash = sha256_text(payload.prompt)" in source
+
+
+def test_image_provenance_tests_use_shared_provenance_helpers() -> None:
+    for test_module in (
+        "test_image_provenance.py",
+        "test_critic_curator.py",
+        "test_security_review.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        imported_names = {
+            (node.module, alias.name)
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+            for alias in node.names
+        }
+        called_names = {
+            node.func.id
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+        }
+
+        assert called_names & {
+            "image_provenance_store_for_test",
+            "image_provenance_payload_for_test",
+            "image_provenance_record_for_test",
+        }
+        assert ("backend.image_provenance", "LocalImageProvenanceStore") not in imported_names
+        assert ("backend.image_provenance", "ImageProvenanceRecord") not in imported_names
