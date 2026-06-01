@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 533 passed, 1 warning
+Final validation: 534 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -108,6 +108,7 @@ tests/path_helpers.py: shared test project root, checked-in project text reads, 
 tests/cache_entry_helpers.py: shared approved response-cache entry construction for cache, source-freshness, and observability tests, including cache identity, request fingerprint, requester/policy scope, read-only operation, response body, reuse flags, source state, and cache timestamp defaults.
 tests/connection_env_helpers.py: shared test env builders and secret constants for LLM, Slack, GitHub, and full connection-settings test scenarios.
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
+tests/human_approval_helpers.py: shared HumanApproval construction for execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests, including approved/unapproved state, approver scope, and approval timestamp defaults.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
 tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
@@ -220,6 +221,10 @@ fixtures directly.
 Request metadata, Safety Service unit, and observability tests that need
 workspace/agent metadata must use tests/request_metadata_helpers.py before
 constructing RequestMetadata fixtures directly.
+Execution-envelope, execution-gate, policy-contract, adapter-result, and
+publishing-adapter tests that need human approval state must use
+tests/human_approval_helpers.py before constructing HumanApproval fixtures
+directly.
 Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes must
 use tests/execution_envelope_helpers.py before ComfyUI, Publishing, GitHub,
 Safety Service unit, policy-contract, publishing-agent, or future gated test

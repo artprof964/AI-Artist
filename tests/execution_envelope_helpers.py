@@ -3,9 +3,13 @@ from typing import Any
 from uuid import UUID
 
 from backend.interface_types import REQUEST_KIND_ACTION
-from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
+from backend.schemas import ExecutionEnvelopeRequest, SourceFreshness
 from backend.service import create_execution_envelope
 from backend.source_freshness_contracts import unchanged_source_freshness_payload
+from human_approval_helpers import (
+    approved_human_approval_for_test,
+    unapproved_human_approval_for_test,
+)
 
 DEFAULT_TEST_REQUEST_KIND = REQUEST_KIND_ACTION
 DEFAULT_TEST_REQUESTER_SCOPE = "user:local"
@@ -27,10 +31,9 @@ def execution_envelope_for_test(
     source_freshness: SourceFreshness | None = None,
     metadata: dict[str, Any] | None = None,
 ):
-    human_approval = HumanApproval(approved=False)
+    human_approval = unapproved_human_approval_for_test()
     if approved:
-        human_approval = HumanApproval(
-            approved=True,
+        human_approval = approved_human_approval_for_test(
             approver_scope=approver_scope,
             approved_at=approved_at,
         )

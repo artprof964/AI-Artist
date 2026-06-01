@@ -17,8 +17,9 @@ from backend.runtime_field_contracts import (
     REQUEST_ID_FIELD,
     TARGET_FIELD,
 )
-from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
+from backend.schemas import ExecutionEnvelopeResponse, SourceFreshness
 from backend.time_utils import utc_now
+from human_approval_helpers import approved_human_approval_for_test
 from path_helpers import read_backend_source
 
 
@@ -33,7 +34,7 @@ def envelope() -> ExecutionEnvelopeResponse:
         request_id=REQUEST_ID,
         operation="publish",
         target="channel:main",
-        human_approval=HumanApproval(approved=True),
+        human_approval=approved_human_approval_for_test(),
         valid=True,
         allow=True,
         reason="approved",

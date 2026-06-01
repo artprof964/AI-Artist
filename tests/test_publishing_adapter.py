@@ -11,12 +11,12 @@ from backend.publishing_adapter import (
     PublishingExecutionGateError,
     PublishingRequest,
 )
-from backend.schemas import HumanApproval
 from backend.time_utils import utc_now
 from execution_envelope_helpers import (
     approved_execution_envelope,
     unapproved_execution_envelope,
 )
+from human_approval_helpers import unapproved_human_approval_for_test
 from path_helpers import read_backend_source, read_test_source
 
 
@@ -106,7 +106,7 @@ def test_publishing_blocks_external_client_until_human_approval_is_attached() ->
             approved_envelope().model_copy(
                 update={
                     "allow": True,
-                    "human_approval": HumanApproval(approved=False),
+                    "human_approval": unapproved_human_approval_for_test(),
                     "requires_human_approval": False,
                     "valid": True,
                 }

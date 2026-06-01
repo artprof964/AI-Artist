@@ -22,9 +22,10 @@ from backend.runtime_field_contracts import (
     REQUIRES_HUMAN_APPROVAL_FIELD,
     TARGET_FIELD,
 )
-from backend.schemas import HumanApproval, PolicyEvaluateRequest
+from backend.schemas import PolicyEvaluateRequest
 from backend.service import evaluate_policy
 from execution_envelope_helpers import execution_envelope_for_test
+from human_approval_helpers import approved_human_approval_for_test
 from path_helpers import read_backend_source, read_test_source
 
 
@@ -73,8 +74,7 @@ def test_execution_envelope_signing_and_ttl_contracts_are_shared() -> None:
 def test_execution_envelope_signature_contract_covers_envelope_fields() -> None:
     issued_at = datetime(2026, 5, 31, 10, 0, tzinfo=timezone.utc)
     expires_at = execution_envelope_expires_at(issued_at)
-    human_approval = HumanApproval(
-        approved=True,
+    human_approval = approved_human_approval_for_test(
         approver_scope="user:owner",
         approved_at=issued_at,
     )
@@ -131,8 +131,7 @@ def test_execution_envelope_signature_contract_covers_envelope_fields() -> None:
 def test_execution_envelope_signature_payload_uses_runtime_field_contracts() -> None:
     issued_at = datetime(2026, 5, 31, 10, 0, tzinfo=timezone.utc)
     expires_at = execution_envelope_expires_at(issued_at)
-    human_approval = HumanApproval(
-        approved=True,
+    human_approval = approved_human_approval_for_test(
         approver_scope="user:owner",
         approved_at=issued_at,
     )

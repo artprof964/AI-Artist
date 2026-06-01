@@ -198,6 +198,7 @@
 - `../../validation_reports/runtime_secret_resolution_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_registry_derivation_standardization_2026-06-01.md`
 - `../../validation_reports/connection_env_helper_standardization_2026-06-01.md`
+- `../../validation_reports/human_approval_helper_standardization_2026-06-01.md`
 - `../../validation_reports/cache_entry_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_response_helper_standardization_2026-06-01.md`
 - `../../validation_reports/request_metadata_helper_standardization_2026-06-01.md`
@@ -260,6 +261,7 @@
 - `../../tests/path_helpers.py`
 - `../../tests/cache_entry_helpers.py`
 - `../../tests/connection_env_helpers.py`
+- `../../tests/human_approval_helpers.py`
 - `../../tests/policy_request_helpers.py`
 - `../../tests/policy_response_helpers.py`
 - `../../tests/request_metadata_helpers.py`

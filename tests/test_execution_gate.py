@@ -1,4 +1,5 @@
 from datetime import timedelta
+import ast
 from uuid import UUID
 
 import pytest
@@ -21,9 +22,13 @@ from backend.policy_contracts import (
     LOCAL_ENVELOPE_SIGNING_KEY,
     execution_envelope_signature,
 )
-from backend.schemas import ExecutionEnvelopeResponse, HumanApproval, SourceFreshness
+from backend.schemas import ExecutionEnvelopeResponse, SourceFreshness
 from backend.time_utils import utc_now
-from path_helpers import read_backend_source
+from human_approval_helpers import (
+    approved_human_approval_for_test,
+    unapproved_human_approval_for_test,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 REQUEST_ID = UUID("42424242-4242-4242-4242-424242424242")
@@ -40,7 +45,7 @@ def envelope(**overrides: object) -> ExecutionEnvelopeResponse:
         "allow": True,
         "valid": True,
         "requires_human_approval": True,
-        "human_approval": HumanApproval(approved=True, approver="tester"),
+        "human_approval": approved_human_approval_for_test(),
         "source_freshness": SourceFreshness(
             all_required_sources_unchanged=True,
             changed_source_count=0,
@@ -122,7 +127,7 @@ def test_execution_gate_rejects_invalid_envelopes(candidate: object, match: str)
 def test_execution_gate_can_require_human_approval_unconditionally() -> None:
     with pytest.raises(ExecutionGateError, match="publish requires human approval"):
         require_execution_envelope(
-            envelope(human_approval=HumanApproval(approved=False)),
+            envelope(human_approval=unapproved_human_approval_for_test()),
             operation="publish",
             missing_message="missing",
             require_human_approval=True,
@@ -134,7 +139,7 @@ def test_execution_gate_can_require_human_approval_only_when_marked() -> None:
     require_execution_envelope(
         envelope(
             requires_human_approval=False,
-            human_approval=HumanApproval(approved=False),
+            human_approval=unapproved_human_approval_for_test(),
             operation="github_write",
         ),
         operation="github_write",
@@ -147,7 +152,7 @@ def test_execution_gate_can_require_human_approval_only_when_marked() -> None:
         require_execution_envelope(
             envelope(
                 requires_human_approval=True,
-                human_approval=HumanApproval(approved=False),
+                human_approval=unapproved_human_approval_for_test(),
                 operation="github_write",
             ),
             operation="github_write",
@@ -213,3 +218,25 @@ def test_execution_gate_uses_shared_error_message_contracts() -> None:
         assert literal not in contents
     assert "execution_envelope_operation_mismatch(" in contents
     assert "execution_envelope_target_mismatch(" in contents
+
+
+def test_envelope_tests_use_shared_human_approval_helper() -> None:
+    for test_module in (
+        "execution_envelope_helpers.py",
+        "test_adapter_results.py",
+        "test_execution_gate.py",
+        "test_policy_contracts.py",
+        "test_publishing_adapter.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        direct_constructor_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "HumanApproval"
+        ]
+
+        assert "human_approval_for_test(" in source
+        assert direct_constructor_calls == []
