@@ -1,3 +1,4 @@
+import ast
 from datetime import timedelta
 from typing import Any
 from uuid import UUID
@@ -10,10 +11,13 @@ from backend.publishing_adapter import (
     PublishingExecutionGateError,
     PublishingRequest,
 )
-from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
-from backend.service import create_execution_envelope
+from backend.schemas import HumanApproval
 from backend.time_utils import utc_now
-from path_helpers import read_backend_source
+from execution_envelope_helpers import (
+    approved_execution_envelope,
+    unapproved_execution_envelope,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 REQUEST_ID = UUID("22222222-2222-2222-2222-222222222222")
@@ -35,42 +39,19 @@ class MockPublishingClient:
 
 
 def approved_envelope(*, operation: str = "publish", target: str = PUBLISH_TARGET):
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation=operation,
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target=target,
-            human_approval=HumanApproval(
-                approved=True,
-                approver_scope="user:owner",
-                approved_at=NOW,
-            ),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-        )
+    return approved_execution_envelope(
+        request_id=REQUEST_ID,
+        operation=operation,
+        target=target,
+        approved_at=NOW,
     )
 
 
 def unapproved_publish_envelope():
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation="publish",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target=PUBLISH_TARGET,
-            human_approval=HumanApproval(approved=False),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-        )
+    return unapproved_execution_envelope(
+        request_id=REQUEST_ID,
+        operation="publish",
+        target=PUBLISH_TARGET,
     )
 
 
@@ -191,3 +172,19 @@ def test_publishing_adapter_gate_labels_are_centralized() -> None:
     assert '"publish target"' not in contents
     assert "PUBLISHING_ACTION_LABEL" in contents
     assert "PUBLISHING_TARGET_LABEL" in contents
+
+
+def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None:
+    contents = read_test_source("test_publishing_adapter.py")
+    tree = ast.parse(contents)
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "approved_execution_envelope(" in contents
+    assert "unapproved_execution_envelope(" in contents
+    assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
+    assert ("backend.service", "create_execution_envelope") not in imported_names

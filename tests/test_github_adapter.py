@@ -18,10 +18,12 @@ from backend.repo_paths import (
     backend_module_filenames,
     backend_module_path,
 )
-from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
-from backend.service import create_execution_envelope
 from backend.time_utils import utc_now
-from path_helpers import PROJECT_ROOT, read_backend_source
+from execution_envelope_helpers import (
+    approved_execution_envelope,
+    unapproved_execution_envelope,
+)
+from path_helpers import PROJECT_ROOT, read_backend_source, read_test_source
 
 
 REQUEST_ID = UUID("23232323-2323-2323-2323-232323232323")
@@ -68,42 +70,19 @@ def approved_envelope(
     operation: str = "github_write",
     target: str = GITHUB_TARGET,
 ):
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation=operation,
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target=target,
-            human_approval=HumanApproval(
-                approved=True,
-                approver_scope="user:owner",
-                approved_at=NOW,
-            ),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-        )
+    return approved_execution_envelope(
+        request_id=REQUEST_ID,
+        operation=operation,
+        target=target,
+        approved_at=NOW,
     )
 
 
 def unapproved_github_write_envelope():
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation="github_write",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target=GITHUB_TARGET,
-            human_approval=HumanApproval(approved=False),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-        )
+    return unapproved_execution_envelope(
+        request_id=REQUEST_ID,
+        operation="github_write",
+        target=GITHUB_TARGET,
     )
 
 
@@ -374,3 +353,19 @@ def test_github_adapter_uses_shared_missing_envelope_message() -> None:
 
     assert '"GitHub write requires an execution envelope"' not in source
     assert "execution_envelope_required(GITHUB_WRITE_ACTION_LABEL)" in source
+
+
+def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
+    source = read_test_source("test_github_adapter.py")
+    tree = ast.parse(source)
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "approved_execution_envelope(" in source
+    assert "unapproved_execution_envelope(" in source
+    assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
+    assert ("backend.service", "create_execution_envelope") not in imported_names

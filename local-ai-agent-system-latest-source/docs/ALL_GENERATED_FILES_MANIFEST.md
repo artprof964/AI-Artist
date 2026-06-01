@@ -177,6 +177,7 @@
 - `../../tests/test_publishing_agent.py`
 - `../../tests/test_publishing_adapter.py`
 - `../../tests/test_publishing_status.py`
+- `../../tests/execution_envelope_helpers.py`
 - `../../validation_reports/t23_github_adapter_implementation_2026-05-31.md`
 - `../../validation_reports/t23_github_adapter_validation_2026-05-31.md`
 - `../../validation_reports/github_url_boundary_standardization_2026-05-31.md`
@@ -212,6 +213,7 @@
 - `../../validation_reports/repo_root_workspace_path_standardization_2026-05-31.md`
 - `../../validation_reports/repo_source_open_standardization_2026-05-31.md`
 - `../../validation_reports/test_path_helper_standardization_2026-05-31.md`
+- `../../validation_reports/test_execution_envelope_helper_standardization_2026-06-01.md`
 - `../../validation_reports/test_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/backend_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_contract_source_read_helper_standardization_2026-05-31.md`

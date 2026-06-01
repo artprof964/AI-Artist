@@ -1,3 +1,4 @@
+import ast
 from datetime import timedelta
 from typing import Any
 from uuid import UUID
@@ -10,14 +11,17 @@ from backend.comfyui_adapter import (
     ComfyUIExecutionGateError,
     ComfyUIImageGenerationRequest,
 )
-from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
-from backend.service import create_execution_envelope
 from backend.time_utils import utc_now
-from path_helpers import read_backend_source
+from execution_envelope_helpers import (
+    approved_execution_envelope,
+    unapproved_execution_envelope,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 REQUEST_ID = UUID("17171717-1717-1717-1717-171717171717")
 NOW = utc_now()
+COMFYUI_TARGET = "comfyui://workflow/mock-image-generation"
 
 
 class MockComfyUIClient:
@@ -39,42 +43,19 @@ class MockComfyUIClient:
 
 
 def approved_envelope(*, operation: str):
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation=operation,
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target="comfyui://workflow/mock-image-generation",
-            human_approval=HumanApproval(
-                approved=True,
-                approver_scope="user:owner",
-                approved_at=NOW,
-            ),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-        )
+    return approved_execution_envelope(
+        request_id=REQUEST_ID,
+        operation=operation,
+        target=COMFYUI_TARGET,
+        approved_at=NOW,
     )
 
 
 def unapproved_envelope():
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation="image_generate",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target="comfyui://workflow/mock-image-generation",
-            human_approval=HumanApproval(approved=False),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-        )
+    return unapproved_execution_envelope(
+        request_id=REQUEST_ID,
+        operation="image_generate",
+        target=COMFYUI_TARGET,
     )
 
 
@@ -167,3 +148,19 @@ def test_comfyui_adapter_gate_labels_are_centralized() -> None:
     contents = read_backend_source("comfyui_adapter.py")
     assert '"image generation"' not in contents
     assert "COMFYUI_IMAGE_GENERATION_ACTION_LABEL" in contents
+
+
+def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
+    contents = read_test_source("test_comfyui_adapter.py")
+    tree = ast.parse(contents)
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "approved_execution_envelope(" in contents
+    assert "unapproved_execution_envelope(" in contents
+    assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
+    assert ("backend.service", "create_execution_envelope") not in imported_names

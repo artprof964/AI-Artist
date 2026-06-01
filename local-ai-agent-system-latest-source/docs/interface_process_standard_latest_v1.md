@@ -142,6 +142,9 @@ Rules:
 - Repo-wide validation tests that scan project, backend, or test sources use
   shared test path helpers instead of local root resolution, local source reads,
   or test-module glob loops.
+- Gated-adapter tests that need approved or unapproved execution envelopes use
+  `tests/execution_envelope_helpers.py` instead of constructing
+  `ExecutionEnvelopeRequest` directly in adapter-specific test modules.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

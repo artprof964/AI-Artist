@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 520 passed, 1 warning
+Final validation: 523 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -105,6 +105,7 @@ backend/shell_commands.py: shared shell command and process argument constructio
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
 tests/path_helpers.py: shared test project root, checked-in project text reads, backend source reads, test source reads, and repo-wide test-module source iteration for guard tests.
+tests/execution_envelope_helpers.py: shared approved/unapproved execution-envelope construction for gated-adapter tests.
 backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
 backend/llm_api_smoke.py: provider-neutral LLM API configuration, named smoke-test connection purpose, centralized smoke request defaults/overrides, centralized smoke timeout, shared runtime secret resolution, and redacted smoke request path using shared LLM request/result contracts.
 backend/openclaw_contracts.py: shared OpenClaw tool policy metadata, redaction, metric tag, and structured telemetry field shapes.
@@ -190,6 +191,9 @@ runbook, OPA policy, PostgreSQL schema, workspace, or backend module files.
 Repo-wide validation tests that scan checked-in project, backend, or test source
 must use tests/path_helpers.py for project root resolution, project text reads,
 backend source reads, test source reads, and source iteration.
+Gated-adapter tests that need approved or unapproved execution envelopes must
+use tests/execution_envelope_helpers.py before ComfyUI, Publishing, GitHub, or
+future gated-adapter test modules construct envelope requests directly.
 Execution-envelope validation, expiry checks, and signature verification must
 flow through backend/execution_gate.py before adapter-specific side-effect logic.
 Execution-envelope validation failure, signature failure, and required-envelope
