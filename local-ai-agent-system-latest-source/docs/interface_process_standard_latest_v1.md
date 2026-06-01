@@ -84,6 +84,7 @@ can be marked done.
 61. Gated-adapter and policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
+64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
 ```
 
 ## Standard Request Envelope
@@ -148,6 +149,9 @@ Rules:
 - LLM, Slack, GitHub, connection-settings, and future connection tests use
   `tests/connection_env_helpers.py` instead of repeating env-var maps or test
   secret constants locally.
+- Audit, security-review, secret-redaction, side-effect audit, and future
+  redaction tests use `tests/secret_test_helpers.py` instead of repeating
+  token-shaped payloads or redaction assertion helpers locally.
 - Cache, source freshness, observability, Safety Service unit, and future
   policy-path tests use `tests/policy_request_helpers.py` instead of
   constructing standard `PolicyEvaluateRequest` fixtures directly.

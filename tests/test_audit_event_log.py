@@ -16,6 +16,7 @@ from backend.runtime_field_contracts import (
     REQUEST_ID_FIELD,
 )
 from path_helpers import read_backend_source
+from secret_test_helpers import audit_secret_payload
 
 
 client = TestClient(app)
@@ -77,20 +78,7 @@ def test_audit_payload_secrets_are_redacted_in_persisted_records() -> None:
             "request_id": "35353535-3535-3535-3535-353535353535",
             "correlation_id": correlation_id,
             "occurred_at": "2026-05-31T10:10:00Z",
-            "payload": {
-                "tool": "slack.post_message",
-                "authorization": "Bearer should-not-store",
-                "diagnostic": "adapter returned xoxb-should-not-store-value",
-                "nested": {
-                    "api_key": "sk-should-not-store",
-                    "status": "accepted",
-                },
-                "items": [
-                    {"token": "xoxb-should-not-store"},
-                    {"note": "fallback used sk-should-not-store-value"},
-                    {"result": "ok"},
-                ],
-            },
+            "payload": audit_secret_payload(),
         },
     )
     stored_response = client.get(f"/v1/audit/events/{correlation_id}")
@@ -100,8 +88,8 @@ def test_audit_payload_secrets_are_redacted_in_persisted_records() -> None:
     stored_payload = stored_response.json()[0]["payload"]
     assert stored_payload["authorization"] == "[REDACTED]"
     assert stored_payload["diagnostic"] == "[REDACTED]"
-    assert stored_payload["nested"]["api_key"] == "[REDACTED]"
-    assert stored_payload["nested"]["status"] == "accepted"
+    assert stored_payload["nested"]["provider"]["api_key"] == "[REDACTED]"
+    assert stored_payload["nested"]["items"][1]["status"] == "ok"
     assert stored_payload["items"][0]["token"] == "[REDACTED]"
     assert stored_payload["items"][1]["note"] == "[REDACTED]"
     assert stored_payload["items"][2]["result"] == "ok"

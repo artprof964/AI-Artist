@@ -35,6 +35,13 @@ from backend.security_review_contracts import (
     security_review_target,
 )
 from path_helpers import PROJECT_ROOT, read_backend_source
+from secret_test_helpers import (
+    assert_nested_payload_redacted,
+    assert_no_known_nested_secrets,
+    nested_secret_payload,
+    observability_secret_fields,
+    workspace_secret_lines,
+)
 
 
 REPO_ROOT = PROJECT_ROOT
@@ -53,14 +60,7 @@ def test_workspace_secret_scanner_flags_llm_api_github_slack_and_generic_assignm
     try:
         workspace.mkdir(parents=True, exist_ok=True)
         (workspace / "MEMORY.md").write_text(
-            "\n".join(
-                [
-                    "deepseek-open-art=sk-local-review-secret",
-                    "github_token: ghp_localreviewsecret0000000000",
-                    "slack = xoxb-local-review-secret",
-                    "password = keepthissecret",
-                ]
-            ),
+            "\n".join(workspace_secret_lines()),
             encoding="utf-8",
         )
 
@@ -73,36 +73,19 @@ def test_workspace_secret_scanner_flags_llm_api_github_slack_and_generic_assignm
 
 
 def test_audit_payload_review_catches_nested_secret_like_keys_and_values() -> None:
-    payload = {
-        "authorization": "Bearer nested-secret-token",
-        "nested": {
-            "provider": {"api_key": "sk-nested-review-secret"},
-            "items": [{"token": "xoxb-nested-review-secret"}, {"status": "ok"}],
-        },
-        "message": "adapter returned ghp_nestedreviewsecret0000000000",
-    }
+    payload = nested_secret_payload()
 
     redacted = redact_audit_value(payload)
 
     assert review_audit_payload_redaction(payload) == []
-    assert redacted["authorization"] == REDACTED_SECRET_VALUE
-    assert redacted["nested"]["provider"]["api_key"] == REDACTED_SECRET_VALUE
-    assert redacted["nested"]["items"][0]["token"] == REDACTED_SECRET_VALUE
-    assert redacted["nested"]["items"][1]["status"] == "ok"
+    assert_nested_payload_redacted(redacted)
     assert redacted["message"] == REDACTED_SECRET_VALUE
     serialized_redacted = canonical_json(redacted)
-    assert "sk-nested-review-secret" not in serialized_redacted
-    assert "xoxb-nested-review-secret" not in serialized_redacted
-    assert "ghp_nestedreviewsecret0000000000" not in serialized_redacted
+    assert_no_known_nested_secrets(serialized_redacted)
 
 
 def test_observability_review_redacts_secret_like_fields_from_events() -> None:
-    fields = {
-        "provider": {"api_key": "sk-observability-review-secret"},
-        "headers": {"authorization": "Bearer observability-secret-token"},
-        "items": [{"token": "xoxb-observability-review-secret"}],
-        "status": "ok",
-    }
+    fields = observability_secret_fields()
     collector = InMemoryObservabilityCollector()
 
     collector.record_stage(
@@ -121,9 +104,7 @@ def test_observability_review_redacts_secret_like_fields_from_events() -> None:
     )
 
     assert review_observability_redaction(fields) == []
-    assert "sk-observability-review-secret" not in serialized
-    assert "observability-secret-token" not in serialized
-    assert "xoxb-observability-review-secret" not in serialized
+    assert_no_known_nested_secrets(serialized)
     assert REDACTED_SECRET_VALUE in serialized
 
 

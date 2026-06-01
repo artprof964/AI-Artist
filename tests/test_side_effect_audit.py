@@ -32,6 +32,7 @@ from backend.side_effect_audit_contracts import (
     SIDE_EFFECT_TARGET_FIELD,
 )
 from path_helpers import read_backend_source
+from secret_test_helpers import side_effect_secret_client_response
 
 
 CORRELATION_ID = UUID("64646464-6464-6464-6464-646464646464")
@@ -79,11 +80,7 @@ def test_record_side_effect_audit_event_redacts_client_response() -> None:
         reason=PUBLISHING_STATUS_PUBLISHED,
         request_id=REQUEST_ID,
         execution_envelope_id=ENVELOPE_ID,
-        client_response={
-            "authorization": "Bearer side-effect-secret",
-            "debug": {"api_key": "sk-side-effect-secret"},
-            "status": PUBLISHING_STATUS_PUBLISHED,
-        },
+        client_response=side_effect_secret_client_response(status=PUBLISHING_STATUS_PUBLISHED),
     )
     events = list_audit_events_by_correlation_id(CORRELATION_ID)
 

@@ -9,31 +9,27 @@ from backend.secret_redaction import (
     redact_secret_value,
     secret_key_value_is_unredacted,
 )
+from path_helpers import read_test_source
+from secret_test_helpers import (
+    TEST_BEARER_SECRET,
+    TEST_EXPLICIT_SECRET,
+    TEST_GITHUB_REVIEW_SECRET,
+    nested_secret_payload,
+)
 
 
 def test_redact_secret_value_redacts_keys_nested_values_and_secret_shapes() -> None:
     redacted = redact_secret_value(
-        {
-            "authorization": "Bearer explicit-secret",
-            "nested": {
-                "api_key": "sk-nested-secret",
-                "status": "ok",
-            },
-            "items": [
-                {"token": "xoxb-local-secret-token"},
-                {"message": "adapter echoed ghp_localreviewsecret0000000000"},
-            ],
-        },
-        explicit_secrets=("explicit-secret",),
+        nested_secret_payload() | {"authorization": f"Bearer {TEST_EXPLICIT_SECRET}"},
+        explicit_secrets=(TEST_EXPLICIT_SECRET,),
     )
 
     assert redacted["authorization"] == REDACTED_SECRET_VALUE
-    assert redacted["nested"]["api_key"] == REDACTED_SECRET_VALUE
-    assert redacted["nested"]["status"] == "ok"
-    assert redacted["items"][0]["token"] == REDACTED_SECRET_VALUE
-    assert redacted["items"][1]["message"] == f"adapter echoed {REDACTED_SECRET_VALUE}"
-    assert "explicit-secret" not in repr(redacted)
-    assert "ghp_localreviewsecret0000000000" not in repr(redacted)
+    assert redacted["nested"]["provider"]["api_key"] == REDACTED_SECRET_VALUE
+    assert redacted["nested"]["items"][1]["status"] == "ok"
+    assert redacted["message"] == f"adapter returned {REDACTED_SECRET_VALUE}"
+    assert TEST_EXPLICIT_SECRET not in repr(redacted)
+    assert TEST_GITHUB_REVIEW_SECRET not in repr(redacted)
 
 
 def test_redact_secret_text_supports_lowercase_replacement_for_slack() -> None:
@@ -64,15 +60,15 @@ def test_looks_secret_key_covers_adapter_secret_terms() -> None:
 
 def test_contains_secret_like_value_covers_tokens_and_assignments() -> None:
     assert contains_secret_like_value("token: keepthissecret")
-    assert contains_secret_like_value("Bearer nested-secret-token")
-    assert contains_secret_like_value("github_token: ghp_localreviewsecret0000000000")
+    assert contains_secret_like_value(TEST_BEARER_SECRET)
+    assert contains_secret_like_value(f"github_token: {TEST_GITHUB_REVIEW_SECRET}")
     assert not contains_secret_like_value("model: deepseek-v4-pro")
 
 
 def test_contains_unredacted_secret_value_covers_structured_payloads() -> None:
     assert contains_unredacted_secret_value({"api_key": "plain-secret"})
     assert contains_unredacted_secret_value({"metadata": {"token": "xoxb-local-secret-token"}})
-    assert contains_unredacted_secret_value(["message ghp_localreviewsecret0000000000"])
+    assert contains_unredacted_secret_value([f"message {TEST_GITHUB_REVIEW_SECRET}"])
     assert not contains_unredacted_secret_value(
         {
             "api_key": REDACTED_SECRET_VALUE,
@@ -96,3 +92,13 @@ def test_is_redacted_secret_value_accepts_standard_replacements() -> None:
     assert is_redacted_secret_value(REDACTED_SECRET_VALUE)
     assert is_redacted_secret_value(LOWER_REDACTED_SECRET_VALUE)
     assert not is_redacted_secret_value("plain-secret")
+
+
+def test_redaction_tests_use_shared_secret_fixtures() -> None:
+    for test_module in (
+        "test_audit_event_log.py",
+        "test_secret_redaction.py",
+        "test_security_review.py",
+        "test_side_effect_audit.py",
+    ):
+        assert "secret_test_helpers import" in read_test_source(test_module)
