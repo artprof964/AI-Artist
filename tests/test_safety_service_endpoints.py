@@ -1,4 +1,4 @@
-from fastapi.testclient import TestClient
+import ast
 
 from backend.api_contracts import (
     AUDIT_EVENTS_ROUTE,
@@ -11,16 +11,13 @@ from backend.api_contracts import (
     SAFETY_API_TITLE,
     SAFETY_API_VERSION,
 )
-from backend.app import app
 from backend.health_contracts import health_response_payload
-from path_helpers import read_backend_source
-
-
-client = TestClient(app)
+from path_helpers import read_backend_source, read_test_source
+from safety_service_client_helpers import safety_service_client
 
 
 def test_health_endpoint() -> None:
-    response = client.get(HEALTH_ROUTE)
+    response = safety_service_client.get(HEALTH_ROUTE)
 
     assert response.status_code == 200
     assert response.json() == health_response_payload()
@@ -37,8 +34,8 @@ def test_canonicalize_endpoint_returns_stable_fingerprint() -> None:
         "metadata": {"workspace": "ai-artist-main", "agent": "ai-artist-main"},
     }
 
-    first = client.post(CANONICALIZE_ROUTE, json=payload)
-    second = client.post(CANONICALIZE_ROUTE, json=payload)
+    first = safety_service_client.post(CANONICALIZE_ROUTE, json=payload)
+    second = safety_service_client.post(CANONICALIZE_ROUTE, json=payload)
 
     assert first.status_code == 200
     body = first.json()
@@ -48,7 +45,7 @@ def test_canonicalize_endpoint_returns_stable_fingerprint() -> None:
 
 
 def test_classify_endpoint_detects_action_request() -> None:
-    response = client.post(
+    response = safety_service_client.post(
         CLASSIFY_ROUTE,
         json={
             "request_id": "22222222-2222-2222-2222-222222222222",
@@ -64,7 +61,7 @@ def test_classify_endpoint_detects_action_request() -> None:
 
 
 def test_policy_endpoint_allows_read_and_denies_sensitive_operation() -> None:
-    read_response = client.post(
+    read_response = safety_service_client.post(
         POLICY_EVALUATE_ROUTE,
         json={
             "request_id": "33333333-3333-3333-3333-333333333333",
@@ -79,7 +76,7 @@ def test_policy_endpoint_allows_read_and_denies_sensitive_operation() -> None:
             },
         },
     )
-    publish_response = client.post(
+    publish_response = safety_service_client.post(
         POLICY_EVALUATE_ROUTE,
         json={
             "request_id": "44444444-4444-4444-4444-444444444444",
@@ -103,7 +100,7 @@ def test_policy_endpoint_allows_read_and_denies_sensitive_operation() -> None:
 
 
 def test_sensitive_external_write_requires_execution_envelope_approval() -> None:
-    policy_response = client.post(
+    policy_response = safety_service_client.post(
         POLICY_EVALUATE_ROUTE,
         json={
             "request_id": "55555555-5555-5555-5555-555555555555",
@@ -118,7 +115,7 @@ def test_sensitive_external_write_requires_execution_envelope_approval() -> None
             },
         },
     )
-    envelope_response = client.post(
+    envelope_response = safety_service_client.post(
         EXECUTION_ENVELOPE_ROUTE,
         json={
             "request_id": "55555555-5555-5555-5555-555555555555",
@@ -147,7 +144,7 @@ def test_sensitive_external_write_requires_execution_envelope_approval() -> None
 
 
 def test_approved_sensitive_external_write_returns_valid_execution_envelope() -> None:
-    response = client.post(
+    response = safety_service_client.post(
         EXECUTION_ENVELOPE_ROUTE,
         json={
             "request_id": "66666666-6666-6666-6666-666666666666",
@@ -180,7 +177,7 @@ def test_approved_sensitive_external_write_returns_valid_execution_envelope() ->
 def test_audit_events_accept_correlation_ids_and_redact_secrets() -> None:
     correlation_id = "77777777-7777-7777-7777-000000000001"
 
-    response = client.post(
+    response = safety_service_client.post(
         AUDIT_EVENTS_ROUTE,
         json={
             "event_id": "77777777-7777-7777-7777-777777777777",
@@ -210,9 +207,9 @@ def test_audit_events_accept_correlation_ids_and_redact_secrets() -> None:
 def test_api_metadata_and_routes_are_centralized() -> None:
     app_source = read_backend_source("app.py")
 
-    assert app.title == SAFETY_API_TITLE
-    assert app.version == SAFETY_API_VERSION
-    assert app.description == SAFETY_API_DESCRIPTION
+    assert safety_service_client.app.title == SAFETY_API_TITLE
+    assert safety_service_client.app.version == SAFETY_API_VERSION
+    assert safety_service_client.app.description == SAFETY_API_DESCRIPTION
     assert {
         HEALTH_ROUTE,
         CANONICALIZE_ROUTE,
@@ -220,7 +217,7 @@ def test_api_metadata_and_routes_are_centralized() -> None:
         POLICY_EVALUATE_ROUTE,
         EXECUTION_ENVELOPE_ROUTE,
         AUDIT_EVENTS_ROUTE,
-    } <= {route.path for route in app.routes}
+    } <= {route.path for route in safety_service_client.app.routes}
     for literal in [
         '"AI-Artist Safety Service"',
         '"0.1.0"',
@@ -234,3 +231,29 @@ def test_api_metadata_and_routes_are_centralized() -> None:
         '"/v1/audit/events/{correlation_id}"',
     ]:
         assert literal not in app_source
+
+
+def test_safety_service_tests_use_shared_client_helper() -> None:
+    for module_name in [
+        "test_audit_event_log.py",
+        "test_safety_service_endpoints.py",
+        "openclaw_hook_helpers.py",
+    ]:
+        source = read_test_source(module_name)
+        tree = ast.parse(source)
+        imports_test_client = any(
+            isinstance(node, ast.ImportFrom)
+            and node.module == "fastapi.testclient"
+            and any(alias.name == "TestClient" for alias in node.names)
+            for node in ast.walk(tree)
+        )
+        local_test_client_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "TestClient"
+        ]
+
+        assert not imports_test_client
+        assert local_test_client_calls == []

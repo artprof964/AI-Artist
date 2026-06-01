@@ -80,6 +80,7 @@ can be marked done.
 57. Production readiness env, runbook, and command validation detail messages use `backend/readiness.py`.
 58. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
 59. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
+59a. Safety Service endpoint, audit, OpenClaw hook, and observability tests use `tests/safety_service_client_helpers.py` for FastAPI test-client setup.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 61. Policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
 61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, and deterministic fake-client responses.
@@ -156,6 +157,9 @@ Rules:
 - Repo-wide validation tests that scan project, backend, or test sources use
   shared test path helpers instead of local root resolution, local source reads,
   or test-module glob loops.
+- Safety Service endpoint, audit, OpenClaw hook, observability, and future
+  service-boundary tests use `tests/safety_service_client_helpers.py` instead
+  of constructing `TestClient(app)` locally.
 - LLM, Slack, GitHub, connection-settings, and future connection tests use
   `tests/connection_env_helpers.py` instead of repeating env-var maps or test
   secret constants locally.

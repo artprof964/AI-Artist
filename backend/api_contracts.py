@@ -11,6 +11,10 @@ AUDIT_EVENTS_ROUTE = "/v1/audit/events"
 AUDIT_EVENTS_BY_CORRELATION_ROUTE = "/v1/audit/events/{correlation_id}"
 
 
+def audit_events_by_correlation_path(correlation_id: object) -> str:
+    return AUDIT_EVENTS_BY_CORRELATION_ROUTE.format(correlation_id=correlation_id)
+
+
 __all__ = [
     "AUDIT_EVENTS_BY_CORRELATION_ROUTE",
     "AUDIT_EVENTS_ROUTE",
@@ -22,4 +26,5 @@ __all__ = [
     "SAFETY_API_DESCRIPTION",
     "SAFETY_API_TITLE",
     "SAFETY_API_VERSION",
+    "audit_events_by_correlation_path",
 ]

@@ -1,6 +1,4 @@
-from fastapi.testclient import TestClient
-
-from backend.app import app
+from backend.api_contracts import POLICY_EVALUATE_ROUTE
 from backend.openclaw_hook import (
     SafetyDecision,
     ToolCallRequest,
@@ -12,15 +10,13 @@ from backend.orchestrator import (
     run_mock_subagent_orchestration,
 )
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SubAgentOutput
+from safety_service_client_helpers import safety_service_post_json
 
 OPENCLAW_SAFETY_EVENT = "safety"
 OPENCLAW_ADAPTER_EVENT = "adapter"
 OPENCLAW_MOCK_AGENTS_EVENT = "mock_agents"
 OPENCLAW_VALIDATION_EVENT = "validation"
 OPENCLAW_SYNTHESIS_EVENT = "synthesis"
-
-client = TestClient(app)
-
 
 class RecordingSafetyClient:
     def __init__(self, events: list[str]) -> None:
@@ -30,10 +26,7 @@ class RecordingSafetyClient:
     def evaluate_tool_call(self, request: PolicyEvaluateRequest) -> SafetyDecision:
         self.events.append(OPENCLAW_SAFETY_EVENT)
         self.requests.append(request)
-        response = client.post(
-            "/v1/policy/evaluate",
-            json=request.model_dump(mode="json"),
-        )
+        response = safety_service_post_json(POLICY_EVALUATE_ROUTE, request.model_dump(mode="json"))
         response.raise_for_status()
         return decision_from_policy_response(PolicyEvaluateResponse(**response.json()))
 

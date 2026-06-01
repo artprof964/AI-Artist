@@ -277,6 +277,7 @@
 - `../../tests/policy_request_helpers.py`
 - `../../tests/policy_response_helpers.py`
 - `../../tests/request_metadata_helpers.py`
+- `../../tests/safety_service_client_helpers.py`
 - `../../tests/secret_test_helpers.py`
 - `../../tests/source_registry_helpers.py`
 - `../../tests/tool_call_helpers.py`
@@ -285,6 +286,7 @@
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
 - `../../validation_reports/api_contract_standardization_2026-05-31.md`
 - `../../validation_reports/health_contract_standardization_2026-05-31.md`
+- `../../validation_reports/safety_service_client_helper_standardization_2026-06-01.md`
 - `../../validation_reports/response_fields_standardization_2026-05-31.md`
 - `../../validation_reports/response_field_message_standardization_2026-05-31.md`
 - `../../backend/health_contracts.py`

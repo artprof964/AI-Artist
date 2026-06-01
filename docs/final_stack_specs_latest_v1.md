@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 540 passed, 1 warning
+Final validation: 541 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -115,6 +115,7 @@ tests/openclaw_hook_helpers.py: shared OpenClaw safety-hook recording Safety Ser
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
 tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
+tests/safety_service_client_helpers.py: shared FastAPI Safety Service TestClient and request helpers for endpoint, audit, OpenClaw hook, and observability tests.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
 tests/slack_adapter_helpers.py: shared Slack adapter test client, inbound event payload, channel/user/team/event IDs, timestamps, and normalized text defaults.
 tests/source_registry_helpers.py: shared SourceFreshnessRegistry construction for source freshness and source ingestion tests, including empty, single-source, two-source, and style-source registry setup.
@@ -204,6 +205,9 @@ runbook, OPA policy, PostgreSQL schema, workspace, or backend module files.
 Repo-wide validation tests that scan checked-in project, backend, or test source
 must use tests/path_helpers.py for project root resolution, project text reads,
 backend source reads, test source reads, and source iteration.
+Safety Service endpoint, audit, OpenClaw hook, and observability tests that need
+the FastAPI test client must use tests/safety_service_client_helpers.py before
+constructing TestClient directly.
 Cache, source-freshness, and observability tests that need approved cache
 entries must use tests/cache_entry_helpers.py before constructing
 ApprovedResponseCacheEntry directly.

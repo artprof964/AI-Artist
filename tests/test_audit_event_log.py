@@ -1,6 +1,7 @@
-from fastapi.testclient import TestClient
-
-from backend.app import app
+from backend.api_contracts import (
+    AUDIT_EVENTS_ROUTE,
+    audit_events_by_correlation_path,
+)
 from backend.audit import audit_event_repository
 from backend.audit_contracts import (
     AUDIT_ACTOR_SCOPE_FIELD,
@@ -16,10 +17,8 @@ from backend.runtime_field_contracts import (
     REQUEST_ID_FIELD,
 )
 from path_helpers import read_backend_source
+from safety_service_client_helpers import safety_service_client
 from secret_test_helpers import audit_secret_payload
-
-
-client = TestClient(app)
 
 
 def test_audit_events_persist_all_required_types_by_correlation_id() -> None:
@@ -36,8 +35,8 @@ def test_audit_events_persist_all_required_types_by_correlation_id() -> None:
     ]
 
     for index, event_type in enumerate(event_types, start=1):
-        response = client.post(
-            "/v1/audit/events",
+        response = safety_service_client.post(
+            AUDIT_EVENTS_ROUTE,
             json={
                 "event_id": f"15151515-1515-1515-1515-{index:012d}",
                 "event_type": event_type,
@@ -56,7 +55,7 @@ def test_audit_events_persist_all_required_types_by_correlation_id() -> None:
         assert response.status_code == 200
         assert response.json()["accepted"] is True
 
-    stored_response = client.get(f"/v1/audit/events/{correlation_id}")
+    stored_response = safety_service_client.get(audit_events_by_correlation_path(correlation_id))
 
     assert stored_response.status_code == 200
     stored_events = stored_response.json()
@@ -70,8 +69,8 @@ def test_audit_payload_secrets_are_redacted_in_persisted_records() -> None:
     audit_event_repository.clear()
     correlation_id = "25252525-2525-2525-2525-000000000001"
 
-    response = client.post(
-        "/v1/audit/events",
+    response = safety_service_client.post(
+        AUDIT_EVENTS_ROUTE,
         json={
             "event_id": "25252525-2525-2525-2525-252525252525",
             "event_type": "tool_call",
@@ -81,7 +80,7 @@ def test_audit_payload_secrets_are_redacted_in_persisted_records() -> None:
             "payload": audit_secret_payload(),
         },
     )
-    stored_response = client.get(f"/v1/audit/events/{correlation_id}")
+    stored_response = safety_service_client.get(audit_events_by_correlation_path(correlation_id))
 
     assert response.status_code == 200
     assert stored_response.status_code == 200
@@ -96,8 +95,8 @@ def test_audit_payload_secrets_are_redacted_in_persisted_records() -> None:
 
 
 def test_audit_correlation_id_must_be_uuid_compatible() -> None:
-    response = client.post(
-        "/v1/audit/events",
+    response = safety_service_client.post(
+        AUDIT_EVENTS_ROUTE,
         json={
             "event_id": "45454545-4545-4545-4545-454545454545",
             "event_type": "request",
