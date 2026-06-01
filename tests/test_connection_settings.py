@@ -4,6 +4,7 @@ import pytest
 
 from backend.connection_settings import (
     CONNECTION_ENV_VARS,
+    CONNECTION_SETTING_NAME_BY_ENV_VAR,
     CONNECTION_SETTING_NAMES,
     DEEPSEEK_API_KEY_ENV_VAR,
     DEEPSEEK_OPEN_ART_ENV_VAR,
@@ -16,6 +17,7 @@ from backend.connection_settings import (
     STANDARD_LLM_API_KEY_ENV_VAR,
     connection_value_required,
     connection_endpoint_url,
+    connection_setting_name_for_env_var,
     env_example_text,
     env_example_values,
     load_connection_settings,
@@ -123,6 +125,19 @@ def test_connection_registry_maps_every_runtime_setting_once() -> None:
 
     assert set(registry_setting_names) == CONNECTION_SETTING_NAMES
     assert len(registry_setting_names) == len(set(registry_setting_names))
+    assert CONNECTION_SETTING_NAME_BY_ENV_VAR == {
+        spec.name: spec.setting_name for spec in CONNECTION_ENV_VARS
+    }
+
+
+def test_connection_registry_resolves_setting_name_from_standard_env_var() -> None:
+    assert connection_setting_name_for_env_var(SLACK_BOT_TOKEN_ENV_VAR) == "slack_bot_token"
+    assert connection_setting_name_for_env_var(GITHUB_TOKEN_ENV_VAR) == "github_token"
+
+    with pytest.raises(RuntimeError) as exc:
+        connection_setting_name_for_env_var("CUSTOM_TOKEN")
+
+    assert str(exc.value) == unknown_connection_setting("CUSTOM_TOKEN")
 
 
 def test_connection_settings_loader_uses_registry_defaults_and_aliases() -> None:

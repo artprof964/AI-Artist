@@ -196,6 +196,7 @@
 - `../../validation_reports/runtime_env_access_guard_standardization_2026-05-31.md`
 - `../../validation_reports/runtime_secret_resolution_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_secret_lookup_standardization_2026-05-31.md`
+- `../../validation_reports/adapter_secret_registry_lookup_standardization_2026-06-01.md`
 - `../../validation_reports/connection_error_message_standardization_2026-05-31.md`
 - `../../validation_reports/shell_command_standardization_2026-05-31.md`
 - `../../validation_reports/process_argument_builder_standardization_2026-05-31.md`

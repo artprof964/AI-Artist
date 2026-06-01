@@ -352,6 +352,7 @@ def test_github_adapter_uses_shared_runtime_secret_resolver() -> None:
 
     assert "adapter_runtime_secret(" in source
     assert "explicit_secret=self._token" in source
+    assert 'setting_name="github_token"' not in source
     assert "require_runtime_secret(" not in source
     assert "load_connection_settings(" not in source
     assert "require_env_value(" not in source

@@ -130,6 +130,9 @@ CONNECTION_ENV_VARS: tuple[EnvVarSpec, ...] = (
 )
 
 CONNECTION_SETTING_NAMES: frozenset[str] = frozenset(ConnectionSettings.__dataclass_fields__)
+CONNECTION_SETTING_NAME_BY_ENV_VAR: dict[str, str] = {
+    spec.name: spec.setting_name for spec in CONNECTION_ENV_VARS
+}
 ENV_EXAMPLE_SECTION_BREAK_AFTER: frozenset[str] = frozenset(
     {
         "LLM_EMBEDDING_MODEL",
@@ -159,6 +162,13 @@ def connection_value_required(name: str, purpose: str) -> str:
 
 def unknown_connection_setting(setting_name: str) -> str:
     return f"unknown connection setting: {setting_name}"
+
+
+def connection_setting_name_for_env_var(name: str) -> str:
+    try:
+        return CONNECTION_SETTING_NAME_BY_ENV_VAR[name]
+    except KeyError as exc:
+        raise RuntimeError(unknown_connection_setting(name)) from exc
 
 
 def require_env_value(
@@ -265,6 +275,7 @@ def connection_endpoint_url(base_url: str, path: str) -> str:
 
 __all__ = [
     "CONNECTION_ENV_VARS",
+    "CONNECTION_SETTING_NAME_BY_ENV_VAR",
     "CONNECTION_SETTING_NAMES",
     "DEEPSEEK_API_KEY_ENV_VAR",
     "DEEPSEEK_OPEN_ART_ENV_VAR",
@@ -289,6 +300,7 @@ __all__ = [
     "STANDARD_LLM_API_KEY_ENV_VAR",
     "ConnectionSettings",
     "connection_endpoint_url",
+    "connection_setting_name_for_env_var",
     "connection_value_required",
     "env_example_text",
     "env_example_values",

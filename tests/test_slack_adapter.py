@@ -225,6 +225,7 @@ def test_slack_adapter_uses_shared_boundary_helpers_directly() -> None:
     assert "slack_local_request_payload(" in source
     assert "slack_outbound_message_payload(" in source
     assert "adapter_runtime_secret(" in source
+    assert 'setting_name="slack_bot_token"' not in source
     assert "require_runtime_secret(" not in source
     assert "load_connection_settings(" not in source
     assert "require_env_value(" not in source
