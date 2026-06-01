@@ -5,7 +5,6 @@ import pytest
 
 from backend.adapter_gate_contracts import PUBLISHING_ACTION_LABEL, PUBLISHING_TARGET_LABEL
 from backend.publishing_adapter import (
-    PublishingAdapter,
     PublishingExecutionGateError,
 )
 from backend.time_utils import utc_now
@@ -14,8 +13,8 @@ from gated_adapter_helpers import (
     PUBLISHING_ADAPTER_TARGET,
     PUBLISHING_TEST_EXTERNAL_POST_ID,
     PUBLISHING_TEST_PAYLOAD,
-    MockPublishingClient,
     approved_publishing_envelope_for_test,
+    publishing_adapter_harness_for_test,
     publishing_request_for_test,
     unapproved_publishing_envelope_for_test,
 )
@@ -29,8 +28,9 @@ PUBLISH_TARGET = PUBLISHING_ADAPTER_TARGET
 
 
 def test_publishing_blocks_external_client_until_human_approval_is_attached() -> None:
-    client = MockPublishingClient()
-    adapter = PublishingAdapter(client)
+    harness = publishing_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
     payload = dict(PUBLISHING_TEST_PAYLOAD)
 
     with pytest.raises(PublishingExecutionGateError, match="not valid"):
@@ -112,8 +112,9 @@ def test_publishing_rejects_invalid_execution_envelopes_before_client_execution(
     envelope: object,
     expected_reason: str,
 ) -> None:
-    client = MockPublishingClient()
-    adapter = PublishingAdapter(client)
+    harness = publishing_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(PublishingExecutionGateError, match=expected_reason):
         adapter.publish(
@@ -171,15 +172,26 @@ def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None
         if isinstance(node, ast.ImportFrom)
         for alias in node.names
     }
+    direct_adapter_calls = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "PublishingAdapter"
+    }
 
     assert "approved_publishing_envelope_for_test" in called_names
     assert "unapproved_publishing_envelope_for_test" in called_names
     assert "publishing_request_for_test" in called_names
+    assert "publishing_adapter_harness_for_test" in called_names
     assert "approved_execution_envelope" not in called_names
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_publish_envelope" not in function_names
     assert "MockPublishingClient" not in class_names
+    assert "PublishingAdapterHarness" not in class_names
+    assert not direct_adapter_calls
+    assert ("backend.publishing_adapter", "PublishingAdapter") not in imported_names
     assert ("backend.publishing_adapter", "PublishingRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

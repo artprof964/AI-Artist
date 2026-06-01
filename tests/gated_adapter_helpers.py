@@ -3,7 +3,7 @@ from datetime import datetime
 from typing import Any, Mapping
 from uuid import UUID
 
-from backend.comfyui_adapter import ComfyUIImageGenerationRequest
+from backend.comfyui_adapter import ComfyUIAdapter, ComfyUIImageGenerationRequest
 from backend.github_adapter import GitHubAdapter, GitHubWriteRequest
 from backend.operations import (
     OPERATION_GITHUB_WRITE,
@@ -11,7 +11,7 @@ from backend.operations import (
     OPERATION_PUBLISH,
 )
 from backend.publishing import LocalPublishingClient
-from backend.publishing_adapter import PublishingRequest
+from backend.publishing_adapter import PublishingAdapter, PublishingRequest
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from execution_envelope_helpers import (
     approved_execution_envelope,
@@ -61,6 +61,20 @@ class MockComfyUIClient:
                 }
             ],
         }
+
+
+@dataclass(frozen=True)
+class ComfyUIAdapterHarness:
+    adapter: ComfyUIAdapter
+    client: MockComfyUIClient
+
+
+def comfyui_adapter_harness_for_test() -> ComfyUIAdapterHarness:
+    client = MockComfyUIClient()
+    return ComfyUIAdapterHarness(
+        adapter=ComfyUIAdapter(client),
+        client=client,
+    )
 
 
 class MockGitHubAPI:
@@ -132,6 +146,20 @@ class MockPublishingClient:
             "status": PUBLISHING_STATUS_PUBLISHED,
             "target": target,
         }
+
+
+@dataclass(frozen=True)
+class PublishingAdapterHarness:
+    adapter: PublishingAdapter
+    client: MockPublishingClient
+
+
+def publishing_adapter_harness_for_test() -> PublishingAdapterHarness:
+    client = MockPublishingClient()
+    return PublishingAdapterHarness(
+        adapter=PublishingAdapter(client),
+        client=client,
+    )
 
 
 class SecretEchoPublishingClient(LocalPublishingClient):

@@ -5,7 +5,6 @@ import pytest
 
 from backend.adapter_gate_contracts import COMFYUI_IMAGE_GENERATION_ACTION_LABEL
 from backend.comfyui_adapter import (
-    ComfyUIAdapter,
     ComfyUIExecutionGateError,
 )
 from backend.time_utils import utc_now
@@ -14,8 +13,8 @@ from gated_adapter_helpers import (
     COMFYUI_ADAPTER_TARGET,
     COMFYUI_TEST_PROMPT_ID,
     COMFYUI_TEST_WORKFLOW,
-    MockComfyUIClient,
     approved_comfyui_envelope_for_test,
+    comfyui_adapter_harness_for_test,
     comfyui_image_request_for_test,
     unapproved_comfyui_envelope_for_test,
 )
@@ -28,8 +27,9 @@ COMFYUI_TARGET = COMFYUI_ADAPTER_TARGET
 
 
 def test_image_generation_succeeds_with_mocked_approved_execution_envelope() -> None:
-    client = MockComfyUIClient()
-    adapter = ComfyUIAdapter(client)
+    harness = comfyui_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
     envelope = approved_comfyui_envelope_for_test(approved_at=NOW)
     workflow = dict(COMFYUI_TEST_WORKFLOW)
 
@@ -78,8 +78,9 @@ def test_image_generation_fails_without_valid_execution_envelope(
     envelope: object,
     expected_reason: str,
 ) -> None:
-    client = MockComfyUIClient()
-    adapter = ComfyUIAdapter(client)
+    harness = comfyui_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(ComfyUIExecutionGateError, match=expected_reason):
         adapter.generate_image(
@@ -134,15 +135,26 @@ def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
         if isinstance(node, ast.ImportFrom)
         for alias in node.names
     }
+    direct_adapter_calls = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "ComfyUIAdapter"
+    }
 
     assert "approved_comfyui_envelope_for_test" in called_names
     assert "unapproved_comfyui_envelope_for_test" in called_names
     assert "comfyui_image_request_for_test" in called_names
+    assert "comfyui_adapter_harness_for_test" in called_names
     assert "approved_execution_envelope" not in called_names
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_envelope" not in function_names
     assert "MockComfyUIClient" not in class_names
+    assert "ComfyUIAdapterHarness" not in class_names
+    assert not direct_adapter_calls
+    assert ("backend.comfyui_adapter", "ComfyUIAdapter") not in imported_names
     assert ("backend.comfyui_adapter", "ComfyUIImageGenerationRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names
