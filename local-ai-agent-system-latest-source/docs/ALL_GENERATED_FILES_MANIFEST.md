@@ -248,6 +248,7 @@
 - `../../validation_reports/llm_secret_redaction_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/llm_smoke_request_standardization_2026-05-31.md`
 - `../../validation_reports/llm_api_request_contract_standardization_2026-06-01.md`
+- `../../validation_reports/llm_api_smoke_helper_standardization_2026-06-01.md`
 - `../../validation_reports/llm_smoke_timeout_standardization_2026-05-31.md`
 - `../../validation_reports/llm_slack_connection_message_standardization_2026-05-31.md`
 - `../../backend/connection_settings.py`
@@ -268,6 +269,7 @@
 - `../../tests/path_helpers.py`
 - `../../tests/cache_entry_helpers.py`
 - `../../tests/connection_env_helpers.py`
+- `../../tests/llm_api_smoke_helpers.py`
 - `../../tests/human_approval_helpers.py`
 - `../../tests/policy_request_helpers.py`
 - `../../tests/policy_response_helpers.py`

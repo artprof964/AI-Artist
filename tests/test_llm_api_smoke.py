@@ -1,4 +1,4 @@
-from typing import Any
+import ast
 
 import pytest
 
@@ -54,26 +54,12 @@ from connection_env_helpers import (
     legacy_llm_env,
     llm_env,
 )
-from path_helpers import read_backend_source
-
-
-class RecordingChatCompletions:
-    def __init__(self) -> None:
-        self.calls: list[dict[str, Any]] = []
-
-    def create(self, **kwargs: Any) -> dict[str, Any]:
-        self.calls.append(kwargs)
-        return {
-            "id": "resp_smoke_123",
-            "model": kwargs["model"],
-            "choices": [{"message": {"content": "Hello! How can I help you today?"}}],
-        }
-
-
-class RecordingLLMClient:
-    def __init__(self) -> None:
-        self.completions = RecordingChatCompletions()
-        self.chat = type("RecordingChat", (), {"completions": self.completions})()
+from llm_api_smoke_helpers import (
+    LLM_TEST_RESPONSE_CONTENT,
+    LLM_TEST_RESPONSE_ID,
+    RecordingLLMClient,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 def test_llm_api_model_config_loads_defaults_without_logging_secret() -> None:
@@ -281,9 +267,9 @@ def test_llm_api_smoke_test_uses_mocked_openai_client_and_redacts_request() -> N
         LLM_REQUEST_THINKING_FIELD: {LLM_REQUEST_TYPE_FIELD: LLM_SMOKE_THINKING_TYPE}
     }
 
-    assert result[LLM_SMOKE_RESULT_RESPONSE_ID_FIELD] == "resp_smoke_123"
+    assert result[LLM_SMOKE_RESULT_RESPONSE_ID_FIELD] == LLM_TEST_RESPONSE_ID
     assert result[LLM_SMOKE_RESULT_MODEL_FIELD] == "test-model"
-    assert result[LLM_SMOKE_RESULT_CONTENT_FIELD] == "Hello! How can I help you today?"
+    assert result[LLM_SMOKE_RESULT_CONTENT_FIELD] == LLM_TEST_RESPONSE_CONTENT
     assert result[LLM_SMOKE_RESULT_REQUEST_FIELD][LLM_REQUEST_LOG_API_KEY_FIELD] == SECRET_REDACTION
     assert result[LLM_SMOKE_RESULT_REQUEST_FIELD][LLM_REQUEST_LOG_BASE_URL_FIELD] == (
         "https://example.test/llm"
@@ -353,6 +339,15 @@ def test_llm_api_smoke_uses_shared_runtime_secret_resolver() -> None:
     assert "runtime_env(" not in source
     assert '"the live LLM API smoke test"' in source
     assert 'purpose="the live LLM API smoke test"' not in source
+
+
+def test_llm_api_smoke_tests_use_shared_recording_client() -> None:
+    source = read_test_source("test_llm_api_smoke.py")
+    tree = ast.parse(source)
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
+
+    assert "RecordingChatCompletions" not in class_names
+    assert "RecordingLLMClient" not in class_names
 
 
 @pytest.mark.skipif(

@@ -85,6 +85,7 @@ can be marked done.
 61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, and deterministic fake-client responses.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
+63a. LLM API smoke tests use `tests/llm_api_smoke_helpers.py` for mocked OpenAI-compatible recording clients, response ids, and response content.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
 64a. Slack adapter tests use `tests/slack_adapter_helpers.py` for deterministic Slack clients, inbound event payloads, event identity values, timestamps, and normalized text.
 65. OpenClaw hook and observability tests use `tests/tool_call_helpers.py` for standard `ToolCallRequest` setup.
@@ -157,6 +158,8 @@ Rules:
 - LLM, Slack, GitHub, connection-settings, and future connection tests use
   `tests/connection_env_helpers.py` instead of repeating env-var maps or test
   secret constants locally.
+- LLM API smoke tests use `tests/llm_api_smoke_helpers.py` instead of defining
+  local OpenAI-compatible recording clients, response ids, or response content.
 - Audit, security-review, secret-redaction, side-effect audit, and future
   redaction tests use `tests/secret_test_helpers.py` instead of repeating
   token-shaped payloads or redaction assertion helpers locally.
