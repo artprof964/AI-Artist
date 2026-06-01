@@ -234,7 +234,10 @@ def test_source_registry_tests_use_shared_registry_helper() -> None:
             and node.func.id == "SourceFreshnessRegistry"
         ]
 
-        assert "source_freshness_registry_for_test(" in source
+        assert (
+            "source_freshness_registry_for_test(" in source
+            or "source_ingestion_harness_for_test(" in source
+        )
         assert direct_constructor_calls == []
 
 

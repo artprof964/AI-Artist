@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 546 passed, 1 warning
+Final validation: 547 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -118,7 +118,7 @@ tests/request_metadata_helpers.py: shared RequestMetadata construction for reque
 tests/safety_service_client_helpers.py: shared FastAPI Safety Service TestClient and request helpers for endpoint, audit, OpenClaw hook, and observability tests.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
 tests/slack_adapter_helpers.py: shared Slack adapter test harness, deterministic Slack client, inbound event payload, channel/user/team/event IDs, timestamps, and normalized text defaults.
-tests/source_registry_helpers.py: shared SourceFreshnessRegistry construction for source freshness and source ingestion tests, including empty, single-source, two-source, and style-source registry setup.
+tests/source_registry_helpers.py: shared SourceFreshnessRegistry and source-ingestion harness construction for source freshness and source ingestion tests, including empty, single-source, two-source, style-source, approved-domain, snapshot-repository, service, and sample-candidate setup.
 tests/subagent_output_helpers.py: shared raw SubAgentOutput payload construction for schema-boundary tests using the shared sub-agent output field contracts.
 tests/tool_call_helpers.py: shared ToolCallRequest construction for OpenClaw safety hook and observability tests, including default operation, request kind, scope, correlation ID, request ID, metadata, arguments, and source freshness setup.
 backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
@@ -227,9 +227,11 @@ Slack adapter tests that need adapter/client setup, deterministic Slack clients,
 inbound event payloads, event identity values, timestamps, or normalized text
 must use tests/slack_adapter_helpers.py before constructing SlackAdapter
 directly or defining local Slack client or event payload helpers.
-Source freshness and source ingestion tests that need local source registries
-must use tests/source_registry_helpers.py before constructing
-SourceFreshnessRegistry fixtures directly.
+Source freshness and source ingestion tests that need local source registries,
+source-ingestion services, snapshot repositories, or sample candidates must use
+tests/source_registry_helpers.py before constructing SourceFreshnessRegistry,
+SourceIngestionService, InMemorySourceSnapshotRepository, or
+SourceIngestionCandidate fixtures directly.
 Source freshness tests must call tests/policy_request_helpers.py and
 tests/cache_entry_helpers.py directly before adding local policy-request or
 cache-entry wrappers.

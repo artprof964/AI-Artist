@@ -96,7 +96,7 @@ can be marked done.
 67. Cache and source-freshness tests use `tests/policy_response_helpers.py` for standard approved `PolicyEvaluateResponse` setup.
 68. Request metadata, Safety Service unit, and observability tests use `tests/request_metadata_helpers.py` for standard `RequestMetadata` setup.
 69. Execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests use `tests/human_approval_helpers.py` for standard `HumanApproval` setup.
-70. Source freshness and source ingestion tests use `tests/source_registry_helpers.py` for standard `SourceFreshnessRegistry` setup.
+70. Source freshness and source ingestion tests use `tests/source_registry_helpers.py` for standard `SourceFreshnessRegistry`, source-ingestion service, snapshot repository, approved-domain, and sample-candidate setup.
 ```
 
 ## Standard Request Envelope
@@ -175,7 +175,9 @@ Rules:
   locally.
 - Source freshness, source ingestion, and future source-registry tests use
   `tests/source_registry_helpers.py` instead of constructing standard
-  `SourceFreshnessRegistry` fixtures directly.
+  `SourceFreshnessRegistry`, `SourceIngestionService`,
+  `InMemorySourceSnapshotRepository`, or `SourceIngestionCandidate` fixtures
+  directly.
 - Source freshness tests call `tests/policy_request_helpers.py` and
   `tests/cache_entry_helpers.py` directly instead of defining local
   policy-request or cache-entry wrappers.

@@ -169,6 +169,7 @@
 - `../../validation_reports/source_ingestion_metadata_key_standardization_2026-05-31.md`
 - `../../validation_reports/source_registry_metadata_payload_contract_standardization_2026-05-31.md`
 - `../../validation_reports/source_registry_id_lookup_standardization_2026-05-31.md`
+- `../../validation_reports/source_ingestion_harness_standardization_2026-06-01.md`
 - `../../backend/source_ingestion_contracts.py`
 - `../../backend/source_ingestion.py`
 - `../../tests/test_source_ingestion.py`
