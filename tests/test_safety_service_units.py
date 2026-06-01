@@ -5,7 +5,6 @@ import pytest
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
-    PolicyEvaluateRequest,
     RequestMetadata,
 )
 from backend.service import (
@@ -16,6 +15,7 @@ from backend.service import (
 from backend.time_utils import as_utc
 from execution_envelope_helpers import execution_envelope_for_test, stale_source_freshness
 from path_helpers import read_backend_source
+from policy_request_helpers import policy_evaluate_request_for_test
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:
@@ -81,14 +81,7 @@ def test_classifier_maps_common_safety_operations(
 
 def test_policy_denies_stale_read_reuse_without_requiring_approval() -> None:
     response = evaluate_policy(
-        PolicyEvaluateRequest(
-            request_kind="read",
-            operation="reuse",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            requires_human_approval=False,
-            source_freshness=stale_source_freshness(),
-        )
+        policy_evaluate_request_for_test(source_freshness=stale_source_freshness())
     )
 
     assert response.allow is False

@@ -215,6 +215,7 @@
 - `../../validation_reports/test_path_helper_standardization_2026-05-31.md`
 - `../../validation_reports/test_execution_envelope_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_path_execution_envelope_helper_standardization_2026-06-01.md`
+- `../../validation_reports/policy_request_helper_standardization_2026-06-01.md`
 - `../../validation_reports/test_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/backend_source_read_helper_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_contract_source_read_helper_standardization_2026-05-31.md`
@@ -252,6 +253,7 @@
 - `../../tests/test_readiness_paths.py`
 - `../../tests/test_repo_paths.py`
 - `../../tests/path_helpers.py`
+- `../../tests/policy_request_helpers.py`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
 - `../../validation_reports/t24_unit_ci_validation_2026-05-31.md`
 - `../../validation_reports/api_contract_standardization_2026-05-31.md`

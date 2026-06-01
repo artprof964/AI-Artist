@@ -14,7 +14,8 @@ from backend.orchestrator import (
     run_mock_subagent_orchestration,
 )
 from backend.policy_contracts import LOCAL_DEFAULT_DENY_POLICY_VERSION
-from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness, SubAgentOutput
+from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SubAgentOutput
+from execution_envelope_helpers import unchanged_source_freshness
 from path_helpers import read_backend_source
 
 
@@ -106,10 +107,7 @@ def test_tool_call_reaches_safety_service_before_adapter_runs() -> None:
         requester_scope="user:local",
         policy_scope="workspace:ai-artist-main",
         correlation_id="trace-openclaw-read-001",
-        source_freshness=SourceFreshness(
-            all_required_sources_unchanged=True,
-            changed_source_count=0,
-        ),
+        source_freshness=unchanged_source_freshness(),
         arguments={
             "query": "Flux style references",
             "provider": {"api_key": "sk-test-secret"},
@@ -223,10 +221,7 @@ def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthes
             "workspace": "ai-artist-main",
             "agent": "ai-artist-main",
         },
-        source_freshness=SourceFreshness(
-            all_required_sources_unchanged=True,
-            changed_source_count=0,
-        ),
+        source_freshness=unchanged_source_freshness(),
     )
 
     result = execute_tool_call_with_safety(request, safety_client, adapter)

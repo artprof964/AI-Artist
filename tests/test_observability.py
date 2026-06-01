@@ -33,13 +33,13 @@ from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_r
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
-    PolicyEvaluateRequest,
     PolicyEvaluateResponse,
     RequestMetadata,
-    SourceFreshness,
 )
 from backend.service import canonicalize_request, classify_request, evaluate_policy
+from execution_envelope_helpers import unchanged_source_freshness
 from path_helpers import read_backend_source
+from policy_request_helpers import policy_evaluate_request_for_test
 
 
 REQUEST_ID = UUID("26262626-2626-2626-2626-262626262626")
@@ -55,7 +55,7 @@ def clear_observability() -> None:
 
 
 class LocalSafetyClient:
-    def evaluate_tool_call(self, request: PolicyEvaluateRequest) -> SafetyDecision:
+    def evaluate_tool_call(self, request) -> SafetyDecision:
         response = evaluate_policy(request)
         return decision_from_policy_response(PolicyEvaluateResponse(**response.model_dump()))
 
@@ -99,17 +99,12 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
             request_text="Research safe local image context",
         )
     )
-    policy_request = PolicyEvaluateRequest(
+    policy_request = policy_evaluate_request_for_test(
         request_id=REQUEST_ID,
         request_kind=classified.request_kind,
         operation="reuse",
         requester_scope=canonical.requester_scope,
         policy_scope=canonical.policy_scope,
-        requires_human_approval=False,
-        source_freshness=SourceFreshness(
-            all_required_sources_unchanged=True,
-            changed_source_count=0,
-        ),
         metadata={"correlation_id": TRACE_ID},
     )
     policy_response = evaluate_policy(policy_request)
@@ -141,10 +136,7 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
             policy_scope=canonical.policy_scope,
             correlation_id=TRACE_ID,
             request_id=REQUEST_ID,
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
+            source_freshness=unchanged_source_freshness(),
             arguments={
                 "request_text": "Research safe local image context",
                 "provider": {"api_key": "sk-observability-secret"},

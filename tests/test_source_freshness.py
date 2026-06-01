@@ -2,7 +2,7 @@ from datetime import datetime, timedelta, timezone
 from uuid import uuid4
 
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
-from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
+from backend.schemas import PolicyEvaluateResponse, SourceFreshness
 from backend.source_freshness_contracts import (
     DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
     DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
@@ -18,6 +18,7 @@ from backend.source_registry_contracts import (
     source_registry_row_not_found,
 )
 from path_helpers import read_backend_source, read_test_source
+from policy_request_helpers import policy_evaluate_request_for_test
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -27,14 +28,9 @@ REQUEST_FINGERPRINT = "sha256:freshness-sensitive-read"
 def policy_request_from_registry(
     registry: SourceFreshnessRegistry,
     source_keys: list[str],
-) -> PolicyEvaluateRequest:
+):
     snapshot = registry.record_dependency_snapshot(source_keys=source_keys)
-    return PolicyEvaluateRequest(
-        request_kind="read",
-        operation="reuse",
-        requester_scope="user:local",
-        policy_scope="workspace:ai-artist-main",
-        requires_human_approval=False,
+    return policy_evaluate_request_for_test(
         source_freshness=snapshot.source_freshness,
     )
 
@@ -127,12 +123,7 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
     snapshot_at_cache = registry.record_dependency_snapshot(source_keys=["reference-brief"])
 
     fresh_decision = evaluate_cached_response_reuse(
-        policy_request=PolicyEvaluateRequest(
-            request_kind="read",
-            operation="reuse",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            requires_human_approval=False,
+        policy_request=policy_evaluate_request_for_test(
             source_freshness=snapshot_at_cache.source_freshness,
         ),
         policy_response=approved_policy_response(),
@@ -144,12 +135,7 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
     stale_snapshot = registry.evaluate_snapshot(dependencies=snapshot_at_cache.dependencies)
 
     stale_decision = evaluate_cached_response_reuse(
-        policy_request=PolicyEvaluateRequest(
-            request_kind="read",
-            operation="reuse",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            requires_human_approval=False,
+        policy_request=policy_evaluate_request_for_test(
             source_freshness=stale_snapshot.source_freshness,
         ),
         policy_response=approved_policy_response(),

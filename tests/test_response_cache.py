@@ -1,5 +1,6 @@
 from dataclasses import replace
 from datetime import datetime, timedelta, timezone
+import ast
 
 import pytest
 
@@ -23,26 +24,18 @@ from backend.response_cache_contracts import (
     cache_reuse_observability_fields,
 )
 from backend.runtime_field_contracts import OPERATION_FIELD, REASON_FIELD, REQUEST_KIND_FIELD
-from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
-from path_helpers import read_backend_source
+from backend.schemas import PolicyEvaluateResponse, SourceFreshness
+from execution_envelope_helpers import stale_source_freshness
+from path_helpers import read_backend_source, read_test_source
+from policy_request_helpers import policy_evaluate_request_for_test
 
 
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
 REQUEST_FINGERPRINT = "sha256:repeat-read-request"
 
 
-def base_policy_request() -> PolicyEvaluateRequest:
-    return PolicyEvaluateRequest(
-        request_kind=REQUEST_KIND_READ,
-        operation=OPERATION_REUSE,
-        requester_scope="user:local",
-        policy_scope="workspace:ai-artist-main",
-        requires_human_approval=False,
-        source_freshness=SourceFreshness(
-            all_required_sources_unchanged=True,
-            changed_source_count=0,
-        ),
-    )
+def base_policy_request():
+    return policy_evaluate_request_for_test()
 
 
 def approved_policy_response() -> PolicyEvaluateResponse:
@@ -118,18 +111,9 @@ def test_rejects_non_reuse_policy_requests() -> None:
 @pytest.mark.parametrize(
     "source_freshness",
     [
-        SourceFreshness(
-            all_required_sources_unchanged=False,
-            changed_source_count=0,
-        ),
-        SourceFreshness(
-            all_required_sources_unchanged=True,
-            changed_source_count=1,
-        ),
-        SourceFreshness(
-            all_required_sources_unchanged=False,
-            changed_source_count=1,
-        ),
+        stale_source_freshness(changed_source_count=0),
+        SourceFreshness(changed_source_count=1),
+        stale_source_freshness(),
     ],
 )
 def test_rejects_stale_replay_request_sources(source_freshness: SourceFreshness) -> None:
@@ -318,3 +302,23 @@ def test_response_cache_runtime_fields_reuse_shared_contracts() -> None:
     assert 'CACHE_OPERATION_FIELD = "operation"' not in source
     assert 'CACHE_REQUEST_KIND_FIELD = "request_kind"' not in source
     assert 'CACHE_REASON_FIELD = "reason"' not in source
+
+
+def test_policy_path_tests_use_shared_policy_request_helper() -> None:
+    for test_module in (
+        "test_observability.py",
+        "test_response_cache.py",
+        "test_safety_service_units.py",
+        "test_source_freshness.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        imported_names = {
+            (node.module, alias.name)
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+            for alias in node.names
+        }
+
+        assert "policy_evaluate_request_for_test(" in source
+        assert ("backend.schemas", "PolicyEvaluateRequest") not in imported_names
