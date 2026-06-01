@@ -7,7 +7,6 @@ import pytest
 
 from backend.connection_settings import SLACK_BOT_TOKEN_ENV_VAR, connection_value_required
 from backend.slack_adapter import (
-    SlackAdapter,
     SlackAdapterConfigurationError,
     SlackAdapterError,
 )
@@ -29,7 +28,7 @@ from slack_adapter_helpers import (
     SLACK_TEST_TEAM_ID,
     SLACK_TEST_THREAD_TS,
     SLACK_TEST_USER,
-    MockSlackClient,
+    slack_adapter_harness_for_test,
     slack_event_payload_for_test,
 )
 
@@ -38,7 +37,7 @@ BOT_TOKEN = TEST_SLACK_BOT_TOKEN
 
 
 def test_slack_adapter_normalizes_inbound_event_to_local_request_envelope() -> None:
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), bot_token=BOT_TOKEN)
+    adapter = slack_adapter_harness_for_test().adapter
 
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
     local_request = envelope.to_local_request()
@@ -62,8 +61,9 @@ def test_slack_adapter_normalizes_inbound_event_to_local_request_envelope() -> N
 
 
 def test_slack_adapter_formats_and_posts_threaded_outbound_response_without_token() -> None:
-    client = MockSlackClient(BOT_TOKEN)
-    adapter = SlackAdapter(client, bot_token=BOT_TOKEN)
+    harness = slack_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
 
     result = adapter.send_response(envelope, "  Drafted 3 directions for review.  ")
@@ -85,8 +85,9 @@ def test_slack_adapter_formats_and_posts_threaded_outbound_response_without_toke
 
 
 def test_slack_adapter_redacts_token_shapes_from_outbound_payload_and_result() -> None:
-    client = MockSlackClient(BOT_TOKEN)
-    adapter = SlackAdapter(client, bot_token=BOT_TOKEN)
+    harness = slack_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
     unexpected_token = "xoxp-unexpected-outbound-secret-123456"
 
@@ -110,11 +111,10 @@ def test_slack_adapter_redacts_token_shapes_from_outbound_payload_and_result() -
 
 
 def test_slack_adapter_can_read_token_from_injected_connection_env() -> None:
-    client = MockSlackClient(BOT_TOKEN)
-    adapter = SlackAdapter(
-        client,
+    harness = slack_adapter_harness_for_test(
         env=slack_token_env(padded=True),
     )
+    adapter = harness.adapter
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
 
     result = adapter.send_response(envelope, f"Do not leak {BOT_TOKEN}.")
@@ -125,12 +125,10 @@ def test_slack_adapter_can_read_token_from_injected_connection_env() -> None:
 
 
 def test_slack_adapter_supports_custom_runtime_token_env_name() -> None:
-    client = MockSlackClient(BOT_TOKEN)
-    adapter = SlackAdapter(
-        client,
+    adapter = slack_adapter_harness_for_test(
         env=slack_token_env(env_var="CUSTOM_SLACK_TOKEN", padded=True),
         token_env_var="CUSTOM_SLACK_TOKEN",
-    )
+    ).adapter
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
 
     result = adapter.send_response(envelope, f"Do not leak {BOT_TOKEN}.")
@@ -139,7 +137,7 @@ def test_slack_adapter_supports_custom_runtime_token_env_name() -> None:
 
 
 def test_slack_adapter_reports_missing_runtime_token_before_send() -> None:
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env=slack_token_env(token=" ", padded=True))
+    adapter = slack_adapter_harness_for_test(env=slack_token_env(token=" ", padded=True)).adapter
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
 
     with pytest.raises(SlackAdapterConfigurationError) as exc:
@@ -152,7 +150,7 @@ def test_slack_adapter_reports_missing_runtime_token_before_send() -> None:
 
 
 def test_slack_adapter_rejects_empty_response_before_token_read() -> None:
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), env=slack_token_env(token=" ", padded=True))
+    adapter = slack_adapter_harness_for_test(env=slack_token_env(token=" ", padded=True)).adapter
     envelope = adapter.normalize_inbound_event(slack_event_payload_for_test())
 
     with pytest.raises(SlackAdapterError) as exc:
@@ -164,7 +162,7 @@ def test_slack_adapter_rejects_empty_response_before_token_read() -> None:
 def test_slack_adapter_uses_message_ts_as_thread_fallback() -> None:
     payload = slack_event_payload_for_test()
     payload["event"].pop("thread_ts")
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), bot_token=BOT_TOKEN)
+    adapter = slack_adapter_harness_for_test().adapter
 
     envelope = adapter.normalize_inbound_event(payload)
 
@@ -183,7 +181,7 @@ def test_slack_adapter_uses_message_ts_as_thread_fallback() -> None:
 def test_slack_adapter_rejects_malformed_inbound_events(event_update: dict[str, Any]) -> None:
     payload = slack_event_payload_for_test()
     payload["event"].update(event_update)
-    adapter = SlackAdapter(MockSlackClient(BOT_TOKEN), bot_token=BOT_TOKEN)
+    adapter = slack_adapter_harness_for_test().adapter
 
     with pytest.raises(SlackAdapterError):
         adapter.normalize_inbound_event(payload)
@@ -228,7 +226,17 @@ def test_slack_adapter_tests_use_shared_slack_adapter_helpers() -> None:
         for node in ast.walk(tree)
         if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
     }
+    direct_adapter_calls = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "SlackAdapter"
+    }
 
     assert "MockSlackClient" not in class_names
     assert "slack_event_payload" not in function_names
+    assert "SlackAdapterHarness" not in class_names
     assert "slack_event_payload_for_test" in called_names
+    assert "slack_adapter_harness_for_test" in called_names
+    assert not direct_adapter_calls

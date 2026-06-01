@@ -117,7 +117,7 @@ tests/policy_response_helpers.py: shared approved policy-evaluate response const
 tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
 tests/safety_service_client_helpers.py: shared FastAPI Safety Service TestClient and request helpers for endpoint, audit, OpenClaw hook, and observability tests.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
-tests/slack_adapter_helpers.py: shared Slack adapter test client, inbound event payload, channel/user/team/event IDs, timestamps, and normalized text defaults.
+tests/slack_adapter_helpers.py: shared Slack adapter test harness, deterministic Slack client, inbound event payload, channel/user/team/event IDs, timestamps, and normalized text defaults.
 tests/source_registry_helpers.py: shared SourceFreshnessRegistry construction for source freshness and source ingestion tests, including empty, single-source, two-source, and style-source registry setup.
 tests/subagent_output_helpers.py: shared raw SubAgentOutput payload construction for schema-boundary tests using the shared sub-agent output field contracts.
 tests/tool_call_helpers.py: shared ToolCallRequest construction for OpenClaw safety hook and observability tests, including default operation, request kind, scope, correlation ID, request ID, metadata, arguments, and source freshness setup.
@@ -223,10 +223,10 @@ classes.
 Redaction and security-review tests that need secret-bearing payloads,
 workspace secret lines, observability fields, or side-effect client responses
 must use tests/secret_test_helpers.py before repeating token-shaped literals.
-Slack adapter tests that need deterministic Slack clients, inbound event
-payloads, event identity values, timestamps, or normalized text must use
-tests/slack_adapter_helpers.py before defining local Slack client or event
-payload helpers.
+Slack adapter tests that need adapter/client setup, deterministic Slack clients,
+inbound event payloads, event identity values, timestamps, or normalized text
+must use tests/slack_adapter_helpers.py before constructing SlackAdapter
+directly or defining local Slack client or event payload helpers.
 Source freshness and source ingestion tests that need local source registries
 must use tests/source_registry_helpers.py before constructing
 SourceFreshnessRegistry fixtures directly.

@@ -89,7 +89,7 @@ can be marked done.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
 63a. LLM API smoke tests use `tests/llm_api_smoke_helpers.py` for mocked OpenAI-compatible recording clients, response ids, and response content.
 64. Audit, security-review, secret-redaction, and side-effect audit tests use `tests/secret_test_helpers.py` for standard secret-bearing payloads and redaction assertions.
-64a. Slack adapter tests use `tests/slack_adapter_helpers.py` for deterministic Slack clients, inbound event payloads, event identity values, timestamps, and normalized text.
+64a. Slack adapter tests use `tests/slack_adapter_helpers.py` for adapter/client harness setup, deterministic Slack clients, inbound event payloads, event identity values, timestamps, and normalized text.
 65. OpenClaw hook and observability tests use `tests/tool_call_helpers.py` for standard `ToolCallRequest` setup.
 65a. OpenClaw safety hook and observability tests use `tests/openclaw_hook_helpers.py` for recording Safety Service clients, recording adapters, mock orchestration adapters, and event labels.
 66. Cache, source-freshness, and observability tests use `tests/cache_entry_helpers.py` for standard `ApprovedResponseCacheEntry` setup.
@@ -169,9 +169,10 @@ Rules:
 - Audit, security-review, secret-redaction, side-effect audit, and future
   redaction tests use `tests/secret_test_helpers.py` instead of repeating
   token-shaped payloads or redaction assertion helpers locally.
-- Slack adapter tests use `tests/slack_adapter_helpers.py` instead of defining
-  local Slack client doubles, inbound event payloads, event identity values,
-  timestamps, or normalized text locally.
+- Slack adapter tests use `tests/slack_adapter_helpers.py` instead of
+  constructing `SlackAdapter` directly or defining local Slack client doubles,
+  inbound event payloads, event identity values, timestamps, or normalized text
+  locally.
 - Source freshness, source ingestion, and future source-registry tests use
   `tests/source_registry_helpers.py` instead of constructing standard
   `SourceFreshnessRegistry` fixtures directly.
