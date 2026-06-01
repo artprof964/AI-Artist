@@ -99,8 +99,8 @@ backend/response_cache_contracts.py: shared response-cache reuse telemetry event
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, time, and cache observability boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, source registry role/change-sequence contracts, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version, URL-domain validation, registry metadata payload, and source-registry default boundaries.
-backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution, env-var-to-setting-name lookup, connection error messages, and guards, endpoint URL composition, env-example rendering/parsing, env-example validation helpers, connection settings loader, and the project-standard deepseek-open-art LLM API key.
-backend/adapter_secrets.py: shared adapter secret lookup that maps standard env vars to connection settings through the connection registry, supports custom env names and explicit injected secrets, and wraps adapter-specific configuration errors.
+backend/connection_settings.py: registry-driven env var names, defaults, aliases, runtime env resolution, runtime secret resolution with registered env-var-to-setting-name derivation, connection error messages, and guards, endpoint URL composition, env-example rendering/parsing, env-example validation helpers, connection settings loader, and the project-standard deepseek-open-art LLM API key.
+backend/adapter_secrets.py: shared adapter secret lookup that delegates standard env-var setting-name derivation to the connection registry, supports custom env names and explicit injected secrets, and wraps adapter-specific configuration errors.
 backend/shell_commands.py: shared shell command and process argument construction for Docker Compose, curl, MinIO, and OPA command definitions plus subprocess execution defaults and delimited process-output parsing.
 backend/readiness_paths.py: shared production readiness backup paths, container dump path, and MinIO source alias.
 backend/repo_paths.py: shared repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text readers, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, and backend module files.
@@ -158,14 +158,17 @@ endpoint, schema, or runbook readiness health-check logic is changed.
 Safety Service API metadata and route paths must flow through
 backend/api_contracts.py before FastAPI decorators, endpoint tests, or
 interface docs change.
-Connection names, defaults, secret aliases, target setting fields, env-var-to-setting lookup, endpoint URL
+Connection names, defaults, secret aliases, target setting fields, registered env-var-to-setting lookup, endpoint URL
 composition, env-example rendering/parsing/validation, runtime env resolution, runtime secret resolution, connection error messages, and env-access guards must be changed through
 backend/connection_settings.py before adapter-specific code; the standard LLM
 API secret key is `deepseek-open-art`, with `DEEPSEEK_API_KEY` retained only as
 a legacy loader alias and excluded from rendered project setup examples.
-Adapter secret lookup for standard env vars must derive target connection
-settings through backend/connection_settings.py inside backend/adapter_secrets.py
-before Slack, GitHub, or future adapters read runtime tokens.
+Runtime secret lookup for registered env vars must derive target connection
+settings inside backend/connection_settings.py before LLM, Slack, GitHub, or
+future adapters read runtime secrets.
+Adapter secret lookup must delegate standard setting-name derivation to
+backend/connection_settings.py before Slack, GitHub, or future adapters read
+runtime tokens.
 LLM smoke-test prompts, reasoning effort, thinking mode, timeout, request payload
 construction, runtime secret lookup, and redacted request recording must flow
 through backend/llm_api_smoke.py before live-provider diagnostics are changed.

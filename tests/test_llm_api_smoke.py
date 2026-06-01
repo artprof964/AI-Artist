@@ -350,6 +350,7 @@ def test_llm_api_smoke_uses_shared_runtime_secret_resolver() -> None:
 
     assert "require_runtime_secret(" in source
     assert "LLM_API_SMOKE_TEST_PURPOSE" in source
+    assert 'setting_name="llm_api_key"' not in source
     assert "if not settings.llm_api_key" not in source
     assert "require_env_value(" not in source
     assert "runtime_env(" not in source
@@ -372,6 +373,5 @@ def test_live_llm_api_smoke_test_records_id_and_model_without_secret() -> None:
         runtime_env(),
         STANDARD_LLM_API_KEY_ENV_VAR,
         purpose=LLM_API_SMOKE_TEST_PURPOSE,
-        setting_name="llm_api_key",
     )
     assert api_key not in repr(result)

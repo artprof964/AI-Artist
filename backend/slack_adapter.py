@@ -216,7 +216,6 @@ class SlackAdapter:
             env=self._env,
             env_var=self._token_env_var,
             purpose=SLACK_ADAPTER_EXECUTION_PURPOSE,
-            standard_env_var=SLACK_BOT_TOKEN_ENV_VAR,
             error_type=SlackAdapterConfigurationError,
             explicit_secret=self._bot_token,
         )
@@ -242,7 +241,6 @@ class SlackAdapter:
             env=self._env,
             env_var=self._token_env_var,
             purpose=SLACK_ADAPTER_EXECUTION_PURPOSE,
-            standard_env_var=SLACK_BOT_TOKEN_ENV_VAR,
             error_type=SlackAdapterConfigurationError,
             explicit_secret=self._bot_token,
         )

@@ -122,7 +122,6 @@ class GitHubAdapter:
             env=self._env,
             env_var=self._token_env_var,
             purpose=GITHUB_ADAPTER_EXECUTION_PURPOSE,
-            standard_env_var=GITHUB_TOKEN_ENV_VAR,
             error_type=GitHubAdapterConfigurationError,
             explicit_secret=self._token,
         )

@@ -193,12 +193,13 @@ def require_runtime_secret(
     aliases: tuple[str, ...] = (),
 ) -> str:
     values = runtime_env(env)
-    if setting_name is None:
+    resolved_setting_name = setting_name or CONNECTION_SETTING_NAME_BY_ENV_VAR.get(name)
+    if resolved_setting_name is None:
         value = env_value(values, name, aliases=aliases)
     else:
-        if setting_name not in CONNECTION_SETTING_NAMES:
-            raise RuntimeError(unknown_connection_setting(setting_name))
-        value = getattr(load_connection_settings(values), setting_name)
+        if resolved_setting_name not in CONNECTION_SETTING_NAMES:
+            raise RuntimeError(unknown_connection_setting(resolved_setting_name))
+        value = getattr(load_connection_settings(values), resolved_setting_name)
 
     normalized = value.strip()
     if not normalized:

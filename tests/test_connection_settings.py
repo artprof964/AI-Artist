@@ -178,7 +178,6 @@ def test_require_runtime_secret_trims_and_loads_registry_setting() -> None:
             env,
             GITHUB_TOKEN_ENV_VAR,
             purpose="GitHub adapter execution",
-            setting_name="github_token",
         )
         == "ghp_localtoken"
     )
@@ -201,7 +200,6 @@ def test_require_runtime_secret_reports_standard_name_when_missing() -> None:
             {GITHUB_TOKEN_ENV_VAR: "   "},
             GITHUB_TOKEN_ENV_VAR,
             purpose="GitHub adapter execution",
-            setting_name="github_token",
         )
 
     assert str(exc.value) == connection_value_required(

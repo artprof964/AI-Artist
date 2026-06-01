@@ -51,7 +51,6 @@ def load_llm_api_model_config(env: Mapping[str, str] | None = None) -> LLMAPIMod
         env,
         STANDARD_LLM_API_KEY_ENV_VAR,
         purpose=LLM_API_SMOKE_TEST_PURPOSE,
-        setting_name="llm_api_key",
     )
 
     return LLMAPIModelConfig(
