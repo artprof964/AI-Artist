@@ -247,7 +247,7 @@ GitHub explicit-token connection validation: 51 focused tests passed; GitHub ada
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 LLM API smoke helper validation: 17 focused tests passed; provider-neutral LLM API smoke tests share OpenAI-compatible recording client setup, response id, and response content through tests/llm_api_smoke_helpers.py
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
-source registry helper validation: 22 focused tests passed; source freshness and source ingestion tests share SourceFreshnessRegistry construction and guard against direct local constructor setup
+source registry helper validation: 14 focused source-freshness tests passed; source freshness and source ingestion tests share SourceFreshnessRegistry construction, source-freshness tests call shared policy-request and cache-entry helpers directly, and guards prevent direct local constructor setup or local policy/cache wrapper functions
 source freshness payload helper validation: 78 focused tests passed; unchanged source-freshness payload construction is shared by gated-adapter test envelopes and security review policy/envelope probes
 policy-path execution-envelope helper validation: 25 focused tests passed; policy-contract, Safety Service unit, and publishing-agent tests share execution-envelope construction and guard against direct low-level envelope request imports
 human-approval helper validation: 41 focused tests passed; execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests share HumanApproval construction and guard against direct local constructor setup
@@ -275,7 +275,7 @@ adapter result field validation: 48 focused tests passed; latest full pytest 532
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 543 passed, 1 warning
+final pytest: 544 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

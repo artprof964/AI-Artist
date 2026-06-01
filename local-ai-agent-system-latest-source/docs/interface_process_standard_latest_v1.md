@@ -175,6 +175,9 @@ Rules:
 - Source freshness, source ingestion, and future source-registry tests use
   `tests/source_registry_helpers.py` instead of constructing standard
   `SourceFreshnessRegistry` fixtures directly.
+- Source freshness tests call `tests/policy_request_helpers.py` and
+  `tests/cache_entry_helpers.py` directly instead of defining local
+  policy-request or cache-entry wrappers.
 - OpenClaw hook, observability, and future tool-stage tests use
   `tests/tool_call_helpers.py` instead of constructing standard
   `ToolCallRequest` fixtures directly.

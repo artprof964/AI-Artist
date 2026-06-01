@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime, timezone
 import ast
 from uuid import uuid4
 
-from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
+from backend.response_cache import evaluate_cached_response_reuse
 from backend.schemas import SourceFreshness
 from backend.source_freshness_contracts import (
     DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
@@ -10,7 +10,6 @@ from backend.source_freshness_contracts import (
     source_freshness_is_unchanged,
     unchanged_source_freshness_payload,
 )
-from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import (
     SOURCE_DEPENDENCY_ROLE_READ,
     SOURCE_EMPTY_CHANGE_SEQ,
@@ -34,27 +33,6 @@ from source_registry_helpers import (
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
 REQUEST_FINGERPRINT = "sha256:freshness-sensitive-read"
-
-
-def policy_request_from_registry(
-    registry: SourceFreshnessRegistry,
-    source_keys: list[str],
-):
-    snapshot = registry.record_dependency_snapshot(source_keys=source_keys)
-    return policy_evaluate_request_for_test(
-        source_freshness=snapshot.source_freshness,
-    )
-
-
-def cache_entry() -> ApprovedResponseCacheEntry:
-    return approved_response_cache_entry_for_test(
-        now=NOW,
-        cache_key="cache:freshness-sensitive-read",
-        request_fingerprint=REQUEST_FINGERPRINT,
-        response_body={"answer": "cached source-cited response"},
-        cached_delta=timedelta(minutes=1),
-        expires_delta=timedelta(minutes=9),
-    )
 
 
 def test_source_snapshot_reports_required_sources_unchanged() -> None:
@@ -124,7 +102,10 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
         ),
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(
+            now=NOW,
+            request_fingerprint=REQUEST_FINGERPRINT,
+        ),
         now=NOW,
     )
     registry.increment_change_seq(DEFAULT_REFERENCE_SOURCE_KEY)
@@ -136,7 +117,10 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
         ),
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
-        cache_entry=cache_entry(),
+        cache_entry=approved_response_cache_entry_for_test(
+            now=NOW,
+            request_fingerprint=REQUEST_FINGERPRINT,
+        ),
         now=NOW,
     )
 
@@ -252,3 +236,16 @@ def test_source_registry_tests_use_shared_registry_helper() -> None:
 
         assert "source_freshness_registry_for_test(" in source
         assert direct_constructor_calls == []
+
+
+def test_source_freshness_tests_use_shared_policy_and_cache_helpers_directly() -> None:
+    source = read_test_source("test_source_freshness.py")
+    tree = ast.parse(source)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+
+    assert "policy_request_from_registry" not in function_names
+    assert "cache_entry" not in function_names
+    assert "policy_evaluate_request_for_test(" in source
+    assert "approved_response_cache_entry_for_test(" in source

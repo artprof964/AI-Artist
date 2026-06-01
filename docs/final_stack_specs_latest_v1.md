@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 543 passed, 1 warning
+Final validation: 544 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -228,6 +228,9 @@ payload helpers.
 Source freshness and source ingestion tests that need local source registries
 must use tests/source_registry_helpers.py before constructing
 SourceFreshnessRegistry fixtures directly.
+Source freshness tests must call tests/policy_request_helpers.py and
+tests/cache_entry_helpers.py directly before adding local policy-request or
+cache-entry wrappers.
 SubAgentOutput schema-boundary tests that need raw valid payload dictionaries
 must use tests/subagent_output_helpers.py before defining local payload builders.
 OpenClaw hook and observability tests that need standard tool-call requests
