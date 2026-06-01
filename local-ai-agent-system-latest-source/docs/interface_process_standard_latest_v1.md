@@ -97,6 +97,7 @@ can be marked done.
 66. Cache, source-freshness, and observability tests use `tests/cache_entry_helpers.py` for standard `ApprovedResponseCacheEntry` setup.
 67. Cache and source-freshness tests use `tests/policy_response_helpers.py` for standard approved `PolicyEvaluateResponse` setup.
 68. Request metadata, Safety Service unit, and observability tests use `tests/request_metadata_helpers.py` for standard `RequestMetadata` setup.
+68a. Safety Service unit tests use `tests/service_request_helpers.py` for standard `CanonicalizeRequest` and `ClassifyRequest` setup.
 69. Execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests use `tests/human_approval_helpers.py` for standard `HumanApproval` setup.
 70. Source freshness and source ingestion tests use `tests/source_registry_helpers.py` for standard `SourceFreshnessRegistry`, source-ingestion service, snapshot repository, approved-domain, and sample-candidate setup.
 ```
@@ -205,6 +206,9 @@ Rules:
 - Request metadata, Safety Service unit, observability, and future metadata-path
   tests use `tests/request_metadata_helpers.py` instead of constructing
   standard `RequestMetadata` fixtures directly.
+- Safety Service unit and future service-boundary tests use
+  `tests/service_request_helpers.py` instead of constructing
+  `CanonicalizeRequest` or `ClassifyRequest` directly.
 - Execution-envelope, execution-gate, policy-contract, adapter-result,
   publishing-adapter, and future envelope-path tests use
   `tests/human_approval_helpers.py` instead of constructing standard

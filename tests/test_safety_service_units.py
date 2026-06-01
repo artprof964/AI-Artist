@@ -1,11 +1,8 @@
+import ast
 from datetime import datetime, timezone
 
 import pytest
 
-from backend.schemas import (
-    CanonicalizeRequest,
-    ClassifyRequest,
-)
 from backend.service import (
     canonicalize_request,
     classify_request,
@@ -13,20 +10,19 @@ from backend.service import (
 )
 from backend.time_utils import as_utc
 from execution_envelope_helpers import execution_envelope_for_test, stale_source_freshness
-from path_helpers import read_backend_source
+from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
 from request_metadata_helpers import request_metadata_for_test
+from service_request_helpers import (
+    SERVICE_TEST_NORMALIZED_TEXT,
+    canonicalize_request_for_test,
+    classify_request_for_test,
+)
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:
-    base = CanonicalizeRequest(
-        request_text="  Research   FLUX  lighting\nreferences ",
-        requester_scope="user:local",
-        policy_scope="workspace:ai-artist-main",
-        channel="cli",
-        metadata=request_metadata_for_test(agent="knowledge"),
-    )
-    same_semantics = base.model_copy(update={"request_text": "research flux lighting references"})
+    base = canonicalize_request_for_test()
+    same_semantics = base.model_copy(update={"request_text": SERVICE_TEST_NORMALIZED_TEXT})
     different_agent = base.model_copy(
         update={"metadata": request_metadata_for_test(agent="critic")}
     )
@@ -35,7 +31,7 @@ def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None
     second = canonicalize_request(same_semantics)
     third = canonicalize_request(different_agent)
 
-    assert first.canonical_text == "research flux lighting references"
+    assert first.canonical_text == SERVICE_TEST_NORMALIZED_TEXT
     assert first.request_fingerprint == second.request_fingerprint
     assert first.request_fingerprint != third.request_fingerprint
 
@@ -68,7 +64,10 @@ def test_classifier_maps_common_safety_operations(
     expected_kind: str,
 ) -> None:
     response = classify_request(
-        ClassifyRequest(request_text=request_text, operation=explicit_operation)
+        classify_request_for_test(
+            request_text=request_text,
+            operation=explicit_operation,
+        )
     )
 
     assert response.operation == expected_operation
@@ -91,13 +90,13 @@ def test_policy_denies_stale_read_reuse_without_requiring_approval() -> None:
 
 def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
     read_envelope = execution_envelope_for_test(
-        request_id=CanonicalizeRequest(request_text="read").request_id,
+        request_id=canonicalize_request_for_test(request_text="read").request_id,
         request_kind="read",
         operation="read",
         target="knowledge://local",
     )
     stale_publish_envelope = execution_envelope_for_test(
-        request_id=CanonicalizeRequest(request_text="publish").request_id,
+        request_id=canonicalize_request_for_test(request_text="publish").request_id,
         operation="publish",
         target="slack://workspace/channel",
         approved=True,
@@ -133,3 +132,26 @@ def test_cache_datetime_normalization_treats_naive_datetimes_as_utc() -> None:
     naive = datetime(2026, 5, 31, 12, 0)
 
     assert as_utc(naive) == datetime(2026, 5, 31, 12, 0, tzinfo=timezone.utc)
+
+
+def test_safety_service_unit_tests_use_shared_service_request_helpers() -> None:
+    source = read_test_source("test_safety_service_units.py")
+    tree = ast.parse(source)
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+
+    assert "canonicalize_request_for_test" in called_names
+    assert "classify_request_for_test" in called_names
+    assert "CanonicalizeRequest" not in called_names
+    assert "ClassifyRequest" not in called_names
+    assert ("backend.schemas", "CanonicalizeRequest") not in imported_names
+    assert ("backend.schemas", "ClassifyRequest") not in imported_names
