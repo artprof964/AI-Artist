@@ -81,6 +81,7 @@ can be marked done.
 58. Repository artifact paths, repo-root resolution, workspace paths/text reads, backend module discovery, source-text reads, and source-inspection file reads for Compose, env, runbook, OPA policy, PostgreSQL schema, workspace, and backend module files use `backend/repo_paths.py`.
 59. Repo-wide validation tests that scan project, backend, or test sources use `tests/path_helpers.py` for project-root resolution, project text reads, backend source reads, test source reads, and source iteration.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
+61. Gated-adapter and policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
 ```
 
 ## Standard Request Envelope
@@ -142,9 +143,10 @@ Rules:
 - Repo-wide validation tests that scan project, backend, or test sources use
   shared test path helpers instead of local root resolution, local source reads,
   or test-module glob loops.
-- Gated-adapter tests that need approved or unapproved execution envelopes use
+- Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes use
   `tests/execution_envelope_helpers.py` instead of constructing
-  `ExecutionEnvelopeRequest` directly in adapter-specific test modules.
+  `ExecutionEnvelopeRequest` directly in adapter-specific, policy-contract,
+  Safety Service unit, or publishing-agent test modules.
 - Tool hooks must call `/v1/execution/envelope` before external writes.
 
 ### FastAPI Safety Service To OPA

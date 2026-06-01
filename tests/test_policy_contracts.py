@@ -1,3 +1,4 @@
+import ast
 from datetime import datetime, timezone
 from uuid import UUID
 
@@ -21,9 +22,10 @@ from backend.runtime_field_contracts import (
     REQUIRES_HUMAN_APPROVAL_FIELD,
     TARGET_FIELD,
 )
-from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, PolicyEvaluateRequest
-from backend.service import create_execution_envelope, evaluate_policy
-from path_helpers import read_backend_source
+from backend.schemas import HumanApproval, PolicyEvaluateRequest
+from backend.service import evaluate_policy
+from execution_envelope_helpers import execution_envelope_for_test
+from path_helpers import read_backend_source, read_test_source
 
 
 def test_policy_version_contract_is_shared_by_policy_and_envelope_responses() -> None:
@@ -36,15 +38,11 @@ def test_policy_version_contract_is_shared_by_policy_and_envelope_responses() ->
             requires_human_approval=False,
         )
     )
-    envelope_response = create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-            request_kind="read",
-            operation="read",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target="knowledge://local",
-        )
+    envelope_response = execution_envelope_for_test(
+        request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        request_kind="read",
+        operation="read",
+        target="knowledge://local",
     )
 
     assert policy_response.policy_version == LOCAL_DEFAULT_DENY_POLICY_VERSION
@@ -178,16 +176,11 @@ def test_execution_envelope_signature_payload_uses_runtime_field_contracts() -> 
 
 
 def test_created_execution_envelope_signature_verifies_through_shared_contract() -> None:
-    envelope = create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
-            request_kind="action",
-            operation="publish",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target="slack://workspace/channel",
-            human_approval=HumanApproval(approved=True, approver_scope="user:owner"),
-        )
+    envelope = execution_envelope_for_test(
+        request_id=UUID("aaaaaaaa-aaaa-aaaa-aaaa-aaaaaaaaaaaa"),
+        operation="publish",
+        target="slack://workspace/channel",
+        approved=True,
     )
 
     assert execution_envelope_signature_is_valid(
@@ -213,3 +206,23 @@ def test_service_uses_shared_envelope_signing_and_ttl_contracts() -> None:
     assert "hmac_sha256_json" not in service_source
     assert "LOCAL_ENVELOPE_SIGNING_KEY = b" in contract_source
     assert "EXECUTION_ENVELOPE_TTL_MINUTES = 15" in contract_source
+
+
+def test_policy_path_tests_use_shared_execution_envelope_helper() -> None:
+    for test_module in (
+        "test_policy_contracts.py",
+        "test_publishing_agent.py",
+        "test_safety_service_units.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        imported_names = {
+            (node.module, alias.name)
+            for node in ast.walk(tree)
+            if isinstance(node, ast.ImportFrom)
+            for alias in node.names
+        }
+
+        assert "execution_envelope_for_test(" in source
+        assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
+        assert ("backend.service", "create_execution_envelope") not in imported_names

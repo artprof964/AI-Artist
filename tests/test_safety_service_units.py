@@ -5,19 +5,16 @@ import pytest
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
-    ExecutionEnvelopeRequest,
-    HumanApproval,
     PolicyEvaluateRequest,
     RequestMetadata,
-    SourceFreshness,
 )
 from backend.service import (
     canonicalize_request,
     classify_request,
-    create_execution_envelope,
     evaluate_policy,
 )
 from backend.time_utils import as_utc
+from execution_envelope_helpers import execution_envelope_for_test, stale_source_freshness
 from path_helpers import read_backend_source
 
 
@@ -90,10 +87,7 @@ def test_policy_denies_stale_read_reuse_without_requiring_approval() -> None:
             requester_scope="user:local",
             policy_scope="workspace:ai-artist-main",
             requires_human_approval=False,
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=False,
-                changed_source_count=1,
-            ),
+            source_freshness=stale_source_freshness(),
         )
     )
 
@@ -103,30 +97,18 @@ def test_policy_denies_stale_read_reuse_without_requiring_approval() -> None:
 
 
 def test_execution_envelope_handles_read_and_stale_sensitive_paths() -> None:
-    read_envelope = create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=CanonicalizeRequest(request_text="read").request_id,
-            request_kind="read",
-            operation="read",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target="knowledge://local",
-        )
+    read_envelope = execution_envelope_for_test(
+        request_id=CanonicalizeRequest(request_text="read").request_id,
+        request_kind="read",
+        operation="read",
+        target="knowledge://local",
     )
-    stale_publish_envelope = create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=CanonicalizeRequest(request_text="publish").request_id,
-            request_kind="action",
-            operation="publish",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target="slack://workspace/channel",
-            human_approval=HumanApproval(approved=True, approver_scope="user:owner"),
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=False,
-                changed_source_count=1,
-            ),
-        )
+    stale_publish_envelope = execution_envelope_for_test(
+        request_id=CanonicalizeRequest(request_text="publish").request_id,
+        operation="publish",
+        target="slack://workspace/channel",
+        approved=True,
+        source_freshness=stale_source_freshness(),
     )
 
     assert read_envelope.allow is True

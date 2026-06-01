@@ -12,8 +12,7 @@ from backend.request_scope_contracts import (
     DEFAULT_PUBLISHING_ACTOR_SCOPE,
     DEFAULT_PUBLISHING_POLICY_SCOPE,
 )
-from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
-from backend.service import create_execution_envelope
+from execution_envelope_helpers import execution_envelope_for_test
 from path_helpers import read_backend_source
 
 
@@ -36,29 +35,13 @@ class SecretEchoPublishingClient(LocalPublishingClient):
 
 
 def publish_envelope(*, approved: bool):
-    approval = HumanApproval(approved=False)
-    if approved:
-        approval = HumanApproval(
-            approved=True,
-            approver_scope="user:owner",
-            approved_at=NOW,
-        )
-
-    return create_execution_envelope(
-        ExecutionEnvelopeRequest(
-            request_id=REQUEST_ID,
-            request_kind="action",
-            operation="publish",
-            requester_scope="user:local",
-            policy_scope="workspace:ai-artist-main",
-            target=PUBLISH_TARGET,
-            human_approval=approval,
-            source_freshness=SourceFreshness(
-                all_required_sources_unchanged=True,
-                changed_source_count=0,
-            ),
-            metadata={"artifact_id": "image-001"},
-        )
+    return execution_envelope_for_test(
+        request_id=REQUEST_ID,
+        operation="publish",
+        target=PUBLISH_TARGET,
+        approved=approved,
+        approved_at=NOW,
+        metadata={"artifact_id": "image-001"},
     )
 
 
