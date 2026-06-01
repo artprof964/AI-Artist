@@ -108,7 +108,7 @@ tests/path_helpers.py: shared test project root, checked-in project text reads, 
 tests/cache_entry_helpers.py: shared approved response-cache entry construction for cache, source-freshness, and observability tests, including cache identity, request fingerprint, requester/policy scope, read-only operation, response body, reuse flags, source state, and cache timestamp defaults.
 tests/connection_env_helpers.py: shared test env builders and secret constants for LLM, Slack, GitHub, and full connection-settings test scenarios.
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
-tests/gated_adapter_helpers.py: shared adapter-specific request, envelope, and fake-client defaults for ComfyUI, GitHub, Publishing adapter tests, and Publishing Agent redaction tests, including stable request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved envelope construction, mocked client responses, and secret-echo client responses.
+tests/gated_adapter_helpers.py: shared adapter-specific request, envelope, adapter/client harness, and fake-client defaults for ComfyUI, GitHub, Publishing adapter tests, and Publishing Agent redaction tests, including stable request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved envelope construction, mocked client responses, GitHub token/env adapter setup, and secret-echo client responses.
 tests/human_approval_helpers.py: shared HumanApproval construction for execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests, including approved/unapproved state, approver scope, and approval timestamp defaults.
 tests/llm_api_smoke_helpers.py: shared OpenAI-compatible recording LLM client, recording chat completions, response id, and response content for provider-neutral LLM API smoke tests.
 tests/openclaw_hook_helpers.py: shared OpenClaw safety-hook recording Safety Service client, recording adapter, mock orchestration adapter, and event labels for OpenClaw-to-safety and observability integration tests.
@@ -262,9 +262,10 @@ use tests/execution_envelope_helpers.py before Safety Service unit,
 policy-contract, publishing-agent, or future policy-path test modules construct
 envelope requests directly. ComfyUI, Publishing, GitHub, and future gated
 adapter tests that need adapter-specific request IDs, targets, operation
-defaults, payload defaults, request construction, or approved/unapproved
-envelopes must use tests/gated_adapter_helpers.py before defining
-adapter-local request or envelope wrappers.
+defaults, payload defaults, request construction, approved/unapproved
+envelopes, or adapter/client harness setup must use
+tests/gated_adapter_helpers.py before constructing adapters directly or
+defining adapter-local request or envelope wrappers.
 Gated adapter and publishing-agent tests that need deterministic fake ComfyUI,
 GitHub, publishing, or secret-echo publishing clients must use
 tests/gated_adapter_helpers.py before defining local fake client classes.

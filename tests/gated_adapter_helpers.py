@@ -1,9 +1,10 @@
+from dataclasses import dataclass
 from datetime import datetime
-from typing import Any
+from typing import Any, Mapping
 from uuid import UUID
 
 from backend.comfyui_adapter import ComfyUIImageGenerationRequest
-from backend.github_adapter import GitHubWriteRequest
+from backend.github_adapter import GitHubAdapter, GitHubWriteRequest
 from backend.operations import (
     OPERATION_GITHUB_WRITE,
     OPERATION_IMAGE_GENERATE,
@@ -92,6 +93,32 @@ class MockGitHubAPI:
                 "message": f"mock client echoed {token}",
             },
         }
+
+
+@dataclass(frozen=True)
+class GitHubAdapterHarness:
+    adapter: GitHubAdapter
+    client: MockGitHubAPI
+
+
+def github_adapter_harness_for_test(
+    *,
+    token: str | None = None,
+    token_env_var: str | None = None,
+    env: Mapping[str, str] | None = None,
+) -> GitHubAdapterHarness:
+    client = MockGitHubAPI()
+    adapter_kwargs: dict[str, Any] = {}
+    if token is not None:
+        adapter_kwargs["token"] = token
+    if token_env_var is not None:
+        adapter_kwargs["token_env_var"] = token_env_var
+    if env is not None:
+        adapter_kwargs["env"] = env
+    return GitHubAdapterHarness(
+        adapter=GitHubAdapter(client, **adapter_kwargs),
+        client=client,
+    )
 
 
 class MockPublishingClient:

@@ -83,7 +83,7 @@ can be marked done.
 59a. Safety Service endpoint, audit, OpenClaw hook, and observability tests use `tests/safety_service_client_helpers.py` for FastAPI test-client setup.
 60. Security review finding surfaces, messages, probe event/trace IDs, policy default-deny pattern, review target formatting, and prompt-hash field checks use `backend/security_review_contracts.py`.
 61. Policy-path tests use `tests/execution_envelope_helpers.py` for approved, unapproved, unchanged-source, and stale-source execution-envelope setup.
-61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, and deterministic fake-client responses.
+61a. Gated-adapter tests use `tests/gated_adapter_helpers.py` for adapter-specific request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved execution-envelope setup, adapter/client harness setup, and deterministic fake-client responses.
 61b. SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py` for raw valid payload dictionaries.
 62. Cache, freshness, observability, and Safety Service policy-path tests use `tests/policy_request_helpers.py` for standard `PolicyEvaluateRequest` setup.
 63. LLM, Slack, GitHub, and connection-settings tests use `tests/connection_env_helpers.py` for standard env maps and test secret values.
@@ -210,10 +210,11 @@ Rules:
   instead of constructing `ExecutionEnvelopeRequest` directly in
   policy-contract, Safety Service unit, or publishing-agent test modules.
 - Gated-adapter tests that need adapter request IDs, targets, operation
-  defaults, payload defaults, request construction, or approved/unapproved
-  execution envelopes use `tests/gated_adapter_helpers.py` instead of defining
-  adapter-local request or envelope wrappers in ComfyUI, Publishing, GitHub, or
-  future gated adapter test modules.
+  defaults, payload defaults, request construction, approved/unapproved
+  execution envelopes, or adapter/client harness setup use
+  `tests/gated_adapter_helpers.py` instead of constructing adapters directly
+  or defining adapter-local request or envelope wrappers in ComfyUI,
+  Publishing, GitHub, or future gated adapter test modules.
 - SubAgentOutput schema-boundary tests use `tests/subagent_output_helpers.py`
   instead of defining local valid SubAgentOutput payload dictionaries.
 - Gated-adapter and Publishing Agent tests that need deterministic fake

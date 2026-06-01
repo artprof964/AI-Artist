@@ -234,6 +234,7 @@
 - `../../validation_reports/gated_adapter_envelope_helper_standardization_2026-06-01.md`
 - `../../validation_reports/gated_adapter_request_helper_standardization_2026-06-01.md`
 - `../../validation_reports/gated_adapter_client_helper_standardization_2026-06-01.md`
+- `../../validation_reports/github_adapter_harness_standardization_2026-06-01.md`
 - `../../validation_reports/policy_path_execution_envelope_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_request_helper_standardization_2026-06-01.md`
 - `../../validation_reports/policy_contract_policy_request_helper_standardization_2026-06-01.md`

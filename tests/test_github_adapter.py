@@ -7,7 +7,6 @@ import pytest
 
 from backend.github_adapter import (
     GITHUB_TOKEN_ENV_VAR,
-    GitHubAdapter,
     GitHubAdapterConfigurationError,
     GitHubExecutionGateError,
 )
@@ -22,8 +21,8 @@ from gated_adapter_helpers import (
     GITHUB_ADAPTER_REQUEST_ID,
     GITHUB_ADAPTER_TARGET,
     GITHUB_TEST_PAYLOAD,
-    MockGitHubAPI,
     approved_github_write_envelope_for_test,
+    github_adapter_harness_for_test,
     github_write_request_for_test,
     unapproved_github_write_envelope_for_test,
 )
@@ -41,8 +40,9 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv(GITHUB_TOKEN_ENV_VAR, MOCK_GITHUB_TOKEN)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client)
+    harness = github_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
     envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
     result = adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
@@ -66,8 +66,9 @@ def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
 
 
 def test_github_adapter_can_read_token_from_injected_connection_env() -> None:
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client, env=github_token_env())
+    harness = github_adapter_harness_for_test(env=github_token_env())
+    client = harness.client
+    adapter = harness.adapter
     envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
     result = adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
@@ -80,8 +81,9 @@ def test_github_adapter_supports_explicit_token_connection_injection(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR, raising=False)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client, token=f"  {MOCK_GITHUB_TOKEN}  ")
+    harness = github_adapter_harness_for_test(token=f"  {MOCK_GITHUB_TOKEN}  ")
+    client = harness.client
+    adapter = harness.adapter
     envelope = approved_github_write_envelope_for_test(approved_at=NOW)
 
     result = adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
@@ -117,8 +119,9 @@ def test_github_adapter_reads_token_only_after_execution_gate_allows(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv(GITHUB_TOKEN_ENV_VAR, MOCK_GITHUB_TOKEN)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client)
+    harness = github_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(GitHubExecutionGateError, match="not valid"):
         adapter.write(
@@ -146,8 +149,9 @@ def test_github_adapter_rejects_invalid_envelope_before_token_read(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR, raising=False)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client)
+    harness = github_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(GitHubExecutionGateError, match="not valid"):
         adapter.write(
@@ -203,8 +207,9 @@ def test_github_write_rejects_invalid_execution_envelopes_before_client_executio
     expected_reason: str,
 ) -> None:
     monkeypatch.setenv(GITHUB_TOKEN_ENV_VAR, MOCK_GITHUB_TOKEN)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client)
+    harness = github_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(GitHubExecutionGateError, match=expected_reason):
         adapter.write(github_write_request_for_test(execution_envelope=envelope), now=NOW)
@@ -231,8 +236,9 @@ def test_github_adapter_rejects_unsafe_api_shapes_before_client_execution(
     expected_reason: str,
 ) -> None:
     monkeypatch.setenv(GITHUB_TOKEN_ENV_VAR, MOCK_GITHUB_TOKEN)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client)
+    harness = github_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(GitHubExecutionGateError, match=expected_reason):
         adapter.write(
@@ -263,8 +269,9 @@ def test_github_adapter_rejects_unsafe_paths_before_token_read(
     expected_reason: str,
 ) -> None:
     monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR, raising=False)
-    client = MockGitHubAPI()
-    adapter = GitHubAdapter(client)
+    harness = github_adapter_harness_for_test()
+    client = harness.client
+    adapter = harness.adapter
 
     with pytest.raises(GitHubExecutionGateError, match=expected_reason):
         adapter.write(
@@ -335,16 +342,27 @@ def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
         if isinstance(node, ast.ImportFrom)
         for alias in node.names
     }
+    direct_adapter_calls = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call)
+        and isinstance(node.func, ast.Name)
+        and node.func.id == "GitHubAdapter"
+    }
 
     assert "approved_github_write_envelope_for_test" in called_names
     assert "unapproved_github_write_envelope_for_test" in called_names
     assert "github_write_request_for_test" in called_names
+    assert "github_adapter_harness_for_test" in called_names
     assert "approved_execution_envelope" not in called_names
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_github_write_envelope" not in function_names
     assert "github_write_request" not in function_names
     assert "MockGitHubAPI" not in class_names
+    assert "GitHubAdapterHarness" not in class_names
+    assert not direct_adapter_calls
+    assert ("backend.github_adapter", "GitHubAdapter") not in imported_names
     assert ("backend.github_adapter", "GitHubWriteRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names
