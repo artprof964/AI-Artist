@@ -76,10 +76,12 @@ class GitHubAdapter:
         self,
         client: GitHubAPIClient,
         *,
+        token: str | None = None,
         token_env_var: str = GITHUB_TOKEN_ENV_VAR,
         env: Mapping[str, str] | None = None,
     ) -> None:
         self._client = client
+        self._token = token
         self._token_env_var = token_env_var
         self._env = env
 
@@ -123,6 +125,7 @@ class GitHubAdapter:
             standard_env_var=GITHUB_TOKEN_ENV_VAR,
             setting_name="github_token",
             error_type=GitHubAdapterConfigurationError,
+            explicit_secret=self._token,
         )
         client_response = self._client.request(
             method=method,

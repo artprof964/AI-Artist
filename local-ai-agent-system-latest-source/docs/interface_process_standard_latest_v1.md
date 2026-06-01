@@ -72,7 +72,7 @@ can be marked done.
 51. Gated adapter action and target labels use `backend/adapter_gate_contracts.py` before execution-envelope message construction.
 51a. Gated adapter result envelope IDs, request IDs, operation, target, and client response field names use `backend/adapter_results.py`, with generic execution-envelope/client-response/request/operation/target field names reused from `backend/runtime_field_contracts.py`, before adapter return dataclasses or side-effect audit payloads change.
 51. Slack source labels, inbound event field names, requester/policy scopes, runtime-field-backed local requester/policy/request-id and client-response fields, local-request payloads, outbound payloads, post-result payloads, adapter validation messages, and token-purpose text use `backend/slack_contracts.py`.
-52. GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing use `backend/github_contracts.py` and `backend/connection_settings.py`.
+52. GitHub adapter action labels, validation messages, token-purpose text, token-required message routing, and explicit/env token lookup use `backend/github_contracts.py`, `backend/connection_settings.py`, and `backend/adapter_secrets.py`.
 53. Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use `backend/source_ingestion_contracts.py`.
 54. Production readiness service URLs, `.env.example` rendering, and health/backup/restore endpoint commands use `backend/connection_settings.py`.
 55. Production readiness Docker Compose, curl, and MinIO command strings, OPA/test process argument lists, test process invocations, and delimited process-output parsers use `backend/shell_commands.py`.
@@ -308,7 +308,7 @@ Output:
    - Domain and adapter inputs and structured outputs coerce model-or-dict payloads through the shared model coercion helper.
    - Provider SDK object-or-dict responses are read through the shared response-field helper.
    - Connector HTTP methods are normalized through the shared HTTP method helper.
-   - GitHub adapter labels, API validation messages, and token-purpose text use the shared GitHub contract before adapter errors are raised.
+   - GitHub adapter labels, API validation messages, token-purpose text, and explicit/env token resolution use shared GitHub/connection/adapter-secret contracts before adapter errors are raised.
 
 8. Execution Gate
    - Any external write, publish, GitHub write, deletion, or image generation

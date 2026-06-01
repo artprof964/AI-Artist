@@ -181,6 +181,7 @@
 - `../../validation_reports/t23_github_adapter_validation_2026-05-31.md`
 - `../../validation_reports/github_url_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/github_contract_standardization_2026-05-31.md`
+- `../../validation_reports/github_explicit_token_connection_standardization_2026-06-01.md`
 - `../../validation_reports/github_token_required_message_standardization_2026-05-31.md`
 - `../../validation_reports/http_method_standardization_2026-05-31.md`
 - `../../validation_reports/http_method_message_standardization_2026-05-31.md`

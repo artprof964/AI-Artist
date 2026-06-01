@@ -162,6 +162,21 @@ def test_github_adapter_can_read_token_from_injected_connection_env() -> None:
     assert result.client_response["authorization"] == "[REDACTED]"
 
 
+def test_github_adapter_supports_explicit_token_connection_injection(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.delenv(GITHUB_TOKEN_ENV_VAR, raising=False)
+    client = MockGitHubAPI()
+    adapter = GitHubAdapter(client, token=f"  {MOCK_GITHUB_TOKEN}  ")
+    envelope = approved_envelope()
+
+    result = adapter.write(github_write_request(envelope=envelope), now=NOW)
+
+    assert client.calls[0]["token"] == MOCK_GITHUB_TOKEN
+    assert result.client_response["debug"]["token"] == "[REDACTED]"
+    assert MOCK_GITHUB_TOKEN not in repr(result)
+
+
 def test_github_token_env_var_is_owned_by_adapter_not_backend_agents() -> None:
     allowed_owners = {"connection_settings.py", "github_adapter.py"}
     forbidden_refs: list[str] = []
@@ -336,6 +351,7 @@ def test_github_adapter_uses_shared_runtime_secret_resolver() -> None:
     source = read_backend_source("github_adapter.py")
 
     assert "adapter_runtime_secret(" in source
+    assert "explicit_secret=self._token" in source
     assert "require_runtime_secret(" not in source
     assert "load_connection_settings(" not in source
     assert "require_env_value(" not in source

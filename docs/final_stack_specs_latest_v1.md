@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 517 passed, 1 warning
+Final validation: 518 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -120,7 +120,7 @@ backend/slack_adapter.py: mocked Slack request/response adapter using shared pay
 backend/publishing_contracts.py: shared local publishing ID prefix, dry-run response fields, deterministic ID material shape, and publishing response status/target fields that reuse runtime field contracts.
 backend/publishing.py and backend/publishing_adapter.py: approval-gated publishing path using direct shared operation, publishing scope, and publishing response-shape constants.
 backend/publishing_status.py: shared publishing outcome status vocabulary and checks.
-backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary and direct shared operation and URL path validation.
+backend/github_adapter.py: GitHub write adapter with token isolated to adapter boundary, explicit-token and env-token resolution routed through the shared adapter secret helper, and direct shared operation and URL path validation.
 backend/observability.py: telemetry stage/log-level constants, default metric values, metric-name constants/formatting, trace-id fallback formatting, event-message formatting, traces, metrics, and structured logs using shared audit redacted-mapping boundary.
 backend/security_review_contracts.py: shared security review finding surfaces, messages, probe event/trace, default-deny pattern, target formatting, and prompt-hash field contracts.
 backend/security_review.py: deterministic security checklist helpers using shared security-review contracts.
@@ -331,9 +331,9 @@ path-safety logic is added.
 HTTP method vocabulary, normalization, and validation messages must flow through
 backend/http_methods.py before connector-specific method allowlists are added.
 GitHub adapter action labels, target labels, API validation messages, token
-purpose text, and token-required message routing must flow through
-backend/github_contracts.py and backend/connection_settings.py before GitHub
-adapter errors are raised.
+purpose text, token-required message routing, and explicit/env token lookup
+must flow through backend/github_contracts.py, backend/connection_settings.py,
+and backend/adapter_secrets.py before GitHub adapter errors are raised.
 Reviewable text-file suffixes and recursive scanner discovery must flow through
 backend/file_scanning.py before security review or future scanner paths inspect
 workspace files.

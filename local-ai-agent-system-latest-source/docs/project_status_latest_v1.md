@@ -36,7 +36,7 @@ Test project-root resolution, checked-in project text reads, backend source read
 Execution gates, expiry checks, and signature verification: centralized in backend/execution_gate.py
 Execution-envelope messages including signature failures: centralized in backend/execution_gate_messages.py
 Slack adapter contracts, event fields, scopes, runtime-field-backed local request scope/request-id fields, payload shapes, and post-result shape: centralized in backend/slack_contracts.py
-GitHub adapter contracts and token-required message routing: centralized in backend/github_contracts.py and backend/connection_settings.py
+GitHub adapter contracts, token-required message routing, and explicit/env token lookup: centralized in backend/github_contracts.py, backend/connection_settings.py, and backend/adapter_secrets.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, structured unredacted-secret checks, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
 Audit scope payload field names, runtime policy-scope/request/correlation-id fields, and audit response shape: centralized in backend/audit_contracts.py and backend/runtime_field_contracts.py
@@ -192,7 +192,7 @@ Shell commands: shared across readiness health, backup, and restore command defi
 Readiness paths: shared across local backup directories, container dump path, and MinIO source alias
 Repository paths: shared across Compose, env, runbook, OPA policy, PostgreSQL schema, repo-root lookup, workspace file lookups, backend module discovery, and backend module source lookups
 HTTP methods: shared across GitHub write method validation, validation messages, and future connector method allowlists
-GitHub adapter contracts: shared across action labels, target labels, API validation messages, token-purpose text, token-required message routing through connection settings, and adapter secret lookup
+GitHub adapter contracts: shared across action labels, target labels, API validation messages, token-purpose text, token-required message routing through connection settings, explicit/env token lookup, and adapter secret lookup
 File scanning: shared across security review workspace secret scans and future scanner paths
 Operations: shared across Safety Service classification, policy/envelope sensitivity, and gated adapters
 Execution-envelope messages: shared across ComfyUI, Publishing, GitHub, and execution gate validation/signature errors
@@ -238,21 +238,22 @@ Slack response contract validation: 51 focused tests passed; Slack inbound field
 LLM API key standard validation: 49 focused tests passed; deepseek-open-art is the rendered project setup key and DEEPSEEK_API_KEY remains only a connection-loader compatibility alias
 response-cache runtime field validation: 21 focused tests passed; response-cache telemetry operation/request-kind/reason aliases reuse runtime_field_contracts.py while preserving cache-specific exported names
 Slack scope runtime field validation: 20 focused tests passed; Slack local request requester/policy scope aliases reuse runtime_field_contracts.py while preserving Slack-specific exported names
-runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
+runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup, including explicit injected tokens for local/test wiring; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
+GitHub explicit-token connection validation: 51 focused tests passed; GitHub adapter explicit and env token resolution use the shared adapter secret helper and redact token echoes from mocked client responses
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 connection env validation helper validation: 32 focused tests passed; readiness env example missing-key and placeholder-secret checks use shared connection settings helpers
-publishing runtime field validation: 24 focused tests passed; latest full pytest 517 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
+publishing runtime field validation: 24 focused tests passed; latest full pytest 518 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
-request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 517 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
-execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 517 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
-client-response runtime field validation: 68 focused tests passed; full pytest 517 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
-adapter result field validation: 48 focused tests passed; latest full pytest 517 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
+request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 518 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
+execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 518 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
+client-response runtime field validation: 68 focused tests passed; full pytest 518 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
+adapter result field validation: 48 focused tests passed; latest full pytest 518 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 517 passed, 1 warning
+final pytest: 518 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```
