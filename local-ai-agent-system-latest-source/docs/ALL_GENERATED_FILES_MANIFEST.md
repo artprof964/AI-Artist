@@ -346,6 +346,7 @@
 - `../../requirements.txt`
 - `../../validation_reports/context_handoff_2026-05-31.md`
 - `../../validation_reports/project_review_summary_and_optimization_proposals_2026-06-01.md`
+- `../../validation_reports/standardization_process_review_2026-06-01.md`
 - `../../validation_reports/openclaw_request_kind_standardization_2026-05-31.md`
 - `../../validation_reports/openclaw_contract_shape_standardization_2026-05-31.md`
 - `../../validation_reports/side_effect_audit_event_type_contract_standardization_2026-05-31.md`
