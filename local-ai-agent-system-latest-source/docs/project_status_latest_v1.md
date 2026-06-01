@@ -217,7 +217,7 @@ docker compose config: passed
 docker compose up -d postgres redis qdrant minio opa: passed
 service health: docker compose ps reports all five services healthy
 T27 security review: 12 passed; prompt/memory secrets, audit redaction, structured unredacted-secret checks, observability redaction, canonical JSON serialization, policy bypass controls, artifact prompt-hash handling, and centralized security review finding/probe/policy contracts validated
-T28 production readiness: 11 passed; runbook, env schema rendering, shared service URL, shell command construction, backup paths, centralized readiness detail messages, health checks, backup commands, restore checks, retention, and contacts validated
+T28 production readiness: 13 passed; runbook, env schema rendering, shared service URL, shell command construction, backup paths, centralized readiness detail messages, health checks, backup commands, restore checks, retention, and contacts validated
 repo path validation: 8 passed; Compose, env, runbook, OPA policy, PostgreSQL schema paths, repo-root lookup, workspace file lookups, backend module discovery, backend module source reads, raw-open source-inspection guard tests, source-inspection guard tests, repo-root guard tests, migrated backend/source-inspection guard tests, filesystem/process fixture repo roots, and test path/source helper usage centralized
 time utility validation: 6 focused files passed; direct test `datetime.now(timezone.utc)` calls guarded
 canonical JSON validation: 6 focused files passed; non-canonical-hash tests guarded against direct `json.dumps`

@@ -342,6 +342,7 @@
 - `../../tests/test_production_readiness.py`
 - `../../docs/production_runbook_latest_v1.md`
 - `../../docs/final_stack_specs_latest_v1.md`
+- `../../validation_reports/final_project_validation_2026-06-01.md`
 - `../../pyproject.toml`
 - `../../requirements.txt`
 - `../../validation_reports/context_handoff_2026-05-31.md`
