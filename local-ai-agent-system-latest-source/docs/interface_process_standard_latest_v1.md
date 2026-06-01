@@ -45,7 +45,7 @@ can be marked done.
 29. Cache, provenance, execution-envelope, source freshness, observability, and persistence timestamps use `backend/time_utils.py` directly for UTC creation and normalization.
 30. Connector payload string-field extraction, tolerant string reads, and nested object extraction use `backend/payload_fields.py`.
 31. Provider response object/dict field access, first-choice message content extraction, shape validation, and response validation messages use `backend/response_fields.py`.
-31a. Response-cache reuse telemetry event, message, metric tags, and structured fields use `backend/response_cache_contracts.py`.
+31a. Response-cache reuse telemetry event, message, metric tags, and structured fields use `backend/response_cache_contracts.py`, with generic operation/request-kind/reason fields reused from `backend/runtime_field_contracts.py`.
 32. Connector URL/domain, relative API path validation, and URL validation messages use `backend/url_utils.py`.
 33. Connector HTTP method vocabulary, normalization, and validation messages use `backend/http_methods.py`.
 34. Operation constants, classification term maps, and sensitivity rules use `backend/operations.py`.
@@ -258,7 +258,7 @@ Output:
    - Request metadata workspace/agent fields, canonical request fingerprint fields, and canonicalization observability fields use the shared metadata helper.
    - Request metadata defaults, default channel, request envelope field names, and fingerprint field names use the shared metadata contract before schema or telemetry changes.
    - Safety Service request and policy telemetry shapes use the shared service-observability contract helper.
-   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, execution-envelope signature, adapter result, audit response, Slack local request/result, publishing response, or side-effect audit payload shapes are changed.
+   - Runtime policy/telemetry/audit field names use the shared runtime field contract before service, OpenClaw, observability trace fallback, execution-envelope signature, adapter result, response-cache telemetry, audit response, Slack local request/result, publishing response, or side-effect audit payload shapes are changed.
    - Canonical JSON, SHA-256 digest creation, HMAC signing, and security-review serialization flow through the shared hash helper.
    - Channel adapters and tool hooks use the shared request identity helper for text normalization, stable event ids, and prefixed trace ids.
    - Slack adapter payload parsing, request identity, local request/outbound payload construction, secret redaction, and runtime token lookup call the shared helpers directly at the adapter boundary.
@@ -282,7 +282,7 @@ Output:
    - Fresh source snapshot defaults and unchanged-source checks come from the shared source-freshness contract.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay and OpenClaw pre-tool approval request-kind checks use shared interface and operation constants.
-   - Cache reuse telemetry event, message, metric tags, and structured fields use the shared response-cache contract helper.
+   - Cache reuse telemetry event, message, metric tags, and structured fields use the shared response-cache contract helper, with operation/request-kind/reason field names reused from the runtime field contract.
    - OpenClaw tool policy metadata and redacted tool arguments use the shared OpenClaw contract helper.
    - Source ingestion validates absolute HTTP(S) source domains through the shared URL helper.
    - Source ingestion approved-domain defaults, rejection messages, registry metadata keys, and registry metadata payload shape use the shared source-ingestion contract.

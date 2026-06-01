@@ -2,13 +2,15 @@ from __future__ import annotations
 
 from typing import Any
 
+from backend.runtime_field_contracts import OPERATION_FIELD, REASON_FIELD, REQUEST_KIND_FIELD
+
 CACHE_REUSE_EVALUATE_EVENT = "reuse_evaluate"
 CACHE_REUSE_EVALUATED_MESSAGE = "cache reuse evaluated"
-CACHE_OPERATION_FIELD = "operation"
-CACHE_REQUEST_KIND_FIELD = "request_kind"
+CACHE_OPERATION_FIELD = OPERATION_FIELD
+CACHE_REQUEST_KIND_FIELD = REQUEST_KIND_FIELD
 CACHE_POLICY_ALLOW_FIELD = "policy_allow"
 CACHE_REPLAY_FIELD = "replay"
-CACHE_REASON_FIELD = "reason"
+CACHE_REASON_FIELD = REASON_FIELD
 CACHE_KEY_FIELD = "cache_key"
 CACHE_ENTRY_PRESENT_FIELD = "cache_entry_present"
 

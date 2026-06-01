@@ -22,6 +22,7 @@ from backend.response_cache_contracts import (
     cache_reuse_metric_tags,
     cache_reuse_observability_fields,
 )
+from backend.runtime_field_contracts import OPERATION_FIELD, REASON_FIELD, REQUEST_KIND_FIELD
 from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SourceFreshness
 from path_helpers import read_backend_source
 
@@ -264,6 +265,9 @@ def test_response_cache_uses_shared_request_kind_and_operation_constants() -> No
 def test_response_cache_observability_contract_shapes_are_centralized() -> None:
     assert CACHE_REUSE_EVALUATE_EVENT == "reuse_evaluate"
     assert CACHE_REUSE_EVALUATED_MESSAGE == "cache reuse evaluated"
+    assert CACHE_OPERATION_FIELD == OPERATION_FIELD
+    assert CACHE_REQUEST_KIND_FIELD == REQUEST_KIND_FIELD
+    assert CACHE_REASON_FIELD == REASON_FIELD
     assert cache_reuse_metric_tags(replay=True, reason="cache replay approved") == {
         CACHE_REPLAY_FIELD: True,
         CACHE_REASON_FIELD: "cache replay approved",
@@ -303,3 +307,14 @@ def test_response_cache_uses_shared_observability_contract_shapes() -> None:
     assert '"policy_allow": policy_response.allow' not in source
     assert '"cache_key": decision.cache_key' not in source
     assert '"cache_entry_present": cache_entry is not None' not in source
+
+
+def test_response_cache_runtime_fields_reuse_shared_contracts() -> None:
+    source = read_backend_source("response_cache_contracts.py")
+
+    assert "CACHE_OPERATION_FIELD = OPERATION_FIELD" in source
+    assert "CACHE_REQUEST_KIND_FIELD = REQUEST_KIND_FIELD" in source
+    assert "CACHE_REASON_FIELD = REASON_FIELD" in source
+    assert 'CACHE_OPERATION_FIELD = "operation"' not in source
+    assert 'CACHE_REQUEST_KIND_FIELD = "request_kind"' not in source
+    assert 'CACHE_REASON_FIELD = "reason"' not in source

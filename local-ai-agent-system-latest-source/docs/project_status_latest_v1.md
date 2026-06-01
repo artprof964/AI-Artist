@@ -71,7 +71,7 @@ Time creation/normalization: centralized in backend/time_utils.py for runtime co
 Payload fields, nested payload objects, and payload validation messages: centralized in backend/payload_fields.py
 Response fields, provider response field names, first-choice message parsing, and response validation messages: centralized in backend/response_fields.py
 LLM API request/result contracts: centralized in backend/llm_api_contracts.py for chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape
-Response cache observability event/message/tag/field shapes: centralized in backend/response_cache_contracts.py
+Response cache observability event/message/tag/field shapes: centralized in backend/response_cache_contracts.py, with operation/request-kind/reason field spellings reused from backend/runtime_field_contracts.py
 URL validation and URL validation messages: centralized in backend/url_utils.py and called directly by connector and source-ingestion boundaries
 HTTP method vocabulary, normalization, and validation messages: centralized in backend/http_methods.py
 File scanning suffixes and discovery: centralized in backend/file_scanning.py
@@ -162,7 +162,7 @@ Source ingestion hashes: source snapshots call shared canonical hash/version hel
 Request identity: shared directly across Safety Service canonicalization/classification, Slack request normalization, and OpenClaw tool-call trace IDs
 Request metadata contracts and mapping: shared across schema defaults, Safety Service request fingerprints, metric tags, and canonicalization observability fields
 Safety Service observability contracts: shared across canonicalization, classification, and policy evaluation event/message/tag/field shapes
-Runtime field contracts: shared across Safety Service policy observability, OpenClaw tool telemetry, observability trace fallback metadata, execution-envelope signature payload fields, adapter result execution-envelope/client-response/request/operation/target fields, audit response request/correlation-id fields, Slack local request-id and post-result client-response fields, publishing response status/target fields, and side-effect audit payload field names
+Runtime field contracts: shared across Safety Service policy observability, OpenClaw tool telemetry, observability trace fallback metadata, execution-envelope signature payload fields, adapter result execution-envelope/client-response/request/operation/target fields, response-cache operation/request-kind/reason fields, audit response request/correlation-id fields, Slack local request-id and post-result client-response fields, publishing response status/target fields, and side-effect audit payload field names
 Request scope defaults: shared across API schemas, mock orchestration request envelopes, and publishing audit context
 Runtime IDs: shared across schema defaults, Safety Service execution envelopes, OpenClaw tool calls, mock orchestration, source freshness, Knowledge retrieval, and security review probes
 Mapping utilities: shared across source ingestion, source freshness, Knowledge Agent payloads, image provenance response handling, and security review metadata serialization
@@ -201,7 +201,7 @@ Publishing operation constants: shared directly across publishing adapter gates 
 Gated adapter operation constants and action/target labels: shared directly across ComfyUI, Publishing, and GitHub execution gates
 Interface types: shared directly across API schemas, operation classification, audit event records, side-effect audit event typing, OpenClaw tool hook approval checks, and cache replay boundaries
 API route contracts: shared directly across FastAPI decorators and endpoint tests
-Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants; cache reuse telemetry event/message/tag/field shapes use response_cache_contracts.py
+Response cache boundaries: cache replay request-kind and operation checks use shared interface and operation constants; cache reuse telemetry event/message/tag/field shapes use response_cache_contracts.py with generic operation/request-kind/reason fields owned by runtime_field_contracts.py
 Model coercion: shared directly across execution-envelope validation, validation messages, image provenance input, critic metadata scoring, and the shared sub-agent output constructor
 Telemetry constants: shared across Safety Service, cache replay, OpenClaw tool hooks, mock orchestration, default metric values, metric-name constants, trace fallback ids, shared correlation-id metadata lookup, default event messages, service observability shape contracts, and security review probes
 Publishing dry-run response contracts: shared across LocalPublishingClient response construction, deterministic local publishing IDs, and runtime-field-backed status/target response fields
@@ -232,21 +232,22 @@ mock simulation metadata validation: 7 focused tests passed; mock-agent status s
 audit response contract validation: 5 focused tests passed, 1 warning; audit response accepted flag and payload shape centralized in audit_contracts.py
 Slack response contract validation: 51 focused tests passed; Slack inbound field constants, outbound field constants, post-result payload shape, LLM standard key, and LLM smoke contract unit paths validated together
 LLM API key standard validation: 49 focused tests passed; deepseek-open-art is the rendered project setup key and DEEPSEEK_API_KEY remains only a connection-loader compatibility alias
+response-cache runtime field validation: 21 focused tests passed; response-cache telemetry operation/request-kind/reason aliases reuse runtime_field_contracts.py while preserving cache-specific exported names
 runtime secret validation: LLM API smoke uses a named connection purpose plus shared runtime-token resolution, centralized smoke request defaults/overrides/timeout, and connection error messages; GitHub token-required messages route through shared connection error helpers; GitHub and Slack use shared adapter secret lookup; adapter tests guard against local runtime-token methods and local required-secret formatting; LLM smoke guarded against local redaction wrappers
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
 connection env validation helper validation: 32 focused tests passed; readiness env example missing-key and placeholder-secret checks use shared connection settings helpers
-publishing runtime field validation: 24 focused tests passed; latest full pytest 511 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
+publishing runtime field validation: 24 focused tests passed; latest full pytest 512 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
-request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 511 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
-execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 511 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
-client-response runtime field validation: 68 focused tests passed; full pytest 511 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
-adapter result field validation: 48 focused tests passed; latest full pytest 511 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
+request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 512 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
+execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 512 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
+client-response runtime field validation: 68 focused tests passed; full pytest 512 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
+adapter result field validation: 48 focused tests passed; latest full pytest 512 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 511 passed, 1 warning
+final pytest: 512 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

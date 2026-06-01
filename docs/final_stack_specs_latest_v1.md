@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 511 passed, 1 warning
+Final validation: 512 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -95,7 +95,7 @@ backend/github_contracts.py: shared GitHub adapter action labels, validation mes
 backend/audit.py: in-memory audit repository, recursive secret redaction, redacted mapping helper for telemetry/audit payloads, and audit response construction through shared audit contracts.
 backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion, semantic validation, expiry validation, and signature verification for gated adapters.
-backend/response_cache_contracts.py: shared response-cache reuse telemetry event, message, metric-tag, and structured-field shapes.
+backend/response_cache_contracts.py: shared response-cache reuse telemetry event, message, metric-tag, and structured-field shapes with generic operation/request-kind/reason field names reused from runtime field contracts.
 backend/response_cache.py: approved read-only response cache using shared request kind, operation, reason, time, and cache observability boundaries.
 backend/source_freshness.py: dependency snapshot, stale-source checks, source registry role/change-sequence contracts, and key/id source registry lookup.
 backend/source_ingestion.py: approved local source ingestion with direct canonical hash/version, URL-domain validation, registry metadata payload, and source-registry default boundaries.
@@ -358,7 +358,8 @@ default-deny pattern, review targets, and prompt-hash field names must flow
 through backend/security_review_contracts.py before checklist logic changes.
 Response-cache reuse telemetry event, message, metric-tag, and structured-field
 shapes must flow through backend/response_cache_contracts.py before cache reuse
-observability changes.
+observability changes, with generic operation/request-kind/reason fields reused
+from backend/runtime_field_contracts.py.
 Publishing outcome status values must flow through backend/publishing_status.py
 before publishing agent or side-effect audit status text is added.
 Local publishing dry-run response fields, deterministic ID prefix, ID material
