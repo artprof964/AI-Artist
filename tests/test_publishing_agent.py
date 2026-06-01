@@ -1,5 +1,5 @@
+import ast
 from datetime import datetime, timezone
-from typing import Any
 from uuid import UUID
 
 import pytest
@@ -13,25 +13,17 @@ from backend.request_scope_contracts import (
     DEFAULT_PUBLISHING_POLICY_SCOPE,
 )
 from execution_envelope_helpers import execution_envelope_for_test
-from path_helpers import read_backend_source
+from gated_adapter_helpers import (
+    PUBLISHING_SECRET_TEST_EXTERNAL_POST_ID,
+    SecretEchoPublishingClient,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 REQUEST_ID = UUID("22222222-2222-2222-2222-222222222222")
 CORRELATION_ID = UUID("22222222-2222-2222-2222-000000000001")
 NOW = datetime(2026, 5, 31, 10, 0, tzinfo=timezone.utc)
 PUBLISH_TARGET = "mock-publisher://channels/artist-feed"
-
-
-class SecretEchoPublishingClient(LocalPublishingClient):
-    def publish(self, target: str, payload: dict[str, Any]) -> dict[str, Any]:
-        self.calls.append((target, payload))
-        return {
-            "authorization": "Bearer secret-publish-token",
-            "debug": {"api_key": "sk-publish-secret-value"},
-            "external_post_id": "mock-post-secret-001",
-            "status": PUBLISHING_STATUS_PUBLISHED,
-            "target": target,
-        }
 
 
 def publish_envelope(*, approved: bool):
@@ -121,7 +113,7 @@ def test_publishing_agent_redacts_sensitive_client_response_in_audit_event() -> 
 
     audit_payload = result.audit_event.payload
     assert client.calls == [(PUBLISH_TARGET, payload)]
-    assert result.client_response["external_post_id"] == "mock-post-secret-001"
+    assert result.client_response["external_post_id"] == PUBLISHING_SECRET_TEST_EXTERNAL_POST_ID
     assert audit_payload["client_response"]["authorization"] == "[REDACTED]"
     assert audit_payload["client_response"]["debug"]["api_key"] == "[REDACTED]"
     assert "secret-publish-token" not in repr(audit_payload)
@@ -151,3 +143,11 @@ def test_publishing_agent_uses_shared_scope_defaults() -> None:
     assert "DEFAULT_PUBLISHING_POLICY_SCOPE" in source
     assert 'actor_scope: str = "user:local"' not in source
     assert 'policy_scope: str = "workspace:ai-artist-main"' not in source
+
+
+def test_publishing_agent_tests_use_shared_fake_publishing_clients() -> None:
+    source = read_test_source("test_publishing_agent.py")
+    tree = ast.parse(source)
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
+
+    assert "SecretEchoPublishingClient" not in class_names

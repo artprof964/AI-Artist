@@ -1,6 +1,5 @@
 import ast
 from datetime import timedelta
-from typing import Any
 
 import pytest
 
@@ -13,7 +12,9 @@ from backend.time_utils import utc_now
 from gated_adapter_helpers import (
     COMFYUI_ADAPTER_REQUEST_ID,
     COMFYUI_ADAPTER_TARGET,
+    COMFYUI_TEST_PROMPT_ID,
     COMFYUI_TEST_WORKFLOW,
+    MockComfyUIClient,
     approved_comfyui_envelope_for_test,
     comfyui_image_request_for_test,
     unapproved_comfyui_envelope_for_test,
@@ -24,24 +25,6 @@ from path_helpers import read_backend_source, read_test_source
 REQUEST_ID = COMFYUI_ADAPTER_REQUEST_ID
 NOW = utc_now()
 COMFYUI_TARGET = COMFYUI_ADAPTER_TARGET
-
-
-class MockComfyUIClient:
-    def __init__(self) -> None:
-        self.calls: list[dict[str, Any]] = []
-
-    def submit_workflow(self, workflow: dict[str, Any]) -> dict[str, Any]:
-        self.calls.append(workflow)
-        return {
-            "prompt_id": "mock-prompt-001",
-            "images": [
-                {
-                    "filename": "mock-image.png",
-                    "subfolder": "",
-                    "type": "output",
-                }
-            ],
-        }
 
 
 def test_image_generation_succeeds_with_mocked_approved_execution_envelope() -> None:
@@ -62,7 +45,7 @@ def test_image_generation_succeeds_with_mocked_approved_execution_envelope() -> 
     assert result.execution_envelope_id == envelope.execution_envelope_id
     assert result.request_id == REQUEST_ID
     assert result.operation == "image_generate"
-    assert result.client_response["prompt_id"] == "mock-prompt-001"
+    assert result.client_response["prompt_id"] == COMFYUI_TEST_PROMPT_ID
 
 
 @pytest.mark.parametrize(
@@ -139,6 +122,7 @@ def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
     function_names = {
         node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
     }
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
     called_names = {
         node.func.id
         for node in ast.walk(tree)
@@ -158,6 +142,7 @@ def test_comfyui_adapter_tests_use_shared_execution_envelope_helper() -> None:
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_envelope" not in function_names
+    assert "MockComfyUIClient" not in class_names
     assert ("backend.comfyui_adapter", "ComfyUIImageGenerationRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

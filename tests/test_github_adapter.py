@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import ast
 from datetime import timedelta
-from typing import Any
 
 import pytest
 
@@ -23,6 +22,7 @@ from gated_adapter_helpers import (
     GITHUB_ADAPTER_REQUEST_ID,
     GITHUB_ADAPTER_TARGET,
     GITHUB_TEST_PAYLOAD,
+    MockGitHubAPI,
     approved_github_write_envelope_for_test,
     github_write_request_for_test,
     unapproved_github_write_envelope_for_test,
@@ -35,38 +35,6 @@ NOW = utc_now()
 GITHUB_TARGET = GITHUB_ADAPTER_TARGET
 GITHUB_PATH = GITHUB_ADAPTER_PATH
 MOCK_GITHUB_TOKEN = TEST_GITHUB_TOKEN
-
-
-class MockGitHubAPI:
-    def __init__(self) -> None:
-        self.calls: list[dict[str, Any]] = []
-
-    def request(
-        self,
-        *,
-        method: str,
-        path: str,
-        json: dict[str, Any],
-        token: str,
-    ) -> dict[str, Any]:
-        self.calls.append(
-            {
-                "method": method,
-                "path": path,
-                "json": json,
-                "token": token,
-            }
-        )
-        return {
-            "id": 123,
-            "status": "created",
-            "url": "https://api.github.local/repos/artprof964/AI-Art/issues/123",
-            "authorization": f"Bearer {token}",
-            "debug": {
-                "token": token,
-                "message": f"mock client echoed {token}",
-            },
-        }
 
 
 def test_github_adapter_uses_mocked_api_and_keeps_token_inside_adapter(
@@ -355,6 +323,7 @@ def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
     function_names = {
         node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
     }
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
     called_names = {
         node.func.id
         for node in ast.walk(tree)
@@ -375,6 +344,7 @@ def test_github_adapter_tests_use_shared_execution_envelope_helper() -> None:
     assert "approved_envelope" not in function_names
     assert "unapproved_github_write_envelope" not in function_names
     assert "github_write_request" not in function_names
+    assert "MockGitHubAPI" not in class_names
     assert ("backend.github_adapter", "GitHubWriteRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names

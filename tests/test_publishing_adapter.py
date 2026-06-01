@@ -1,6 +1,5 @@
 import ast
 from datetime import timedelta
-from typing import Any
 
 import pytest
 
@@ -13,7 +12,9 @@ from backend.time_utils import utc_now
 from gated_adapter_helpers import (
     PUBLISHING_ADAPTER_REQUEST_ID,
     PUBLISHING_ADAPTER_TARGET,
+    PUBLISHING_TEST_EXTERNAL_POST_ID,
     PUBLISHING_TEST_PAYLOAD,
+    MockPublishingClient,
     approved_publishing_envelope_for_test,
     publishing_request_for_test,
     unapproved_publishing_envelope_for_test,
@@ -25,19 +26,6 @@ from path_helpers import read_backend_source, read_test_source
 REQUEST_ID = PUBLISHING_ADAPTER_REQUEST_ID
 NOW = utc_now()
 PUBLISH_TARGET = PUBLISHING_ADAPTER_TARGET
-
-
-class MockPublishingClient:
-    def __init__(self) -> None:
-        self.calls: list[tuple[str, dict[str, Any]]] = []
-
-    def publish(self, target: str, payload: dict[str, Any]) -> dict[str, Any]:
-        self.calls.append((target, payload))
-        return {
-            "external_post_id": "mock-post-001",
-            "status": "published",
-            "target": target,
-        }
 
 
 def test_publishing_blocks_external_client_until_human_approval_is_attached() -> None:
@@ -69,7 +57,7 @@ def test_publishing_blocks_external_client_until_human_approval_is_attached() ->
     assert result.execution_envelope_id == envelope.execution_envelope_id
     assert result.request_id == REQUEST_ID
     assert result.operation == "publish"
-    assert result.client_response["external_post_id"] == "mock-post-001"
+    assert result.client_response["external_post_id"] == PUBLISHING_TEST_EXTERNAL_POST_ID
 
 
 @pytest.mark.parametrize(
@@ -171,6 +159,7 @@ def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None
     function_names = {
         node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
     }
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
     called_names = {
         node.func.id
         for node in ast.walk(tree)
@@ -190,6 +179,7 @@ def test_publishing_adapter_tests_use_shared_execution_envelope_helper() -> None
     assert "unapproved_execution_envelope" not in called_names
     assert "approved_envelope" not in function_names
     assert "unapproved_publish_envelope" not in function_names
+    assert "MockPublishingClient" not in class_names
     assert ("backend.publishing_adapter", "PublishingRequest") not in imported_names
     assert ("backend.schemas", "ExecutionEnvelopeRequest") not in imported_names
     assert ("backend.service", "create_execution_envelope") not in imported_names
