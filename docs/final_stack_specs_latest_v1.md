@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 532 passed, 1 warning
+Final validation: 533 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -110,6 +110,7 @@ tests/connection_env_helpers.py: shared test env builders and secret constants f
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
+tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
 tests/secret_test_helpers.py: shared secret-bearing test payloads, secret constants, and redaction assertions for audit, security review, secret-redaction, and side-effect audit tests.
 tests/tool_call_helpers.py: shared ToolCallRequest construction for OpenClaw safety hook and observability tests, including default operation, request kind, scope, correlation ID, request ID, metadata, arguments, and source freshness setup.
 backend/llm_api_contracts.py: shared provider-neutral LLM chat request field names, role vocabulary, smoke request body construction, redacted request-log payload shape, and smoke result payload shape.
@@ -216,6 +217,9 @@ PolicyEvaluateRequest directly.
 Cache and source-freshness tests that need approved policy responses must use
 tests/policy_response_helpers.py before constructing PolicyEvaluateResponse
 fixtures directly.
+Request metadata, Safety Service unit, and observability tests that need
+workspace/agent metadata must use tests/request_metadata_helpers.py before
+constructing RequestMetadata fixtures directly.
 Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes must
 use tests/execution_envelope_helpers.py before ComfyUI, Publishing, GitHub,
 Safety Service unit, policy-contract, publishing-agent, or future gated test

@@ -34,13 +34,13 @@ from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
     PolicyEvaluateResponse,
-    RequestMetadata,
 )
 from backend.service import canonicalize_request, classify_request, evaluate_policy
 from cache_entry_helpers import approved_response_cache_entry_for_test
 from execution_envelope_helpers import unchanged_source_freshness
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
+from request_metadata_helpers import request_metadata_for_test
 from tool_call_helpers import tool_call_request_for_test
 
 
@@ -92,7 +92,7 @@ def test_observability_emits_trace_metrics_and_logs_for_runtime_stages() -> None
             requester_scope="user:local",
             policy_scope="workspace:ai-artist-main",
             channel="cli",
-            metadata=RequestMetadata(workspace="ai-artist-main", agent="ai-artist-main"),
+            metadata=request_metadata_for_test(),
         )
     )
     classified = classify_request(

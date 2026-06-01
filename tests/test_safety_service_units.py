@@ -5,7 +5,6 @@ import pytest
 from backend.schemas import (
     CanonicalizeRequest,
     ClassifyRequest,
-    RequestMetadata,
 )
 from backend.service import (
     canonicalize_request,
@@ -16,6 +15,7 @@ from backend.time_utils import as_utc
 from execution_envelope_helpers import execution_envelope_for_test, stale_source_freshness
 from path_helpers import read_backend_source
 from policy_request_helpers import policy_evaluate_request_for_test
+from request_metadata_helpers import request_metadata_for_test
 
 
 def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None:
@@ -24,11 +24,11 @@ def test_canonicalizer_fingerprint_includes_scope_channel_and_metadata() -> None
         requester_scope="user:local",
         policy_scope="workspace:ai-artist-main",
         channel="cli",
-        metadata=RequestMetadata(workspace="ai-artist-main", agent="knowledge"),
+        metadata=request_metadata_for_test(agent="knowledge"),
     )
     same_semantics = base.model_copy(update={"request_text": "research flux lighting references"})
     different_agent = base.model_copy(
-        update={"metadata": RequestMetadata(workspace="ai-artist-main", agent="critic")}
+        update={"metadata": request_metadata_for_test(agent="critic")}
     )
 
     first = canonicalize_request(base)

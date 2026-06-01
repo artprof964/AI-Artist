@@ -1,3 +1,5 @@
+import ast
+
 from backend.request_metadata import (
     request_fingerprint_fields,
     request_metadata_fields,
@@ -18,12 +20,12 @@ from backend.request_metadata_contracts import (
 from backend.request_scope_contracts import DEFAULT_POLICY_SCOPE, DEFAULT_REQUESTER_SCOPE
 from backend.orchestrator import MockAgentRequest
 from backend.schemas import CanonicalizeRequest
-from backend.schemas import RequestMetadata
-from path_helpers import read_backend_source
+from path_helpers import read_backend_source, read_test_source
+from request_metadata_helpers import request_metadata_for_test
 
 
 def test_request_metadata_fields_centralizes_workspace_and_agent_mapping() -> None:
-    metadata = RequestMetadata(workspace="ai-artist-main", agent="knowledge")
+    metadata = request_metadata_for_test(agent="knowledge")
 
     assert request_metadata_fields(metadata) == {
         REQUEST_METADATA_WORKSPACE_FIELD: "ai-artist-main",
@@ -32,7 +34,7 @@ def test_request_metadata_fields_centralizes_workspace_and_agent_mapping() -> No
 
 
 def test_request_fingerprint_fields_centralize_canonical_request_shape() -> None:
-    metadata = RequestMetadata(workspace="ai-artist-main", agent="knowledge")
+    metadata = request_metadata_for_test(agent="knowledge")
 
     assert request_fingerprint_fields(
         request_text="research flux references",
@@ -51,7 +53,7 @@ def test_request_fingerprint_fields_centralize_canonical_request_shape() -> None
 
 
 def test_request_observability_fields_centralize_telemetry_shape() -> None:
-    metadata = RequestMetadata(workspace="ai-artist-main", agent="knowledge")
+    metadata = request_metadata_for_test(agent="knowledge")
 
     assert request_observability_fields(channel="slack", metadata=metadata) == {
         REQUEST_CHANNEL_FIELD: "slack",
@@ -129,3 +131,23 @@ def test_request_metadata_helpers_use_shared_contract_fields() -> None:
     assert 'channel: Channel = "cli"' not in schema_source
     assert "DEFAULT_REQUEST_METADATA_WORKSPACE" in schema_source
     assert "DEFAULT_REQUEST_CHANNEL" in schema_source
+
+
+def test_metadata_path_tests_use_shared_request_metadata_helper() -> None:
+    for test_module in (
+        "test_observability.py",
+        "test_request_metadata.py",
+        "test_safety_service_units.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        direct_constructor_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "RequestMetadata"
+        ]
+
+        assert "request_metadata_for_test(" in source
+        assert direct_constructor_calls == []

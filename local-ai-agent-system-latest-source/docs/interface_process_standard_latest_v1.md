@@ -88,6 +88,7 @@ can be marked done.
 65. OpenClaw hook and observability tests use `tests/tool_call_helpers.py` for standard `ToolCallRequest` setup.
 66. Cache, source-freshness, and observability tests use `tests/cache_entry_helpers.py` for standard `ApprovedResponseCacheEntry` setup.
 67. Cache and source-freshness tests use `tests/policy_response_helpers.py` for standard approved `PolicyEvaluateResponse` setup.
+68. Request metadata, Safety Service unit, and observability tests use `tests/request_metadata_helpers.py` for standard `RequestMetadata` setup.
 ```
 
 ## Standard Request Envelope
@@ -167,6 +168,9 @@ Rules:
 - Cache, source freshness, and future policy-response fixture tests use
   `tests/policy_response_helpers.py` instead of constructing standard
   approved `PolicyEvaluateResponse` fixtures directly.
+- Request metadata, Safety Service unit, observability, and future metadata-path
+  tests use `tests/request_metadata_helpers.py` instead of constructing
+  standard `RequestMetadata` fixtures directly.
 - Gated-adapter and policy-path tests that need approved, unapproved, unchanged-source, or stale-source execution envelopes use
   `tests/execution_envelope_helpers.py` instead of constructing
   `ExecutionEnvelopeRequest` directly in adapter-specific, policy-contract,
