@@ -184,6 +184,8 @@ Rules:
 - Cache, source freshness, observability, Safety Service unit, and future
   policy-path tests use `tests/policy_request_helpers.py` instead of
   constructing standard `PolicyEvaluateRequest` fixtures directly.
+- Response-cache tests call `tests/policy_request_helpers.py` directly instead
+  of defining local base-policy-request wrappers.
 - Cache, source freshness, observability, and future cache-path tests use
   `tests/cache_entry_helpers.py` instead of constructing standard
   `ApprovedResponseCacheEntry` fixtures directly.

@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 542 passed, 1 warning
+Final validation: 543 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -240,6 +240,8 @@ Policy-path tests that need cache-reuse or Safety Service policy requests must
 use tests/policy_request_helpers.py before cache, source freshness,
 observability, Safety Service unit, or future policy-path tests construct
 PolicyEvaluateRequest directly.
+Response-cache tests must call tests/policy_request_helpers.py directly for
+standard policy requests before adding local base-policy-request wrappers.
 Cache and source-freshness tests that need approved policy responses must use
 tests/policy_response_helpers.py before constructing PolicyEvaluateResponse
 fixtures directly.

@@ -35,11 +35,6 @@ from policy_response_helpers import approved_policy_response_for_test
 NOW = datetime(2026, 5, 31, 8, 0, tzinfo=timezone.utc)
 REQUEST_FINGERPRINT = "sha256:repeat-read-request"
 
-
-def base_policy_request():
-    return policy_evaluate_request_for_test()
-
-
 def base_cache_entry() -> ApprovedResponseCacheEntry:
     return approved_response_cache_entry_for_test(
         now=NOW,
@@ -53,7 +48,7 @@ def base_cache_entry() -> ApprovedResponseCacheEntry:
 
 def test_replays_approved_read_response_with_fresh_non_expired_cache_entry() -> None:
     decision = evaluate_cached_response_reuse(
-        policy_request=base_policy_request(),
+        policy_request=policy_evaluate_request_for_test(),
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
@@ -67,7 +62,7 @@ def test_replays_approved_read_response_with_fresh_non_expired_cache_entry() -> 
 
 @pytest.mark.parametrize("request_kind", [REQUEST_KIND_ACTION, REQUEST_KIND_MIXED])
 def test_rejects_non_read_replay_requests(request_kind: str) -> None:
-    request = base_policy_request().model_copy(update={"request_kind": request_kind})
+    request = policy_evaluate_request_for_test().model_copy(update={"request_kind": request_kind})
 
     decision = evaluate_cached_response_reuse(
         policy_request=request,
@@ -82,7 +77,7 @@ def test_rejects_non_read_replay_requests(request_kind: str) -> None:
 
 
 def test_rejects_non_reuse_policy_requests() -> None:
-    request = base_policy_request().model_copy(update={"operation": OPERATION_READ})
+    request = policy_evaluate_request_for_test().model_copy(update={"operation": OPERATION_READ})
 
     decision = evaluate_cached_response_reuse(
         policy_request=request,
@@ -105,7 +100,7 @@ def test_rejects_non_reuse_policy_requests() -> None:
     ],
 )
 def test_rejects_stale_replay_request_sources(source_freshness: SourceFreshness) -> None:
-    request = base_policy_request().model_copy(
+    request = policy_evaluate_request_for_test().model_copy(
         update={"source_freshness": source_freshness}
     )
 
@@ -128,14 +123,14 @@ def test_rejects_policy_denial_or_human_approval_requirement() -> None:
     )
 
     denied_decision = evaluate_cached_response_reuse(
-        policy_request=base_policy_request(),
+        policy_request=policy_evaluate_request_for_test(),
         policy_response=denied,
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
         now=NOW,
     )
     approval_decision = evaluate_cached_response_reuse(
-        policy_request=base_policy_request(),
+        policy_request=policy_evaluate_request_for_test(),
         policy_response=approval_required,
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=base_cache_entry(),
@@ -199,7 +194,7 @@ def test_rejects_cache_entry_mismatches_and_unsafe_states(
     reason: str,
 ) -> None:
     decision = evaluate_cached_response_reuse(
-        policy_request=base_policy_request(),
+        policy_request=policy_evaluate_request_for_test(),
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=request_fingerprint,
         cache_entry=entry,
@@ -212,7 +207,7 @@ def test_rejects_cache_entry_mismatches_and_unsafe_states(
 
 def test_rejects_missing_cache_entry() -> None:
     decision = evaluate_cached_response_reuse(
-        policy_request=base_policy_request(),
+        policy_request=policy_evaluate_request_for_test(),
         policy_response=approved_policy_response_for_test(),
         request_fingerprint=REQUEST_FINGERPRINT,
         cache_entry=None,
@@ -310,6 +305,17 @@ def test_policy_path_tests_use_shared_policy_request_helper() -> None:
 
         assert "policy_evaluate_request_for_test(" in source
         assert ("backend.schemas", "PolicyEvaluateRequest") not in imported_names
+
+
+def test_response_cache_tests_use_shared_policy_request_helper_directly() -> None:
+    source = read_test_source("test_response_cache.py")
+    tree = ast.parse(source)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+
+    assert "base_policy_request" not in function_names
+    assert "policy_evaluate_request_for_test(" in source
 
 
 def test_cache_path_tests_use_shared_cache_entry_helper() -> None:
