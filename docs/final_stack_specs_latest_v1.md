@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 538 passed, 1 warning
+Final validation: 539 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -111,6 +111,7 @@ tests/execution_envelope_helpers.py: shared execution-envelope construction for 
 tests/gated_adapter_helpers.py: shared adapter-specific request, envelope, and fake-client defaults for ComfyUI, GitHub, Publishing adapter tests, and Publishing Agent redaction tests, including stable request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved envelope construction, mocked client responses, and secret-echo client responses.
 tests/human_approval_helpers.py: shared HumanApproval construction for execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests, including approved/unapproved state, approver scope, and approval timestamp defaults.
 tests/llm_api_smoke_helpers.py: shared OpenAI-compatible recording LLM client, recording chat completions, response id, and response content for provider-neutral LLM API smoke tests.
+tests/openclaw_hook_helpers.py: shared OpenClaw safety-hook recording Safety Service client, recording adapter, mock orchestration adapter, and event labels for OpenClaw-to-safety integration tests.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
 tests/policy_response_helpers.py: shared approved policy-evaluate response construction for cache and source-freshness tests, including allow, reason, human-approval, and policy-version defaults.
 tests/request_metadata_helpers.py: shared RequestMetadata construction for request metadata, Safety Service unit, and observability tests, including workspace and agent defaults.
@@ -225,6 +226,9 @@ SourceFreshnessRegistry fixtures directly.
 OpenClaw hook and observability tests that need standard tool-call requests
 must use tests/tool_call_helpers.py before constructing ToolCallRequest
 directly.
+OpenClaw hook tests that need recording safety clients, recording adapters,
+mock orchestration adapters, or event labels must use
+tests/openclaw_hook_helpers.py before defining local recording adapter classes.
 Policy-path tests that need cache-reuse or Safety Service policy requests must
 use tests/policy_request_helpers.py before cache, source freshness,
 observability, Safety Service unit, or future policy-path tests construct

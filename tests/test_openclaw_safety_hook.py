@@ -1,100 +1,23 @@
-from fastapi.testclient import TestClient
+import ast
 
-from backend.app import app
 from backend.canonical_hash import canonical_json
 from backend.openclaw_hook import (
-    SafetyDecision,
-    ToolCallRequest,
-    decision_from_policy_response,
     execute_tool_call_with_safety,
 )
-from backend.orchestrator import (
-    MockAgentRequest,
-    MockOrchestrationResult,
-    run_mock_subagent_orchestration,
-)
 from backend.policy_contracts import LOCAL_DEFAULT_DENY_POLICY_VERSION
-from backend.schemas import PolicyEvaluateRequest, PolicyEvaluateResponse, SubAgentOutput
 from execution_envelope_helpers import unchanged_source_freshness
+from openclaw_hook_helpers import (
+    OPENCLAW_ADAPTER_EVENT,
+    OPENCLAW_MOCK_AGENTS_EVENT,
+    OPENCLAW_SAFETY_EVENT,
+    OPENCLAW_SYNTHESIS_EVENT,
+    OPENCLAW_VALIDATION_EVENT,
+    MockOrchestrationAdapter,
+    RecordingAdapter,
+    RecordingSafetyClient,
+)
 from path_helpers import read_backend_source, read_test_source
 from tool_call_helpers import tool_call_request_for_test
-
-
-client = TestClient(app)
-
-
-class RecordingSafetyClient:
-    def __init__(self, events: list[str]) -> None:
-        self.events = events
-        self.requests: list[PolicyEvaluateRequest] = []
-
-    def evaluate_tool_call(self, request: PolicyEvaluateRequest) -> SafetyDecision:
-        self.events.append("safety")
-        self.requests.append(request)
-        response = client.post(
-            "/v1/policy/evaluate",
-            json=request.model_dump(mode="json"),
-        )
-        response.raise_for_status()
-        return decision_from_policy_response(PolicyEvaluateResponse(**response.json()))
-
-
-class RecordingAdapter:
-    def __init__(self, events: list[str]) -> None:
-        self.events = events
-        self.requests: list[ToolCallRequest] = []
-
-    def run(self, request: ToolCallRequest) -> dict[str, object]:
-        self.events.append("adapter")
-        self.requests.append(request)
-        return {"tool_name": request.tool_name, "status": "executed"}
-
-
-class MockOrchestrationAdapter:
-    def __init__(self, events: list[str]) -> None:
-        self.events = events
-        self.requests: list[ToolCallRequest] = []
-        self.validated_outputs: list[SubAgentOutput] = []
-        self.validated_result: MockOrchestrationResult | None = None
-
-    def run(self, request: ToolCallRequest) -> dict[str, object]:
-        self.events.append("mock_agents")
-        self.requests.append(request)
-
-        orchestration_request = MockAgentRequest(
-            task_id=request.request_id,
-            request_text=str(request.arguments["request_text"]),
-            requester_scope=request.requester_scope,
-            policy_scope=request.policy_scope,
-            metadata={
-                "correlation_id": request.correlation_id,
-                "workspace": request.metadata["workspace"],
-                "tool_name": request.tool_name,
-            },
-        )
-        result = run_mock_subagent_orchestration(orchestration_request)
-
-        self.events.append("validation")
-        self.validated_outputs = [
-            SubAgentOutput.model_validate(output.model_dump(mode="json"))
-            for output in result.agent_outputs
-        ]
-        self.validated_result = MockOrchestrationResult.model_validate(
-            result.model_dump(mode="json")
-        )
-
-        self.events.append("synthesis")
-        return {
-            "task_id": str(self.validated_result.task_id),
-            "status": self.validated_result.status,
-            "summary": self.validated_result.summary,
-            "status_counts": self.validated_result.status_counts,
-            "artifact_count": len(self.validated_result.artifacts),
-            "source_count": len(self.validated_result.sources),
-            "policy_notes": self.validated_result.policy_notes,
-            "confidence": self.validated_result.confidence,
-            "errors": [error.model_dump(mode="json") for error in self.validated_result.errors],
-        }
 
 
 def test_tool_call_reaches_safety_service_before_adapter_runs() -> None:
@@ -122,7 +45,7 @@ def test_tool_call_reaches_safety_service_before_adapter_runs() -> None:
 
     result = execute_tool_call_with_safety(request, safety_client, adapter)
 
-    assert events == ["safety", "adapter"]
+    assert events == [OPENCLAW_SAFETY_EVENT, OPENCLAW_ADAPTER_EVENT]
     assert len(safety_client.requests) == 1
     safety_request = safety_client.requests[0]
     assert safety_request.request_id == request.request_id
@@ -180,7 +103,7 @@ def test_denied_tool_call_never_runs_adapter() -> None:
 
     result = execute_tool_call_with_safety(request, safety_client, adapter)
 
-    assert events == ["safety"]
+    assert events == [OPENCLAW_SAFETY_EVENT]
     assert len(safety_client.requests) == 1
     safety_request = safety_client.requests[0]
     assert safety_request.request_id == request.request_id
@@ -227,7 +150,12 @@ def test_openclaw_request_runs_through_safety_mock_agents_validation_and_synthes
 
     result = execute_tool_call_with_safety(request, safety_client, adapter)
 
-    assert events == ["safety", "mock_agents", "validation", "synthesis"]
+    assert events == [
+        OPENCLAW_SAFETY_EVENT,
+        OPENCLAW_MOCK_AGENTS_EVENT,
+        OPENCLAW_VALIDATION_EVENT,
+        OPENCLAW_SYNTHESIS_EVENT,
+    ]
     assert result.executed is True
     assert result.request_id == request.request_id
     assert result.correlation_id == "trace-openclaw-e2e-001"
@@ -300,3 +228,13 @@ def test_openclaw_hook_tests_use_shared_tool_call_request_helper() -> None:
 
     assert "tool_call_request_for_test(" in source
     assert "request = ToolCallRequest(\n" not in source
+
+
+def test_openclaw_hook_tests_use_shared_recording_adapters() -> None:
+    source = read_test_source("test_openclaw_safety_hook.py")
+    tree = ast.parse(source)
+    class_names = {node.name for node in ast.walk(tree) if isinstance(node, ast.ClassDef)}
+
+    assert "RecordingSafetyClient" not in class_names
+    assert "RecordingAdapter" not in class_names
+    assert "MockOrchestrationAdapter" not in class_names
