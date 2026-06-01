@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 
 import pytest
 
-from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import SOURCE_INITIAL_CHANGE_SEQ
 from backend.source_ingestion import (
     InMemorySourceSnapshotRepository,
@@ -18,6 +17,7 @@ from backend.source_ingestion_contracts import (
     source_registry_metadata,
 )
 from path_helpers import read_backend_source
+from source_registry_helpers import source_freshness_registry_for_test
 
 
 NOW = datetime(2026, 5, 31, 10, 30, tzinfo=timezone.utc)
@@ -66,7 +66,7 @@ def approved_sample_sources() -> list[SourceIngestionCandidate]:
 
 
 def test_ingestion_imports_approved_sources_stores_snapshots_and_registry_rows() -> None:
-    registry = SourceFreshnessRegistry()
+    registry = source_freshness_registry_for_test()
     snapshot_repository = InMemorySourceSnapshotRepository()
     service = SourceIngestionService(
         approved_domains=APPROVED_DOMAINS,
@@ -113,7 +113,7 @@ def test_ingestion_imports_approved_sources_stores_snapshots_and_registry_rows()
 
 
 def test_ingestion_reimport_preserves_or_increments_change_sequence_by_snapshot_hash() -> None:
-    registry = SourceFreshnessRegistry()
+    registry = source_freshness_registry_for_test()
     snapshot_repository = InMemorySourceSnapshotRepository()
     service = SourceIngestionService(
         approved_domains=APPROVED_DOMAINS,
@@ -157,7 +157,7 @@ def test_ingestion_reimport_preserves_or_increments_change_sequence_by_snapshot_
 
 
 def test_ingestion_rejects_disallowed_source_domains_without_registry_rows() -> None:
-    registry = SourceFreshnessRegistry()
+    registry = source_freshness_registry_for_test()
     snapshot_repository = InMemorySourceSnapshotRepository()
     service = SourceIngestionService(
         approved_domains=APPROVED_DOMAINS,

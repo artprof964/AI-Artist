@@ -1,4 +1,5 @@
 from datetime import datetime, timedelta, timezone
+import ast
 from uuid import uuid4
 
 from backend.response_cache import ApprovedResponseCacheEntry, evaluate_cached_response_reuse
@@ -21,6 +22,14 @@ from cache_entry_helpers import approved_response_cache_entry_for_test
 from path_helpers import read_backend_source, read_test_source
 from policy_request_helpers import policy_evaluate_request_for_test
 from policy_response_helpers import approved_policy_response_for_test
+from source_registry_helpers import (
+    DEFAULT_REFERENCE_SOURCE_KEY,
+    DEFAULT_STYLE_SOURCE_KEY,
+    single_reference_source_registry_for_test,
+    source_freshness_registry_for_test,
+    standard_two_source_registry_for_test,
+    upsert_style_source_for_test,
+)
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -49,12 +58,10 @@ def cache_entry() -> ApprovedResponseCacheEntry:
 
 
 def test_source_snapshot_reports_required_sources_unchanged() -> None:
-    registry = SourceFreshnessRegistry()
-    registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
-    registry.upsert_source(source_key="reference-brief", source_type="document")
+    registry = standard_two_source_registry_for_test()
 
     snapshot = registry.record_dependency_snapshot(
-        source_keys=["style-guide", "reference-brief"]
+        source_keys=[DEFAULT_STYLE_SOURCE_KEY, DEFAULT_REFERENCE_SOURCE_KEY]
     )
 
     assert snapshot.required_source_count == 2
@@ -66,18 +73,18 @@ def test_source_snapshot_reports_required_sources_unchanged() -> None:
 
 
 def test_incremented_source_change_seq_marks_snapshot_stale() -> None:
-    registry = SourceFreshnessRegistry()
-    registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
-    registry.upsert_source(source_key="reference-brief", source_type="document")
+    registry = standard_two_source_registry_for_test()
     snapshot_at_run = registry.record_dependency_snapshot(
-        source_keys=["style-guide", "reference-brief"]
+        source_keys=[DEFAULT_STYLE_SOURCE_KEY, DEFAULT_REFERENCE_SOURCE_KEY]
     )
 
-    changed_source = registry.increment_change_seq("reference-brief")
+    changed_source = registry.increment_change_seq(DEFAULT_REFERENCE_SOURCE_KEY)
     stale_snapshot = registry.evaluate_snapshot(dependencies=snapshot_at_run.dependencies)
 
     assert changed_source.change_seq == SOURCE_INITIAL_CHANGE_SEQ + 1
-    assert registry.get_source("reference-brief").change_seq == SOURCE_INITIAL_CHANGE_SEQ + 1
+    assert registry.get_source(DEFAULT_REFERENCE_SOURCE_KEY).change_seq == (
+        SOURCE_INITIAL_CHANGE_SEQ + 1
+    )
     assert stale_snapshot.changed_source_count == 1
     assert stale_snapshot.all_required_sources_unchanged is False
     assert stale_snapshot.source_freshness.changed_source_count == 1
@@ -85,30 +92,31 @@ def test_incremented_source_change_seq_marks_snapshot_stale() -> None:
 
 
 def test_find_source_returns_optional_registry_entry_without_raising() -> None:
-    registry = SourceFreshnessRegistry()
+    registry = source_freshness_registry_for_test()
 
     assert registry.find_source("missing") is None
 
-    entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
+    entry = upsert_style_source_for_test(registry)
 
-    assert registry.find_source("style-guide") == entry
+    assert registry.find_source(DEFAULT_STYLE_SOURCE_KEY) == entry
 
 
 def test_find_source_by_id_returns_optional_registry_entry_without_raising() -> None:
-    registry = SourceFreshnessRegistry()
+    registry = source_freshness_registry_for_test()
 
     assert registry.find_source_by_id(uuid4()) is None
 
-    entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
+    entry = upsert_style_source_for_test(registry)
 
     assert registry.find_source_by_id(entry.source_id) == entry
     assert registry.get_source_by_id(entry.source_id) == entry
 
 
 def test_stale_source_freshness_blocks_cached_response_replay() -> None:
-    registry = SourceFreshnessRegistry()
-    registry.upsert_source(source_key="reference-brief", source_type="document")
-    snapshot_at_cache = registry.record_dependency_snapshot(source_keys=["reference-brief"])
+    registry = single_reference_source_registry_for_test()
+    snapshot_at_cache = registry.record_dependency_snapshot(
+        source_keys=[DEFAULT_REFERENCE_SOURCE_KEY]
+    )
 
     fresh_decision = evaluate_cached_response_reuse(
         policy_request=policy_evaluate_request_for_test(
@@ -119,7 +127,7 @@ def test_stale_source_freshness_blocks_cached_response_replay() -> None:
         cache_entry=cache_entry(),
         now=NOW,
     )
-    registry.increment_change_seq("reference-brief")
+    registry.increment_change_seq(DEFAULT_REFERENCE_SOURCE_KEY)
     stale_snapshot = registry.evaluate_snapshot(dependencies=snapshot_at_cache.dependencies)
 
     stale_decision = evaluate_cached_response_reuse(
@@ -147,9 +155,9 @@ def test_source_registry_missing_row_message_contract_is_shared() -> None:
 
 
 def test_source_registry_contract_defaults_are_shared() -> None:
-    registry = SourceFreshnessRegistry()
-    entry = registry.upsert_source(source_key="style-guide", source_type="workspace_memory")
-    snapshot = registry.record_dependency_snapshot(source_keys=["style-guide"])
+    registry = source_freshness_registry_for_test()
+    entry = upsert_style_source_for_test(registry)
+    snapshot = registry.record_dependency_snapshot(source_keys=[DEFAULT_STYLE_SOURCE_KEY])
     empty_snapshot = registry.evaluate_snapshot(dependencies=())
     source = read_backend_source("source_freshness.py")
 
@@ -225,3 +233,22 @@ def test_source_freshness_uses_public_source_id_lookup_boundary() -> None:
 
     assert "def _require_source_by_id(" not in contents
     assert "self.get_source_by_id(dependency.source_id)" in contents
+
+
+def test_source_registry_tests_use_shared_registry_helper() -> None:
+    for test_module in (
+        "test_source_freshness.py",
+        "test_source_ingestion.py",
+    ):
+        source = read_test_source(test_module)
+        tree = ast.parse(source)
+        direct_constructor_calls = [
+            node
+            for node in ast.walk(tree)
+            if isinstance(node, ast.Call)
+            and isinstance(node.func, ast.Name)
+            and node.func.id == "SourceFreshnessRegistry"
+        ]
+
+        assert "source_freshness_registry_for_test(" in source
+        assert direct_constructor_calls == []

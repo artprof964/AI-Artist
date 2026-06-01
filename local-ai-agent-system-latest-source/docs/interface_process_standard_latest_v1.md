@@ -90,6 +90,7 @@ can be marked done.
 67. Cache and source-freshness tests use `tests/policy_response_helpers.py` for standard approved `PolicyEvaluateResponse` setup.
 68. Request metadata, Safety Service unit, and observability tests use `tests/request_metadata_helpers.py` for standard `RequestMetadata` setup.
 69. Execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests use `tests/human_approval_helpers.py` for standard `HumanApproval` setup.
+70. Source freshness and source ingestion tests use `tests/source_registry_helpers.py` for standard `SourceFreshnessRegistry` setup.
 ```
 
 ## Standard Request Envelope
@@ -157,6 +158,9 @@ Rules:
 - Audit, security-review, secret-redaction, side-effect audit, and future
   redaction tests use `tests/secret_test_helpers.py` instead of repeating
   token-shaped payloads or redaction assertion helpers locally.
+- Source freshness, source ingestion, and future source-registry tests use
+  `tests/source_registry_helpers.py` instead of constructing standard
+  `SourceFreshnessRegistry` fixtures directly.
 - OpenClaw hook, observability, and future tool-stage tests use
   `tests/tool_call_helpers.py` instead of constructing standard
   `ToolCallRequest` fixtures directly.

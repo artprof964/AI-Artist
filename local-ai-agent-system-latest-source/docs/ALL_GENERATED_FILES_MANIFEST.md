@@ -203,6 +203,7 @@
 - `../../validation_reports/policy_response_helper_standardization_2026-06-01.md`
 - `../../validation_reports/request_metadata_helper_standardization_2026-06-01.md`
 - `../../validation_reports/secret_test_helper_standardization_2026-06-01.md`
+- `../../validation_reports/source_registry_helper_standardization_2026-06-01.md`
 - `../../validation_reports/adapter_secret_lookup_standardization_2026-05-31.md`
 - `../../validation_reports/adapter_secret_registry_lookup_standardization_2026-06-01.md`
 - `../../validation_reports/connection_error_message_standardization_2026-05-31.md`
@@ -266,6 +267,7 @@
 - `../../tests/policy_response_helpers.py`
 - `../../tests/request_metadata_helpers.py`
 - `../../tests/secret_test_helpers.py`
+- `../../tests/source_registry_helpers.py`
 - `../../tests/tool_call_helpers.py`
 - `../../validation_reports/tool_call_helper_standardization_2026-06-01.md`
 - `../../validation_reports/t24_unit_ci_implementation_2026-05-31.md`
