@@ -87,6 +87,18 @@ def test_required_env_registry_is_shared_with_readiness() -> None:
     assert example_values["SAFETY_SERVICE_URL"] == DEFAULT_SAFETY_SERVICE_URL
 
 
+def test_deepseek_open_art_is_the_project_standard_llm_key() -> None:
+    connection_source = read_backend_source("connection_settings.py")
+    env_example = env_example_text()
+
+    assert STANDARD_LLM_API_KEY_ENV_VAR == "deepseek-open-art"
+    assert DEEPSEEK_OPEN_ART_ENV_VAR == "deepseek-open-art"
+    assert env_example.startswith("deepseek-open-art=\n")
+    assert "DEEPSEEK_API_KEY=" not in env_example
+    assert "STANDARD_LLM_API_KEY_ENV_VAR = DEEPSEEK_OPEN_ART_ENV_VAR" in connection_source
+    assert "aliases=(DEEPSEEK_API_KEY_ENV_VAR,)" in connection_source
+
+
 def test_env_validation_helpers_share_connection_registry() -> None:
     parsed_example = parse_env_text(env_example_text())
 

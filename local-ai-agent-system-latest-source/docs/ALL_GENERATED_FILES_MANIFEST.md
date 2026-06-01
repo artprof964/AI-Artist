@@ -217,6 +217,7 @@
 - `../../validation_reports/test_hashlib_standardization_2026-05-31.md`
 - `../../validation_reports/service_text_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/llm_api_key_standard_2026-05-31.md`
+- `../../validation_reports/llm_api_key_standard_2026-06-01.md`
 - `../../validation_reports/llm_runtime_secret_standardization_2026-05-31.md`
 - `../../validation_reports/llm_secret_redaction_boundary_standardization_2026-05-31.md`
 - `../../validation_reports/llm_smoke_request_standardization_2026-05-31.md`
