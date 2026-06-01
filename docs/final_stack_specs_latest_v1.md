@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 547 passed, 1 warning
+Final validation: 548 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -110,6 +110,7 @@ tests/connection_env_helpers.py: shared test env builders and secret constants f
 tests/execution_envelope_helpers.py: shared execution-envelope construction for gated-adapter and policy-path tests, including approved, unapproved, unchanged-source, and stale-source fixtures.
 tests/gated_adapter_helpers.py: shared adapter-specific request, envelope, adapter/client harness, and fake-client defaults for ComfyUI, GitHub, Publishing adapter tests, and Publishing Agent redaction tests, including stable request IDs, targets, operation defaults, payload defaults, request construction, approved/unapproved envelope construction, mocked client responses, ComfyUI and Publishing adapter setup, GitHub token/env adapter setup, and secret-echo client responses.
 tests/human_approval_helpers.py: shared HumanApproval construction for execution-envelope, execution-gate, policy-contract, adapter-result, and publishing-adapter tests, including approved/unapproved state, approver scope, and approval timestamp defaults.
+tests/knowledge_agent_helpers.py: shared Knowledge Agent harness, in-memory vector store, deterministic embedding model, source-document, approved sample source, and vector-point setup for Knowledge Agent tests.
 tests/llm_api_smoke_helpers.py: shared OpenAI-compatible recording LLM client, recording chat completions, response id, and response content for provider-neutral LLM API smoke tests.
 tests/openclaw_hook_helpers.py: shared OpenClaw safety-hook recording Safety Service client, recording adapter, mock orchestration adapter, and event labels for OpenClaw-to-safety and observability integration tests.
 tests/policy_request_helpers.py: shared policy-evaluate request construction for cache, freshness, observability, and Safety Service policy-path tests.
@@ -237,6 +238,11 @@ tests/cache_entry_helpers.py directly before adding local policy-request or
 cache-entry wrappers.
 SubAgentOutput schema-boundary tests that need raw valid payload dictionaries
 must use tests/subagent_output_helpers.py before defining local payload builders.
+Knowledge Agent tests that need agents, in-memory vector stores, embedding
+models, source documents, approved sample sources, or vector points must use
+tests/knowledge_agent_helpers.py before constructing KnowledgeAgent,
+InMemoryQdrantVectorStore, KnowledgeSourceDocument, or VectorPoint fixtures
+directly.
 OpenClaw hook and observability tests that need standard tool-call requests
 must use tests/tool_call_helpers.py before constructing ToolCallRequest
 directly.

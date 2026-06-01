@@ -106,6 +106,7 @@
 - `../../validation_reports/knowledge_vector_search_contract_standardization_2026-05-31.md`
 - `../../validation_reports/knowledge_vector_payload_contract_standardization_2026-06-01.md`
 - `../../validation_reports/knowledge_payload_reader_contract_standardization_2026-06-01.md`
+- `../../validation_reports/knowledge_agent_helper_standardization_2026-06-01.md`
 - `../../validation_reports/contextual_snippet_boundary_standardization_2026-05-31.md`
 - `../../backend/knowledge_contracts.py`
 - `../../validation_reports/text_utils_standardization_2026-05-31.md`
@@ -118,6 +119,7 @@
 - `../../tests/test_text_utils.py`
 - `../../tests/test_numeric_utils.py`
 - `../../tests/test_knowledge_agent.py`
+- `../../tests/knowledge_agent_helpers.py`
 - `../../validation_reports/t17_comfyui_adapter_validation_2026-05-31.md`
 - `../../validation_reports/execution_gate_message_standardization_2026-05-31.md`
 - `../../validation_reports/required_envelope_message_standardization_2026-05-31.md`

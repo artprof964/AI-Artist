@@ -1,3 +1,4 @@
+import ast
 from uuid import UUID
 
 import pytest
@@ -33,60 +34,26 @@ from backend.knowledge_contracts import (
 )
 from backend.knowledge import (
     DeterministicEmbeddingModel,
-    InMemoryQdrantVectorStore,
-    KnowledgeAgent,
-    KnowledgeSourceDocument,
-    VectorPoint,
 )
 from backend.schemas import SubAgentOutput
 from backend.subagent_status import SUBAGENT_STATUS_OK
-from path_helpers import read_backend_source
+from knowledge_agent_helpers import (
+    approved_knowledge_sources_for_test,
+    knowledge_agent_harness_for_test,
+    knowledge_source_document_for_test,
+    vector_point_for_test,
+)
+from path_helpers import read_backend_source, read_test_source
 
 
 TASK_ID = UUID("16161616-1616-1616-1616-161616161616")
 
 
-def approved_sample_sources() -> list[KnowledgeSourceDocument]:
-    return [
-        KnowledgeSourceDocument(
-            source_id="sample-style-principles",
-            title="Approved Sample Style Principles",
-            uri="workspace://ai-artist-main/memory/style_principles.md",
-            content=(
-                "AI-Artist style principles require source-cited local context, "
-                "human-readable provenance, and cautious use of generated imagery."
-            ),
-            metadata={"sample_data": True, "approved_scope": "local_fixture"},
-        ),
-        KnowledgeSourceDocument(
-            source_id="sample-safety-rules",
-            title="Approved Sample Safety Rules",
-            uri="workspace://ai-artist-main/memory/safety_rules.md",
-            content=(
-                "Safety rules require default-deny write actions, human approval for "
-                "publishing, and execution envelopes before external side effects."
-            ),
-            metadata={"sample_data": True, "approved_scope": "local_fixture"},
-        ),
-        KnowledgeSourceDocument(
-            source_id="unapproved-external-note",
-            title="Unapproved External Note",
-            uri="https://example.invalid/not-approved",
-            content="This unapproved note must not be embedded or returned.",
-            approved=False,
-        ),
-    ]
-
-
 def test_knowledge_agent_ingests_embeds_searches_and_returns_source_citations() -> None:
-    vector_store = InMemoryQdrantVectorStore()
-    agent = KnowledgeAgent(
-        vector_store=vector_store,
-        embedding_model=DeterministicEmbeddingModel(dimensions=48),
-    )
+    harness = knowledge_agent_harness_for_test(dimensions=48)
 
-    embedded_documents = agent.ingest(approved_sample_sources())
-    response = agent.retrieve(
+    embedded_documents = harness.agent.ingest(approved_knowledge_sources_for_test())
+    response = harness.agent.retrieve(
         "Which local rules mention default-deny write actions?",
         task_id=TASK_ID,
         limit=2,
@@ -118,10 +85,10 @@ def test_knowledge_agent_ingests_embeds_searches_and_returns_source_citations() 
 
 
 def test_in_memory_qdrant_upsert_replaces_points_deterministically() -> None:
-    agent = KnowledgeAgent(embedding_model=DeterministicEmbeddingModel(dimensions=32))
-    agent.ingest(
+    harness = knowledge_agent_harness_for_test(dimensions=32)
+    harness.agent.ingest(
         [
-            KnowledgeSourceDocument(
+            knowledge_source_document_for_test(
                 source_id="sample-safety-rules",
                 title="Old Safety Rules",
                 uri="workspace://old",
@@ -129,9 +96,9 @@ def test_in_memory_qdrant_upsert_replaces_points_deterministically() -> None:
             )
         ]
     )
-    agent.ingest(
+    harness.agent.ingest(
         [
-            KnowledgeSourceDocument(
+            knowledge_source_document_for_test(
                 source_id="sample-safety-rules",
                 title="Approved Sample Safety Rules",
                 uri="workspace://ai-artist-main/memory/safety_rules.md",
@@ -140,7 +107,7 @@ def test_in_memory_qdrant_upsert_replaces_points_deterministically() -> None:
         ]
     )
 
-    output = agent.answer("default-deny write actions", task_id=TASK_ID, limit=3)
+    output = harness.agent.answer("default-deny write actions", task_id=TASK_ID, limit=3)
 
     assert len(output.sources) == 1
     assert output.sources[0].title == "Approved Sample Safety Rules"
@@ -153,45 +120,31 @@ def test_deterministic_embedding_model_rejects_non_positive_dimensions() -> None
 
 
 def test_knowledge_agent_does_not_return_disapproved_vector_hits() -> None:
-    vector_store = InMemoryQdrantVectorStore()
-    embedding_model = DeterministicEmbeddingModel(dimensions=32)
-    agent = KnowledgeAgent(vector_store=vector_store, embedding_model=embedding_model)
+    harness = knowledge_agent_harness_for_test(dimensions=32)
 
-    vector_store.upsert(
-        agent.collection_name,
+    harness.vector_store.upsert(
+        harness.agent.collection_name,
         [
-            VectorPoint(
+            vector_point_for_test(
                 point_id="approved-local-note",
-                vector=embedding_model.embed("default-deny write actions approved local source"),
-                payload={
-                    KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD: "approved-local-note",
-                    KNOWLEDGE_TITLE_PAYLOAD_FIELD: "Approved Local Note",
-                    KNOWLEDGE_URI_PAYLOAD_FIELD: "workspace://approved",
-                    KNOWLEDGE_CONTENT_PAYLOAD_FIELD: (
-                        "Approved local source for default-deny write actions."
-                    ),
-                    KNOWLEDGE_APPROVED_PAYLOAD_FIELD: True,
-                    KNOWLEDGE_METADATA_PAYLOAD_FIELD: {"sample_data": True},
-                },
+                embedding_model=harness.embedding_model,
+                content="Approved local source for default-deny write actions.",
+                title="Approved Local Note",
+                uri="workspace://approved",
+                approved=True,
             ),
-            VectorPoint(
+            vector_point_for_test(
                 point_id="unapproved-local-note",
-                vector=embedding_model.embed("default-deny write actions unapproved source"),
-                payload={
-                    KNOWLEDGE_SOURCE_ID_PAYLOAD_FIELD: "unapproved-local-note",
-                    KNOWLEDGE_TITLE_PAYLOAD_FIELD: "Unapproved Local Note",
-                    KNOWLEDGE_URI_PAYLOAD_FIELD: "workspace://unapproved",
-                    KNOWLEDGE_CONTENT_PAYLOAD_FIELD: (
-                        "Unapproved source for default-deny write actions."
-                    ),
-                    KNOWLEDGE_APPROVED_PAYLOAD_FIELD: False,
-                    KNOWLEDGE_METADATA_PAYLOAD_FIELD: {"sample_data": True},
-                },
+                embedding_model=harness.embedding_model,
+                content="Unapproved source for default-deny write actions.",
+                title="Unapproved Local Note",
+                uri="workspace://unapproved",
+                approved=False,
             ),
         ],
     )
 
-    response = agent.retrieve("default-deny write actions", task_id=TASK_ID, limit=5)
+    response = harness.agent.retrieve("default-deny write actions", task_id=TASK_ID, limit=5)
 
     assert {result.source_id for result in response.results} == {"approved-local-note"}
 
@@ -317,3 +270,32 @@ def test_knowledge_agent_uses_shared_contextual_snippet_helper() -> None:
 
     assert "def _make_snippet(" not in source
     assert "contextual_snippet(" in source
+
+
+def test_knowledge_agent_tests_use_shared_harness_and_document_helpers() -> None:
+    source = read_test_source("test_knowledge_agent.py")
+    tree = ast.parse(source)
+    function_names = {
+        node.name for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)
+    }
+    imported_names = {
+        (node.module, alias.name)
+        for node in ast.walk(tree)
+        if isinstance(node, ast.ImportFrom)
+        for alias in node.names
+    }
+    called_names = {
+        node.func.id
+        for node in ast.walk(tree)
+        if isinstance(node, ast.Call) and isinstance(node.func, ast.Name)
+    }
+
+    assert "knowledge_agent_harness_for_test" in called_names
+    assert "approved_knowledge_sources_for_test" in called_names
+    assert "knowledge_source_document_for_test" in called_names
+    assert "vector_point_for_test" in called_names
+    assert "approved_sample_sources" not in function_names
+    assert ("backend.knowledge", "InMemoryQdrantVectorStore") not in imported_names
+    assert ("backend.knowledge", "KnowledgeAgent") not in imported_names
+    assert ("backend.knowledge", "KnowledgeSourceDocument") not in imported_names
+    assert ("backend.knowledge", "VectorPoint") not in imported_names
