@@ -3,6 +3,7 @@ from uuid import UUID
 
 from backend.schemas import ExecutionEnvelopeRequest, HumanApproval, SourceFreshness
 from backend.service import create_execution_envelope
+from backend.source_freshness_contracts import unchanged_source_freshness_payload
 
 DEFAULT_TEST_REQUEST_KIND = "action"
 DEFAULT_TEST_REQUESTER_SCOPE = "user:local"
@@ -56,7 +57,4 @@ def unapproved_execution_envelope(
 
 
 def unchanged_source_freshness() -> SourceFreshness:
-    return SourceFreshness(
-        all_required_sources_unchanged=True,
-        changed_source_count=0,
-    )
+    return SourceFreshness(**unchanged_source_freshness_payload())

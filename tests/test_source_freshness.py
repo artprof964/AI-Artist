@@ -7,6 +7,7 @@ from backend.source_freshness_contracts import (
     DEFAULT_SOURCE_FRESHNESS_ALL_REQUIRED_SOURCES_UNCHANGED,
     DEFAULT_SOURCE_FRESHNESS_CHANGED_SOURCE_COUNT,
     source_freshness_is_unchanged,
+    unchanged_source_freshness_payload,
 )
 from backend.source_freshness import SourceFreshnessRegistry
 from backend.source_registry_contracts import (
@@ -16,7 +17,7 @@ from backend.source_registry_contracts import (
     SOURCE_REGISTRY_ROW_NOT_FOUND,
     source_registry_row_not_found,
 )
-from path_helpers import read_backend_source
+from path_helpers import read_backend_source, read_test_source
 
 
 NOW = datetime(2026, 5, 31, 9, 0, tzinfo=timezone.utc)
@@ -221,6 +222,21 @@ def test_source_freshness_unchanged_predicate_is_shared() -> None:
     assert "source_freshness_is_unchanged(" in cache_source
     assert "changed_source_count == 0" not in freshness_source
     assert "changed_source_count != 0" not in cache_source
+
+
+def test_unchanged_source_freshness_payload_is_shared() -> None:
+    payload = unchanged_source_freshness_payload()
+    helper_source = read_test_source("execution_envelope_helpers.py")
+    security_review_source = read_backend_source("security_review.py")
+
+    assert payload == {
+        "all_required_sources_unchanged": True,
+        "changed_source_count": 0,
+    }
+    assert SourceFreshness(**payload).all_required_sources_unchanged is True
+    assert SourceFreshness(**payload).changed_source_count == 0
+    assert "unchanged_source_freshness_payload()" in helper_source
+    assert "unchanged_source_freshness_payload()" in security_review_source
 
 
 def test_source_freshness_uses_shared_missing_row_message_contract() -> None:

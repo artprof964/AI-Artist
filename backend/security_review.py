@@ -44,6 +44,7 @@ from backend.security_review_contracts import (
     policy_operation_denied_message,
     security_review_target,
 )
+from backend.source_freshness_contracts import unchanged_source_freshness_payload
 
 
 @dataclass(frozen=True)
@@ -129,10 +130,7 @@ def review_policy_bypass_controls(repo_root: Path) -> list[SecurityReviewFinding
                 requester_scope="user:local",
                 policy_scope="workspace:ai-artist-main",
                 requires_human_approval=True,
-                source_freshness=SourceFreshness(
-                    all_required_sources_unchanged=True,
-                    changed_source_count=0,
-                ),
+                source_freshness=SourceFreshness(**unchanged_source_freshness_payload()),
             )
         )
         if policy_response.allow or not policy_response.requires_human_approval:
@@ -152,10 +150,7 @@ def review_policy_bypass_controls(repo_root: Path) -> list[SecurityReviewFinding
                 policy_scope="workspace:ai-artist-main",
                 target=security_review_target(operation),
                 human_approval=HumanApproval(approved=False),
-                source_freshness=SourceFreshness(
-                    all_required_sources_unchanged=True,
-                    changed_source_count=0,
-                ),
+                source_freshness=SourceFreshness(**unchanged_source_freshness_payload()),
             )
         )
         if envelope.allow or envelope.valid or not envelope.requires_human_approval:

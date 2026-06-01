@@ -32,7 +32,7 @@ can be marked done.
 18. Mapping copies and metadata/payload merges use `backend/mapping_utils.py`.
 19. Cache, source-freshness, policy, and execution-envelope reason strings use `backend/reason_messages.py`.
 19a. Local default-deny policy versioning, execution-envelope signing key, runtime-field-backed signature payload/signing/verification helpers, and execution-envelope TTL use `backend/policy_contracts.py` and `backend/runtime_field_contracts.py`.
-19b. Source freshness schema defaults and unchanged-source checks use `backend/source_freshness_contracts.py`.
+19b. Source freshness schema defaults, unchanged-source checks, and unchanged-source payload construction use `backend/source_freshness_contracts.py`.
 20. Sub-agent status vocabulary, priority, and aggregation use `backend/subagent_status.py`.
 21. Sub-agent output construction, payload field names, and model coercion use `backend/subagent_output_contracts.py`, with task-id/status field names reused from `backend/runtime_field_contracts.py`.
 22. Mock sub-agent names, artifact types, output text, error text, simulation metadata lookup, synthesis text, orchestration telemetry events/messages/metrics, and telemetry field/tag shapes use `backend/mock_agent_contracts.py`, with generic task/requester/policy/status fields reused from `backend/runtime_field_contracts.py`.
@@ -282,7 +282,7 @@ Output:
 
 5. Reuse Decision
    - Read-only repeat requests check approved cache and source freshness.
-   - Fresh source snapshot defaults and unchanged-source checks come from the shared source-freshness contract.
+   - Fresh source snapshot defaults, unchanged-source checks, and unchanged-source payload construction come from the shared source-freshness contract.
    - Cache, source-freshness, policy, and execution-envelope decision text uses the shared reason-message helper.
    - Cache replay and OpenClaw pre-tool approval request-kind checks use shared interface and operation constants.
    - Cache reuse telemetry event, message, metric tags, and structured fields use the shared response-cache contract helper, with operation/request-kind/reason field names reused from the runtime field contract.

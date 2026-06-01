@@ -5,7 +5,7 @@
 ```text
 Date: 2026-06-01
 Implementation status: all 28 tracker tasks complete
-Final validation: 523 passed, 1 warning
+Final validation: 524 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
 ```
@@ -88,7 +88,7 @@ backend/side_effect_audit.py: shared side-effect audit payload and event recordi
 backend/secret_redaction.py: shared secret-key detection, token-shape detection, assignment-pattern detection, structured unredacted-secret checks, and redaction utilities.
 backend/comfyui_contracts.py: shared ComfyUI generated-image URI convention, response image field names, response image validation messages, and response-image storage reference helper.
 backend/source_registry_contracts.py: shared source registry missing-row message, dependency-role, empty change-sequence, and initial change-sequence contracts.
-backend/source_freshness_contracts.py: shared source-freshness schema defaults and unchanged-source predicate for fresh source snapshots and cache replay.
+backend/source_freshness_contracts.py: shared source-freshness schema defaults, unchanged-source predicate, and unchanged-source-freshness payload helper for fresh source snapshots, cache replay, security review probes, and gated-adapter test envelopes.
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, registry metadata key contracts, and registry metadata payload shape.
 backend/slack_contracts.py: shared Slack source label, event field names, scope, runtime requester/policy/request-id fields for local-request payloads, outbound payload, runtime client-response field for post-result payloads, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
@@ -277,9 +277,10 @@ persistence adapters raise missing-row errors.
 Source dependency roles plus empty and initial source change sequence defaults must flow
 through backend/source_registry_contracts.py before freshness snapshots or
 registry writes change source semantics.
-SourceFreshness schema defaults and unchanged-source checks must flow through
-backend/source_freshness_contracts.py before default freshness or cache replay
-semantics change.
+SourceFreshness schema defaults, unchanged-source checks, and unchanged-source
+payload construction must flow through backend/source_freshness_contracts.py
+before default freshness, cache replay semantics, security review probes, or
+gated-adapter test envelope freshness setup change.
 Existing source registry row checks must call SourceFreshnessRegistry.find_source
 or SourceFreshnessRegistry.find_source_by_id before ingestion, stale-source
 checks, or future persistence code handles optional source rows.

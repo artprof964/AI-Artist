@@ -55,7 +55,7 @@ Mapping copies and metadata/payload merges: centralized in backend/mapping_utils
 Cache, source-freshness, policy, and execution-envelope reason strings: centralized in backend/reason_messages.py
 Local default-deny policy version, execution-envelope signing key, runtime-field-backed signature payload/signing/verification helpers, and execution-envelope TTL: centralized in backend/policy_contracts.py and backend/runtime_field_contracts.py
 Source registry missing-row messages, dependency roles, empty change-sequence defaults, and initial change-sequence defaults: centralized in backend/source_registry_contracts.py
-Source freshness schema defaults and unchanged-source checks: centralized in backend/source_freshness_contracts.py
+Source freshness schema defaults, unchanged-source checks, and unchanged-source payload construction: centralized in backend/source_freshness_contracts.py
 Source ingestion contracts and registry metadata payloads: centralized in backend/source_ingestion_contracts.py
 Source registry optional lookup: centralized in SourceFreshnessRegistry.find_source and find_source_by_id
 Sub-agent statuses, aggregation, and status validation messages: centralized in backend/subagent_status.py
@@ -169,7 +169,7 @@ Mapping utilities: shared across source ingestion, source freshness, Knowledge A
 Reason messages: shared across cache reuse decisions, Safety Service source-freshness denial paths, policy decisions, and execution-envelope decisions
 Policy contracts: shared across Safety Service policy responses, execution-envelope policy version stamps, runtime-field-backed execution-envelope signing payloads, signature verification, and envelope expiry TTL
 Source registry contracts: shared across source-key/source-id freshness lookup failures, dependency roles, empty source snapshots, and initial change sequence defaults
-Source freshness contracts: shared across schema defaults, unchanged-source checks, source dependency snapshots, policy requests, cache replay, and execution envelopes
+Source freshness contracts: shared across schema defaults, unchanged-source checks, unchanged-source payload construction, source dependency snapshots, policy requests, cache replay, security review probes, and execution envelopes
 Source registry lookup: shared by source freshness key/id checks and source ingestion existing-row checks
 Sub-agent statuses: shared across SubAgentOutput schemas, mock orchestration status synthesis, and empty-status validation
 Sub-agent output construction: shared across Knowledge retrieval and mock orchestration output conversion, with task-id/status field spellings reused from runtime_field_contracts.py and sub-agent-specific payload fields exported locally
@@ -244,19 +244,20 @@ adapter secret registry lookup validation: 66 focused tests passed; standard Sla
 GitHub explicit-token connection validation: 51 focused tests passed; GitHub adapter explicit and env token resolution use the shared adapter secret helper and redact token echoes from mocked client responses
 LLM request/result contract validation: 25 focused tests passed; chat request fields/roles, smoke request construction, request-log payload, smoke result payload, provider response field names, and first-choice response parsing centralized
 source registry lookup validation: 1 focused file passed; key/id optional lookup, dependency-role defaults, empty/initial change-sequence defaults, and source-id stale checks use public registry boundaries
+source freshness payload helper validation: 78 focused tests passed; unchanged source-freshness payload construction is shared by gated-adapter test envelopes and security review policy/envelope probes
 connection env validation helper validation: 32 focused tests passed; readiness env example missing-key and placeholder-secret checks use shared connection settings helpers
-publishing runtime field validation: 24 focused tests passed; latest full pytest 523 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
-test execution-envelope helper validation: 54 focused tests passed; full pytest 523 passed, 1 warning; ComfyUI, Publishing, and GitHub adapter tests share approved/unapproved execution-envelope construction and guard against direct low-level envelope construction imports
+publishing runtime field validation: 24 focused tests passed; latest full pytest 524 passed, 1 warning; local publishing response status/target fields share runtime_field_contracts.py through publishing_contracts.py
+test execution-envelope helper validation: 54 focused tests passed; full pytest 524 passed, 1 warning; ComfyUI, Publishing, and GitHub adapter tests share approved/unapproved execution-envelope construction and guard against direct low-level envelope construction imports
 test path helper validation: adapter/connector, domain, core, remaining simple, GitHub adapter, connection settings, and filesystem/process fixture contract checks plus existing guard tests passed; migrated checked-in backend/source inspections and repo-root fixture tests share test path/source helpers
 request metadata contract validation: 28 focused tests passed; schema defaults, request envelope field names, request fingerprint fields, and observability fields centralized
-request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 523 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
-execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 523 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
-client-response runtime field validation: 68 focused tests passed; full pytest 523 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
-adapter result field validation: 48 focused tests passed; latest full pytest 523 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
+request-id runtime field validation: 31 focused tests passed, 1 warning; latest full pytest 524 passed, 1 warning; adapter result request/operation/target fields, audit response request/correlation-id fields, and Slack local request IDs share runtime_field_contracts.py
+execution-envelope runtime field validation: 79 focused tests passed; latest full pytest 524 passed, 1 warning; execution-envelope signature payload fields, adapter result envelope/request/operation/target fields, and side-effect audit envelope fields share runtime_field_contracts.py
+client-response runtime field validation: 68 focused tests passed; full pytest 524 passed, 1 warning; adapter result, Slack post-result, and side-effect audit client-response fields share runtime_field_contracts.py
+adapter result field validation: 48 focused tests passed; latest full pytest 524 passed, 1 warning; gated adapter result envelope/client-response field names are shared with side-effect audit payload fields
 side-effect runtime field validation: 20 focused tests passed; side-effect audit operation/target/status/reason/policy-scope payload fields share runtime_field_contracts.py with service/OpenClaw policy telemetry fields
 correlation-id runtime field validation: 30 focused tests passed, 1 warning; OpenClaw metadata, observability trace fallback, and audit response payloads share runtime_field_contracts.py
 knowledge vector payload read validation: 11 focused tests passed; vector payload fields, payload construction, payload reading, and approved-hit checks centralized in knowledge_contracts.py
-final pytest: 523 passed, 1 warning
+final pytest: 524 passed, 1 warning
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```
