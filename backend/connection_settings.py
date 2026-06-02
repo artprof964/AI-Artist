@@ -10,6 +10,7 @@ DEEPSEEK_API_KEY_ENV_VAR = "DEEPSEEK_API_KEY"
 STANDARD_LLM_API_KEY_ENV_VAR = DEEPSEEK_OPEN_ART_ENV_VAR
 GITHUB_TOKEN_ENV_VAR = "git_ai-artist_codex_token"
 SLACK_BOT_TOKEN_ENV_VAR = "SLACK_BOT_TOKEN"
+AUDIT_REPOSITORY_ENV_VAR = "AUDIT_REPOSITORY"
 
 DEFAULT_LLM_API_URL = "https://api.deepseek.com"
 DEFAULT_LLM_PRIMARY_MODEL = "deepseek-v4-pro"
@@ -54,6 +55,7 @@ class ConnectionSettings:
     opa_url: str
     comfyui_url: str
     safety_service_url: str
+    audit_repository: str
     slack_bot_token: str
     github_token: str
 
@@ -124,6 +126,12 @@ CONNECTION_ENV_VARS: tuple[EnvVarSpec, ...] = (
         "safety_service_url",
         "Local FastAPI safety service endpoint",
         default=DEFAULT_SAFETY_SERVICE_URL,
+    ),
+    EnvVarSpec(
+        AUDIT_REPOSITORY_ENV_VAR,
+        "audit_repository",
+        "Audit event repository backend: memory or postgres",
+        default="memory",
     ),
     EnvVarSpec(SLACK_BOT_TOKEN_ENV_VAR, "slack_bot_token", "Slack adapter bot token", secret=True),
     EnvVarSpec(GITHUB_TOKEN_ENV_VAR, "github_token", "GitHub adapter token", secret=True),
@@ -280,6 +288,7 @@ __all__ = [
     "CONNECTION_SETTING_NAMES",
     "DEEPSEEK_API_KEY_ENV_VAR",
     "DEEPSEEK_OPEN_ART_ENV_VAR",
+    "AUDIT_REPOSITORY_ENV_VAR",
     "DEFAULT_COMFYUI_URL",
     "DEFAULT_DATABASE_URL",
     "DEFAULT_LLM_API_URL",

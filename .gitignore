@@ -6,3 +6,4 @@ __pycache__/
 .coverage
 *.pyc
 .codex_tmp/
+.env

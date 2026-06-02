@@ -62,6 +62,13 @@ def test_compose_defines_foundation_services() -> None:
     assert "./infra/postgres/init:/docker-entrypoint-initdb.d:ro" in compose
 
 
+def test_qdrant_compose_ports_are_locally_overridable() -> None:
+    compose = read_project_text(DOCKER_COMPOSE_PATH)
+
+    assert "${QDRANT_HTTP_PORT:-6333}:6333" in compose
+    assert "${QDRANT_GRPC_PORT:-6334}:6334" in compose
+
+
 def test_policy_and_database_scaffold_cover_required_contracts() -> None:
     policy = read_project_text(OPA_POLICY_PATH)
     schema = read_project_text(POSTGRES_QUERY_TRACKING_SCHEMA_PATH)

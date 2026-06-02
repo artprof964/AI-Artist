@@ -28,10 +28,29 @@ docker compose up -d postgres redis qdrant minio opa
 docker compose ps
 ```
 
+If another local stack already owns Qdrant host ports `6333` and `6334`, set
+the ignored local `.env` before startup:
+
+```env
+QDRANT_HTTP_PORT=6335
+QDRANT_GRPC_PORT=6336
+QDRANT_URL=http://localhost:6335
+```
+
+This changes only the published host ports. The Qdrant container still listens
+on its standard internal ports, so Compose health checks continue to use the
+container-local `6333`.
+
 Start the Safety Service:
 
 ```powershell
 .\.venv\Scripts\python.exe -m uvicorn backend.app:app --host 127.0.0.1 --port 8000
+```
+
+Or start it through the project CLI:
+
+```powershell
+.\.venv\Scripts\python.exe -m backend.cli serve --host 127.0.0.1 --port 8000
 ```
 
 Stop the local stack:
@@ -81,6 +100,15 @@ REDIS_URL
 OPA_URL
 COMFYUI_URL
 SAFETY_SERVICE_URL
+AUDIT_REPOSITORY
+```
+
+`AUDIT_REPOSITORY` defaults to `memory` for isolated local development and
+tests. Set it to `postgres` before Safety Service startup when audit events
+must be persisted in the production-backed `audit_event` table:
+
+```powershell
+$env:AUDIT_REPOSITORY="postgres"
 ```
 
 Local validation command:
@@ -101,6 +129,9 @@ curl.exe -fsS http://localhost:6333/healthz
 curl.exe -fsS http://localhost:9000/minio/health/live
 curl.exe -fsS http://localhost:8181/health
 ```
+
+When a local Qdrant port override is active, run the Qdrant health check
+against the configured `QDRANT_URL` host port instead of `localhost:6333`.
 
 Expected local stack signals:
 
@@ -150,10 +181,12 @@ mc mirror --overwrite local-ai-artist/ .codex_tmp/backups/minio/
 Qdrant backup:
 
 ```powershell
-curl.exe -fsS -X POST http://localhost:6333/collections/{collection}/snapshots
+curl.exe -fsS -X POST $env:QDRANT_URL/collections/{collection}/snapshots
 ```
 
 Record each generated snapshot name under `.codex_tmp/backups/qdrant/`.
+When no Qdrant override is active, set `$env:QDRANT_URL="http://localhost:6333"`
+or use `http://localhost:6333` directly.
 
 ## Restore Check Commands
 
@@ -175,7 +208,7 @@ mc ls --recursive .codex_tmp/backups/minio/
 Qdrant restore check:
 
 ```powershell
-curl.exe -fsS http://localhost:6333/collections/{collection}/snapshots
+curl.exe -fsS $env:QDRANT_URL/collections/{collection}/snapshots
 ```
 
 The restore check passes when the PostgreSQL dump lists contents, MinIO backup
@@ -205,3 +238,35 @@ T28 readiness is validated with:
 .\.venv\Scripts\python.exe -m pytest tests/test_production_readiness.py -q -p no:cacheprovider
 .\.venv\Scripts\python.exe -m ruff check backend/readiness.py tests/test_production_readiness.py
 ```
+
+2026-06-02 local Qdrant override and app-state regression evidence:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests\test_tree_shape.py tests\test_composition.py tests\test_audit_event_log.py -q -p no:cacheprovider
+docker compose config qdrant
+docker compose ps --all
+curl.exe -fsS http://localhost:6335/healthz
+```
+
+Result: Qdrant compose host-port overrides are covered by tests, rendered
+configuration publishes 6335 and 6336 to container ports 6333 and 6334,
+`ai-artist-qdrant-1` reports healthy, and the local override health endpoint
+returns `healthz check passed`.
+
+2026-06-02 production CLI wrap-up evidence:
+
+```powershell
+.\.venv\Scripts\python.exe -m pytest tests\test_cli.py -q -p no:cacheprovider
+.\.venv\Scripts\ruff.exe check backend\cli.py tests\test_cli.py pyproject.toml
+.\.venv\Scripts\python.exe -m backend.cli health
+.\.venv\Scripts\python.exe -m backend.cli classify "Generate an image from this prompt"
+.\.venv\Scripts\python.exe -m backend.cli policy --request-kind read --operation read --no-requires-human-approval
+.\.venv\Scripts\python.exe -m backend.cli envelope "Publish this update" --operation publish --target slack://workspace/channel
+.\.venv\Scripts\python.exe -m backend.cli envelope "Publish this update" --operation publish --target slack://workspace/channel --approved --approver-scope user:owner
+.\.venv\Scripts\python.exe -m backend.cli serve --host 127.0.0.1 --port 8766
+curl.exe -fsS http://127.0.0.1:8766/health
+```
+
+Result: focused CLI tests passed, ruff passed, direct CLI examples returned the
+expected JSON decisions, and a CLI-launched live service returned healthy on
+port 8766. Exact examples are in `docs/cli_manual_latest_v1.md`.

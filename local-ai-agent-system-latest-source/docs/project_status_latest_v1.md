@@ -3,13 +3,13 @@
 ## Status Date
 
 ```text
-2026-06-01
+2026-06-02
 ```
 
 ## Current State
 
 ```text
-Overall status: All 28 implementation tasks are complete and locally validated. Current work is post-completion standardization of shared contracts, connection boundaries, helper setup, and validation evidence.
+Overall status: All 28 implementation tasks are complete and locally validated. Current review confirms 0 open implementation tasks; remaining work is next-phase optimization proposal scope tracked separately as NP01-NP08. NP01-NP04 are integrated.
 Selected control plane: OpenClaw
 Selected LLM backend: provider-neutral LLM API
 Safety layer: FastAPI Safety Service + OPA + PostgreSQL
@@ -39,7 +39,7 @@ Slack adapter contracts, event fields, scopes, runtime-field-backed local reques
 GitHub adapter contracts, token-required message routing, and explicit/env token lookup: centralized in backend/github_contracts.py, backend/connection_settings.py, and backend/adapter_secrets.py
 Execution gate failure messages: centralized in backend/execution_gate_messages.py
 Secret detection, structured unredacted-secret checks, redaction, and redacted audit mappings: centralized in backend/secret_redaction.py and backend/audit.py
-Audit scope payload field names, runtime policy-scope/request/correlation-id fields, and audit response shape: centralized in backend/audit_contracts.py and backend/runtime_field_contracts.py
+Audit scope payload field names, runtime policy-scope/request/correlation-id fields, audit response shape, and production-selectable audit storage: centralized in backend/audit_contracts.py, backend/runtime_field_contracts.py, backend/audit.py, and backend/audit_storage.py
 ComfyUI generated-image URI, response field names, response validation contracts, and storage-reference resolution: centralized in backend/comfyui_contracts.py
 Gated adapter action and target labels: centralized in backend/adapter_gate_contracts.py
 Adapter result field vocabulary and mapping: centralized in backend/adapter_results.py with generic execution-envelope/request/operation/target fields reused from backend/runtime_field_contracts.py
@@ -152,7 +152,7 @@ Execution gate messages: shared across invalid envelope, operation mismatch, tar
 Secret detection, structured unredacted-secret checks, and redaction: shared directly across audit, observability, LLM smoke request logging, OpenClaw hook, GitHub, Slack, and security review
 OpenClaw contracts: shared across tool policy metadata redaction, tool metric tags, preflight telemetry fields, policy decision telemetry fields, and executed telemetry fields
 Redacted audit mappings: shared directly by observability fields and metric tags
-Audit scope and response contracts: shared by audit record scope extraction, accepted response payloads, audit response policy-scope/request/correlation-id field names, and side-effect audit payload scope field names
+Audit scope, response, and storage contracts: shared by audit record scope extraction, accepted response payloads, audit response policy-scope/request/correlation-id field names, production-selectable audit repository wiring, and side-effect audit payload scope field names
 Gated adapter action and target labels: shared across Publishing and ComfyUI execution-envelope message construction; GitHub labels remain in the GitHub contract boundary
 Adapter result field vocabulary and mapping: shared across GitHub, Publishing, ComfyUI gated adapters, and side-effect audit payload result fields, with generic execution-envelope/request/operation/target fields reused from runtime_field_contracts.py
 Side-effect audit: shared helper adopted by Publishing Agent and ready for future external adapters, with payload field names routed through side_effect_audit_contracts.py and tool-call audit event typing routed through interface contracts
@@ -280,8 +280,18 @@ knowledge vector payload read validation: 11 focused tests passed; vector payloa
 Knowledge Agent helper validation: 12 focused tests passed; Knowledge Agent tests share agent, vector store, embedding model, source document, approved sample source, and vector-point setup through tests/knowledge_agent_helpers.py and guard against direct test-local construction
 image provenance helper validation: 38 focused provenance/review/security tests passed; image provenance, Critic/Curator, and security-review tests share provenance store, payload, and record setup through tests/image_provenance_helpers.py and guard against direct LocalImageProvenanceStore/ImageProvenanceRecord imports
 project review summary: status-alignment review completed; stale backend-stack foundation-only boundary and tracker source-of-truth/dashboard implementation gate updated; optimization proposals sorted by effectiveness in validation_reports/project_review_summary_and_optimization_proposals_2026-06-01.md
-standardization process review: older T01-T28 implementation tasks mapped to current shared-contract/helper standards; next implementation phase should start with composition root and adapter connection/client factory in validation_reports/standardization_process_review_2026-06-01.md
-final pytest: 553 passed, 1 warning
+standardization process review: older T01-T28 implementation tasks mapped to current shared-contract/helper standards; reviewed next-phase plan is NP01-NP08, with NP01-NP04 now integrated in next-phase scope
+next-phase roadmap: NP01 composition root, NP02 adapter connection/client factory, NP03 injectable FastAPI app state, NP04 repository/storage protocols, NP05 clock/id providers, NP06 gated-adapter protocol, NP07 source-text test cleanup, NP08 registry-driven docs validation
+tracker next-phase sheet: AI_Artist_Agent_Projekttracker.xlsx includes Next Phase Plan with NP01-NP08 proposals and keeps Dashboard totals scoped to completed T01-T28 tasks
+NP01-NP04 implementation: composition root, adapter factory, create_app audit repository hook, injectable/resettable FastAPI app state, production-selectable Postgres audit repository, focused tests, and validation reports added; remaining direct global hook points documented for follow-up
+Qdrant port conflict review: ai-artist-qdrant-1 is healthy on local host ports 6335 and 6336 while another local Qdrant stack owns 6333 and 6334; docker-compose.yml keeps defaults and supports QDRANT_HTTP_PORT/QDRANT_GRPC_PORT overrides
+current open-task review: tracker dashboard shows 28 complete, 0 in progress, 0 open, 28 validations passed; Detailplan shows T01-T28 Erledigt; workbook formula-error scan found 0 matches
+production CLI wrap-up: `backend/cli.py` and the `ai-artist` console-script entry are present; `docs/cli_manual_latest_v1.md` records exact health, classify, policy, envelope, serve, and live HTTP examples; focused CLI tests passed 5/5; ruff passed for CLI files; CLI-launched service probe on port 8766 returned healthy and canonicalized sample text
+tracker production wrap-up sheet: `AI_Artist_Agent_Projekttracker.xlsx` includes `Production CLI Wrap-Up`; formula-error scan found 0 matches after the workbook update
+production startup review: `validation_reports/production_startup_validation_2026-06-02.md` records live ASGI startup evidence; NP04 adds `AUDIT_REPOSITORY=postgres` for production-backed audit persistence, with live Postgres proof pending Docker availability
+NP04 audit storage validation: `validation_reports/np04_audit_storage_slice_2026-06-02.md` records 48 focused tests passed, non-Docker pytest 565 passed/12 skipped/1 warning, ruff all checks passed, and a blocked full Docker-backed PostgreSQL migration check because Docker Desktop was not reachable
+final pytest before NP04: 572 passed, 1 warning in 25.42s
+latest non-Docker pytest after NP04: 565 passed, 12 skipped, 1 warning in 5.08s
 final ruff: all checks passed
 live LLM API smoke test: passed with deepseek-open-art
 ```

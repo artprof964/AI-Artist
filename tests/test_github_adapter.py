@@ -94,7 +94,11 @@ def test_github_adapter_supports_explicit_token_connection_injection(
 
 
 def test_github_token_env_var_is_owned_by_adapter_not_backend_agents() -> None:
-    allowed_owners = {"connection_settings.py", "github_adapter.py"}
+    allowed_owners = {
+        "adapter_factory.py",
+        "connection_settings.py",
+        "github_adapter.py",
+    }
     forbidden_refs: list[str] = []
 
     for module_filename in backend_module_filenames(PROJECT_ROOT):

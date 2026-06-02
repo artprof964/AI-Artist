@@ -5,8 +5,10 @@
 The original 28-task implementation plan is complete. The follow-up
 standardization/generalization process moved the project from "task is present"
 to "task boundary is reusable, validated, and documented." The current status is
-all 28 tasks passed, final pytest 553 passed with 1 warning, ruff clean, and the
+all 28 tasks passed, latest pytest 567 passed with 1 warning, ruff clean, and the
 live provider-neutral LLM API smoke test passed with `deepseek-open-art`.
+Current tracker review also confirms 0 open tasks, 0 in-progress tasks, 28
+completed tasks, and 28 passed validations.
 
 The standardization work is aligned: it consolidated repeated strings,
 constructor setup, request payloads, runtime field names, validation messages,
@@ -68,6 +70,9 @@ changing task-level behavior.
 
 ## Remaining Proposals Sorted By Effectiveness
 
+These are next-phase optimization proposals. They are not open implementation
+tasks in the T01-T28 tracker.
+
 1. Add a composition root / dependency container.
    This has the highest effect because it would move default repositories,
    clients, clocks, app state, and adapter wiring into one replaceable boundary.
@@ -94,10 +99,37 @@ changing task-level behavior.
    This would give ComfyUI, Publishing, GitHub, and future gated adapters one
    protocol while preserving domain-specific convenience methods.
 
+## Reviewed Implementation Sequence
+
+The reviewed plan keeps T01-T28 closed and introduces a separate next-phase
+roadmap:
+
+| Step | Work | Reason For Placement |
+|---|---|---|
+| NP01 | Composition root / dependency container | Establishes the boundary where repositories, clients, app state, clocks, and IDs can be swapped. |
+| NP02 | Adapter connection/client factory | Needs the composition boundary and removes the widest adapter wiring duplication. |
+| NP03 | FastAPI app factory and resettable state | Uses the same dependency context to prevent hidden cross-test coupling. |
+| NP04 | Repository/storage protocols | Moves source ingestion, retrieval, embeddings, and provenance away from concrete defaults after injection exists. |
+| NP05 | Clock/id providers | Completes deterministic runtime dependencies through the same context. |
+| NP06 | Gated adapter request/result protocol | Builds on the adapter factory and protocolized dependencies. |
+| NP07 | Brittle source-text test reduction | Should be done around touched areas once replacement behavior tests are present. |
+| NP08 | Registry-driven docs validation | Should follow the interface cleanup so generated/validated docs mirror stable registries. |
+
+Acceptance gates for the roadmap are focused tests plus `ruff check .` and the
+full pytest suite. NP01-NP03 now provide the foundation before broad repository
+or adapter protocol changes. The tracker workbook mirrors this roadmap on the
+`Next Phase Plan` sheet.
+
+Implementation start: NP01-NP03 foundation work now introduces the composition
+root, adapter factory, app-factory audit repository hook, injectable/resettable
+FastAPI app state, request-time audit composition lookup, and focused coverage.
+Remaining direct global hook points stay documented in `tests/test_composition.py`
+for later NP04-NP08 follow-up.
+
 ## Current Recommendation
 
-Start the next implementation phase with the composition root and adapter
-connection factory together. They reinforce each other, reduce the widest
-remaining duplication, and give the project a clean place to host repository
-protocols, app-state injection, clock/id providers, and future live adapter
-clients.
+NP01-NP03 are now integrated as next-phase optimization work, not as reopened
+T01-T28 implementation. The next recommended slice is NP04 repository/storage
+protocols, with NP05 clock/id provider expansion available once the repository
+boundaries are stable. Current validation is 567 passed with 1 warning and ruff
+clean.

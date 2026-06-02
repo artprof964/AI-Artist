@@ -2,7 +2,6 @@ from backend.api_contracts import (
     AUDIT_EVENTS_ROUTE,
     audit_events_by_correlation_path,
 )
-from backend.audit import audit_event_repository
 from backend.audit_contracts import (
     AUDIT_ACTOR_SCOPE_FIELD,
     AUDIT_CORRELATION_ID_FIELD,
@@ -17,12 +16,15 @@ from backend.runtime_field_contracts import (
     REQUEST_ID_FIELD,
 )
 from path_helpers import read_backend_source
-from safety_service_client_helpers import safety_service_client
+from safety_service_client_helpers import (
+    clear_safety_service_audit_events,
+    safety_service_client,
+)
 from secret_test_helpers import audit_secret_payload
 
 
 def test_audit_events_persist_all_required_types_by_correlation_id() -> None:
-    audit_event_repository.clear()
+    clear_safety_service_audit_events()
     correlation_id = "15151515-1515-1515-1515-000000000001"
     request_id = "15151515-1515-1515-1515-151515151515"
     event_types = [
@@ -66,7 +68,7 @@ def test_audit_events_persist_all_required_types_by_correlation_id() -> None:
 
 
 def test_audit_payload_secrets_are_redacted_in_persisted_records() -> None:
-    audit_event_repository.clear()
+    clear_safety_service_audit_events()
     correlation_id = "25252525-2525-2525-2525-000000000001"
 
     response = safety_service_client.post(

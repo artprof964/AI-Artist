@@ -3,11 +3,15 @@
 ## Status
 
 ```text
-Date: 2026-06-01
+Date: 2026-06-02
 Implementation status: all 28 tracker tasks complete
-Final validation: 553 passed, 1 warning
+Final validation: 572 passed, 1 warning
 Live LLM API smoke test: passed with deepseek-open-art
 Lint: ruff all checks passed
+Next-phase roadmap: NP01-NP08 reviewed; NP01-NP04 integrated as next-phase optimization work
+NP01-NP04 status: composition root, adapter factory, injectable/resettable FastAPI app state, audit-route app-state isolation, production-selectable Postgres audit repository, and focused tests present
+Qdrant local port review: host overrides verified on 6335/6336 while container ports remain 6333/6334
+Production CLI wrap-up: CLI manual, focused tests, tracker workbook sheet, and live CLI-launched service probe completed on 2026-06-02; latest full pytest is 572 passed, 1 warning
 ```
 
 ## Selected Stack
@@ -48,7 +52,9 @@ evaluation, execution-envelope signing, audit event recording.
 
 ```text
 backend/api_contracts.py: shared FastAPI app metadata and Safety Service route paths.
-backend/app.py: FastAPI endpoints using shared API contracts.
+backend/app.py: FastAPI endpoints using shared API contracts, app factory wiring, injectable/resettable app state, and request-time audit composition lookup.
+backend/composition.py: composition root, app-state dependency bundle, default repository/client/telemetry/provenance/source/cache dependencies, production-selectable audit repository wiring, clock, and ID providers.
+backend/adapter_factory.py: shared adapter/client factory for Slack, GitHub, ComfyUI, Publishing, and LLM smoke paths.
 backend/service.py: canonicalization, classification, local policy gate, execution envelope creation using shared signing and service-observability contracts.
 backend/policy_contracts.py: shared local default-deny policy version, execution-envelope signing key, signature prefix, runtime-field-backed signature payload, signing/verification helpers, and execution-envelope TTL contracts for policy responses and execution envelopes.
 backend/schemas.py: API and SubAgentOutput schemas.
@@ -92,7 +98,8 @@ backend/source_freshness_contracts.py: shared source-freshness schema defaults, 
 backend/source_ingestion_contracts.py: shared source ingestion approved-domain defaults, rejection message, registry metadata key contracts, and registry metadata payload shape.
 backend/slack_contracts.py: shared Slack source label, event field names, scope, runtime requester/policy/request-id fields for local-request payloads, outbound payload, runtime client-response field for post-result payloads, validation message contracts, and token-purpose text.
 backend/github_contracts.py: shared GitHub adapter action labels, validation messages, token-purpose text, and token-required message routing through connection settings.
-backend/audit.py: in-memory audit repository, recursive secret redaction, redacted mapping helper for telemetry/audit payloads, and audit response construction through shared audit contracts.
+backend/audit.py: audit repository protocol, in-memory audit repository, recursive secret redaction, redacted mapping helper for telemetry/audit payloads, and audit response construction through shared audit contracts.
+backend/audit_storage.py: production-selectable audit storage adapter with `AUDIT_REPOSITORY=memory|postgres`, Postgres `audit_event` table persistence, row hydration, and repository factory helpers.
 backend/execution_gate_messages.py: shared execution-envelope validation failure, signature, and required-envelope message contracts.
 backend/execution_gate.py: shared execution-envelope coercion, semantic validation, expiry validation, and signature verification for gated adapters.
 backend/response_cache_contracts.py: shared response-cache reuse telemetry event, message, metric-tag, and structured-field shapes with generic operation/request-kind/reason field names reused from runtime field contracts.
@@ -517,4 +524,14 @@ Project status: local-ai-agent-system-latest-source/docs/project_status_latest_v
 Validation reports: validation_reports/t04 through t28
 Latest project review and optimization proposals: validation_reports/project_review_summary_and_optimization_proposals_2026-06-01.md
 Standardization process review: validation_reports/standardization_process_review_2026-06-01.md
+Reviewed next-phase plan: NP01 composition root; NP02 adapter connection/client factory; NP03 injectable FastAPI app state; NP04 repository/storage protocols; NP05 clock/id providers; NP06 gated-adapter protocol; NP07 source-text test cleanup; NP08 registry-driven docs validation
+Tracker next-phase sheet: AI_Artist_Agent_Projekttracker.xlsx / Next Phase Plan
+NP01/NP02 progress report: validation_reports/np01_np02_foundation_slice_2026-06-01.md
+NP03 progress report: validation_reports/np03_app_state_slice_2026-06-02.md
+NP04 progress report: validation_reports/np04_audit_storage_slice_2026-06-02.md
+Qdrant service review: docker-compose.yml host ports are locally overridable through QDRANT_HTTP_PORT and QDRANT_GRPC_PORT; local ai-artist-qdrant-1 verified healthy on 6335/6336
+CLI manual: docs/cli_manual_latest_v1.md
+Production CLI wrap-up test log: validation_reports/production_wrap_up_test_log_2026-06-02.md
+Production startup validation: validation_reports/production_startup_validation_2026-06-02.md
+Tracker production CLI sheet: AI_Artist_Agent_Projekttracker.xlsx / Production CLI Wrap-Up
 ```

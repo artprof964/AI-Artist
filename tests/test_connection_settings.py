@@ -296,6 +296,7 @@ def test_env_example_text_renders_registry_values_with_section_breaks() -> None:
         "COMFYUI_URL=http://localhost:8188\n"
         "SAFETY_SERVICE_URL=http://localhost:8000\n"
         "\n"
+        "AUDIT_REPOSITORY=memory\n"
         "SLACK_BOT_TOKEN=\n"
         "git_ai-artist_codex_token=\n"
     )
