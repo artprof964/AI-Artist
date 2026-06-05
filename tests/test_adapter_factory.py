@@ -11,7 +11,13 @@ from backend.adapter_factory import (
     SlackWebAPIClient,
 )
 from backend.comfyui_adapter import ComfyUIAdapter
+from backend.critic_curator import (
+    CRITIC_DECISION_PASS,
+    CriticCuratorResult,
+    RubricScore,
+)
 from backend.github_adapter import GitHubAdapter
+from backend.media_release_gate import evaluate_media_release_gate
 from backend.llm_api_contracts import (
     LLM_REQUEST_MODEL_FIELD,
     LLM_SMOKE_RESULT_MODEL_FIELD,
@@ -19,6 +25,8 @@ from backend.llm_api_contracts import (
 from backend.llm_api_smoke import LLMAPIHTTPClient, LLMAPIModelConfig
 from backend.publishing import LocalPublishingClient, PublishingAgent
 from backend.publishing_adapter import PublishingAdapter
+from backend.review_status import REVIEW_STATUS_APPROVED
+from backend.security_review import SecurityReviewFinding
 from backend.slack_adapter import SlackAdapter
 from backend.time_utils import utc_now
 from connection_env_helpers import (
@@ -37,6 +45,8 @@ from gated_adapter_helpers import (
     github_write_request_for_test,
     publishing_request_for_test,
 )
+from human_approval_helpers import approved_human_approval_for_test
+from image_provenance_helpers import image_provenance_record_for_test
 from llm_api_smoke_helpers import RecordingLLMClient
 from slack_adapter_helpers import (
     MockSlackClient,
@@ -223,3 +233,84 @@ def test_publishing_default_client_is_centralized_and_usable() -> None:
     assert result.target == "mock-publisher://channels/artist-feed"
     assert result.client_response["status"] == "published"
     assert result.client_response["external_post_id"].startswith("local-publish-")
+
+
+def media_release_gate_inputs(
+    *,
+    security_findings: list[SecurityReviewFinding] | None = None,
+) -> dict[str, Any]:
+    image_id = "factory-release-gate-001"
+    return {
+        "provenance": image_provenance_record_for_test(
+            image_id=image_id,
+            review_status=REVIEW_STATUS_APPROVED,
+        ),
+        "critic_result": CriticCuratorResult(
+            image_id=image_id,
+            overall_score=5.0,
+            decision=CRITIC_DECISION_PASS,
+            category_scores=[
+                RubricScore(
+                    category="prompt adherence",
+                    score=5.0,
+                    passed=True,
+                    critique="passes",
+                    improvement_notes=[],
+                )
+            ],
+            improvement_notes=[],
+        ),
+        "security_findings": security_findings or [],
+        "human_approval": approved_human_approval_for_test(),
+    }
+
+
+def test_adapter_factory_exposes_media_release_gate_boundary() -> None:
+    factory = AdapterFactory(env=full_connection_env())
+    gate = factory.create_media_release_gate()
+    inputs = media_release_gate_inputs()
+
+    direct_result = evaluate_media_release_gate(**inputs)
+
+    assert gate is evaluate_media_release_gate
+    assert gate(**inputs) == direct_result
+    assert factory.evaluate_media_release_gate(**inputs) == direct_result
+
+
+def test_media_release_gate_factory_boundary_has_no_runtime_side_effects(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    factory = AdapterFactory(env=full_connection_env())
+    inputs = media_release_gate_inputs(
+        security_findings=[
+            SecurityReviewFinding(
+                surface="artifact",
+                message="unsafe artifact metadata",
+                location="artifact.json",
+            )
+        ]
+    )
+    forbidden_factory_methods = [
+        "create_slack_client",
+        "create_github_client",
+        "create_comfyui_client",
+        "create_publishing_client",
+        "create_publishing_adapter",
+        "create_publishing_agent",
+        "create_llm_api_client",
+    ]
+
+    def fail_on_side_effect_path(*args: Any, **kwargs: Any) -> None:
+        raise AssertionError("media release gate must not construct clients or publish")
+
+    for method_name in forbidden_factory_methods:
+        monkeypatch.setattr(AdapterFactory, method_name, fail_on_side_effect_path)
+    monkeypatch.setattr("backend.adapter_factory.httpx.post", fail_on_side_effect_path)
+    monkeypatch.setattr("backend.adapter_factory.httpx.request", fail_on_side_effect_path)
+
+    result = factory.create_media_release_gate()(**inputs)
+    delegated_result = factory.evaluate_media_release_gate(**inputs)
+
+    assert result == evaluate_media_release_gate(**inputs)
+    assert delegated_result == result
+    assert result.blocked is True

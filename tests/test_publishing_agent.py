@@ -16,6 +16,8 @@ from gated_adapter_helpers import (
     PUBLISHING_SECRET_TEST_EXTERNAL_POST_ID,
     PUBLISHING_TEST_PAYLOAD,
     approved_publishing_envelope_for_test,
+    bound_media_release_gate_result_for_test,
+    blocked_media_release_gate_result_for_test,
     local_publishing_agent_harness_for_test,
     publishing_agent_request_for_test,
     secret_echo_publishing_agent_harness_for_test,
@@ -64,6 +66,9 @@ def test_publishing_agent_blocks_external_publish_until_human_approval_is_attach
         publishing_agent_request_for_test(
             execution_envelope=approved_envelope,
             payload=payload,
+            media_release_gate_result=bound_media_release_gate_result_for_test(
+                payload=payload,
+            ),
         ),
         now=approved_envelope.issued_at,
     )
@@ -95,6 +100,9 @@ def test_publishing_agent_redacts_sensitive_client_response_in_audit_event() -> 
         publishing_agent_request_for_test(
             execution_envelope=envelope,
             payload=payload,
+            media_release_gate_result=bound_media_release_gate_result_for_test(
+                payload=payload,
+            ),
         ),
         now=envelope.issued_at,
     )
@@ -108,6 +116,111 @@ def test_publishing_agent_redacts_sensitive_client_response_in_audit_event() -> 
     assert "sk-publish-secret-value" not in repr(audit_payload)
 
 
+def test_publishing_agent_records_blocked_audit_event_for_media_release_gate_failure() -> None:
+    audit_event_repository.clear()
+    harness = local_publishing_agent_harness_for_test()
+    envelope = approved_publishing_envelope_for_test()
+    payload = dict(PUBLISHING_TEST_PAYLOAD)
+
+    with pytest.raises(PublishingExecutionGateError, match="media release gate result"):
+        harness.agent.publish(
+            publishing_agent_request_for_test(
+                execution_envelope=envelope,
+                payload=payload,
+                media_release_gate_result=bound_media_release_gate_result_for_test(
+                    gate_result=blocked_media_release_gate_result_for_test(),
+                    payload=payload,
+                ),
+            ),
+            now=envelope.issued_at,
+        )
+
+    assert harness.client.calls == []
+    audit_events = list_audit_events_by_correlation_id(CORRELATION_ID)
+    assert len(audit_events) == 1
+    assert audit_events[0].payload["status"] == PUBLISHING_STATUS_BLOCKED
+    assert audit_events[0].payload["operation"] == "publish"
+    assert "media release gate result" in audit_events[0].payload["reason"]
+    assert audit_events[0].payload["client_response"] == {}
+
+
+def test_publishing_agent_requires_media_release_gate_result_before_publish() -> None:
+    audit_event_repository.clear()
+    harness = local_publishing_agent_harness_for_test()
+    envelope = approved_publishing_envelope_for_test()
+
+    with pytest.raises(PublishingExecutionGateError, match="media release gate result is required"):
+        harness.agent.publish(
+            publishing_agent_request_for_test(
+                execution_envelope=envelope,
+                payload=dict(PUBLISHING_TEST_PAYLOAD),
+                media_release_gate_result=None,
+            ),
+            now=envelope.issued_at,
+        )
+
+    assert harness.client.calls == []
+    audit_events = list_audit_events_by_correlation_id(CORRELATION_ID)
+    assert [event.payload["status"] for event in audit_events] == [
+        PUBLISHING_STATUS_BLOCKED,
+    ]
+
+
+def test_publishing_agent_records_blocked_audit_event_for_binding_failure() -> None:
+    audit_event_repository.clear()
+    harness = local_publishing_agent_harness_for_test()
+    envelope = approved_publishing_envelope_for_test()
+    original_payload = dict(PUBLISHING_TEST_PAYLOAD)
+    changed_payload = dict(PUBLISHING_TEST_PAYLOAD, caption="changed after gate")
+
+    with pytest.raises(PublishingExecutionGateError, match="payload hash does not match"):
+        harness.agent.publish(
+            publishing_agent_request_for_test(
+                execution_envelope=envelope,
+                payload=changed_payload,
+                media_release_gate_result=bound_media_release_gate_result_for_test(
+                    payload=original_payload,
+                ),
+            ),
+            now=envelope.issued_at,
+        )
+
+    assert harness.client.calls == []
+    audit_events = list_audit_events_by_correlation_id(CORRELATION_ID)
+    assert len(audit_events) == 1
+    assert audit_events[0].payload["status"] == PUBLISHING_STATUS_BLOCKED
+    assert audit_events[0].payload["operation"] == "publish"
+    assert "payload hash does not match" in audit_events[0].payload["reason"]
+    assert audit_events[0].payload["client_response"] == {}
+
+
+def test_publishing_agent_records_blocked_audit_event_for_binding_signature_failure() -> None:
+    audit_event_repository.clear()
+    harness = local_publishing_agent_harness_for_test()
+    envelope = approved_publishing_envelope_for_test()
+    payload = dict(PUBLISHING_TEST_PAYLOAD)
+    binding = bound_media_release_gate_result_for_test(payload=payload).model_dump(mode="json")
+    binding["signature"] = "hmac-sha256:not-the-real-signature"
+
+    with pytest.raises(PublishingExecutionGateError, match="signature is invalid"):
+        harness.agent.publish(
+            publishing_agent_request_for_test(
+                execution_envelope=envelope,
+                payload=payload,
+                media_release_gate_result=binding,
+            ),
+            now=envelope.issued_at,
+        )
+
+    assert harness.client.calls == []
+    audit_events = list_audit_events_by_correlation_id(CORRELATION_ID)
+    assert len(audit_events) == 1
+    assert audit_events[0].payload["status"] == PUBLISHING_STATUS_BLOCKED
+    assert audit_events[0].payload["operation"] == "publish"
+    assert "signature is invalid" in audit_events[0].payload["reason"]
+    assert audit_events[0].payload["client_response"] == {}
+
+
 def test_publishing_agent_uses_shared_publish_operation_constant() -> None:
     source = read_backend_source("publishing.py")
 
@@ -116,10 +229,18 @@ def test_publishing_agent_uses_shared_publish_operation_constant() -> None:
     assert "operation=OPERATION_PUBLISH" in source
 
 
+def test_publishing_agent_forwards_precomputed_media_release_gate_result() -> None:
+    source = read_backend_source("publishing.py")
+
+    assert "media_release_gate_result=request.media_release_gate_result" in source
+    assert "evaluate_media_release_gate" not in source
+
+
 def test_publishing_agent_uses_shared_scope_defaults() -> None:
     request = publishing_agent_request_for_test(
         payload=dict(PUBLISHING_TEST_PAYLOAD),
         execution_envelope=None,
+        media_release_gate_result=bound_media_release_gate_result_for_test(),
     )
     source = read_backend_source("publishing.py")
 
@@ -159,6 +280,7 @@ def test_publishing_agent_tests_use_shared_publishing_agent_helpers() -> None:
 
     assert "publish_envelope" not in function_names
     assert "publishing_agent_request_for_test" in called_names
+    assert "bound_media_release_gate_result_for_test" in called_names
     assert "approved_publishing_envelope_for_test" in called_names
     assert "unapproved_publishing_envelope_for_test" in called_names
     assert "local_publishing_agent_harness_for_test" in called_names

@@ -27,6 +27,10 @@ from backend.llm_api_smoke import (
     load_llm_api_model_config,
     run_llm_api_smoke_test as run_default_llm_api_smoke_test,
 )
+from backend.media_release_gate import (
+    MediaReleaseGateResult,
+    evaluate_media_release_gate as evaluate_default_media_release_gate,
+)
 from backend.publishing import LocalPublishingClient, PublishingAgent
 from backend.publishing_adapter import PublishingAdapter, PublishingClient
 from backend.slack_adapter import (
@@ -40,6 +44,7 @@ from backend.slack_contracts import SLACK_ADAPTER_EXECUTION_PURPOSE
 DEFAULT_HTTP_TIMEOUT_SECONDS = 30.0
 DEFAULT_GITHUB_API_URL = "https://api.github.com"
 DEFAULT_SLACK_API_URL = "https://slack.com/api"
+MediaReleaseGateEvaluator = Callable[..., MediaReleaseGateResult]
 
 
 @dataclass(frozen=True)
@@ -232,6 +237,12 @@ class AdapterFactory:
     ) -> PublishingAgent:
         return PublishingAgent(client or self.create_publishing_client())
 
+    def create_media_release_gate(self) -> MediaReleaseGateEvaluator:
+        return evaluate_default_media_release_gate
+
+    def evaluate_media_release_gate(self, **gate_inputs: Any) -> MediaReleaseGateResult:
+        return self.create_media_release_gate()(**gate_inputs)
+
     def load_llm_api_model_config(
         self,
         env: Mapping[str, str] | None = None,
@@ -267,5 +278,6 @@ __all__ = [
     "AdapterFactory",
     "ComfyUIHTTPClient",
     "GitHubHTTPClient",
+    "MediaReleaseGateEvaluator",
     "SlackWebAPIClient",
 ]

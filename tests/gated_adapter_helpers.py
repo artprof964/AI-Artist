@@ -5,6 +5,15 @@ from uuid import UUID
 
 from backend.comfyui_adapter import ComfyUIAdapter, ComfyUIImageGenerationRequest
 from backend.github_adapter import GitHubAdapter, GitHubWriteRequest
+from backend.media_release_gate import (
+    MEDIA_RELEASE_CHECK_CRITIC,
+    MEDIA_RELEASE_CHECK_HUMAN_APPROVAL,
+    MEDIA_RELEASE_CHECK_PROVENANCE,
+    MEDIA_RELEASE_CHECK_REVIEW_STATUS,
+    MEDIA_RELEASE_CHECK_SECURITY_REVIEW,
+    MediaReleaseGateCheck,
+    MediaReleaseGateResult,
+)
 from backend.operations import (
     OPERATION_GITHUB_WRITE,
     OPERATION_IMAGE_GENERATE,
@@ -12,7 +21,15 @@ from backend.operations import (
 )
 from backend.publishing import LocalPublishingClient
 from backend.publishing import PublishingAgent, PublishingAgentRequest
-from backend.publishing_adapter import PublishingAdapter, PublishingRequest
+from backend.publishing_adapter import (
+    PublishingAdapter,
+    PublishingMediaReleaseGateBinding,
+    PublishingRequest,
+)
+from backend.publishing_contracts import (
+    publishing_release_binding_material,
+    publishing_release_binding_signature,
+)
 from backend.publishing_status import PUBLISHING_STATUS_PUBLISHED
 from execution_envelope_helpers import (
     approved_execution_envelope,
@@ -45,6 +62,7 @@ GITHUB_TEST_RESPONSE_ID = 123
 PUBLISHING_TEST_EXTERNAL_POST_ID = "mock-post-001"
 PUBLISHING_SECRET_TEST_EXTERNAL_POST_ID = "mock-post-secret-001"
 PUBLISHING_AGENT_CORRELATION_ID = UUID("22222222-2222-2222-2222-000000000001")
+_DEFAULT_MEDIA_RELEASE_GATE_RESULT = object()
 
 
 class MockComfyUIClient:
@@ -284,6 +302,86 @@ def unapproved_publishing_envelope_for_test(
     )
 
 
+def approved_media_release_gate_result_for_test() -> MediaReleaseGateResult:
+    return MediaReleaseGateResult(
+        allowed=True,
+        blocked=False,
+        blocked_checks=[],
+        blockers=[],
+        checks=[
+            _media_release_gate_check(MEDIA_RELEASE_CHECK_PROVENANCE),
+            _media_release_gate_check(MEDIA_RELEASE_CHECK_REVIEW_STATUS),
+            _media_release_gate_check(MEDIA_RELEASE_CHECK_CRITIC),
+            _media_release_gate_check(MEDIA_RELEASE_CHECK_SECURITY_REVIEW),
+            _media_release_gate_check(MEDIA_RELEASE_CHECK_HUMAN_APPROVAL),
+        ],
+    )
+
+
+def bound_media_release_gate_result_for_test(
+    *,
+    gate_result: MediaReleaseGateResult | None = None,
+    target: str = PUBLISHING_ADAPTER_TARGET,
+    payload: dict[str, Any] | None = None,
+) -> PublishingMediaReleaseGateBinding:
+    material_payload = payload or dict(PUBLISHING_TEST_PAYLOAD)
+    resolved_gate_result = gate_result or approved_media_release_gate_result_for_test()
+    material = publishing_release_binding_material(
+        target=target,
+        payload=material_payload,
+    )
+    return PublishingMediaReleaseGateBinding(
+        gate_result=resolved_gate_result,
+        **material,
+        signature=publishing_release_binding_signature(
+            gate_result=resolved_gate_result,
+            target=material["target"],
+            payload_hash=material["payload_hash"],
+            artifact_id=material["artifact_id"],
+        ),
+    )
+
+
+def blocked_media_release_gate_result_for_test(
+    *,
+    check_name: str = MEDIA_RELEASE_CHECK_SECURITY_REVIEW,
+    blocker: str = "security review findings must be empty",
+) -> MediaReleaseGateResult:
+    checks = [
+        _media_release_gate_check(MEDIA_RELEASE_CHECK_PROVENANCE),
+        _media_release_gate_check(MEDIA_RELEASE_CHECK_REVIEW_STATUS),
+        _media_release_gate_check(MEDIA_RELEASE_CHECK_CRITIC),
+        _media_release_gate_check(MEDIA_RELEASE_CHECK_SECURITY_REVIEW),
+        _media_release_gate_check(MEDIA_RELEASE_CHECK_HUMAN_APPROVAL),
+    ]
+    checks = [
+        _media_release_gate_check(check.name, passed=False, blockers=[blocker])
+        if check.name == check_name
+        else check
+        for check in checks
+    ]
+    return MediaReleaseGateResult(
+        allowed=False,
+        blocked=True,
+        blocked_checks=[check_name],
+        blockers=[blocker],
+        checks=checks,
+    )
+
+
+def _media_release_gate_check(
+    name: str,
+    *,
+    passed: bool = True,
+    blockers: list[str] | None = None,
+) -> MediaReleaseGateCheck:
+    return MediaReleaseGateCheck(
+        name=name,
+        passed=passed,
+        blockers=blockers or [],
+    )
+
+
 def comfyui_image_request_for_test(
     *,
     execution_envelope: object,
@@ -317,26 +415,48 @@ def github_write_request_for_test(
 def publishing_request_for_test(
     *,
     execution_envelope: object,
+    media_release_gate_result: object = _DEFAULT_MEDIA_RELEASE_GATE_RESULT,
     target: str = PUBLISHING_ADAPTER_TARGET,
     payload: dict[str, Any] | None = None,
 ) -> PublishingRequest:
+    request_payload = payload or dict(PUBLISHING_TEST_PAYLOAD)
+    gate_result = (
+        bound_media_release_gate_result_for_test(
+            target=target,
+            payload=request_payload,
+        )
+        if media_release_gate_result is _DEFAULT_MEDIA_RELEASE_GATE_RESULT
+        else media_release_gate_result
+    )
     return PublishingRequest(
         target=target,
-        payload=payload or dict(PUBLISHING_TEST_PAYLOAD),
+        payload=request_payload,
         execution_envelope=execution_envelope,
+        media_release_gate_result=gate_result,
     )
 
 
 def publishing_agent_request_for_test(
     *,
     execution_envelope: object,
+    media_release_gate_result: object = _DEFAULT_MEDIA_RELEASE_GATE_RESULT,
     correlation_id: UUID = PUBLISHING_AGENT_CORRELATION_ID,
     target: str = PUBLISHING_ADAPTER_TARGET,
     payload: dict[str, Any] | None = None,
 ) -> PublishingAgentRequest:
+    request_payload = payload or dict(PUBLISHING_TEST_PAYLOAD)
+    gate_result = (
+        bound_media_release_gate_result_for_test(
+            target=target,
+            payload=request_payload,
+        )
+        if media_release_gate_result is _DEFAULT_MEDIA_RELEASE_GATE_RESULT
+        else media_release_gate_result
+    )
     return PublishingAgentRequest(
         target=target,
-        payload=payload or dict(PUBLISHING_TEST_PAYLOAD),
+        payload=request_payload,
         execution_envelope=execution_envelope,
+        media_release_gate_result=gate_result,
         correlation_id=correlation_id,
     )

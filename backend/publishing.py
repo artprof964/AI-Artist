@@ -11,6 +11,7 @@ from backend.publishing_adapter import (
     PublishingAdapter,
     PublishingClient,
     PublishingExecutionGateError,
+    PublishingMediaReleaseGateBinding,
     PublishingRequest,
 )
 from backend.publishing_contracts import (
@@ -37,6 +38,7 @@ class PublishingAgentRequest:
     target: str
     payload: dict[str, Any]
     execution_envelope: ExecutionEnvelopeResponse | dict[str, Any] | None
+    media_release_gate_result: PublishingMediaReleaseGateBinding | dict[str, Any] | None
     correlation_id: UUID
     actor_scope: str = DEFAULT_PUBLISHING_ACTOR_SCOPE
     policy_scope: str = DEFAULT_PUBLISHING_POLICY_SCOPE
@@ -82,6 +84,7 @@ class PublishingAgent:
                     target=request.target,
                     payload=request.payload,
                     execution_envelope=request.execution_envelope,
+                    media_release_gate_result=request.media_release_gate_result,
                 ),
                 now=now,
             )
