@@ -1,0 +1,13 @@
+.codex_tmp/
+.git/
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.coverage
+validation_reports/
+local-ai-agent-system-latest-source/
+AI_Artist_Agent_Projekttracker.xlsx

@@ -3,6 +3,7 @@ name: ai-artist
 services:
   postgres:
     image: postgres:16-alpine
+    restart: unless-stopped
     environment:
       POSTGRES_DB: ai_artist
       POSTGRES_USER: ai_artist
@@ -20,6 +21,7 @@ services:
 
   redis:
     image: redis:7-alpine
+    restart: unless-stopped
     ports:
       - "6379:6379"
     healthcheck:
@@ -30,6 +32,7 @@ services:
 
   qdrant:
     image: qdrant/qdrant:v1.12.5
+    restart: unless-stopped
     ports:
       - "${QDRANT_HTTP_PORT:-6333}:6333"
       - "${QDRANT_GRPC_PORT:-6334}:6334"
@@ -43,6 +46,7 @@ services:
 
   minio:
     image: minio/minio:RELEASE.2025-01-20T14-49-07Z
+    restart: unless-stopped
     command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: ai_artist
@@ -60,6 +64,7 @@ services:
 
   opa:
     image: openpolicyagent/opa:0.70.0
+    restart: unless-stopped
     command:
       - run
       - --server
@@ -75,6 +80,82 @@ services:
       interval: 10s
       timeout: 5s
       retries: 5
+
+  ai-artist-backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: python -m backend.cli serve --host 0.0.0.0 --port 8000
+    environment:
+      DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
+      QDRANT_URL: http://qdrant:6333
+      MINIO_ENDPOINT: http://minio:9000
+      REDIS_URL: redis://redis:6379/0
+      OPA_URL: http://opa:8181
+      SAFETY_SERVICE_URL: http://ai-artist-backend:8000
+      LLM_API_URL: ${LLM_API_URL:-https://api.deepseek.com}
+      LLM_PRIMARY_MODEL: ${LLM_PRIMARY_MODEL:-deepseek-v4-pro}
+      deepseek-open-art: ${DEEPSEEK_OPEN_ART:-}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      AUDIT_REPOSITORY: ${AUDIT_REPOSITORY:-memory}
+      GIT_REPOS_ROOT: /git_repos
+    ports:
+      - "8000:8000"
+    volumes:
+      - type: bind
+        source: C:\Users\fredo\git_repos
+        target: /git_repos
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      qdrant:
+        condition: service_healthy
+      minio:
+        condition: service_healthy
+      opa:
+        condition: service_healthy
+
+  thestone_01-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: python /agent_runtime/scripts/thestone_01_service.py
+    working_dir: /agent_runtime
+    environment:
+      PYTHONPATH: /agent_runtime/src:/harness/src
+      THESTONE_01_AGENT_ROOT: /agent_data/thestone_01
+      THESTONE_01_MODEL: deepseek-v4-pro
+      THESTONE_01_AGENT_DATA_STORAGE: postgres
+      THESTONE_01_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
+      tele_thestone_01: ${tele_thestone_01:?tele_thestone_01 is required for thestone_01-bot}
+      deepseek-open-art: ${DEEPSEEK_OPEN_ART:?DEEPSEEK_OPEN_ART is required for thestone_01-bot}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      GIT_REPOS_ROOT: /git_repos
+    volumes:
+      - type: bind
+        source: C:\Users\fredo\git_repos
+        target: /git_repos
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\agent_runtime_maraca
+        target: /agent_runtime
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\Harness_age_mem_v02
+        target: /harness
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\Agent_data\thestone_01
+        target: /agent_data/thestone_01
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
 
 volumes:
   postgres_data:
