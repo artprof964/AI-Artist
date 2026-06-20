@@ -128,7 +128,8 @@ services:
     working_dir: /agent_runtime
     environment:
       PYTHONPATH: /agent_runtime/src:/harness/src
-      THESTONE_01_AGENT_ROOT: /agent_data/thestone_01
+      THESTONE_01_AGENT_ROOT: /agent_runtime/agents/thestone_01
+      THESTONE_01_SERVICE_ROOT: /tmp/thestone_01_service
       THESTONE_01_MODEL: deepseek-v4-pro
       THESTONE_01_AGENT_DATA_STORAGE: postgres
       THESTONE_01_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
@@ -148,10 +149,6 @@ services:
       - type: bind
         source: C:\Users\fredo\git_repos\Harness_age_mem_v02
         target: /harness
-        read_only: true
-      - type: bind
-        source: C:\Users\fredo\git_repos\Agent_data\thestone_01
-        target: /agent_data/thestone_01
         read_only: true
     depends_on:
       postgres:

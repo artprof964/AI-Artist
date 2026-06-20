@@ -44,7 +44,8 @@ def test_compose_defines_thestone_bot_with_mounts_and_required_secrets() -> None
     assert "thestone_01-bot:" in compose
     assert "command: python /agent_runtime/scripts/thestone_01_service.py" in compose
     assert "PYTHONPATH: /agent_runtime/src:/harness/src" in compose
-    assert "THESTONE_01_AGENT_ROOT: /agent_data/thestone_01" in compose
+    assert "THESTONE_01_AGENT_ROOT: /agent_runtime/agents/thestone_01" in compose
+    assert "THESTONE_01_SERVICE_ROOT: /tmp/thestone_01_service" in compose
     assert "THESTONE_01_MODEL: deepseek-v4-pro" in compose
     assert "THESTONE_01_AGENT_DATA_STORAGE: postgres" in compose
     assert "THESTONE_01_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist" in compose
@@ -53,8 +54,9 @@ def test_compose_defines_thestone_bot_with_mounts_and_required_secrets() -> None
     assert "DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}" in compose
     assert r"source: C:\Users\fredo\git_repos\agent_runtime_maraca" in compose
     assert r"source: C:\Users\fredo\git_repos\Harness_age_mem_v02" in compose
-    assert r"source: C:\Users\fredo\git_repos\Agent_data\thestone_01" in compose
-    assert thestone_block.count("read_only: true") >= 4
+    assert r"source: C:\Users\fredo\git_repos\Agent_data\thestone_01" not in compose
+    assert "/agent_data/thestone_01" not in compose
+    assert thestone_block.count("read_only: true") >= 3
     assert "SAFETY_SERVICE_URL: http://ai-artist-backend:8000" not in thestone_block
     assert "condition: service_healthy" in thestone_block
 
