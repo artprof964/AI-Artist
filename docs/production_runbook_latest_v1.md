@@ -53,6 +53,17 @@ Or start it through the project CLI:
 .\.venv\Scripts\python.exe -m backend.cli serve --host 127.0.0.1 --port 8000
 ```
 
+Start or re-check the thestone bot containers after loading required env values into the current PowerShell process:
+
+```powershell
+$env:tele_thestone_01 = [Environment]::GetEnvironmentVariable('tele_thestone_01','User')
+$env:tele_thestone_04 = [Environment]::GetEnvironmentVariable('tele_thestone_04','User')
+$env:tele_thestone_07 = [Environment]::GetEnvironmentVariable('tele_thestone_07','User')
+$env:DEEPSEEK_OPEN_ART = [Environment]::GetEnvironmentVariable('deepseek-open-art','User')
+docker compose up -d thestone_01-bot thestone_04-bot thestone_07-bot
+docker compose logs --tail=80 thestone_01-bot thestone_04-bot thestone_07-bot
+```
+
 Stop the local stack:
 
 ```powershell
@@ -102,6 +113,17 @@ COMFYUI_URL
 SAFETY_SERVICE_URL
 AUDIT_REPOSITORY
 ```
+
+Required thestone bot keys for live Compose startup:
+
+```text
+tele_thestone_01
+tele_thestone_04
+tele_thestone_07
+DEEPSEEK_OPEN_ART
+```
+
+Compose maps those host values to per-container runtime settings such as `THESTONE_01_DATABASE_URL`, `THESTONE_04_DATABASE_URL`, `THESTONE_07_DATABASE_URL`, and `THESTONE_<id>_AGENT_DATA_STORAGE=postgres`.
 
 `AUDIT_REPOSITORY` defaults to `memory` for isolated local development and
 tests. Set it to `postgres` before Safety Service startup when audit events
@@ -154,6 +176,16 @@ Expected Safety Service signal:
 ```json
 {"status":"ok","service":"ai-artist-safety-service"}
 ```
+
+Thestone bot identity checks:
+
+```powershell
+docker compose logs --tail=80 thestone_01-bot
+docker compose logs --tail=80 thestone_04-bot
+docker compose logs --tail=80 thestone_07-bot
+```
+
+Expected identity lines are `@thestone_01_bot`, `@thestone_04_bot`, and `@thestone_07_bot`. Do not run host thestone launchers while these containers are active; Telegram allows only one long-poller per token.
 
 ## Backup Commands
 

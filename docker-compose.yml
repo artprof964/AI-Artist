@@ -154,6 +154,77 @@ services:
       postgres:
         condition: service_healthy
 
+  thestone_04-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: python /agent_runtime/scripts/thestone_04_service.py
+    working_dir: /agent_runtime
+    environment:
+      PYTHONPATH: /agent_runtime/src:/harness/src
+      THESTONE_04_AGENT_ROOT: /agent_runtime/agents/thestone_04
+      THESTONE_04_SERVICE_ROOT: /tmp/thestone_04_service
+      THESTONE_04_MODEL: deepseek-v4-pro
+      THESTONE_04_AGENT_DATA_STORAGE: postgres
+      THESTONE_04_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
+      tele_thestone_04: ${tele_thestone_04:?tele_thestone_04 is required for thestone_04-bot}
+      deepseek-open-art: ${DEEPSEEK_OPEN_ART:?DEEPSEEK_OPEN_ART is required for thestone_04-bot}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      GIT_REPOS_ROOT: /git_repos
+    volumes:
+      - type: bind
+        source: C:\Users\fredo\git_repos
+        target: /git_repos
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\agent_runtime_maraca
+        target: /agent_runtime
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\Harness_age_mem_v02
+        target: /harness
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+  thestone_07-bot:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    command: python /agent_runtime/scripts/thestone_07_service.py
+    working_dir: /agent_runtime
+    environment:
+      PYTHONPATH: /agent_runtime/src:/harness/src
+      THESTONE_07_AGENT_ROOT: /agent_runtime/agents/thestone_07
+      THESTONE_07_SERVICE_ROOT: /tmp/thestone_07_service
+      THESTONE_07_MODEL: deepseek-v4-pro
+      THESTONE_07_ALLOWED_CHAT_ID: ${THESTONE_07_ALLOWED_CHAT_ID:-6715426666}
+      THESTONE_07_AGENT_DATA_STORAGE: postgres
+      THESTONE_07_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
+      tele_thestone_07: ${tele_thestone_07:?tele_thestone_07 is required for thestone_07-bot}
+      deepseek-open-art: ${DEEPSEEK_OPEN_ART:?DEEPSEEK_OPEN_ART is required for thestone_07-bot}
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      GIT_REPOS_ROOT: /git_repos
+    volumes:
+      - type: bind
+        source: C:\Users\fredo\git_repos
+        target: /git_repos
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\agent_runtime_maraca
+        target: /agent_runtime
+        read_only: true
+      - type: bind
+        source: C:\Users\fredo\git_repos\Harness_age_mem_v02
+        target: /harness
+        read_only: true
+    depends_on:
+      postgres:
+        condition: service_healthy
+
 volumes:
   postgres_data:
   qdrant_data:

@@ -33,6 +33,11 @@ OPA
   port: 8181
   policy path: policies/opa/ai_artist.rego
   purpose: default-deny policy authority for reuse and privileged execution
+
+thestone_01-bot, thestone_04-bot, thestone_07-bot
+  purpose: Telegram long-polling bot containers backed by agent_runtime_maraca scripts and AI-Art PostgreSQL
+  required host env: tele_thestone_01, tele_thestone_04, tele_thestone_07, DEEPSEEK_OPEN_ART
+  runtime data tables: agent_data_record and agent_event_log, partitioned by agent_id
 ```
 
 ## Local Commands
@@ -45,6 +50,16 @@ docker compose config
 docker compose up -d postgres redis qdrant minio opa
 docker compose ps
 docker compose down
+```
+
+Start thestone bots after loading required env names:
+
+```powershell
+$env:tele_thestone_01 = [Environment]::GetEnvironmentVariable('tele_thestone_01','User')
+$env:tele_thestone_04 = [Environment]::GetEnvironmentVariable('tele_thestone_04','User')
+$env:tele_thestone_07 = [Environment]::GetEnvironmentVariable('tele_thestone_07','User')
+$env:DEEPSEEK_OPEN_ART = [Environment]::GetEnvironmentVariable('deepseek-open-art','User')
+docker compose up -d thestone_01-bot thestone_04-bot thestone_07-bot
 ```
 
 When another local stack already owns the default Qdrant host ports, keep the

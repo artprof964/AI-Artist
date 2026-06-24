@@ -46,6 +46,11 @@ OPA 0.70.0: default-deny policy for reuse and privileged execution.
 
 FastAPI Safety Service: request canonicalization, classification, local policy
 evaluation, execution-envelope signing, audit event recording.
+
+Thestone Telegram runtimes: thestone_01-bot, thestone_04-bot, and
+thestone_07-bot run scripts mounted from agent_runtime_maraca, use dedicated
+tele_thestone_* tokens, and persist source/state/event data in PostgreSQL
+tables agent_data_record and agent_event_log.
 ```
 
 ## Backend Modules
@@ -501,6 +506,9 @@ T16-T19: retrieval, ComfyUI gate, image provenance, critic/curator
 T20-T23: Slack, source ingestion, publishing approval, GitHub adapter
 T24-T26: unit CI coverage, OpenClaw-to-safety integration, observability
 T27-T28: security review and production readiness
+CR-DOC-001 / CR-DOC-XREPO-001: docs/status/manual normalization for Harness,
+agent_runtime_maraca, AI-Art, and MARACA; live thestone topology, env vars,
+duplicate-poller rule, validation matrix, and MARACA env requirements recorded.
 ```
 
 ## Operating Commands
@@ -512,6 +520,7 @@ docker compose ps
 .\.venv\Scripts\python.exe -m pytest -p no:cacheprovider
 .\.venv\Scripts\python.exe -m ruff check .
 powershell -ExecutionPolicy Bypass -File .\scripts\run_t24_unit_ci.ps1
+docker compose logs --tail=80 thestone_01-bot thestone_04-bot thestone_07-bot
 ```
 
 ## Runbooks And Evidence

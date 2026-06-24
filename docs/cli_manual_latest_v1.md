@@ -168,3 +168,18 @@ Live canonicalize: passed
 Focused CLI tests: 5 passed
 Ruff for CLI files: all checks passed
 ```
+
+## Thestone Compose Helpers
+
+The thestone bots are operated through Docker Compose, not the backend CLI. Load token env values into the current PowerShell process, then use Compose:
+
+```powershell
+$env:tele_thestone_01 = [Environment]::GetEnvironmentVariable('tele_thestone_01','User')
+$env:tele_thestone_04 = [Environment]::GetEnvironmentVariable('tele_thestone_04','User')
+$env:tele_thestone_07 = [Environment]::GetEnvironmentVariable('tele_thestone_07','User')
+$env:DEEPSEEK_OPEN_ART = [Environment]::GetEnvironmentVariable('deepseek-open-art','User')
+docker compose up -d thestone_01-bot thestone_04-bot thestone_07-bot
+docker compose logs --tail=80 thestone_01-bot thestone_04-bot thestone_07-bot
+```
+
+Keep one active long-poller per `tele_thestone_*` token.
