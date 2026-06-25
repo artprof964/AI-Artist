@@ -28,6 +28,20 @@ AI-Artist provides the local production-style stack for safety, policy, persiste
 
 All three set `THESTONE_<id>_AGENT_DATA_STORAGE=postgres` and store rows in `agent_data_record` / `agent_event_log` under separate `agent_id` values.
 
+## Telegram Group Setup
+
+Telegram group access has two gates:
+
+- Telegram delivery: in `@BotFather`, allow group joins with `/setjoingroups`. For ordinary group text, disable group privacy with `/setprivacy` or make the bot an admin in the group.
+- Runtime allowlist: Compose defaults `THESTONE_04_ALLOWED_CHAT_TITLES=04` and `THESTONE_07_ALLOWED_CHAT_TITLES=07`; add `THESTONE_07_ALLOWED_CHAT_IDS=-100...` after the group ID appears in logs.
+
+Restart the target bot after changing env:
+
+```powershell
+docker compose up -d thestone_07-bot
+docker compose logs --tail=80 thestone_07-bot
+```
+
 ## Environment
 
 Use `.env.example` for AI-Art service settings. For thestone startup, the required host process env values are:

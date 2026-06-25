@@ -166,6 +166,9 @@ services:
       THESTONE_04_AGENT_ROOT: /agent_runtime/agents/thestone_04
       THESTONE_04_SERVICE_ROOT: /tmp/thestone_04_service
       THESTONE_04_MODEL: deepseek-v4-pro
+      THESTONE_04_ALLOWED_CHAT_ID: ${THESTONE_04_ALLOWED_CHAT_ID:-6715426666}
+      THESTONE_04_ALLOWED_CHAT_IDS: ${THESTONE_04_ALLOWED_CHAT_IDS:-}
+      THESTONE_04_ALLOWED_CHAT_TITLES: ${THESTONE_04_ALLOWED_CHAT_TITLES:-04}
       THESTONE_04_AGENT_DATA_STORAGE: postgres
       THESTONE_04_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
       tele_thestone_04: ${tele_thestone_04:?tele_thestone_04 is required for thestone_04-bot}
@@ -202,6 +205,8 @@ services:
       THESTONE_07_SERVICE_ROOT: /tmp/thestone_07_service
       THESTONE_07_MODEL: deepseek-v4-pro
       THESTONE_07_ALLOWED_CHAT_ID: ${THESTONE_07_ALLOWED_CHAT_ID:-6715426666}
+      THESTONE_07_ALLOWED_CHAT_IDS: ${THESTONE_07_ALLOWED_CHAT_IDS:-}
+      THESTONE_07_ALLOWED_CHAT_TITLES: ${THESTONE_07_ALLOWED_CHAT_TITLES:-07}
       THESTONE_07_AGENT_DATA_STORAGE: postgres
       THESTONE_07_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist
       tele_thestone_07: ${tele_thestone_07:?tele_thestone_07 is required for thestone_07-bot}

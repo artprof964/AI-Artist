@@ -29,6 +29,17 @@ $env:DEEPSEEK_OPEN_ART = [Environment]::GetEnvironmentVariable('deepseek-open-ar
 
 `DEEPSEEK_API_KEY` remains a fallback alias. New setup should use `deepseek-open-art` / `DEEPSEEK_OPEN_ART`.
 
+## Telegram Groups
+
+`thestone_07-bot` is configured for the Telegram group title `07` by default through `THESTONE_07_ALLOWED_CHAT_TITLES`. `thestone_04-bot` mirrors this with group title `04`. For stronger locking after the first delivered group message, set the numeric Telegram group ID:
+
+```powershell
+$env:THESTONE_07_ALLOWED_CHAT_IDS = "-1001234567890"
+docker compose up -d thestone_07-bot
+```
+
+Before the runtime can read group messages, configure `@BotFather`: enable group joins with `/setjoingroups`, and either disable group privacy with `/setprivacy` or make the bot an admin in group `07`.
+
 ## Start
 
 ```powershell

@@ -125,6 +125,8 @@ DEEPSEEK_OPEN_ART
 
 Compose maps those host values to per-container runtime settings such as `THESTONE_01_DATABASE_URL`, `THESTONE_04_DATABASE_URL`, `THESTONE_07_DATABASE_URL`, and `THESTONE_<id>_AGENT_DATA_STORAGE=postgres`.
 
+Telegram group operation also needs BotFather configuration. Use `/setjoingroups` so the bot can be added to the target group. To read ordinary group text, use `/setprivacy` to disable privacy mode for that bot or make the bot an admin in the group. The runtime then applies its allowlist: `THESTONE_07_ALLOWED_CHAT_TITLES=07` is the default bootstrap for group `07`, and `THESTONE_07_ALLOWED_CHAT_IDS=-100...` is the preferred stable setting once the numeric group ID is known.
+
 `AUDIT_REPOSITORY` defaults to `memory` for isolated local development and
 tests. Set it to `postgres` before Safety Service startup when audit events
 must be persisted in the production-backed `audit_event` table:
@@ -186,6 +188,8 @@ docker compose logs --tail=80 thestone_07-bot
 ```
 
 Expected identity lines are `@thestone_01_bot`, `@thestone_04_bot`, and `@thestone_07_bot`. Do not run host thestone launchers while these containers are active; Telegram allows only one long-poller per token.
+
+For group `07`, send a message after BotFather setup and inspect `thestone_07-bot` logs/session records. If Telegram delivers the message under title `07`, the bot will answer; then copy the negative chat ID into `THESTONE_07_ALLOWED_CHAT_IDS` and restart `thestone_07-bot` for a stable allowlist.
 
 ## Backup Commands
 

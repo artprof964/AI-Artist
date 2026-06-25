@@ -152,6 +152,9 @@ def test_compose_defines_thestone_04_bot_with_mounts_and_required_secrets() -> N
     assert "THESTONE_04_AGENT_ROOT: /agent_runtime/agents/thestone_04" in compose
     assert "THESTONE_04_SERVICE_ROOT: /tmp/thestone_04_service" in compose
     assert "THESTONE_04_MODEL: deepseek-v4-pro" in compose
+    assert "THESTONE_04_ALLOWED_CHAT_ID: ${THESTONE_04_ALLOWED_CHAT_ID:-6715426666}" in compose
+    assert "THESTONE_04_ALLOWED_CHAT_IDS: ${THESTONE_04_ALLOWED_CHAT_IDS:-}" in compose
+    assert "THESTONE_04_ALLOWED_CHAT_TITLES: ${THESTONE_04_ALLOWED_CHAT_TITLES:-04}" in compose
     assert "THESTONE_04_AGENT_DATA_STORAGE: postgres" in compose
     assert "THESTONE_04_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist" in compose
     assert "tele_thestone_04: ${tele_thestone_04:?" in compose
@@ -177,6 +180,8 @@ def test_compose_defines_thestone_07_bot_with_mounts_and_required_secrets() -> N
     assert "THESTONE_07_SERVICE_ROOT: /tmp/thestone_07_service" in thestone_block
     assert "THESTONE_07_MODEL: deepseek-v4-pro" in thestone_block
     assert "THESTONE_07_ALLOWED_CHAT_ID: ${THESTONE_07_ALLOWED_CHAT_ID:-6715426666}" in thestone_block
+    assert "THESTONE_07_ALLOWED_CHAT_IDS: ${THESTONE_07_ALLOWED_CHAT_IDS:-}" in thestone_block
+    assert "THESTONE_07_ALLOWED_CHAT_TITLES: ${THESTONE_07_ALLOWED_CHAT_TITLES:-07}" in thestone_block
     assert "THESTONE_07_AGENT_DATA_STORAGE: postgres" in thestone_block
     assert "THESTONE_07_DATABASE_URL: postgresql://ai_artist:ai_artist@postgres:5432/ai_artist" in thestone_block
     assert "tele_thestone_07: ${tele_thestone_07:?" in thestone_block
